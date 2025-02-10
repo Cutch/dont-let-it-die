@@ -1,0 +1,23 @@
+{
+    "rootDir": ".", 
+    "compilerOptions": {
+      "target": "es5",
+      "module": "none",
+      "lib": ["dom", "esnext"],  
+      "sourceMap": false,
+      "allowJs": true,
+      "typeRoots": ["src/types", "./types", "./node_modules/@types"],
+      "outFile": "dontletitdie.js"
+    },
+    "files": [
+      "src/assets/boards-spritesheet.js",
+      "src/assets/characters-spritesheet.js",
+      "src/assets/decks-spritesheet.js",
+      "src/assets/expansion-spritesheet.js",
+      "src/assets/items-spritesheet.js",
+      "src/assets/upgrades-spritesheet.js",
+      "src/assets/index.js",
+      "src/utils/images.js",
+      "src/dontletitdie.js"
+    ]
+}

@@ -1,7 +1,7 @@
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * DontLetItDie implementation : © <Your name here> <Your email address here>
+ * DontLetItDie implementation : © Cutch <Your email address here>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -12,6 +12,58 @@
  * DontLetItDie stylesheet
  *
  */
+ #game_play_area{
+    margin: 1em;
+ }
+ #game_play_area.hide{
+    display: none;
+ }
+ .character-selector{
+    display: flex !important;
+    flex-flow: wrap;
+    justify-content: center;
+    gap: 1em;
+    margin-bottom: 1em;
+ }
+#players-container{
+    display: flex;
+    flex-flow: wrap;
+    justify-content: center;
+    gap: 1em;
+    margin-bottom: 1em;
+}
+.player-card{
+    position: relative;
+}
+.card {
+    background-repeat: repeat;
+    border-radius: 10px;
+    margin: 0 auto;
+}
+.card-rotator{
+    margin: 0 auto 1em;
+}
+#players-container .card-rotator {
+    margin: 0;
+}
+.card.boards-card {
+    background-image: url(img/boards-spritesheet.png);
+}
+.card.characters-card {
+    background-image: url(img/characters-spritesheet.png);
+}
+.card.decks-card {
+    background-image: url(img/decks-spritesheet.png);
+}
+.card.expansion-card {
+    background-image: url(img/expansion-spritesheet.png);
+}
+.card.items-card {
+    background-image: url(img/items-spritesheet.png);
+}
+.card.upgrades-card {
+    background-image: url(img/upgrades-spritesheet.png);
+}
 
 /*
     This is the CSS stylesheet of your game User Interface.

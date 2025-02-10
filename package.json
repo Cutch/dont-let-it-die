@@ -3,14 +3,21 @@
   "version": "1.0.0",
   "main": "dontletitdie.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:ts": "tsc",
+    "build:scss": "sass --no-source-map src/yourgamename.scss yourgamename.css",
+    "watch:ts": "tsc --watch --onSuccess \"node ./upload.js\"",
+    "watch:scss": "sass --watch src/yourgamename.scss yourgamename.css",
+    "watch": "npm run watch:ts && npm run watch:scss",
+    "build": "npm run build:ts && npm run build:scss"
   },
   "author": "Cutch",
-  "license": "ISC",
+  "license": "MIT",
   "description": "",
   "devDependencies": {
     "@prettier/plugin-php": "^0.19.1",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "sass": "^1.84.0",
+    "typescript": "^5.7.3"
   },
   "prettier": {
     "braceStyle": "1tbs"
