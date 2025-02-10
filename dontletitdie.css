@@ -25,27 +25,73 @@
     gap: 1em;
     margin-bottom: 1em;
  }
+ /* Player Card Start */
 #players-container{
     display: flex;
     flex-flow: wrap;
     justify-content: center;
     gap: 1em;
-    margin-bottom: 1em;
 }
 .player-card{
     position: relative;
 }
+.player-card .character{
+    position: absolute;
+    top: 10px;
+    left: 9px;
+}
+.player-card .weapon{
+    position: absolute;
+    top: 60px;
+    left: 122px;
+}
+.player-card .tool{
+    position: absolute;
+    top: 60px;
+    left: 241px;
+}
+/* Player Card Stop */
+
+/* Board Container Start */
+#board-container {
+    position: relative;
+}
+#board-container .gather {
+    position: absolute;
+    top: 34px;
+    left: 187px;
+}
+#board-container .forage {
+    position: absolute;
+    top: 34px;
+    left: 324px;
+}
+#board-container .harvest {
+    position: absolute;
+    top: 34px;
+    left: 457px;
+}
+#board-container .hunt {
+    position: absolute;
+    top: 34px;
+    left: 594px;
+}
+/* Board Container Stop */
+.container {
+    margin: 0 auto;
+}
 .card {
     background-repeat: repeat;
     border-radius: 10px;
-    margin: 0 auto;
+    box-shadow: 3px 3px 9px rgb(0 0 0);
+    /* margin: 0 auto; */
 }
-.card-rotator{
-    margin: 0 auto 1em;
+.card-rotator {
+    /* margin: 0 auto 1em; */
 }
-#players-container .card-rotator {
+/* #players-container .card-rotator {
     margin: 0;
-}
+} */
 .card.boards-card {
     background-image: url(img/boards-spritesheet.png);
 }

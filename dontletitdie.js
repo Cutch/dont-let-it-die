@@ -105,6 +105,9 @@ var boardsSprites = {
 var charactersSprites = {
     sprites: {
         Gronk: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1,
                 y: 1,
@@ -113,6 +116,9 @@ var charactersSprites = {
             },
         },
         Grub: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 395,
                 y: 1,
@@ -121,6 +127,9 @@ var charactersSprites = {
             },
         },
         Kara: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 789,
                 y: 1,
@@ -129,6 +138,9 @@ var charactersSprites = {
             },
         },
         Cron: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1183,
                 y: 1,
@@ -137,6 +149,9 @@ var charactersSprites = {
             },
         },
         Dub: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1577,
                 y: 1,
@@ -145,6 +160,9 @@ var charactersSprites = {
             },
         },
         Faye: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1971,
                 y: 1,
@@ -153,6 +171,9 @@ var charactersSprites = {
             },
         },
         Ajax: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1,
                 y: 631,
@@ -161,6 +182,9 @@ var charactersSprites = {
             },
         },
         Atouk: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 395,
                 y: 631,
@@ -169,6 +193,9 @@ var charactersSprites = {
             },
         },
         Ayla: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 789,
                 y: 631,
@@ -177,6 +204,9 @@ var charactersSprites = {
             },
         },
         River: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1183,
                 y: 631,
@@ -185,6 +215,9 @@ var charactersSprites = {
             },
         },
         Sig: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1577,
                 y: 631,
@@ -193,6 +226,9 @@ var charactersSprites = {
             },
         },
         Tara: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1971,
                 y: 631,
@@ -201,6 +237,9 @@ var charactersSprites = {
             },
         },
         Nirv: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1,
                 y: 1261,
@@ -209,6 +248,9 @@ var charactersSprites = {
             },
         },
         Oof: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 395,
                 y: 1261,
@@ -217,6 +259,9 @@ var charactersSprites = {
             },
         },
         Rex: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 789,
                 y: 1261,
@@ -225,6 +270,9 @@ var charactersSprites = {
             },
         },
         Mabe: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1183,
                 y: 1261,
@@ -233,6 +281,9 @@ var charactersSprites = {
             },
         },
         Nanuk: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1577,
                 y: 1261,
@@ -241,6 +292,9 @@ var charactersSprites = {
             },
         },
         Nibna: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1971,
                 y: 1261,
@@ -249,6 +303,9 @@ var charactersSprites = {
             },
         },
         Zeebo: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1,
                 y: 1891,
@@ -257,6 +314,9 @@ var charactersSprites = {
             },
         },
         Thunk: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 395,
                 y: 1891,
@@ -265,6 +325,9 @@ var charactersSprites = {
             },
         },
         Tiku: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 789,
                 y: 1891,
@@ -273,6 +336,9 @@ var charactersSprites = {
             },
         },
         Vog: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1183,
                 y: 1891,
@@ -281,6 +347,9 @@ var charactersSprites = {
             },
         },
         DiceThing: {
+            options: {
+                type: "character",
+            },
             frame: {
                 x: 1577,
                 y: 1891,
@@ -289,6 +358,9 @@ var charactersSprites = {
             },
         },
         "back-character": {
+            options: {
+                type: "back",
+            },
             frame: {
                 x: 1971,
                 y: 1891,
@@ -297,6 +369,9 @@ var charactersSprites = {
             },
         },
         "back-character-hindrance": {
+            options: {
+                type: "back",
+            },
             frame: {
                 x: 2365,
                 y: 1,
@@ -306,6 +381,9 @@ var charactersSprites = {
         },
         "instructions-1": {
             rotate: -90,
+            options: {
+                type: "instruction",
+            },
             frame: {
                 x: 2365,
                 y: 631,
@@ -315,6 +393,9 @@ var charactersSprites = {
         },
         "instructions-2": {
             rotate: -90,
+            options: {
+                type: "instruction",
+            },
             frame: {
                 x: 2365,
                 y: 1261,
@@ -337,6 +418,10 @@ var charactersSprites = {
 var decksSprites = {
     sprites: {
         "explore-7_0": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 1,
                 y: 1,
@@ -346,6 +431,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_1": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 310,
                 y: 1,
@@ -355,6 +444,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_10": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 619,
                 y: 1,
@@ -364,6 +457,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_11": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 928,
                 y: 1,
@@ -373,6 +470,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_12": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 1237,
                 y: 1,
@@ -382,6 +483,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_13": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 1546,
                 y: 1,
@@ -391,6 +496,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_14": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 1855,
                 y: 1,
@@ -400,6 +509,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_15": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 2164,
                 y: 1,
@@ -409,6 +522,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_4": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 2473,
                 y: 1,
@@ -418,6 +535,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_5": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 2782,
                 y: 1,
@@ -427,6 +548,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_6": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 3091,
                 y: 1,
@@ -436,6 +561,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_7": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 3400,
                 y: 1,
@@ -445,6 +574,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_8": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 1,
                 y: 446,
@@ -454,6 +587,10 @@ var decksSprites = {
             rotate: 0,
         },
         "explore-7_9": {
+            options: {
+                type: "card",
+                deck: "explore",
+            },
             frame: {
                 x: 310,
                 y: 446,
@@ -462,7 +599,11 @@ var decksSprites = {
             },
             rotate: 0,
         },
-        "explore-back-7_2": {
+        "explore-back": {
+            options: {
+                deck: "explore",
+                type: "back",
+            },
             frame: {
                 x: 619,
                 y: 446,
@@ -472,6 +613,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-7_10": {
+            options: {
+                type: "card",
+                deck: "forage",
+            },
             frame: {
                 x: 928,
                 y: 446,
@@ -481,6 +626,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-7_11": {
+            options: {
+                type: "card",
+                deck: "forage",
+            },
             frame: {
                 x: 1237,
                 y: 446,
@@ -490,6 +639,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-7_12": {
+            options: {
+                type: "card",
+                deck: "forage",
+            },
             frame: {
                 x: 1546,
                 y: 446,
@@ -499,6 +652,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-7_13": {
+            options: {
+                type: "card",
+                deck: "forage",
+            },
             frame: {
                 x: 1855,
                 y: 446,
@@ -508,6 +665,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-7_14": {
+            options: {
+                type: "card",
+                deck: "forage",
+            },
             frame: {
                 x: 2164,
                 y: 446,
@@ -517,6 +678,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-7_15": {
+            options: {
+                type: "card",
+                deck: "forage",
+            },
             frame: {
                 x: 2473,
                 y: 446,
@@ -526,6 +691,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-7_4": {
+            options: {
+                type: "card",
+                deck: "forage",
+            },
             frame: {
                 x: 2782,
                 y: 446,
@@ -535,6 +704,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-7_8": {
+            options: {
+                type: "card",
+                deck: "forage",
+            },
             frame: {
                 x: 3091,
                 y: 446,
@@ -544,6 +717,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-7_9": {
+            options: {
+                type: "card",
+                deck: "forage",
+            },
             frame: {
                 x: 3400,
                 y: 446,
@@ -553,6 +730,10 @@ var decksSprites = {
             rotate: 0,
         },
         "forage-back": {
+            options: {
+                deck: "forage",
+                type: "back",
+            },
             frame: {
                 x: 1,
                 y: 891,
@@ -562,6 +743,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-7_10": {
+            options: {
+                type: "card",
+                deck: "gather",
+            },
             frame: {
                 x: 310,
                 y: 891,
@@ -571,6 +756,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-7_11": {
+            options: {
+                type: "card",
+                deck: "gather",
+            },
             frame: {
                 x: 619,
                 y: 891,
@@ -580,6 +769,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-7_12": {
+            options: {
+                type: "card",
+                deck: "gather",
+            },
             frame: {
                 x: 928,
                 y: 891,
@@ -589,6 +782,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-7_13": {
+            options: {
+                type: "card",
+                deck: "gather",
+            },
             frame: {
                 x: 1237,
                 y: 891,
@@ -598,6 +795,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-7_14": {
+            options: {
+                type: "card",
+                deck: "gather",
+            },
             frame: {
                 x: 1546,
                 y: 891,
@@ -607,6 +808,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-7_15": {
+            options: {
+                type: "card",
+                deck: "gather",
+            },
             frame: {
                 x: 1855,
                 y: 891,
@@ -616,6 +821,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-7_4": {
+            options: {
+                type: "card",
+                deck: "gather",
+            },
             frame: {
                 x: 2164,
                 y: 891,
@@ -625,6 +834,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-7_8": {
+            options: {
+                type: "card",
+                deck: "gather",
+            },
             frame: {
                 x: 2473,
                 y: 891,
@@ -634,6 +847,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-7_9": {
+            options: {
+                type: "card",
+                deck: "gather",
+            },
             frame: {
                 x: 2782,
                 y: 891,
@@ -643,6 +860,10 @@ var decksSprites = {
             rotate: 0,
         },
         "gather-back": {
+            options: {
+                deck: "gather",
+                type: "back",
+            },
             frame: {
                 x: 3091,
                 y: 891,
@@ -652,6 +873,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_10": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 3400,
                 y: 891,
@@ -661,6 +886,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_11": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 1,
                 y: 1336,
@@ -670,6 +899,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_12": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 310,
                 y: 1336,
@@ -679,6 +912,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_13": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 619,
                 y: 1336,
@@ -688,6 +925,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_14": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 928,
                 y: 1336,
@@ -697,6 +938,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_15": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 1237,
                 y: 1336,
@@ -706,6 +951,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_4": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 1546,
                 y: 1336,
@@ -715,6 +964,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_5": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 1855,
                 y: 1336,
@@ -724,6 +977,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_8": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 2164,
                 y: 1336,
@@ -733,6 +990,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-7_9": {
+            options: {
+                type: "card",
+                deck: "harvest",
+            },
             frame: {
                 x: 2473,
                 y: 1336,
@@ -742,6 +1003,10 @@ var decksSprites = {
             rotate: 0,
         },
         "harvest-back": {
+            options: {
+                deck: "harvest",
+                type: "back",
+            },
             frame: {
                 x: 2782,
                 y: 1336,
@@ -751,6 +1016,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_10": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 3091,
                 y: 1336,
@@ -760,6 +1029,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_11": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 3400,
                 y: 1336,
@@ -769,6 +1042,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_12": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 1,
                 y: 1781,
@@ -778,6 +1055,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_13": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 310,
                 y: 1781,
@@ -787,6 +1068,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_14": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 619,
                 y: 1781,
@@ -796,6 +1081,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_15": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 928,
                 y: 1781,
@@ -805,6 +1094,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_4": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 1237,
                 y: 1781,
@@ -814,6 +1107,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_5": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 1546,
                 y: 1781,
@@ -823,6 +1120,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_6": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 1855,
                 y: 1781,
@@ -832,6 +1133,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_7": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 2164,
                 y: 1781,
@@ -841,6 +1146,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_8": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 2473,
                 y: 1781,
@@ -850,6 +1159,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-7_9": {
+            options: {
+                type: "card",
+                deck: "hunt",
+            },
             frame: {
                 x: 2782,
                 y: 1781,
@@ -859,6 +1172,10 @@ var decksSprites = {
             rotate: 0,
         },
         "hunt-back": {
+            options: {
+                deck: "hunt",
+                type: "back",
+            },
             frame: {
                 x: 3091,
                 y: 1781,
@@ -868,6 +1185,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_0": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3400,
                 y: 1781,
@@ -877,6 +1198,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_1": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1,
                 y: 2226,
@@ -886,6 +1211,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_10": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 310,
                 y: 2226,
@@ -895,6 +1224,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_11": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 619,
                 y: 2226,
@@ -904,6 +1237,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_12": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 928,
                 y: 2226,
@@ -913,6 +1250,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_13": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1237,
                 y: 2226,
@@ -922,6 +1263,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_14": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1546,
                 y: 2226,
@@ -931,6 +1276,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_15": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1855,
                 y: 2226,
@@ -940,6 +1289,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_2": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 2164,
                 y: 2226,
@@ -949,6 +1302,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_3": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 2473,
                 y: 2226,
@@ -958,6 +1315,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_4": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 2782,
                 y: 2226,
@@ -967,6 +1328,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_5": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3091,
                 y: 2226,
@@ -976,6 +1341,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_6": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3400,
                 y: 2226,
@@ -985,6 +1354,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_7": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1,
                 y: 2671,
@@ -994,6 +1367,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_8": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 310,
                 y: 2671,
@@ -1003,6 +1380,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-7_9": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 619,
                 y: 2671,
@@ -1021,6 +1402,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_0": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1237,
                 y: 2671,
@@ -1030,6 +1415,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_1": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1546,
                 y: 2671,
@@ -1039,6 +1428,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_10": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1855,
                 y: 2671,
@@ -1048,6 +1441,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_11": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 2164,
                 y: 2671,
@@ -1057,6 +1454,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_12": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 2473,
                 y: 2671,
@@ -1066,6 +1467,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_13": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 2782,
                 y: 2671,
@@ -1075,6 +1480,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_14": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3091,
                 y: 2671,
@@ -1084,6 +1493,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_15": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3400,
                 y: 2671,
@@ -1093,6 +1506,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_2": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1,
                 y: 3116,
@@ -1102,6 +1519,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_3": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 310,
                 y: 3116,
@@ -1111,6 +1532,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_4": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 619,
                 y: 3116,
@@ -1120,6 +1545,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_5": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 928,
                 y: 3116,
@@ -1129,6 +1558,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_6": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1237,
                 y: 3116,
@@ -1138,6 +1571,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_7": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1546,
                 y: 3116,
@@ -1147,6 +1584,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-8_8": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 1855,
                 y: 3116,
@@ -1156,6 +1597,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_9": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 2164,
                 y: 3116,
@@ -1165,6 +1610,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_10": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 2473,
                 y: 3116,
@@ -1174,6 +1623,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_11": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 2782,
                 y: 3116,
@@ -1183,6 +1636,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_12": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3091,
                 y: 3116,
@@ -1192,6 +1649,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_13": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3400,
                 y: 3116,
@@ -1201,6 +1662,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_14": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3709,
                 y: 1,
@@ -1210,6 +1675,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_15": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3709,
                 y: 446,
@@ -1219,6 +1688,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_4": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3709,
                 y: 891,
@@ -1228,6 +1701,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_5": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3709,
                 y: 1336,
@@ -1237,6 +1714,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_6": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3709,
                 y: 1781,
@@ -1246,6 +1727,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-9_8": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3709,
                 y: 2226,
@@ -1255,6 +1740,10 @@ var decksSprites = {
             rotate: 0,
         },
         "night-event-10_9": {
+            options: {
+                type: "card",
+                deck: "night-event",
+            },
             frame: {
                 x: 3709,
                 y: 2671,
@@ -1278,6 +1767,10 @@ var decksSprites = {
 var expansionSprites = {
     sprites: {
         "day-event-back": {
+            options: {
+                type: "back",
+                deck: "day-event",
+            },
             frame: {
                 x: 1,
                 y: 1,
@@ -1287,6 +1780,9 @@ var expansionSprites = {
             rotate: 0,
         },
         "fish-rule": {
+            options: {
+                type: "instruction",
+            },
             frame: {
                 x: 441,
                 y: 1,
@@ -1296,6 +1792,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_0": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 881,
                 y: 1,
@@ -1305,6 +1805,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_1": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 1321,
                 y: 1,
@@ -1314,6 +1818,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_10": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 1761,
                 y: 1,
@@ -1323,6 +1831,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_11": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 2201,
                 y: 1,
@@ -1332,6 +1844,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_3": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 1,
                 y: 443,
@@ -1350,6 +1866,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_5": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 881,
                 y: 443,
@@ -1359,6 +1879,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_6": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 1321,
                 y: 443,
@@ -1368,6 +1892,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_7": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 1761,
                 y: 443,
@@ -1377,6 +1905,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_8": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 2201,
                 y: 443,
@@ -1386,6 +1918,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "day-event_1_9": {
+            options: {
+                type: "card",
+                deck: "day-event",
+            },
             frame: {
                 x: 1,
                 y: 885,
@@ -1395,6 +1931,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_0: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 441,
                 y: 885,
@@ -1404,6 +1944,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_1: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 881,
                 y: 885,
@@ -1413,6 +1957,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_10: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1321,
                 y: 885,
@@ -1422,6 +1970,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_11: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1761,
                 y: 885,
@@ -1431,6 +1983,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_2: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 2201,
                 y: 885,
@@ -1440,6 +1996,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_3: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1,
                 y: 1327,
@@ -1449,6 +2009,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_4: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 441,
                 y: 1327,
@@ -1458,6 +2022,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_5: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 881,
                 y: 1327,
@@ -1467,6 +2035,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_6: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1321,
                 y: 1327,
@@ -1476,6 +2048,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_7: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1761,
                 y: 1327,
@@ -1485,6 +2061,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_8: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 2201,
                 y: 1327,
@@ -1494,6 +2074,10 @@ var expansionSprites = {
             rotate: 0,
         },
         hindrance_1_9: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1,
                 y: 1769,
@@ -1503,6 +2087,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "physical-hindrance-back": {
+            options: {
+                type: "back",
+                deck: "physical-hindrance",
+            },
             frame: {
                 x: 441,
                 y: 1769,
@@ -1512,6 +2100,10 @@ var expansionSprites = {
             rotate: 0,
         },
         "mental-hindrance-back": {
+            options: {
+                type: "back",
+                deck: "mental-hindrance",
+            },
             frame: {
                 x: 881,
                 y: 1769,
@@ -1520,7 +2112,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_0": {
+        hindrance_1_0: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1321,
                 y: 1769,
@@ -1529,7 +2125,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_1": {
+        hindrance_1_1: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1761,
                 y: 1769,
@@ -1538,7 +2138,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_10": {
+        hindrance_1_10: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 2201,
                 y: 1769,
@@ -1547,7 +2151,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_11": {
+        hindrance_1_11: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1,
                 y: 2211,
@@ -1556,7 +2164,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_2": {
+        hindrance_1_2: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 441,
                 y: 2211,
@@ -1565,7 +2177,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_3": {
+        hindrance_1_3: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 881,
                 y: 2211,
@@ -1574,7 +2190,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_4": {
+        hindrance_1_4: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1321,
                 y: 2211,
@@ -1583,7 +2203,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_5": {
+        hindrance_1_5: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 1761,
                 y: 2211,
@@ -1592,7 +2216,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_6": {
+        hindrance_1_6: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 2201,
                 y: 2211,
@@ -1601,7 +2229,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_7": {
+        hindrance_1_7: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 2641,
                 y: 1,
@@ -1610,7 +2242,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_8": {
+        hindrance_1_8: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 2641,
                 y: 443,
@@ -1619,7 +2255,11 @@ var expansionSprites = {
             },
             rotate: 0,
         },
-        "hindrance 1_9": {
+        hindrance_1_9: {
+            options: {
+                type: "card",
+                deck: "hindrance",
+            },
             frame: {
                 x: 2641,
                 y: 885,
@@ -1643,6 +2283,9 @@ var expansionSprites = {
 var itemsSprites = {
     sprites: {
         "bow-and-arrow": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 0,
                 y: 0,
@@ -1652,6 +2295,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "medical-hut": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 438,
                 y: 0,
@@ -1661,6 +2307,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "bone-club": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 876,
                 y: 0,
@@ -1670,6 +2319,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "bone-scythe": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1314,
                 y: 0,
@@ -1679,6 +2331,9 @@ var itemsSprites = {
             rotate: 0,
         },
         bag: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1752,
                 y: 0,
@@ -1688,6 +2343,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "bone-armor": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 2190,
                 y: 0,
@@ -1697,6 +2355,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "camp-walls": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 0,
                 y: 440,
@@ -1706,6 +2367,9 @@ var itemsSprites = {
             rotate: 0,
         },
         fire: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 438,
                 y: 440,
@@ -1715,6 +2379,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "hide-armor": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 876,
                 y: 440,
@@ -1724,6 +2391,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "knowledge-hut": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1314,
                 y: 440,
@@ -1733,6 +2403,9 @@ var itemsSprites = {
             rotate: 0,
         },
         skull: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1752,
                 y: 440,
@@ -1742,6 +2415,9 @@ var itemsSprites = {
             rotate: 0,
         },
         hatchet: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 2190,
                 y: 440,
@@ -1751,6 +2427,9 @@ var itemsSprites = {
             rotate: 0,
         },
         club: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 0,
                 y: 880,
@@ -1760,6 +2439,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "cooking-hut": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 438,
                 y: 880,
@@ -1769,6 +2451,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "carving-knife": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 876,
                 y: 880,
@@ -1778,6 +2463,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "item-back": {
+            options: {
+                type: "back",
+            },
             frame: {
                 x: 1314,
                 y: 880,
@@ -1787,6 +2475,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "sling-shot": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1752,
                 y: 880,
@@ -1796,6 +2487,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "pick-axe": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 2190,
                 y: 880,
@@ -1805,6 +2499,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "planning-hut": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 0,
                 y: 1320,
@@ -1814,6 +2511,9 @@ var itemsSprites = {
             rotate: 0,
         },
         spear: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 438,
                 y: 1320,
@@ -1823,6 +2523,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "sharp-stick": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 876,
                 y: 1320,
@@ -1832,6 +2535,9 @@ var itemsSprites = {
             rotate: 0,
         },
         shelter: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1314,
                 y: 1320,
@@ -1841,6 +2547,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "rock-knife": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1752,
                 y: 1320,
@@ -1850,6 +2559,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "item-back-hindrance": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 2190,
                 y: 1320,
@@ -1859,6 +2571,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "mortar-and-pestle": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 0,
                 y: 1760,
@@ -1868,6 +2583,9 @@ var itemsSprites = {
             rotate: 0,
         },
         bandage: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 438,
                 y: 1760,
@@ -1877,6 +2595,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "skull-shield": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 876,
                 y: 1760,
@@ -1886,6 +2607,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "cooking-pot": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1314,
                 y: 1760,
@@ -1895,6 +2619,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "bone-claws": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1752,
                 y: 1760,
@@ -1904,6 +2631,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "bone-flute": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 2190,
                 y: 1760,
@@ -1913,6 +2643,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "stock-hut": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 0,
                 y: 2200,
@@ -1922,6 +2655,9 @@ var itemsSprites = {
             rotate: 0,
         },
         whip: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 438,
                 y: 2200,
@@ -1931,6 +2667,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "fire-stick": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 876,
                 y: 2200,
@@ -1940,6 +2679,9 @@ var itemsSprites = {
             rotate: 0,
         },
         rock: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1314,
                 y: 2200,
@@ -1949,6 +2691,9 @@ var itemsSprites = {
             rotate: 0,
         },
         bola: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 1752,
                 y: 2200,
@@ -1958,6 +2703,9 @@ var itemsSprites = {
             rotate: 0,
         },
         boomerang: {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 2190,
                 y: 2200,
@@ -1967,6 +2715,9 @@ var itemsSprites = {
             rotate: 0,
         },
         "stone-hammer": {
+            options: {
+                type: "item",
+            },
             frame: {
                 x: 2628,
                 y: 0,
@@ -1990,6 +2741,9 @@ var itemsSprites = {
 var upgradesSprites = {
     sprites: {
         upgrades_2_44_0: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1,
                 y: 1,
@@ -1999,6 +2753,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_1: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 184,
                 y: 1,
@@ -2008,6 +2765,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_10: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 367,
                 y: 1,
@@ -2017,6 +2777,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_11: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 550,
                 y: 1,
@@ -2026,6 +2789,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_12: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 733,
                 y: 1,
@@ -2035,6 +2801,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_13: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 916,
                 y: 1,
@@ -2044,6 +2813,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_14: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1099,
                 y: 1,
@@ -2053,6 +2825,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_15: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1282,
                 y: 1,
@@ -2062,6 +2837,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_2: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1,
                 y: 370,
@@ -2071,6 +2849,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_3: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 184,
                 y: 370,
@@ -2080,6 +2861,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_4: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 367,
                 y: 370,
@@ -2089,6 +2873,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_5: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 550,
                 y: 370,
@@ -2098,6 +2885,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_6: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 733,
                 y: 370,
@@ -2107,6 +2897,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_7: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 916,
                 y: 370,
@@ -2116,6 +2909,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_8: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1099,
                 y: 370,
@@ -2125,6 +2921,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_2_44_9: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1282,
                 y: 370,
@@ -2134,6 +2933,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_0: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1,
                 y: 739,
@@ -2143,6 +2945,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_1: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 184,
                 y: 739,
@@ -2152,6 +2957,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_10: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 367,
                 y: 739,
@@ -2161,6 +2969,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_11: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 550,
                 y: 739,
@@ -2170,6 +2981,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_12: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 733,
                 y: 739,
@@ -2179,6 +2993,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_13: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 916,
                 y: 739,
@@ -2188,6 +3005,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_14: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1099,
                 y: 739,
@@ -2197,6 +3017,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_15: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1282,
                 y: 739,
@@ -2206,6 +3029,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_2: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1465,
                 y: 1,
@@ -2215,6 +3041,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_3: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1465,
                 y: 370,
@@ -2224,6 +3053,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_4: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1465,
                 y: 739,
@@ -2233,6 +3065,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_5: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 1,
                 y: 1108,
@@ -2242,6 +3077,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_6: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 184,
                 y: 1108,
@@ -2251,6 +3089,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_7: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 367,
                 y: 1108,
@@ -2260,6 +3101,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_8: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 550,
                 y: 1108,
@@ -2269,6 +3113,9 @@ var upgradesSprites = {
             rotate: 0,
         },
         upgrades_43_9: {
+            options: {
+                type: "upgrade",
+            },
             frame: {
                 x: 733,
                 y: 1108,
@@ -2312,16 +3159,22 @@ var allSprites = [
     Object.values(sprites).forEach(function (d) { return (d.meta = meta); });
     return __assign(__assign({}, acc), sprites);
 }, {});
-var renderImage = function (name, div, scale) {
+var renderImage = function (name, div, scale, replace) {
     if (scale === void 0) { scale = 2; }
+    if (replace === void 0) { replace = false; }
     // example of adding a div for each player
     if (!allSprites[name])
         throw new Error("Missing image ".concat(name));
     var _a = allSprites[name], _b = _a.meta, css = _b.css, _c = _b.size, spriteWidth = _c.w, spriteHeight = _c.h, _d = _a.frame, x = _d.x, y = _d.y, w = _d.w, h = _d.h, rotate = _a.rotate;
+    var html;
     if (rotate)
-        div.insertAdjacentHTML("beforeend", "<div class=\"card-rotator\" style=\"transform: rotate(".concat(rotate, "deg) translate(0, -50%);height: ").concat(w / scale, "px;width: ").concat(h / scale, "px;\">\n    <div name=\"").concat(name, "-").concat(rotate, "\" class=\"card ").concat(css, "\" style=\"background-size: ").concat(spriteWidth / scale, "px ").concat(spriteHeight / scale, "px;background-position: -").concat(x / scale, "px -").concat(y / scale, "px;width: ").concat(w / scale, "px;height: ").concat(h / scale, "px;\"></div>\n    </div>"));
+        html = "<div class=\"card-rotator\" style=\"transform: rotate(".concat(rotate, "deg) translate(25%, -50%);height: ").concat(w / scale, "px;width: ").concat(h / scale, "px;\">\n    <div name=\"").concat(name, "-").concat(rotate, "\" class=\"card ").concat(css, "\" style=\"background-size: ").concat(spriteWidth / scale, "px ").concat(spriteHeight / scale, "px;background-position: -").concat(x / scale, "px -").concat(y / scale, "px;width: ").concat(w / scale, "px;height: ").concat(h / scale, "px;\"></div>\n    </div>");
     else
-        div.insertAdjacentHTML("beforeend", "<div name=\"".concat(name, "-").concat(rotate, "\" class=\"card ").concat(css, "\" style=\"background-size: ").concat(spriteWidth / scale, "px ").concat(spriteHeight / scale, "px;background-position: -").concat(x / scale, "px -").concat(y / scale, "px;width: ").concat(w / scale, "px;height: ").concat(h / scale, "px;\"></div>"));
+        html = "<div name=\"".concat(name, "-").concat(rotate, "\" class=\"card ").concat(css, "\" style=\"background-size: ").concat(spriteWidth / scale, "px ").concat(spriteHeight / scale, "px;background-position: -").concat(x / scale, "px -").concat(y / scale, "px;width: ").concat(w / scale, "px;height: ").concat(h / scale, "px;\"></div>");
+    if (replace)
+        div.innerHTML = html;
+    else
+        div.insertAdjacentHTML("beforeend", html);
 };
 /**
  *------
@@ -2347,7 +3200,6 @@ define([
 ], function (dojo, declare) {
     return declare("bgagame.dontletitdie", ebg.core.gamegui, {
         constructor: function () {
-            console.log("dontletitdie constructor");
             // Here, you can init the global variables of your user interface
             // Example:
             // this.myGlobalValue = 0;
@@ -2368,14 +3220,28 @@ define([
             document.querySelector("player-side-".concat(player.id, " > .health > .value")).innerHTML = 0;
             document.querySelector("player-side-".concat(player.id, " > .stamina > .value")).innerHTML = 0;
         },
-        setupPlayer: function (player) {
+        setupPlayer: function (player, gamedatas) {
             // Player side board
             this.getPlayerPanelElement(player.id).insertAdjacentHTML("beforeend", "<div id=\"player-side-".concat(player.id, "\">\n          <div class=\"health\"><span class=\"label\">Health: </span><span class=\"value\"></span></div>\n          <div class=\"stamina\"><span class=\"label\">Stamina: </span><span class=\"value\"></span></div>\n          <div class=\"stamina\"><span class=\"label\">Equipment: </span><span class=\"value\">None</span></div>\n        </div>"));
             // Player main board
             document
                 .getElementById("players-container")
-                .insertAdjacentHTML("beforeend", "<div id=\"player-".concat(player.id, "\" class=\"player-card\"></div>"));
-            renderImage("character-board", document.getElementById("player-".concat(player.id)), 4);
+                .insertAdjacentHTML("beforeend", "<div id=\"player-".concat(player.id, "\" class=\"player-card\"><div class=\"card\"></div><div class=\"character\"></div><div class=\"health\"></div><div class=\"stamina\"></div><div class=\"weapon\"></div><div class=\"tool\"></div></div>"));
+            renderImage("character-board", document.querySelector("#player-".concat(player.id, " > .card")), 4);
+            renderImage("Gronk", document.querySelector("#player-".concat(player.id, " > .character")), 4, true);
+            renderImage("club", document.querySelector("#player-".concat(player.id, " > .weapon")), 4, true);
+            renderImage("club", document.querySelector("#player-".concat(player.id, " > .tool")), 4, true);
+        },
+        setupBoard: function (gamedatas) {
+            // Main board
+            document
+                .getElementById("game_play_area")
+                .insertAdjacentHTML("beforeend", "<div id=\"board-container\" class=\"container\"><div class=\"board\"></div><div class=\"gather\"></div><div class=\"forage\"></div><div class=\"harvest\"></div><div class=\"hunt\"></div></div>");
+            renderImage("board", document.querySelector("#board-container > .board"), 2, true);
+            renderImage("gather-back", document.querySelector("#board-container > .gather"), 4, true);
+            renderImage("forage-back", document.querySelector("#board-container > .forage"), 4, true);
+            renderImage("harvest-back", document.querySelector("#board-container > .harvest"), 4, true);
+            renderImage("hunt-back", document.querySelector("#board-container > .hunt"), 4, true);
         },
         setup: function (gamedatas) {
             var _this = this;
@@ -2385,23 +3251,23 @@ define([
             this.dontPreloadImage("items-spritesheet.png");
             this.dontPreloadImage("upgrades-spritesheet.png");
             console.log(gamedatas);
-            document
-                .getElementById("game_play_area")
-                .insertAdjacentHTML("beforeend", "<div id=\"players-container\"></div>");
-            renderImage("board", document.getElementById("game_play_area"));
-            renderImage("track-".concat(mode), document.getElementById("game_play_area"));
-            renderImage("dice", document.getElementById("game_play_area"));
-            renderImage("bow-and-arrow", document.getElementById("game_play_area"));
+            var playArea = document.getElementById("game_play_area");
+            playArea.insertAdjacentHTML("beforeend", "<div id=\"players-container\" class=\"container\"></div>");
+            this.setupBoard();
+            // renderImage(`board`, playArea);
+            renderImage("track-".concat(mode), playArea);
+            renderImage("dice", playArea);
+            renderImage("bow-and-arrow", playArea);
             // Setting up player boards
             Object.values(gamedatas.players).forEach(function (player) {
                 _this.setupPlayer(player);
             });
-            renderImage("knowledge-tree-".concat(knowledgeTree), document.getElementById("game_play_area"));
-            renderImage("instructions", document.getElementById("game_play_area"));
+            renderImage("knowledge-tree-".concat(knowledgeTree), playArea);
+            playArea.insertAdjacentHTML("beforeend", "<div id=\"instructions-container\" class=\"container\"></div>");
+            renderImage("instructions", document.getElementById("instructions-container"));
             // TODO: Set up your game interface here, according to "gamedatas"
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
-            console.log("Ending game setup");
         },
         ///////////////////////////////////////////////////
         //// Game & client states

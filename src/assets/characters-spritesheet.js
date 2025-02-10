@@ -1,6 +1,9 @@
 const charactersSprites = {
   sprites: {
     Gronk: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1,
         y: 1,
@@ -9,6 +12,9 @@ const charactersSprites = {
       },
     },
     Grub: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 395,
         y: 1,
@@ -17,6 +23,9 @@ const charactersSprites = {
       },
     },
     Kara: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 789,
         y: 1,
@@ -25,6 +34,9 @@ const charactersSprites = {
       },
     },
     Cron: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1183,
         y: 1,
@@ -33,6 +45,9 @@ const charactersSprites = {
       },
     },
     Dub: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1577,
         y: 1,
@@ -41,6 +56,9 @@ const charactersSprites = {
       },
     },
     Faye: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1971,
         y: 1,
@@ -49,6 +67,9 @@ const charactersSprites = {
       },
     },
     Ajax: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1,
         y: 631,
@@ -57,6 +78,9 @@ const charactersSprites = {
       },
     },
     Atouk: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 395,
         y: 631,
@@ -65,6 +89,9 @@ const charactersSprites = {
       },
     },
     Ayla: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 789,
         y: 631,
@@ -73,6 +100,9 @@ const charactersSprites = {
       },
     },
     River: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1183,
         y: 631,
@@ -81,6 +111,9 @@ const charactersSprites = {
       },
     },
     Sig: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1577,
         y: 631,
@@ -89,6 +122,9 @@ const charactersSprites = {
       },
     },
     Tara: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1971,
         y: 631,
@@ -97,6 +133,9 @@ const charactersSprites = {
       },
     },
     Nirv: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1,
         y: 1261,
@@ -105,6 +144,9 @@ const charactersSprites = {
       },
     },
     Oof: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 395,
         y: 1261,
@@ -113,6 +155,9 @@ const charactersSprites = {
       },
     },
     Rex: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 789,
         y: 1261,
@@ -121,6 +166,9 @@ const charactersSprites = {
       },
     },
     Mabe: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1183,
         y: 1261,
@@ -129,6 +177,9 @@ const charactersSprites = {
       },
     },
     Nanuk: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1577,
         y: 1261,
@@ -137,6 +188,9 @@ const charactersSprites = {
       },
     },
     Nibna: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1971,
         y: 1261,
@@ -145,6 +199,9 @@ const charactersSprites = {
       },
     },
     Zeebo: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1,
         y: 1891,
@@ -153,6 +210,9 @@ const charactersSprites = {
       },
     },
     Thunk: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 395,
         y: 1891,
@@ -161,6 +221,9 @@ const charactersSprites = {
       },
     },
     Tiku: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 789,
         y: 1891,
@@ -169,6 +232,9 @@ const charactersSprites = {
       },
     },
     Vog: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1183,
         y: 1891,
@@ -177,6 +243,9 @@ const charactersSprites = {
       },
     },
     DiceThing: {
+      options: {
+        type: "character",
+      },
       frame: {
         x: 1577,
         y: 1891,
@@ -185,6 +254,9 @@ const charactersSprites = {
       },
     },
     "back-character": {
+      options: {
+        type: "back",
+      },
       frame: {
         x: 1971,
         y: 1891,
@@ -193,6 +265,9 @@ const charactersSprites = {
       },
     },
     "back-character-hindrance": {
+      options: {
+        type: "back",
+      },
       frame: {
         x: 2365,
         y: 1,
@@ -202,6 +277,9 @@ const charactersSprites = {
     },
     "instructions-1": {
       rotate: -90,
+      options: {
+        type: "instruction",
+      },
       frame: {
         x: 2365,
         y: 631,
@@ -211,6 +289,9 @@ const charactersSprites = {
     },
     "instructions-2": {
       rotate: -90,
+      options: {
+        type: "instruction",
+      },
       frame: {
         x: 2365,
         y: 1261,

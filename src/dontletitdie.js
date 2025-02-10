@@ -23,8 +23,6 @@ define([
 ], function (dojo, declare) {
   return declare("bgagame.dontletitdie", ebg.core.gamegui, {
     constructor: function () {
-      console.log("dontletitdie constructor");
-
       // Here, you can init the global variables of your user interface
       // Example:
       // this.myGlobalValue = 0;
@@ -50,7 +48,7 @@ define([
         `player-side-${player.id} > .stamina > .value`
       ).innerHTML = 0;
     },
-    setupPlayer: function (player) {
+    setupPlayer: function (player, gamedatas) {
       // Player side board
       this.getPlayerPanelElement(player.id).insertAdjacentHTML(
         "beforeend",
@@ -65,12 +63,70 @@ define([
         .getElementById("players-container")
         .insertAdjacentHTML(
           "beforeend",
-          `<div id="player-${player.id}" class="player-card"></div>`
+          `<div id="player-${player.id}" class="player-card"><div class="card"></div><div class="character"></div><div class="health"></div><div class="stamina"></div><div class="weapon"></div><div class="tool"></div></div>`
         );
       renderImage(
         `character-board`,
-        document.getElementById(`player-${player.id}`),
+        document.querySelector(`#player-${player.id} > .card`),
         4
+      );
+      renderImage(
+        `Gronk`,
+        document.querySelector(`#player-${player.id} > .character`),
+        4,
+        true
+      );
+      renderImage(
+        `club`,
+        document.querySelector(`#player-${player.id} > .weapon`),
+        4,
+        true
+      );
+      renderImage(
+        `club`,
+        document.querySelector(`#player-${player.id} > .tool`),
+        4,
+        true
+      );
+    },
+    setupBoard: function (gamedatas) {
+      // Main board
+      document
+        .getElementById("game_play_area")
+        .insertAdjacentHTML(
+          "beforeend",
+          `<div id="board-container" class="container"><div class="board"></div><div class="gather"></div><div class="forage"></div><div class="harvest"></div><div class="hunt"></div></div>`
+        );
+
+      renderImage(
+        `board`,
+        document.querySelector(`#board-container > .board`),
+        2,
+        true
+      );
+      renderImage(
+        `gather-back`,
+        document.querySelector(`#board-container > .gather`),
+        4,
+        true
+      );
+      renderImage(
+        `forage-back`,
+        document.querySelector(`#board-container > .forage`),
+        4,
+        true
+      );
+      renderImage(
+        `harvest-back`,
+        document.querySelector(`#board-container > .harvest`),
+        4,
+        true
+      );
+      renderImage(
+        `hunt-back`,
+        document.querySelector(`#board-container > .hunt`),
+        4,
+        true
       );
     },
     setup: function (gamedatas) {
@@ -80,29 +136,34 @@ define([
       this.dontPreloadImage("items-spritesheet.png");
       this.dontPreloadImage("upgrades-spritesheet.png");
       console.log(gamedatas);
-      document
-        .getElementById("game_play_area")
-        .insertAdjacentHTML("beforeend", `<div id="players-container"></div>`);
-      renderImage(`board`, document.getElementById("game_play_area"));
-      renderImage(`track-${mode}`, document.getElementById("game_play_area"));
-      renderImage(`dice`, document.getElementById("game_play_area"));
-      renderImage("bow-and-arrow", document.getElementById("game_play_area"));
+      const playArea = document.getElementById("game_play_area");
+      playArea.insertAdjacentHTML(
+        "beforeend",
+        `<div id="players-container" class="container"></div>`
+      );
+      this.setupBoard();
+      // renderImage(`board`, playArea);
+      renderImage(`track-${mode}`, playArea);
+      renderImage(`dice`, playArea);
+      renderImage("bow-and-arrow", playArea);
       // Setting up player boards
       Object.values(gamedatas.players).forEach((player) => {
         this.setupPlayer(player);
       });
-      renderImage(
-        `knowledge-tree-${knowledgeTree}`,
-        document.getElementById("game_play_area")
+      renderImage(`knowledge-tree-${knowledgeTree}`, playArea);
+      playArea.insertAdjacentHTML(
+        "beforeend",
+        `<div id="instructions-container" class="container"></div>`
       );
-      renderImage(`instructions`, document.getElementById("game_play_area"));
+      renderImage(
+        `instructions`,
+        document.getElementById("instructions-container")
+      );
 
       // TODO: Set up your game interface here, according to "gamedatas"
 
       // Setup game notifications to handle (see "setupNotifications" method below)
       this.setupNotifications();
-
-      console.log("Ending game setup");
     },
 
     ///////////////////////////////////////////////////

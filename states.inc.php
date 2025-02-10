@@ -49,42 +49,57 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
-
 $machinestates = [
-
     // The initial state. Please do not modify.
 
-    1 => array(
+    1 => [
         "name" => "gameSetup",
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => ["" => 2]
-    ),
+        "transitions" => ["" => 2],
+    ],
 
     // Note: ID=2 => your first state
 
     2 => [
         "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
+        "description" => clienttranslate(
+            '${actplayer} must play a card or pass'
+        ),
+        "descriptionmyturn" => clienttranslate(
+            '${you} must play a card or pass'
+        ),
         "type" => "activeplayer",
         "args" => "argPlayerTurn",
         "possibleactions" => [
             // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
-            "actPlayCard", 
+            "actPlayCard",
             "actPass",
         ],
-        "transitions" => ["playCard" => 3, "pass" => 3]
+        "transitions" => ["playCard" => 3, "pass" => 4],
+    ],
+    3 => [
+        "name" => "evaluateCard",
+        "description" => clienttranslate("Resolving Event"),
+        "descriptionmyturn" => clienttranslate("Resolving Event"),
+        "type" => "activeplayer",
+        "args" => "argPlayerTurn",
+        "possibleactions" => [
+            // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
+            "actPlayCard",
+            "actPass",
+        ],
+        "transitions" => ["playCard" => 2, "pass" => 2],
     ],
 
-    3 => [
+    4 => [
         "name" => "nextPlayer",
-        "description" => '',
+        "description" => "",
         "type" => "game",
         "action" => "stNextPlayer",
         "updateGameProgression" => true,
-        "transitions" => ["endGame" => 99, "nextPlayer" => 2]
+        "transitions" => ["endGame" => 99, "nextPlayer" => 2],
     ],
 
     // Final state.
@@ -94,10 +109,6 @@ $machinestates = [
         "description" => clienttranslate("End of game"),
         "type" => "manager",
         "action" => "stGameEnd",
-        "args" => "argGameEnd"
+        "args" => "argGameEnd",
     ],
-
 ];
-
-
-

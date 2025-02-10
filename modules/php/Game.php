@@ -18,12 +18,11 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
+require_once APP_GAMEMODULE_PATH . "module/table/table.game.php";
 
-class Game extends \Table
-{
-    private static array $CARD_TYPES;
-
+class Game extends \Table {
+    private $cards;
+    private static array $decksData;
     /**
      * Your global variables labels:
      *
@@ -34,8 +33,7 @@ class Game extends \Table
      * NOTE: afterward, you can get/set the global variables with `getGameStateValue`, `setGameStateInitialValue` or
      * `setGameStateValue` functions.
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
 
         $this->initGameStateLabels([
@@ -43,17 +41,15 @@ class Game extends \Table
             "my_second_global_variable" => 11,
             "my_first_game_variant" => 100,
             "my_second_game_variant" => 101,
-        ]);        
-
-        self::$CARD_TYPES = [
-            1 => [
-                "card_name" => clienttranslate('Troll'), // ...
-            ],
-            2 => [
-                "card_name" => clienttranslate('Goblin'), // ...
-            ],
-            // ...
-        ];
+        ]);
+        include dirname(__DIR__) . "/data/boards.php";
+        include dirname(__DIR__) . "/data/characters.php";
+        include dirname(__DIR__) . "/data/decks.php";
+        include dirname(__DIR__) . "/data/expansion.php";
+        include dirname(__DIR__) . "/data/items.php";
+        include dirname(__DIR__) . "/data/tokens.php";
+        include dirname(__DIR__) . "/data/upgrades.php";
+        self::$decksData = $decksData;
 
         /* example of notification decorator.
         // automatically complete notification args when needed
@@ -70,7 +66,12 @@ class Game extends \Table
             return $args;
         });*/
     }
+    public function actDraw(int $player_id, $deck): void {
+        $card = $this->cards->pickCards(13, $deck, $player_id);
 
+        // at the end of the action, move to the next state
+        $this->gamestate->nextState("evaluateCard");
+    }
     /**
      * Player action, example content.
      *
@@ -79,38 +80,40 @@ class Game extends \Table
      *
      * @throws BgaUserException
      */
-    public function actPlayCard(int $card_id): void
-    {
+    public function actPlayCard(int $card_id): void {
         // Retrieve the active player ID.
-        $player_id = (int)$this->getActivePlayerId();
+        $player_id = (int) $this->getActivePlayerId();
 
         // check input values
         $args = $this->argPlayerTurn();
-        $playableCardsIds = $args['playableCardsIds'];
+        $playableCardsIds = $args["playableCardsIds"];
         if (!in_array($card_id, $playableCardsIds)) {
-            throw new \BgaUserException('Invalid card choice');
+            throw new \BgaUserException("Invalid card choice");
         }
 
         // Add your game logic to play a card here.
-        $card_name = self::$CARD_TYPES[$card_id]['card_name'];
+        // $card_name = self::$CARD_TYPES[$card_id]["card_name"];
 
-        // Notify all players about the card played.
-        $this->notify->all("cardPlayed", clienttranslate('${player_name} plays ${card_name}'), [
-            "player_id" => $player_id,
-            "player_name" => $this->getActivePlayerName(), // remove this line if you uncomment notification decorator
-            "card_name" => $card_name, // remove this line if you uncomment notification decorator
-            "card_id" => $card_id,
-            "i18n" => ['card_name'], // remove this line if you uncomment notification decorator
-        ]);
+        // // Notify all players about the card played.
+        // $this->notify->all(
+        //     "cardPlayed",
+        //     clienttranslate('${player_name} plays ${card_name}'),
+        //     [
+        //         "player_id" => $player_id,
+        //         "player_name" => $this->getActivePlayerName(), // remove this line if you uncomment notification decorator
+        //         "card_name" => $card_name, // remove this line if you uncomment notification decorator
+        //         "card_id" => $card_id,
+        //         "i18n" => ["card_name"], // remove this line if you uncomment notification decorator
+        //     ]
+        // );
 
         // at the end of the action, move to the next state
         $this->gamestate->nextState("playCard");
     }
 
-    public function actPass(): void
-    {
+    public function actPass(): void {
         // Retrieve the active player ID.
-        $player_id = (int)$this->getActivePlayerId();
+        $player_id = (int) $this->getActivePlayerId();
 
         // Notify all players about the choice to pass.
         $this->notify->all("pass", clienttranslate('${player_name} passes'), [
@@ -130,8 +133,7 @@ class Game extends \Table
      * @return array
      * @see ./states.inc.php
      */
-    public function argPlayerTurn(): array
-    {
+    public function argPlayerTurn(): array {
         // Get some values from the current game situation from the database.
 
         return [
@@ -149,8 +151,7 @@ class Game extends \Table
      * @return int
      * @see ./states.inc.php
      */
-    public function getGameProgression()
-    {
+    public function getGameProgression() {
         // TODO: compute and return the game progression
 
         return 0;
@@ -163,15 +164,15 @@ class Game extends \Table
      */
     public function stNextPlayer(): void {
         // Retrieve the active player ID.
-        $player_id = (int)$this->getActivePlayerId();
+        $player_id = (int) $this->getActivePlayerId();
 
         // Give some extra time to the active player when he completed an action
         $this->giveExtraTime($player_id);
-        
+
         $this->activeNextPlayer();
 
         // Go to another gamestate
-        // Here, we would detect if the game is over, and in this case use "endGame" transition instead 
+        // Here, we would detect if the game is over, and in this case use "endGame" transition instead
         $this->gamestate->nextState("nextPlayer");
     }
 
@@ -186,23 +187,22 @@ class Game extends \Table
      * @param int $from_version
      * @return void
      */
-    public function upgradeTableDb($from_version)
-    {
-//       if ($from_version <= 1404301345)
-//       {
-//            // ! important ! Use DBPREFIX_<table_name> for all tables
-//
-//            $sql = "ALTER TABLE DBPREFIX_xxxxxxx ....";
-//            $this->applyDbUpgradeToAllDB( $sql );
-//       }
-//
-//       if ($from_version <= 1405061421)
-//       {
-//            // ! important ! Use DBPREFIX_<table_name> for all tables
-//
-//            $sql = "CREATE TABLE DBPREFIX_xxxxxxx ....";
-//            $this->applyDbUpgradeToAllDB( $sql );
-//       }
+    public function upgradeTableDb($from_version) {
+        //       if ($from_version <= 1404301345)
+        //       {
+        //            // ! important ! Use DBPREFIX_<table_name> for all tables
+        //
+        //            $sql = "ALTER TABLE DBPREFIX_xxxxxxx ....";
+        //            $this->applyDbUpgradeToAllDB( $sql );
+        //       }
+        //
+        //       if ($from_version <= 1405061421)
+        //       {
+        //            // ! important ! Use DBPREFIX_<table_name> for all tables
+        //
+        //            $sql = "CREATE TABLE DBPREFIX_xxxxxxx ....";
+        //            $this->applyDbUpgradeToAllDB( $sql );
+        //       }
     }
 
     /*
@@ -213,8 +213,7 @@ class Game extends \Table
      * - when the game starts
      * - when a player refreshes the game page (F5)
      */
-    protected function getAllDatas(): array
-    {
+    protected function getAllDatas(): array {
         $result = [];
 
         // WARNING: We must only return information visible by the current player.
@@ -236,21 +235,44 @@ class Game extends \Table
      *
      * IMPORTANT: Please do not modify.
      */
-    protected function getGameName()
-    {
+    protected function getGameName() {
         return "dontletitdie";
     }
 
+    protected function createDeck($type) {
+        $filtered_cards = array_filter(
+            self::$decksData,
+            function ($v, $k) use ($type) {
+                return $v["options"]["deck"] == $type;
+            },
+            ARRAY_FILTER_USE_BOTH
+        );
+        $cards = array_map(
+            function ($k, $v) {
+                return [
+                    "type" => $v["options"]["deck"],
+                    "card_name" => $k,
+                    "card_location" => "deck",
+                    "type_arg" => 0,
+                    "nbr" => $v["count"] ?? 1,
+                ];
+            },
+            array_keys($filtered_cards),
+            $filtered_cards
+        );
+        $this->cards->createCards($cards, "deck");
+    }
     /**
      * This method is called only once, when a new game is launched. In this method, you must setup the game
      *  according to the game rules, so that the game is ready to be played.
      */
-    protected function setupNewGame($players, $options = [])
-    {
+    protected function setupNewGame($players, $options = []) {
+        // global $decksData;
         // Set the colors of the players with HTML color code. The default below is red/green/blue/orange/brown. The
         // number of colors defined here must correspond to the maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
-        $default_colors = $gameinfos['player_colors'];
+        // echo $decksData;
+        $default_colors = $gameinfos["player_colors"];
 
         foreach ($players as $player_id => $player) {
             // Now you can access both $player_id and $player array
@@ -262,7 +284,29 @@ class Game extends \Table
                 addslashes($player["player_avatar"]),
             ]);
         }
+        $this->cards = $this->getNew("module.common.deck");
+        $this->cards->autoreshuffle = true;
+        $this->cards->init("card");
+        // $this->harvestCards = $this->getNew("module.common.deck");
+        // $this->harvestCards->init("harvest_card");
+        // $this->huntCards = $this->getNew("module.common.deck");
+        // $this->huntCards->init("hunt_card");
+        // $this->exploreCards = $this->getNew("module.common.deck");
+        // $this->exploreCards->init("explore_card");
+        // $this->dayEventCards = $this->getNew("module.common.deck");
+        // $this->dayEventCards->init("day_event_card");
+        // $this->nightEventCards = $this->getNew("module.common.deck");
+        // $this->nightEventCards->init("night_event_card");
+        // $this->hinderanceCards = $this->getNew("module.common.deck");
+        // $this->hinderanceCards->init("hindrance_event_card");
 
+        $this->createDeck("harvest");
+        $this->createDeck("hunt");
+        $this->createDeck("gather");
+        $this->createDeck("explore");
+        $this->createDeck("day-event");
+        $this->createDeck("night-event");
+        $this->createDeck("hindrance");
         // Create players based on generic information.
         //
         // NOTE: You can add extra field on player table in the database (see dbmodel.sql) and initialize
@@ -274,7 +318,10 @@ class Game extends \Table
             )
         );
 
-        $this->reattributeColorsBasedOnPreferences($players, $gameinfos["player_colors"]);
+        $this->reattributeColorsBasedOnPreferences(
+            $players,
+            $gameinfos["player_colors"]
+        );
         $this->reloadPlayersBasicInfos();
 
         // Init global values with their initial values.
@@ -312,17 +359,14 @@ class Game extends \Table
      * @return void
      * @throws feException if the zombie mode is not supported at this game state.
      */
-    protected function zombieTurn(array $state, int $active_player): void
-    {
+    protected function zombieTurn(array $state, int $active_player): void {
         $state_name = $state["name"];
 
         if ($state["type"] === "activeplayer") {
             switch ($state_name) {
                 default:
-                {
                     $this->gamestate->nextState("zombiePass");
                     break;
-                }
             }
 
             return;
@@ -330,10 +374,12 @@ class Game extends \Table
 
         // Make sure player is in a non-blocking status for role turn.
         if ($state["type"] === "multipleactiveplayer") {
-            $this->gamestate->setPlayerNonMultiactive($active_player, '');
+            $this->gamestate->setPlayerNonMultiactive($active_player, "");
             return;
         }
 
-        throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
+        throw new \feException(
+            "Zombie mode not supported at this game state: \"{$state_name}\"."
+        );
     }
 }
