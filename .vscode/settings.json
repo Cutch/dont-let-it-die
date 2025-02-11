@@ -7,4 +7,8 @@
     "source.fixAll.stylelint": "explicit"
   },
   "files.eol": "\n",
+  "cSpell.words": [
+    "dlid",
+    "spritesheet"
+  ],
 }

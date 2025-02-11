@@ -18,6 +18,7 @@
  #game_play_area.hide{
     display: none;
  }
+ /* Character Start */
  .character-selector{
     display: flex !important;
     flex-flow: wrap;
@@ -25,15 +26,30 @@
     gap: 1em;
     margin-bottom: 1em;
  }
+ 
+ /* Character Card Stop */
+
  /* Player Card Start */
 #players-container{
     display: flex;
     flex-flow: wrap;
     justify-content: center;
     gap: 1em;
+    grid-template-columns: 1fr 1fr;
+    display: grid
+;
 }
 .player-card{
     position: relative;
+}
+.player-card .color-marker{
+    position: absolute;
+    top: -0.5em;
+    left: -0.5em;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    border: 1px solid;
 }
 .player-card .character{
     position: absolute;
@@ -50,35 +66,74 @@
     top: 60px;
     left: 241px;
 }
+.player-card .health{
+    position: absolute;
+    top: 13px;
+    left: 127px;
+    width: 0.75em;
+    height: 0.75em;
+    transition: top, left, transform 1s linear;
+    border: 2px solid black;
+    border-radius: 50%;
+}
+.player-card .stamina{
+    position: absolute;
+    top: 38px;
+    left: 127px;
+    width: 0.75em;
+    height: 0.75em;
+    transition: top, left, transform 1s linear;
+    border: 2px solid black;
+    border-radius: 50%;
+}
 /* Player Card Stop */
+
+/* character Container Start */
+#character-container{
+    display: flex;
+    gap: 1rem;
+    margin: auto;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+/* Character Container Stop */
 
 /* Board Container Start */
 #board-container {
     position: relative;
 }
-#board-container .gather {
+.board {
+    position: relative;
+    place-self: anchor-center;
+}
+.board .gather {
     position: absolute;
     top: 34px;
-    left: 187px;
+    left: 189px;
 }
-#board-container .forage {
+.board .forage {
     position: absolute;
     top: 34px;
     left: 324px;
 }
-#board-container .harvest {
+.board .harvest {
     position: absolute;
     top: 34px;
-    left: 457px;
+    left: 460px;
 }
-#board-container .hunt {
+.board .hunt {
     position: absolute;
     top: 34px;
-    left: 594px;
+    left: 596px;
+}
+.action-button .stamina{
+    color: #ffff00;
+    margin-left: 0.25em;
 }
 /* Board Container Stop */
-.container {
-    margin: 0 auto;
+.dlid-container {
+    margin: 0 auto 1rem;
+    place-items: anchor-center;
 }
 .card {
     background-repeat: repeat;
@@ -88,6 +143,8 @@
 }
 .card-rotator {
     /* margin: 0 auto 1em; */
+    position: relative;
+    place-self: anchor-center;
 }
 /* #players-container .card-rotator {
     margin: 0;
@@ -107,64 +164,32 @@
 .card.items-card {
     background-image: url(img/items-spritesheet.png);
 }
+.card.token-card {
+    background-image: url(img/token-spritesheet.png);
+    border-radius: 50%;
+}
 .card.upgrades-card {
     background-image: url(img/upgrades-spritesheet.png);
 }
-
-/*
-    This is the CSS stylesheet of your game User Interface.
-    
-    Styles defined on this file will be applied to the HTML elements you define in your
-    HTML template (dontletitdie_dontletitdie.tpl), and to HTML elements you create dynamically
-    (in dontletitdie.js).
-    
-    Usually, you are using CSS to:
-    
-    1°) define the overall layout of your game
-        (ex: place the board on the top left, place player's hand beside, place the deck on the right, ...).
-
-    2°) create your CSS-sprites:
-        All images of your games should be gathered into a small number of image files. Then, using
-        background-image and background-position CSS properties, you create HTML blocks that can 
-        display these images correctly (see example below).
-    
-    3°) ... anything else:
-        It is really easy to add and remove CSS classes dynamically from your Javascript with
-        dojo.addClass and dojo.removeClass. It is also easy to check if an element has a class
-        (dojo.hasClass) or to get all elements with a specific class (dojo.query). This is why,
-        very often, using CSS classes for the logic of your user interface allow you to do complex
-        thing easily.
-        
-        
-     Note: on the production platform, this file will be compressed and comments will be removed.
-           Consequently, don't hesitate to put as many comments as necessary.
-*/
-
-
-/* Note: you must not use any @import directive */
-
-
-/********* You can start writing your CSS below this line: **********/
-
-
-/*
-    Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
-
-    .white_token {
-        background-image: url('img/tokens.png');
-        background-position: 0px 0px;
-    }
-    .black_token {
-        background-image: url('img/tokens.png');
-        background-position: -20px 0px;
-    }
-    .token {
-        width: 20px;
-        height: 20px;
-        background-repeat: none;
-    }
-*/
-
-
-
-
+.tokens{
+    display: flex;
+    gap: 1em;
+    flex-flow: row wrap;
+}
+.token{
+    position: relative;
+}
+.counter{
+    border-radius: 50%;
+    border: 2px solid black;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1.5em;
+    height: 1.5em;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

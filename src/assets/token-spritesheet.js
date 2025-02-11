@@ -1,8 +1,8 @@
 const tokenSprites = {
-  frames: {
-    "1-token": {
+  sprites: {
+    '1-token': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 0,
@@ -11,9 +11,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "1-unlocked": {
+    '1-unlocked': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 113,
@@ -22,9 +22,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "2-token": {
+    '2-token': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 226,
@@ -33,9 +33,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "2-unlocked": {
+    '2-unlocked': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 339,
@@ -44,9 +44,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "3-token": {
+    '3-token': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 452,
@@ -55,9 +55,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "3-unlocked": {
+    '3-unlocked': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 0,
@@ -66,9 +66,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "4-token": {
+    '4-token': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 113,
@@ -77,9 +77,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "4-unlocked": {
+    '4-unlocked': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 226,
@@ -88,9 +88,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "5-token": {
+    '5-token': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 339,
@@ -99,9 +99,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "5-unlocked": {
+    '5-unlocked': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 452,
@@ -110,9 +110,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "6-token": {
+    '6-token': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 0,
@@ -121,9 +121,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "6-unlocked": {
+    '6-unlocked': {
       options: {
-        type: "token",
+        type: 'token',
       },
       frame: {
         x: 113,
@@ -134,7 +134,7 @@ const tokenSprites = {
     },
     berry: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 226,
@@ -143,9 +143,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "berry-cooked": {
+    'berry-cooked': {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 339,
@@ -156,7 +156,7 @@ const tokenSprites = {
     },
     bone: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 452,
@@ -165,9 +165,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "dino-egg": {
+    'dino-egg': {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 0,
@@ -176,9 +176,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "egg-cooked": {
+    'dino-egg-cooked': {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 113,
@@ -189,7 +189,7 @@ const tokenSprites = {
     },
     fish: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 226,
@@ -198,9 +198,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "fish-cooked": {
+    'fish-cooked': {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 339,
@@ -211,7 +211,7 @@ const tokenSprites = {
     },
     fkp: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 452,
@@ -220,9 +220,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "fkp-unlocked": {
+    'fkp-unlocked': {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 0,
@@ -231,9 +231,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "gem-1": {
+    'gem-1': {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 113,
@@ -242,9 +242,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "gem-2": {
+    'gem-2': {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 226,
@@ -253,9 +253,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "gem-3": {
+    'gem-3': {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 339,
@@ -266,7 +266,7 @@ const tokenSprites = {
     },
     fiber: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 452,
@@ -277,7 +277,7 @@ const tokenSprites = {
     },
     hide: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 565,
@@ -286,9 +286,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    "meat-cooked": {
+    'meat-cooked': {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 565,
@@ -299,7 +299,7 @@ const tokenSprites = {
     },
     herbs: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 565,
@@ -310,7 +310,7 @@ const tokenSprites = {
     },
     meat: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 565,
@@ -319,9 +319,9 @@ const tokenSprites = {
         h: 113,
       },
     },
-    rock: {
+    stone: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 565,
@@ -332,7 +332,7 @@ const tokenSprites = {
     },
     stew: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 0,
@@ -343,7 +343,7 @@ const tokenSprites = {
     },
     trap: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 113,
@@ -354,7 +354,7 @@ const tokenSprites = {
     },
     wood: {
       options: {
-        type: "token",
+        type: 'resource',
       },
       frame: {
         x: 226,
@@ -365,12 +365,13 @@ const tokenSprites = {
     },
   },
   meta: {
-    version: "1.0",
-    image: "token-spritesheet.png",
+    version: '1.0',
+    image: 'token-spritesheet.png',
+    css: 'token-card',
     size: {
       w: 678,
       h: 678,
     },
-    scale: "1",
+    scale: '1',
   },
 };

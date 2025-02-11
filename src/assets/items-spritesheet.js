@@ -1,8 +1,8 @@
 const itemsSprites = {
   sprites: {
-    "bow-and-arrow": {
+    'bow-and-arrow': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 0,
@@ -12,9 +12,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "medical-hut": {
+    'medical-hut': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 438,
@@ -24,9 +24,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "bone-club": {
+    'bone-club': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 876,
@@ -36,9 +36,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "bone-scythe": {
+    'bone-scythe': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1314,
@@ -50,7 +50,7 @@ const itemsSprites = {
     },
     bag: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1752,
@@ -60,9 +60,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "bone-armor": {
+    'bone-armor': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 2190,
@@ -72,9 +72,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "camp-walls": {
+    'camp-walls': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 0,
@@ -86,7 +86,7 @@ const itemsSprites = {
     },
     fire: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 438,
@@ -96,9 +96,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "hide-armor": {
+    'hide-armor': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 876,
@@ -108,9 +108,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "knowledge-hut": {
+    'knowledge-hut': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1314,
@@ -122,7 +122,7 @@ const itemsSprites = {
     },
     skull: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1752,
@@ -134,7 +134,7 @@ const itemsSprites = {
     },
     hatchet: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 2190,
@@ -146,7 +146,7 @@ const itemsSprites = {
     },
     club: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 0,
@@ -156,9 +156,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "cooking-hut": {
+    'cooking-hut': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 438,
@@ -168,9 +168,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "carving-knife": {
+    'carving-knife': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 876,
@@ -180,9 +180,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "item-back": {
+    'item-back': {
       options: {
-        type: "back",
+        type: 'back',
       },
       frame: {
         x: 1314,
@@ -192,9 +192,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "sling-shot": {
+    'sling-shot': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1752,
@@ -204,9 +204,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "pick-axe": {
+    'pick-axe': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 2190,
@@ -216,9 +216,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "planning-hut": {
+    'planning-hut': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 0,
@@ -230,7 +230,7 @@ const itemsSprites = {
     },
     spear: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 438,
@@ -240,9 +240,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "sharp-stick": {
+    'sharp-stick': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 876,
@@ -254,7 +254,7 @@ const itemsSprites = {
     },
     shelter: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1314,
@@ -264,9 +264,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "rock-knife": {
+    'rock-knife': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1752,
@@ -276,9 +276,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "item-back-hindrance": {
+    'item-back-hindrance': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 2190,
@@ -288,9 +288,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "mortar-and-pestle": {
+    'mortar-and-pestle': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 0,
@@ -302,7 +302,7 @@ const itemsSprites = {
     },
     bandage: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 438,
@@ -312,9 +312,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "skull-shield": {
+    'skull-shield': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 876,
@@ -324,9 +324,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "cooking-pot": {
+    'cooking-pot': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1314,
@@ -336,9 +336,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "bone-claws": {
+    'bone-claws': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1752,
@@ -348,9 +348,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "bone-flute": {
+    'bone-flute': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 2190,
@@ -360,9 +360,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "stock-hut": {
+    'stock-hut': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 0,
@@ -374,7 +374,7 @@ const itemsSprites = {
     },
     whip: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 438,
@@ -384,9 +384,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "fire-stick": {
+    'fire-stick': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 876,
@@ -396,9 +396,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    rock: {
+    stone: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1314,
@@ -410,7 +410,7 @@ const itemsSprites = {
     },
     bola: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 1752,
@@ -422,7 +422,7 @@ const itemsSprites = {
     },
     boomerang: {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 2190,
@@ -432,9 +432,9 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    "stone-hammer": {
+    'stone-hammer': {
       options: {
-        type: "item",
+        type: 'item',
       },
       frame: {
         x: 2628,
@@ -446,13 +446,13 @@ const itemsSprites = {
     },
   },
   meta: {
-    version: "1.0",
-    image: "items-spritesheet.png",
-    css: "items-card",
+    version: '1.0',
+    image: 'items-spritesheet.png',
+    css: 'items-card',
     size: {
       w: 3066,
       h: 2640,
     },
-    scale: "1",
+    scale: '1',
   },
 };

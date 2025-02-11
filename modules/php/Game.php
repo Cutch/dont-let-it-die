@@ -18,11 +18,21 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-require_once APP_GAMEMODULE_PATH . "module/table/table.game.php";
+use Exception;
 
-class Game extends \Table {
+require_once APP_GAMEMODULE_PATH . 'module/table/table.game.php';
+
+class Game extends \Table
+{
+    protected $actions;
     private $cards;
     private static array $decksData;
+    private static array $charactersData;
+    private static array $tokensData;
+    private static array $boardsData;
+    private static array $itemsData;
+    private static array $upgradesData;
+    private static array $expansionData;
     /**
      * Your global variables labels:
      *
@@ -30,101 +40,308 @@ class Game extends \Table {
      * variables with IDs between 10 and 99. If your game has options (variants), you also have to associate here a
      * label to the corresponding ID in `gameoptions.inc.php`.
      *
-     * NOTE: afterward, you can get/set the global variables with `getGameStateValue`, `setGameStateInitialValue` or
+     * NOTE: afterward, you can get/set the global variables with `getGameStateValue`, `globals->set` or
      * `setGameStateValue` functions.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
-        $this->initGameStateLabels([
-            "my_first_global_variable" => 10,
-            "my_second_global_variable" => 11,
-            "my_first_game_variant" => 100,
-            "my_second_game_variant" => 101,
-        ]);
-        include dirname(__DIR__) . "/data/boards.php";
-        include dirname(__DIR__) . "/data/characters.php";
-        include dirname(__DIR__) . "/data/decks.php";
-        include dirname(__DIR__) . "/data/expansion.php";
-        include dirname(__DIR__) . "/data/items.php";
-        include dirname(__DIR__) . "/data/tokens.php";
-        include dirname(__DIR__) . "/data/upgrades.php";
-        self::$decksData = $decksData;
+        $this->initGameStateLabels([]);
 
-        /* example of notification decorator.
+        include dirname(__DIR__) . '/data/boards.php';
+        include dirname(__DIR__) . '/data/characters.php';
+        include dirname(__DIR__) . '/data/decks.php';
+        include dirname(__DIR__) . '/data/expansion.php';
+        include dirname(__DIR__) . '/data/items.php';
+        include dirname(__DIR__) . '/data/tokens.php';
+        include dirname(__DIR__) . '/data/upgrades.php';
+
+        self::$decksData = $decksData;
+        self::$charactersData = $charactersData;
+        self::$tokensData = $tokensData;
+        self::$boardsData = $boardsData;
+        self::$itemsData = $itemsData;
+        self::$upgradesData = $upgradesData;
+        self::$expansionData = $expansionData;
+
+        $_this = $this;
+        $this->actions = [
+            'actInvestigateFire' => [
+                'stamina' => 3,
+            ],
+            'actCraft' => [
+                'stamina' => 3,
+            ],
+            'actDrawGather' => [
+                'stamina' => 2,
+            ],
+            'actDrawForage' => [
+                'stamina' => 2,
+            ],
+            'actDrawHarvest' => [
+                'stamina' => 3,
+            ],
+            'actDrawHunt' => [
+                'stamina' => 3,
+            ],
+            'actSpendFKP' => [
+                'stamina' => 0,
+                'requires' => function () use ($_this) {
+                    $fkp = $_this->globals->get('fkp');
+                    return $fkp > 0;
+                },
+            ],
+            'actAddWood' => [
+                'stamina' => 0,
+                'requires' => function () use ($_this) {
+                    $wood = $_this->globals->get('wood');
+                    return $wood > 0;
+                },
+            ],
+            'actEat' => [
+                'stamina' => 0,
+                'requires' => function () use ($_this) {
+                    $variables = $_this->globals->getAll();
+                    $array = array_filter(
+                        self::$tokensData,
+                        function ($v, $k) use ($variables) {
+                            if (isset($variables[$k])) {
+                                return array_key_exists('cooked', $v['options']) && $v['options']['actEat']['count'] >= $variables[$k];
+                            }
+                        },
+                        ARRAY_FILTER_USE_BOTH
+                    );
+                    return sizeof($array) > 0;
+                },
+            ],
+            'actCook' => [
+                'stamina' => 1,
+                'requires' => function () use ($_this) {
+                    $array = array_filter(
+                        self::$tokensData,
+                        function ($v, $k) {
+                            return array_key_exists('cookable', $v['options']);
+                        },
+                        ARRAY_FILTER_USE_BOTH
+                    );
+                    $variables = $_this->globals->getAll();
+                    $count = 0;
+                    foreach ($array as $key => $value) {
+                        if (isset($variables[$key])) {
+                            $count += $variables[$key];
+                        }
+                    }
+                    return $count >= 3;
+                },
+            ],
+            'actTrade' => [
+                'stamina' => 1,
+                'requires' => function () use ($_this) {
+                    $array = array_filter(
+                        self::$tokensData,
+                        function ($v, $k) {
+                            return $v['options']['type'] === 'resource';
+                        },
+                        ARRAY_FILTER_USE_BOTH
+                    );
+                    $variables = $_this->globals->getAll();
+                    $count = 0;
+                    foreach ($array as $key => $value) {
+                        if (isset($variables[$key])) {
+                            $count += $variables[$key];
+                        }
+                    }
+                    return $count >= 3;
+                },
+            ],
+        ];
         // automatically complete notification args when needed
-        $this->notify->addDecorator(function(string $message, array $args) {
+        $this->notify->addDecorator(function (string $message, array $args) {
             if (isset($args['player_id']) && !isset($args['player_name']) && str_contains($message, '${player_name}')) {
                 $args['player_name'] = $this->getPlayerNameById($args['player_id']);
             }
-        
-            if (isset($args['card_id']) && !isset($args['card_name']) && str_contains($message, '${card_name}')) {
-                $args['card_name'] = self::$CARD_TYPES[$args['card_id']]['card_name'];
-                $args['i18n'][] = ['card_name'];
-            }
-            
+            // if (isset($args['character_id']) && !isset($args['character_name']) && str_contains($message, '${character_name}')) {
+            //     $args['character_name'] = self::$charactersData[$args['character_id']]['name'];
+            // }
+
             return $args;
-        });*/
+        });
     }
-    public function actDraw(int $player_id, $deck): void {
-        $card = $this->cards->pickCards(13, $deck, $player_id);
-
-        // at the end of the action, move to the next state
-        $this->gamestate->nextState("evaluateCard");
-    }
-    /**
-     * Player action, example content.
-     *
-     * In this scenario, each time a player plays a card, this method will be called. This method is called directly
-     * by the action trigger on the front side with `bgaPerformAction`.
-     *
-     * @throws BgaUserException
-     */
-    public function actPlayCard(int $card_id): void {
-        // Retrieve the active player ID.
+    public function getActiveCharacter()
+    {
         $player_id = (int) $this->getActivePlayerId();
+    }
+    public function actCharacterClicked(
+        string $character1,
+        string $character2 = null,
+        string $character3 = null,
+        string $character4 = null
+    ): void {
+        $this->validateCharacterCount($character1, $character2, $character3, $character4);
+        $player_id = $this->getCurrentPlayerId();
 
-        // check input values
-        $args = $this->argPlayerTurn();
-        $playableCardsIds = $args["playableCardsIds"];
-        if (!in_array($card_id, $playableCardsIds)) {
-            throw new \BgaUserException("Invalid card choice");
+        self::DbQuery("DELETE FROM `character` WHERE player_id = $player_id");
+        self::DbQuery("INSERT INTO `character` (`character_name`, `player_id`) VALUES ('$character1', $player_id)");
+        if ($character2) {
+            self::DbQuery("INSERT INTO `character` (`character_name`, `player_id`) VALUES ('$character2', $player_id)");
+        }
+        if ($character3) {
+            self::DbQuery("INSERT INTO `character` (`character_name`, `player_id`) VALUES ('$character3', $player_id)");
+        }
+        if ($character4) {
+            self::DbQuery("INSERT INTO `character` (`character_name`, `player_id`) VALUES ('$character4', $player_id)");
         }
 
-        // Add your game logic to play a card here.
-        // $card_name = self::$CARD_TYPES[$card_id]["card_name"];
+        $this->notify->all('characterClicked', '', [
+            'characters' => $this->getCollectionFromDb('SELECT `player_id`, `character_name` FROM `character`'),
+        ]);
+    }
+    private function validateCharacterCount(
+        string $character1,
+        string $character2 = null,
+        string $character3 = null,
+        string $character4 = null
+    ) {
+        if ($character1) {
+            if (!preg_match('/^[A-Z][a-z]+$/', $character1)) {
+                throw new Exception('Bad value for character');
+            }
+        }
+        if ($character2) {
+            if (!preg_match('/^[A-Z][a-z]+$/', $character2)) {
+                throw new Exception('Bad value for character');
+            }
+        }
+        if ($character3) {
+            if (!preg_match('/^[A-Z][a-z]+$/', $character3)) {
+                throw new Exception('Bad value for character');
+            }
+        }
+        if ($character4) {
+            if (!preg_match('/^[A-Z][a-z]+$/', $character4)) {
+                throw new Exception('Bad value for character');
+            }
+        }
+        $playerId = $this->getCurrentPlayerId();
+        $players = $this->loadPlayersBasicInfos();
+        $playerCount = sizeof($players);
+        $count = 0;
+        if ($playerCount == 3) {
+            $count = ((string) $players[$playerId]['player_no']) == '1' ? 2 : 1;
+        } elseif ($playerCount == 1) {
+            $count = 4;
+        } elseif ($playerCount == 2) {
+            $count = 2;
+        } elseif ($playerCount == 4) {
+            $count = 1;
+        }
+        if (($character1 ? 1 : 0) + ($character2 ? 1 : 0) + ($character3 ? 1 : 0) + ($character4 ? 1 : 0) > $count) {
+            throw new Exception('Too many characters selected ');
+        }
+    }
+    public function actChooseCharacters(
+        string $character1,
+        string $character2 = null,
+        string $character3 = null,
+        string $character4 = null
+    ): void {
+        $player_id = $this->getCurrentPlayerId();
+        $this->validateCharacterCount($character1, $character2, $character3, $character4);
+        self::DbQuery("UPDATE `character` set `confirm` = 1 WHERE `player_id` = $player_id");
+        $this->notify->all(
+            'chooseCharacters',
+            clienttranslate(
+                '${player_name} selected ${character1}' +
+                    ($character2 ? ' and ${character2}' : '') +
+                    ($character3 ? ' and ${character2}' : '') +
+                    ($character4 ? ' and ${character2}' : '')
+            ),
+            [
+                'characters' => $this->getCollectionFromDb('SELECT `player_id`, `character_name` FROM `character`'),
+                'character1' => $character1,
+                'character2' => $character2,
+                'character3' => $character3,
+                'character4' => $character4,
+            ]
+        );
+        $this->gamestate->nextState('start');
+    }
+    public function actEat(): void
+    {
+        $player_id = (int) $this->getActivePlayerId();
 
-        // // Notify all players about the card played.
-        // $this->notify->all(
-        //     "cardPlayed",
-        //     clienttranslate('${player_name} plays ${card_name}'),
-        //     [
-        //         "player_id" => $player_id,
-        //         "player_name" => $this->getActivePlayerName(), // remove this line if you uncomment notification decorator
-        //         "card_name" => $card_name, // remove this line if you uncomment notification decorator
-        //         "card_id" => $card_id,
-        //         "i18n" => ["card_name"], // remove this line if you uncomment notification decorator
-        //     ]
-        // );
+        $this->notify->all('tokenUsed', clienttranslate('${player_name}(${character_name}) ate'), [
+            'player_id' => $player_id,
+            'character_name' => 'Gronk',
+            'i18n' => ['card_name'], // remove this line if you uncomment notification decorator
+            'gameData' => $this->getAllDatas(),
+        ]);
+    }
+    public function actDrawGather(): void
+    {
+        $this->actDraw('gather');
+    }
+    public function actDrawForage(): void
+    {
+        $this->actDraw('forage');
+    }
+    public function actDrawHarvest(): void
+    {
+        $this->actDraw('harvest');
+    }
+    public function actDrawHunt(): void
+    {
+        $this->actDraw('hunt');
+    }
+    public function actDraw(string $deck): void
+    {
+        $player_id = (int) $this->getActivePlayerId();
+        $card = $this->cards->pickCards(1, $deck, $player_id);
+
+        $this->notify->all('cardDrawn', clienttranslate('${player_name}(${character_name}) drew from the ${deck} deck'), [
+            'player_id' => $player_id,
+            'character_name' => '',
+            'deck' => $deck,
+            'i18n' => ['card_name'], // remove this line if you uncomment notification decorator
+        ]);
 
         // at the end of the action, move to the next state
-        $this->gamestate->nextState("playCard");
+        $this->gamestate->nextState('evaluateCard');
     }
-
-    public function actPass(): void {
+    public function actPass(): void
+    {
         // Retrieve the active player ID.
         $player_id = (int) $this->getActivePlayerId();
 
         // Notify all players about the choice to pass.
-        $this->notify->all("pass", clienttranslate('${player_name} passes'), [
-            "player_id" => $player_id,
-            "player_name" => $this->getActivePlayerName(), // remove this line if you uncomment notification decorator
+        $this->notify->all('pass', clienttranslate('${player_name} passes'), [
+            'player_id' => $player_id,
+            'player_name' => $this->getActivePlayerName(), // remove this line if you uncomment notification decorator
         ]);
 
         // at the end of the action, move to the next state
-        $this->gamestate->nextState("pass");
+        $this->gamestate->nextState('pass');
     }
 
+    /**
+     * Get character stamina
+     * @return int
+     * @see ./states.inc.php
+     */
+    public function getStamina(): int
+    {
+        return 30;
+    }
+    /**
+     * Get character stamina cost
+     * @return int
+     * @see ./states.inc.php
+     */
+    public function getStaminaCost($action): int
+    {
+        return $this->actions[$action]['stamina'];
+    }
     /**
      * Game state arguments, example content.
      *
@@ -133,11 +350,43 @@ class Game extends \Table {
      * @return array
      * @see ./states.inc.php
      */
-    public function argPlayerTurn(): array {
+    public function argSelectionCount(): array
+    {
+        $result = [];
+        $this->getAllCharacters($result);
+        return $result;
+    }
+    /**
+     * Game state arguments, example content.
+     *
+     * This method returns some additional information that is very specific to the `playerTurn` game state.
+     *
+     * @return array
+     * @see ./states.inc.php
+     */
+    public function argPlayableActions(): array
+    {
         // Get some values from the current game situation from the database.
-
+        $validActionsFiltered = array_filter(
+            $this->actions,
+            function ($v, $k) {
+                return (!array_key_exists('requires', $v) || $v['requires']()) && $this->getStaminaCost($k) <= $this->getStamina();
+            },
+            ARRAY_FILTER_USE_BOTH
+        );
+        $validActions = array_column(
+            array_map(
+                function ($k, $v) {
+                    return [$k, $this->getStaminaCost($k)];
+                },
+                array_keys($validActionsFiltered),
+                $validActionsFiltered
+            ),
+            1,
+            0
+        );
         return [
-            "playableCardsIds" => [1, 2],
+            'actions' => $validActions,
         ];
     }
 
@@ -151,10 +400,10 @@ class Game extends \Table {
      * @return int
      * @see ./states.inc.php
      */
-    public function getGameProgression() {
+    public function getGameProgression()
+    {
         // TODO: compute and return the game progression
-
-        return 0;
+        return $this->globals->get('day') / 14;
     }
 
     /**
@@ -162,7 +411,8 @@ class Game extends \Table {
      *
      * The action method of state `nextPlayer` is called everytime the current game state is set to `nextPlayer`.
      */
-    public function stNextPlayer(): void {
+    public function stNextPlayer(): void
+    {
         // Retrieve the active player ID.
         $player_id = (int) $this->getActivePlayerId();
 
@@ -173,7 +423,7 @@ class Game extends \Table {
 
         // Go to another gamestate
         // Here, we would detect if the game is over, and in this case use "endGame" transition instead
-        $this->gamestate->nextState("nextPlayer");
+        $this->gamestate->nextState('nextPlayer');
     }
 
     /**
@@ -187,7 +437,8 @@ class Game extends \Table {
      * @param int $from_version
      * @return void
      */
-    public function upgradeTableDb($from_version) {
+    public function upgradeTableDb($from_version)
+    {
         //       if ($from_version <= 1404301345)
         //       {
         //            // ! important ! Use DBPREFIX_<table_name> for all tables
@@ -204,7 +455,41 @@ class Game extends \Table {
         //            $this->applyDbUpgradeToAllDB( $sql );
         //       }
     }
-
+    protected function getAllCharacters(&$result): void
+    {
+        $result['players'] = $this->getCollectionFromDb('SELECT `player_id` `id`, `player_score` `score`, player_no FROM `player`');
+        $result['characters'] = $this->getCollectionFromDb('SELECT * FROM `character`');
+    }
+    protected function getDecksCharacters(&$result): void
+    {
+        $result['decks'] = $this->getCollectionFromDb(
+            'SELECT `card_type` `type`, `card_location` `loc`, count(1) `count` FROM `card` GROUP BY card_type, card_location'
+        );
+        $result['discards'] = $this->getCollectionFromDb(
+            "SELECT `card_type` `type`, MAX(`card_name`) `name`
+            FROM `card` a
+            WHERE `card_location` = 'discard' AND `card_location_arg` = (SELECT MAX(`card_location_arg`) FROM `card` b WHERE `card_location` = 'discard' AND a.`card_type` = b.`card_type`)
+            GROUP BY card_type, card_location"
+        );
+    }
+    protected function getGameData(&$result): void
+    {
+        $result['game'] = $this->globals->getAll();
+        $resourcesAvailable = [];
+        array_walk(self::$tokensData, function ($v, $k) use ($result, &$resourcesAvailable) {
+            if ($v['options']['type'] == 'resource' && isset($result['game'][$k])) {
+                if (isset($v['options']['cooked'])) {
+                    $cooked = $v['options']['cooked'];
+                    $resourcesAvailable[$cooked] =
+                        (isset($resourcesAvailable[$cooked]) ? $resourcesAvailable[$cooked] : 0) - $result['game'][$k];
+                } else {
+                    $resourcesAvailable[$k] =
+                        (isset($resourcesAvailable[$k]) ? $resourcesAvailable[$k] : 0) + $v['options']['count'] - $result['game'][$k];
+                }
+            }
+        });
+        $result['resourcesAvailable'] = $resourcesAvailable;
+    }
     /*
      * Gather all information about current game situation (visible by the current player).
      *
@@ -213,20 +498,16 @@ class Game extends \Table {
      * - when the game starts
      * - when a player refreshes the game page (F5)
      */
-    protected function getAllDatas(): array {
+    protected function getAllDatas(): array
+    {
         $result = [];
 
         // WARNING: We must only return information visible by the current player.
         $current_player_id = (int) $this->getCurrentPlayerId();
 
-        // Get information about players.
-        // NOTE: you can retrieve some extra field you added for "player" table in `dbmodel.sql` if you need it.
-        $result["players"] = $this->getCollectionFromDb(
-            "SELECT `player_id` `id`, `player_score` `score` FROM `player`"
-        );
-
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
-
+        $this->getAllCharacters($result);
+        $this->getDecksCharacters($result);
+        $this->getGameData($result);
         return $result;
     }
 
@@ -235,109 +516,102 @@ class Game extends \Table {
      *
      * IMPORTANT: Please do not modify.
      */
-    protected function getGameName() {
-        return "dontletitdie";
+    protected function getGameName()
+    {
+        return 'dontletitdie';
     }
 
-    protected function createDeck($type) {
+    protected function createDeck($type)
+    {
         $filtered_cards = array_filter(
             self::$decksData,
             function ($v, $k) use ($type) {
-                return $v["options"]["deck"] == $type;
+                return $v['options']['deck'] == $type;
             },
             ARRAY_FILTER_USE_BOTH
         );
         $cards = array_map(
             function ($k, $v) {
                 return [
-                    "type" => $v["options"]["deck"],
-                    "card_name" => $k,
-                    "card_location" => "deck",
-                    "type_arg" => 0,
-                    "nbr" => $v["count"] ?? 1,
+                    'type' => $v['options']['deck'],
+                    'card_name' => $k,
+                    'card_location' => 'deck',
+                    'type_arg' => 0,
+                    'nbr' => $v['count'] ?? 1,
                 ];
             },
             array_keys($filtered_cards),
             $filtered_cards
         );
-        $this->cards->createCards($cards, "deck");
+        $this->cards->createCards($cards, 'deck');
     }
     /**
      * This method is called only once, when a new game is launched. In this method, you must setup the game
      *  according to the game rules, so that the game is ready to be played.
      */
-    protected function setupNewGame($players, $options = []) {
+    protected function setupNewGame($players, $options = [])
+    {
         // global $decksData;
         // Set the colors of the players with HTML color code. The default below is red/green/blue/orange/brown. The
         // number of colors defined here must correspond to the maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
         // echo $decksData;
-        $default_colors = $gameinfos["player_colors"];
+        $default_colors = $gameinfos['player_colors'];
 
+        $this->cards = $this->getNew('module.common.deck');
+        $this->cards->autoreshuffle = true;
+        $this->cards->init('card');
+
+        $this->createDeck('harvest');
+        $this->createDeck('hunt');
+        $this->createDeck('gather');
+        $this->createDeck('explore');
+        $this->createDeck('day-event');
+        $this->createDeck('night-event');
+        $this->createDeck('hindrance');
+        // Create players based on generic information.
+        //
         foreach ($players as $player_id => $player) {
             // Now you can access both $player_id and $player array
             $query_values[] = vsprintf("('%s', '%s', '%s', '%s', '%s')", [
                 $player_id,
                 array_shift($default_colors),
-                $player["player_canal"],
-                addslashes($player["player_name"]),
-                addslashes($player["player_avatar"]),
+                $player['player_canal'],
+                addslashes($player['player_name']),
+                addslashes($player['player_avatar']),
             ]);
         }
-        $this->cards = $this->getNew("module.common.deck");
-        $this->cards->autoreshuffle = true;
-        $this->cards->init("card");
-        // $this->harvestCards = $this->getNew("module.common.deck");
-        // $this->harvestCards->init("harvest_card");
-        // $this->huntCards = $this->getNew("module.common.deck");
-        // $this->huntCards->init("hunt_card");
-        // $this->exploreCards = $this->getNew("module.common.deck");
-        // $this->exploreCards->init("explore_card");
-        // $this->dayEventCards = $this->getNew("module.common.deck");
-        // $this->dayEventCards->init("day_event_card");
-        // $this->nightEventCards = $this->getNew("module.common.deck");
-        // $this->nightEventCards->init("night_event_card");
-        // $this->hinderanceCards = $this->getNew("module.common.deck");
-        // $this->hinderanceCards->init("hindrance_event_card");
-
-        $this->createDeck("harvest");
-        $this->createDeck("hunt");
-        $this->createDeck("gather");
-        $this->createDeck("explore");
-        $this->createDeck("day-event");
-        $this->createDeck("night-event");
-        $this->createDeck("hindrance");
-        // Create players based on generic information.
-        //
         // NOTE: You can add extra field on player table in the database (see dbmodel.sql) and initialize
         // additional fields directly here.
         static::DbQuery(
             sprintf(
-                "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES %s",
-                implode(",", $query_values)
+                'INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES %s',
+                implode(',', $query_values)
             )
         );
 
-        $this->reattributeColorsBasedOnPreferences(
-            $players,
-            $gameinfos["player_colors"]
-        );
+        $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         $this->reloadPlayersBasicInfos();
-
-        // Init global values with their initial values.
-
-        // Dummy content.
-        $this->setGameStateInitialValue("my_first_global_variable", 0);
-
-        // Init game statistics.
-        //
-        // NOTE: statistics used in this file must be defined in your `stats.inc.php` file.
-
-        // Dummy content.
-        // $this->initStat("table", "table_teststat1", 0);
-        // $this->initStat("player", "player_teststat1", 0);
-
-        // TODO: Setup the initial game situation here.
+        $this->globals->set('day', 1);
+        $this->globals->set('firstPlayerId', 0);
+        $this->globals->set('wood', 0);
+        $this->globals->set('bone', 0);
+        $this->globals->set('meat', 0);
+        $this->globals->set('meat-cooked', 0);
+        $this->globals->set('fish', 0);
+        $this->globals->set('fish-cooked', 0);
+        $this->globals->set('dino-egg', 0);
+        $this->globals->set('dino-egg-cooked', 0);
+        $this->globals->set('berry', 0);
+        $this->globals->set('berry-cooked', 0);
+        $this->globals->set('stone', 0);
+        $this->globals->set('stew', 0);
+        $this->globals->set('fiber', 0);
+        $this->globals->set('hide', 0);
+        $this->globals->set('trap', 0);
+        $this->globals->set('herbs', 0);
+        $this->globals->set('fkp', 0);
+        $this->globals->set('gem', 0);
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
@@ -359,13 +633,14 @@ class Game extends \Table {
      * @return void
      * @throws feException if the zombie mode is not supported at this game state.
      */
-    protected function zombieTurn(array $state, int $active_player): void {
-        $state_name = $state["name"];
+    protected function zombieTurn(array $state, int $active_player): void
+    {
+        $state_name = $state['name'];
 
-        if ($state["type"] === "activeplayer") {
+        if ($state['type'] === 'activeplayer') {
             switch ($state_name) {
                 default:
-                    $this->gamestate->nextState("zombiePass");
+                    $this->gamestate->nextState('zombiePass');
                     break;
             }
 
@@ -373,13 +648,11 @@ class Game extends \Table {
         }
 
         // Make sure player is in a non-blocking status for role turn.
-        if ($state["type"] === "multipleactiveplayer") {
-            $this->gamestate->setPlayerNonMultiactive($active_player, "");
+        if ($state['type'] === 'multipleactiveplayer') {
+            $this->gamestate->setPlayerNonMultiactive($active_player, '');
             return;
         }
 
-        throw new \feException(
-            "Zombie mode not supported at this game state: \"{$state_name}\"."
-        );
+        throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
     }
 }
