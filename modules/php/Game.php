@@ -108,7 +108,7 @@ class Game extends \Table
                         self::$tokensData,
                         function ($v, $k) use ($variables) {
                             if (isset($variables[$k])) {
-                                return array_key_exists('cooked', $v['options']) && $v['options']['actEat']['count'] >= $variables[$k];
+                                return array_key_exists('cooked', $v) && $v['actEat']['count'] >= $variables[$k];
                             }
                         },
                         ARRAY_FILTER_USE_BOTH
@@ -122,7 +122,7 @@ class Game extends \Table
                     $array = array_filter(
                         self::$tokensData,
                         function ($v, $k) {
-                            return array_key_exists('cookable', $v['options']);
+                            return array_key_exists('cookable', $v);
                         },
                         ARRAY_FILTER_USE_BOTH
                     );
@@ -142,7 +142,7 @@ class Game extends \Table
                     $array = array_filter(
                         self::$tokensData,
                         function ($v, $k) {
-                            return $v['options']['type'] === 'resource';
+                            return $v['type'] === 'resource';
                         },
                         ARRAY_FILTER_USE_BOTH
                     );
@@ -524,14 +524,14 @@ class Game extends \Table
         $result['game'] = $this->globals->getAll();
         $resourcesAvailable = [];
         array_walk(self::$tokensData, function ($v, $k) use ($result, &$resourcesAvailable) {
-            if ($v['options']['type'] == 'resource' && isset($result['game'][$k])) {
-                if (isset($v['options']['cooked'])) {
-                    $cooked = $v['options']['cooked'];
+            if ($v['type'] == 'resource' && isset($result['game'][$k])) {
+                if (isset($v['cooked'])) {
+                    $cooked = $v['cooked'];
                     $resourcesAvailable[$cooked] =
                         (isset($resourcesAvailable[$cooked]) ? $resourcesAvailable[$cooked] : 0) - $result['game'][$k];
                 } else {
                     $resourcesAvailable[$k] =
-                        (isset($resourcesAvailable[$k]) ? $resourcesAvailable[$k] : 0) + $v['options']['count'] - $result['game'][$k];
+                        (isset($resourcesAvailable[$k]) ? $resourcesAvailable[$k] : 0) + $v['count'] - $result['game'][$k];
                 }
             }
         });
@@ -574,14 +574,14 @@ class Game extends \Table
         $filtered_cards = array_filter(
             self::$decksData,
             function ($v, $k) use ($type) {
-                return $v['options']['deck'] == $type;
+                return $v['deck'] == $type;
             },
             ARRAY_FILTER_USE_BOTH
         );
         $cards = array_map(
             function ($k, $v) {
                 return [
-                    'type' => $v['options']['deck'],
+                    'type' => $v['deck'],
                     'card_name' => $k,
                     'card_location' => 'deck',
                     'type_arg' => 0,
