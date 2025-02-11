@@ -3,6 +3,7 @@ const itemsSprites = {
     'bow-and-arrow': {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 0,
@@ -15,6 +16,7 @@ const itemsSprites = {
     'medical-hut': {
       options: {
         type: 'item',
+        itemType: 'building',
       },
       frame: {
         x: 438,
@@ -27,6 +29,7 @@ const itemsSprites = {
     'bone-club': {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 876,
@@ -39,6 +42,7 @@ const itemsSprites = {
     'bone-scythe': {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 1314,
@@ -51,6 +55,7 @@ const itemsSprites = {
     bag: {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 1752,
@@ -63,6 +68,7 @@ const itemsSprites = {
     'bone-armor': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 2190,
@@ -75,6 +81,7 @@ const itemsSprites = {
     'camp-walls': {
       options: {
         type: 'item',
+        itemType: 'building',
       },
       frame: {
         x: 0,
@@ -86,7 +93,7 @@ const itemsSprites = {
     },
     fire: {
       options: {
-        type: 'item',
+        type: 'game-piece',
       },
       frame: {
         x: 438,
@@ -99,6 +106,7 @@ const itemsSprites = {
     'hide-armor': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 876,
@@ -111,6 +119,7 @@ const itemsSprites = {
     'knowledge-hut': {
       options: {
         type: 'item',
+        itemType: 'building',
       },
       frame: {
         x: 1314,
@@ -122,7 +131,7 @@ const itemsSprites = {
     },
     skull: {
       options: {
-        type: 'item',
+        type: 'game-piece',
       },
       frame: {
         x: 1752,
@@ -135,6 +144,7 @@ const itemsSprites = {
     hatchet: {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 2190,
@@ -147,6 +157,7 @@ const itemsSprites = {
     club: {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 0,
@@ -159,6 +170,7 @@ const itemsSprites = {
     'cooking-hut': {
       options: {
         type: 'item',
+        itemType: 'building',
       },
       frame: {
         x: 438,
@@ -171,6 +183,7 @@ const itemsSprites = {
     'carving-knife': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 876,
@@ -195,6 +208,7 @@ const itemsSprites = {
     'sling-shot': {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 1752,
@@ -207,6 +221,7 @@ const itemsSprites = {
     'pick-axe': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 2190,
@@ -219,6 +234,7 @@ const itemsSprites = {
     'planning-hut': {
       options: {
         type: 'item',
+        itemType: 'building',
       },
       frame: {
         x: 0,
@@ -231,6 +247,7 @@ const itemsSprites = {
     spear: {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 438,
@@ -243,6 +260,7 @@ const itemsSprites = {
     'sharp-stick': {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 876,
@@ -255,6 +273,7 @@ const itemsSprites = {
     shelter: {
       options: {
         type: 'item',
+        itemType: 'building',
       },
       frame: {
         x: 1314,
@@ -267,6 +286,7 @@ const itemsSprites = {
     'rock-knife': {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 1752,
@@ -291,6 +311,7 @@ const itemsSprites = {
     'mortar-and-pestle': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 0,
@@ -303,6 +324,7 @@ const itemsSprites = {
     bandage: {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 438,
@@ -315,6 +337,7 @@ const itemsSprites = {
     'skull-shield': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 876,
@@ -327,6 +350,7 @@ const itemsSprites = {
     'cooking-pot': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 1314,
@@ -339,6 +363,7 @@ const itemsSprites = {
     'bone-claws': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 1752,
@@ -351,6 +376,7 @@ const itemsSprites = {
     'bone-flute': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 2190,
@@ -363,6 +389,7 @@ const itemsSprites = {
     'stock-hut': {
       options: {
         type: 'item',
+        itemType: 'building',
       },
       frame: {
         x: 0,
@@ -375,6 +402,7 @@ const itemsSprites = {
     whip: {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 438,
@@ -387,6 +415,7 @@ const itemsSprites = {
     'fire-stick': {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 876,
@@ -396,9 +425,10 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    stone: {
+    rock: {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 1314,
@@ -411,6 +441,7 @@ const itemsSprites = {
     bola: {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 1752,
@@ -423,6 +454,7 @@ const itemsSprites = {
     boomerang: {
       options: {
         type: 'item',
+        itemType: 'weapon',
       },
       frame: {
         x: 2190,
@@ -435,6 +467,7 @@ const itemsSprites = {
     'stone-hammer': {
       options: {
         type: 'item',
+        itemType: 'tool',
       },
       frame: {
         x: 2628,

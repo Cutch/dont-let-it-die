@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
+use BgaUserException;
 use Exception;
 
 require_once APP_GAMEMODULE_PATH . 'module/table/table.game.php';
@@ -170,59 +171,66 @@ class Game extends \Table
     }
     public function getActiveCharacter()
     {
-        $player_id = (int) $this->getActivePlayerId();
+        $playerId = (int) $this->getActivePlayerId();
     }
     public function actCharacterClicked(
-        string $character1,
+        string $character1 = null,
         string $character2 = null,
         string $character3 = null,
         string $character4 = null
     ): void {
-        $this->validateCharacterCount($character1, $character2, $character3, $character4);
-        $player_id = $this->getCurrentPlayerId();
-
-        self::DbQuery("DELETE FROM `character` WHERE player_id = $player_id");
-        self::DbQuery("INSERT INTO `character` (`character_name`, `player_id`) VALUES ('$character1', $player_id)");
-        if ($character2) {
-            self::DbQuery("INSERT INTO `character` (`character_name`, `player_id`) VALUES ('$character2', $player_id)");
+        $characters = [$character1, $character2, $character3, $character4];
+        $this->validateCharacterCount(false, $characters);
+        $playerId = $this->getCurrentPlayerId();
+        // Check if already selected
+        $escapedCharacterList = join(
+            ', ',
+            array_map(function ($char) use ($playerId) {
+                $char = self::escapeStringForDB($char);
+                return "'$char'";
+            }, array_filter($characters))
+        );
+        if (
+            $escapedCharacterList &&
+            sizeof(
+                array_values(
+                    $this->getCollectionFromDb(
+                        "SELECT 1 FROM `character` WHERE player_id != $playerId AND character_name in (" . $escapedCharacterList . ')'
+                    )
+                )
+            ) > 0
+        ) {
+            throw new BgaUserException($this->_('Character Selected By Another Player'));
         }
-        if ($character3) {
-            self::DbQuery("INSERT INTO `character` (`character_name`, `player_id`) VALUES ('$character3', $player_id)");
-        }
-        if ($character4) {
-            self::DbQuery("INSERT INTO `character` (`character_name`, `player_id`) VALUES ('$character4', $player_id)");
-        }
-
-        $this->notify->all('characterClicked', '', [
-            'characters' => $this->getCollectionFromDb('SELECT `player_id`, `character_name` FROM `character`'),
-        ]);
-    }
-    private function validateCharacterCount(
-        string $character1,
-        string $character2 = null,
-        string $character3 = null,
-        string $character4 = null
-    ) {
+        // Remove player's previous selected
+        self::DbQuery("DELETE FROM `character` WHERE player_id = $playerId");
+        // Add player's current selected
         if ($character1) {
-            if (!preg_match('/^[A-Z][a-z]+$/', $character1)) {
-                throw new Exception('Bad value for character');
+            $values = join(
+                ', ',
+                array_map(function ($char) use ($playerId) {
+                    $char = self::escapeStringForDB($char);
+                    return "('$char', $playerId)";
+                }, array_filter($characters))
+            );
+            self::DbQuery("INSERT INTO `character` (`character_name`, `player_id`) VALUES $values");
+        }
+        // Notify Players
+        $results = [];
+        $this->getAllCharacters($results);
+        $this->notify->all('characterClicked', '', $results);
+    }
+    private function validateCharacterCount(bool $checkIfNotEnough, array $characters)
+    {
+        // Check for bad character name
+        foreach ($characters as $index => $char) {
+            if ($char) {
+                if (!preg_match('/^[A-Z][a-z]+$/', $char)) {
+                    throw new Exception('Bad value for character');
+                }
             }
         }
-        if ($character2) {
-            if (!preg_match('/^[A-Z][a-z]+$/', $character2)) {
-                throw new Exception('Bad value for character');
-            }
-        }
-        if ($character3) {
-            if (!preg_match('/^[A-Z][a-z]+$/', $character3)) {
-                throw new Exception('Bad value for character');
-            }
-        }
-        if ($character4) {
-            if (!preg_match('/^[A-Z][a-z]+$/', $character4)) {
-                throw new Exception('Bad value for character');
-            }
-        }
+        // Check how many characters the player can select
         $playerId = $this->getCurrentPlayerId();
         $players = $this->loadPlayersBasicInfos();
         $playerCount = sizeof($players);
@@ -236,43 +244,65 @@ class Game extends \Table
         } elseif ($playerCount == 4) {
             $count = 1;
         }
-        if (($character1 ? 1 : 0) + ($character2 ? 1 : 0) + ($character3 ? 1 : 0) + ($character4 ? 1 : 0) > $count) {
-            throw new Exception('Too many characters selected ');
+        if (sizeof(array_filter($characters)) > $count) {
+            throw new BgaUserException($this->_('Too many characters selected'));
+        }
+        if ($checkIfNotEnough && sizeof(array_filter($characters)) != $count) {
+            throw new BgaUserException($this->_('Not enough characters selected'));
         }
     }
-    public function actChooseCharacters(
-        string $character1,
-        string $character2 = null,
-        string $character3 = null,
-        string $character4 = null
-    ): void {
-        $player_id = $this->getCurrentPlayerId();
-        $this->validateCharacterCount($character1, $character2, $character3, $character4);
-        self::DbQuery("UPDATE `character` set `confirm` = 1 WHERE `player_id` = $player_id");
-        $this->notify->all(
-            'chooseCharacters',
-            clienttranslate(
-                '${player_name} selected ${character1}' +
-                    ($character2 ? ' and ${character2}' : '') +
-                    ($character3 ? ' and ${character2}' : '') +
-                    ($character4 ? ' and ${character2}' : '')
-            ),
-            [
-                'characters' => $this->getCollectionFromDb('SELECT `player_id`, `character_name` FROM `character`'),
-                'character1' => $character1,
-                'character2' => $character2,
-                'character3' => $character3,
-                'character4' => $character4,
-            ]
-        );
-        $this->gamestate->nextState('start');
+    private function initCharacters($playerId)
+    {
+        $selectedCharacters = array_map(function ($char) {
+            return $char['character_name'];
+        }, array_values($this->getCollectionFromDb("SELECT character_name FROM `character` WHERE `player_id` = '$playerId'")));
+
+        foreach ($selectedCharacters as $index => $value) {
+            extract($charactersData[$value]);
+            self::DbQuery(
+                "UPDATE `character` SET `stamina`=$stamina, `health`=$health, `max_health`=$health, `max_stamina`=$stamina VALUES character_name = $value"
+            );
+        }
+    }
+    public function actChooseCharacters(): void
+    {
+        $playerId = $this->getCurrentPlayerId();
+        $selectedCharacters = array_map(function ($char) {
+            return $char['character_name'];
+        }, array_values($this->getCollectionFromDb("SELECT character_name FROM `character` WHERE `player_id` = '$playerId'")));
+
+        $this->validateCharacterCount(true, $selectedCharacters);
+
+        self::DbQuery("UPDATE `character` set `confirmed`=1 WHERE `player_id` = $playerId");
+        $selectedCharactersArgs = [];
+        $message = '${player_name} selected ';
+        foreach ($selectedCharacters as $index => $value) {
+            $selectedCharactersArgs['character' . ($index + 1)] = $value;
+            if ($index == sizeof($selectedCharacters)) {
+                $message = $message . ', and ';
+            } elseif ($index > 0) {
+                $message = $message . ', ';
+            }
+            $message = $message . '${character' . ($index + 1) . '}';
+        }
+        $results = ['player_id' => $playerId];
+        $this->getAllCharacters($results);
+        $this->initCharacters($playerId);
+        $this->notify->all('chooseCharacters', clienttranslate($message), array_merge($results, $selectedCharactersArgs));
+
+        // $waiting = sizeof(array_values($this->getCollectionFromDb('SELECT 1 FROM `character` WHERE `confirmed` = 0'))) > 0;
+        // if ($waiting) {
+        //     $this->gamestate->nextState('start');
+        // }
+        // Deactivate player, and move to next state if none are active
+        $this->gamestate->setPlayerNonMultiactive($playerId, 'start');
     }
     public function actEat(): void
     {
-        $player_id = (int) $this->getActivePlayerId();
+        $playerId = (int) $this->getActivePlayerId();
 
         $this->notify->all('tokenUsed', clienttranslate('${player_name}(${character_name}) ate'), [
-            'player_id' => $player_id,
+            'player_id' => $playerId,
             'character_name' => 'Gronk',
             'i18n' => ['card_name'], // remove this line if you uncomment notification decorator
             'gameData' => $this->getAllDatas(),
@@ -296,11 +326,11 @@ class Game extends \Table
     }
     public function actDraw(string $deck): void
     {
-        $player_id = (int) $this->getActivePlayerId();
-        $card = $this->cards->pickCards(1, $deck, $player_id);
+        $playerId = (int) $this->getActivePlayerId();
+        $card = $this->cards->pickCards(1, $deck, $playerId);
 
         $this->notify->all('cardDrawn', clienttranslate('${player_name}(${character_name}) drew from the ${deck} deck'), [
-            'player_id' => $player_id,
+            'player_id' => $playerId,
             'character_name' => '',
             'deck' => $deck,
             'i18n' => ['card_name'], // remove this line if you uncomment notification decorator
@@ -312,11 +342,11 @@ class Game extends \Table
     public function actPass(): void
     {
         // Retrieve the active player ID.
-        $player_id = (int) $this->getActivePlayerId();
+        $playerId = (int) $this->getActivePlayerId();
 
         // Notify all players about the choice to pass.
         $this->notify->all('pass', clienttranslate('${player_name} passes'), [
-            'player_id' => $player_id,
+            'player_id' => $playerId,
             'player_name' => $this->getActivePlayerName(), // remove this line if you uncomment notification decorator
         ]);
 
@@ -354,6 +384,7 @@ class Game extends \Table
     {
         $result = [];
         $this->getAllCharacters($result);
+        $this->getAllPlayers($result);
         return $result;
     }
     /**
@@ -414,10 +445,10 @@ class Game extends \Table
     public function stNextPlayer(): void
     {
         // Retrieve the active player ID.
-        $player_id = (int) $this->getActivePlayerId();
+        $playerId = (int) $this->getActivePlayerId();
 
         // Give some extra time to the active player when he completed an action
-        $this->giveExtraTime($player_id);
+        $this->giveExtraTime($playerId);
 
         $this->activeNextPlayer();
 
@@ -455,10 +486,26 @@ class Game extends \Table
         //            $this->applyDbUpgradeToAllDB( $sql );
         //       }
     }
-    protected function getAllCharacters(&$result): void
+    protected function getAllPlayers(&$result): void
     {
         $result['players'] = $this->getCollectionFromDb('SELECT `player_id` `id`, `player_score` `score`, player_no FROM `player`');
-        $result['characters'] = $this->getCollectionFromDb('SELECT * FROM `character`');
+    }
+    protected function getAllCharacters(&$result): void
+    {
+        $result['characters'] = Array_map(function ($char) {
+            return [
+                'name' => $char['character_name'],
+                'equipment' => array_filter([$char['item_1_name'], $char['item_2_name']]),
+                'playerColor' => $char['player_color'],
+                'playerId' => $char['player_id'],
+                'stamina' => $char['stamina'],
+                'maxStamina' => $char['max_stamina'],
+                'health' => $char['health'],
+                'maxHealth' => $char['max_health'],
+            ];
+        }, array_values(
+            $this->getCollectionFromDb('SELECT c.*, player_color FROM `character` c INNER JOIN `player` p ON p.player_id = c.player_id')
+        ));
     }
     protected function getDecksCharacters(&$result): void
     {
@@ -506,6 +553,7 @@ class Game extends \Table
         $current_player_id = (int) $this->getCurrentPlayerId();
 
         $this->getAllCharacters($result);
+        $this->getAllPlayers($result);
         $this->getDecksCharacters($result);
         $this->getGameData($result);
         return $result;
@@ -571,10 +619,10 @@ class Game extends \Table
         $this->createDeck('hindrance');
         // Create players based on generic information.
         //
-        foreach ($players as $player_id => $player) {
-            // Now you can access both $player_id and $player array
+        foreach ($players as $playerId => $player) {
+            // Now you can access both $playerId and $player array
             $query_values[] = vsprintf("('%s', '%s', '%s', '%s', '%s')", [
-                $player_id,
+                $playerId,
                 array_shift($default_colors),
                 $player['player_canal'],
                 addslashes($player['player_name']),

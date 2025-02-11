@@ -54,55 +54,80 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       document.querySelector(`player-side-${player.id} > .health > .value`).innerHTML = 0;
       document.querySelector(`player-side-${player.id} > .stamina > .value`).innerHTML = 0;
     },
-    updatePlayer: function (player, gameData) {
-      // Player side board
-      const playerSideContainer = document.getElementById(`player-side-${player.id}`);
-      if (!playerSideContainer) {
-        this.getPlayerPanelElement(player.id).insertAdjacentHTML(
-          'beforeend',
-          `<div id="player-side-${player.id}">
-          <div class="health"><span class="label">Health: </span><span class="value"></span></div>
-          <div class="stamina"><span class="label">Stamina: </span><span class="value"></span></div>
-          <div class="equipment"><span class="label">Equipment: </span><span class="value">None</span></div>
-        </div>`,
-        );
-      } else {
-        // playerSideContainer.querySelector(`#player-${player.id} .health .value`).innerHTML = gameData.characters[0].health;
-        // playerSideContainer.querySelector(`#player-${player.id} .stamina .value`).innerHTML = gameData.characters[0].stamina;
-        // playerSideContainer.querySelector(`#player-${player.id} .equipment .value`).innerHTML =
-        //   gameData.characters[0].equipment?.join(', ') ?? 'None';
+    updatePlayers: function (gameData) {
+      Object.values(gameData.characters).forEach((character) => {
+        // Player side board
+        const playerSideContainer = document.getElementById(`player-side-${character.playerId}`);
+        const characterSideId = `player-side-${character.playerId}-${character.name}`;
+        if (!playerSideContainer) {
+          this.getPlayerPanelElement(character.playerId).insertAdjacentHTML(
+            'beforeend',
+            `<div id="${characterSideId}" class="character-side-container">
+            <div class="character-name">${character.name}</div>
+            <div class="health"><span class="label">Health: </span><span class="value"></span></div>
+            <div class="stamina"><span class="label">Stamina: </span><span class="value"></span></div>
+            <div class="equipment"><span class="label">Equipment: </span><span class="value">None</span></div>
+          </div>`,
+          );
+        } else {
+          playerSideContainer.querySelector(`#${characterSideId} .health .value`).innerHTML = character.health;
+          playerSideContainer.querySelector(`#${characterSideId} .stamina .value`).innerHTML = character.stamina;
+          playerSideContainer.querySelector(`#${characterSideId} .equipment .value`).innerHTML = character.equipment?.join(', ') ?? 'None';
+        }
+        // Player main board
+        if (!document.getElementById(`player-${character.name}`)) {
+          document.getElementById('players-container').insertAdjacentHTML(
+            'beforeend',
+            `<div id="player-${character.name}" class="player-card">
+              <div class="card"></div>
+              <div class="color-marker" style="background-color: #${character.playerColor}"></div>
+              <div class="character"></div>
+              <div class="health" style="background-color: #${character.playerColor};left: ${(character.health ?? 0) * 21 + 127}px"></div>
+              <div class="stamina" style="background-color: #${character.playerColor};left: ${(character.stamina ?? 0) * 21 + 127}px"></div>
+              <div class="weapon"></div>
+              <div class="tool"></div>
+              </div>`,
+          );
+          renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), 4);
+        }
+        renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), 4, 'replace');
+        let usedSlot;
+        const item1 = itemsSprites.sprites[character.equipment[0]];
+        const item2 = itemsSprites.sprites[character.equipment[1]];
+        if (item1) {
+          usedSlot = item1.options.itemType;
+          renderImage(item1.options.name, document.querySelector(`#player-${character.name} > .${item1.options.itemType}`), 4, 'replace');
+        }
+        if (item2) {
+          const otherSlot = usedSlot === 'tool' ? 'weapon' : 'tool';
+          renderImage(
+            item2.options.name,
+            document.querySelector(
+              `#player-${character.name} > .${usedSlot === item1.options.itemType ? otherSlot : item1.options.itemType}`,
+            ),
+            4,
+            'replace',
+          );
+        }
+      });
+    },
+    enableClick: function (elem) {
+      if (elem.classList.contains('disabled')) {
+        elem.classList.remove('disabled');
       }
-      // Player main board
-      if (!document.getElementById(`player-${player.id}`)) {
-        document.getElementById('players-container').insertAdjacentHTML(
-          'beforeend',
-          `<div id="player-${player.id}" class="player-card">
-            <div class="card"></div>
-            <div class="color-marker" style="background-color: #${player.color}"></div>
-            <div class="character"></div>
-            <div class="health" style="background-color: #${player.color};left: ${
-            (gameData.characters?.[0]?.health ?? 0) * 21 + 127
-          }px"></div>
-            <div class="stamina" style="background-color: #${player.color};left: ${
-            (gameData.characters?.[0]?.stamina ?? 0) * 21 + 127
-          }px"></div>
-            <div class="weapon"></div>
-            <div class="tool"></div>
-            </div>`,
-        );
-        renderImage(`character-board`, document.querySelector(`#player-${player.id} > .card`), 4);
-      }
-      renderImage(`Gronk`, document.querySelector(`#player-${player.id} > .character`), 4, 'replace');
-      renderImage(`club`, document.querySelector(`#player-${player.id} > .weapon`), 4, 'replace');
-      renderImage(`club`, document.querySelector(`#player-${player.id} > .tool`), 4, 'replace');
+    },
+    disableClick: function (elem) {
+      if (!elem.classList.contains('disabled')) elem.classList.add('disabled');
     },
     addClickListener: function (elem, name, callback) {
       elem.tabIndex = '0';
-      elem.addEventListener('click', callback);
-      elem.addEventListener('onKeyDown', (e) => {
-        if (e.key === 'Enter') callback();
+      elem.addEventListener('click', () => {
+        if (!elem.classList.contains('disabled')) callback();
       });
-      elem.style.cursor = 'pointer';
+      elem.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !elem.classList.contains('disabled')) callback();
+      });
+      elem.classList.add('clickable');
       elem.role = 'button';
       elem['aria-label'] = name;
     },
@@ -162,7 +187,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       this.updateResources(gameData);
     },
-    setupCharacterSelections: function (elem, gameData) {
+    setupCharacterSelections: function (gameData) {
+      const playArea = document.getElementById('game_play_area');
+      playArea.parentElement.insertAdjacentHTML('beforeend', `<div id="character-selector" class="dlid-container"></div>`);
+      const elem = document.getElementById('character-selector');
+      if (gameData.gamestate.name === 'characterSelect') playArea.style.display = 'none';
+      else elem.style.display = 'none';
       Object.keys(charactersSprites.sprites)
         .filter((d) => charactersSprites.sprites[d].options.type === 'character')
         .sort()
@@ -174,30 +204,50 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               // Remove selection
               this.mySelectedCharacters.splice(i, 1);
             } else {
-              this.mySelectedCharacters.push(characterName);
-              this.bgaPerformAction('actCharacterClicked', {
-                character1: this.mySelectedCharacters?.[0],
-                character2: this.mySelectedCharacters?.[1],
-              });
+              if (this.mySelectedCharacters.length >= this.selectCharacterCount) {
+                this.mySelectedCharacters[this.mySelectedCharacters.length - 1] = characterName;
+              } else {
+                this.mySelectedCharacters.push(characterName);
+              }
             }
+            this.bgaPerformAction('actCharacterClicked', {
+              character1: this.mySelectedCharacters?.[0],
+              character2: this.mySelectedCharacters?.[1],
+            });
           });
         });
     },
+    updateCharacterSelections: function (gameData) {
+      const elem = document.getElementById('character-selector');
+      const myCharacters = this.selectedCharacters
+        .filter((d) => d.player_id == gameui.player_id)
+        .map((d) => d.character_name)
+        .sort((a, b) => this.mySelectedCharacters.indexOf(a) - this.mySelectedCharacters.indexOf(b));
+      this.mySelectedCharacters = myCharacters;
+      const characterLookup = this.selectedCharacters.reduce((acc, d) => ({ ...acc, [d.character_name]: d }), {});
+      elem.querySelectorAll('.characters-card').forEach((card) => {
+        const character = characterLookup[card.getAttribute('name')];
+        if (character) {
+          card.style.setProperty('--player-color', '#' + character.player_color);
+          card.classList.add('selected');
+          if (character.player_id != gameui.player_id) this.disableClick(card);
+        } else {
+          card.classList.remove('selected');
+          this.enableClick(card);
+        }
+      });
+    },
     setup: function (gameData) {
+      console.log(gameData);
       const knowledgeTree = 'normal';
       const mode = 'normal';
       this.dontPreloadImage('upgrades-spritesheet.png');
-      console.log(gameData);
-      const playArea = document.getElementById('game_play_area');
-      playArea.style.display = 'none';
-      playArea.parentElement.insertAdjacentHTML('beforeend', `<div id="character-container" class="dlid-container"></div>`);
 
-      this.setupCharacterSelections(document.getElementById('character-container'), gameData);
+      this.setupCharacterSelections(gameData);
+      const playArea = document.getElementById('game_play_area');
 
       playArea.insertAdjacentHTML('beforeend', `<div id="players-container" class="dlid-container"></div>`);
-      Object.values(gameData.players).forEach((player) => {
-        this.updatePlayer(player, gameData);
-      });
+      this.updatePlayers(gameData);
       this.setupBoard(gameData);
       // renderImage(`board`, playArea);
       playArea.insertAdjacentHTML('beforeend', `<div id="track-container" class="dlid-container"></div>`);
@@ -226,6 +276,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       console.log('Entering state: ' + stateName, args);
 
       switch (stateName) {
+        case 'characterSelect':
+          this.selectedCharacters = args.args.characters;
+          this.updateCharacterSelections();
         case 'dummy':
           break;
       }
@@ -239,7 +292,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       switch (stateName) {
         case 'characterSelect':
-          dojo.style('character-select', 'display', 'none');
+          dojo.style('character-selector', 'display', 'none');
+          dojo.style('game_play_area', 'display', '');
 
           break;
 
@@ -334,15 +388,15 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     notif_characterClicked: function (notif) {
       console.log('notif_characterClicked');
       console.log(notif);
+      this.selectedCharacters = notif.args.characters;
+      this.updateCharacterSelections();
     },
 
     // TODO: from this point and below, you can write your game notifications handling methods
     notif_tokenUsed: function (notif) {
       console.log('notif_tokenUsed');
       console.log(notif);
-      Object.values(notif.args.gameData.players).forEach((player) => {
-        this.updatePlayer(player, notif.args.gameData);
-      });
+      this.updatePlayers(notif.args.gameData);
       this.updateResources(notif.args.gameData);
 
       // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call

@@ -2288,6 +2288,7 @@ var itemsSprites = {
         'bow-and-arrow': {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 0,
@@ -2300,6 +2301,7 @@ var itemsSprites = {
         'medical-hut': {
             options: {
                 type: 'item',
+                itemType: 'building',
             },
             frame: {
                 x: 438,
@@ -2312,6 +2314,7 @@ var itemsSprites = {
         'bone-club': {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 876,
@@ -2324,6 +2327,7 @@ var itemsSprites = {
         'bone-scythe': {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 1314,
@@ -2336,6 +2340,7 @@ var itemsSprites = {
         bag: {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 1752,
@@ -2348,6 +2353,7 @@ var itemsSprites = {
         'bone-armor': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 2190,
@@ -2360,6 +2366,7 @@ var itemsSprites = {
         'camp-walls': {
             options: {
                 type: 'item',
+                itemType: 'building',
             },
             frame: {
                 x: 0,
@@ -2371,7 +2378,7 @@ var itemsSprites = {
         },
         fire: {
             options: {
-                type: 'item',
+                type: 'game-piece',
             },
             frame: {
                 x: 438,
@@ -2384,6 +2391,7 @@ var itemsSprites = {
         'hide-armor': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 876,
@@ -2396,6 +2404,7 @@ var itemsSprites = {
         'knowledge-hut': {
             options: {
                 type: 'item',
+                itemType: 'building',
             },
             frame: {
                 x: 1314,
@@ -2407,7 +2416,7 @@ var itemsSprites = {
         },
         skull: {
             options: {
-                type: 'item',
+                type: 'game-piece',
             },
             frame: {
                 x: 1752,
@@ -2420,6 +2429,7 @@ var itemsSprites = {
         hatchet: {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 2190,
@@ -2432,6 +2442,7 @@ var itemsSprites = {
         club: {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 0,
@@ -2444,6 +2455,7 @@ var itemsSprites = {
         'cooking-hut': {
             options: {
                 type: 'item',
+                itemType: 'building',
             },
             frame: {
                 x: 438,
@@ -2456,6 +2468,7 @@ var itemsSprites = {
         'carving-knife': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 876,
@@ -2480,6 +2493,7 @@ var itemsSprites = {
         'sling-shot': {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 1752,
@@ -2492,6 +2506,7 @@ var itemsSprites = {
         'pick-axe': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 2190,
@@ -2504,6 +2519,7 @@ var itemsSprites = {
         'planning-hut': {
             options: {
                 type: 'item',
+                itemType: 'building',
             },
             frame: {
                 x: 0,
@@ -2516,6 +2532,7 @@ var itemsSprites = {
         spear: {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 438,
@@ -2528,6 +2545,7 @@ var itemsSprites = {
         'sharp-stick': {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 876,
@@ -2540,6 +2558,7 @@ var itemsSprites = {
         shelter: {
             options: {
                 type: 'item',
+                itemType: 'building',
             },
             frame: {
                 x: 1314,
@@ -2552,6 +2571,7 @@ var itemsSprites = {
         'rock-knife': {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 1752,
@@ -2576,6 +2596,7 @@ var itemsSprites = {
         'mortar-and-pestle': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 0,
@@ -2588,6 +2609,7 @@ var itemsSprites = {
         bandage: {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 438,
@@ -2600,6 +2622,7 @@ var itemsSprites = {
         'skull-shield': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 876,
@@ -2612,6 +2635,7 @@ var itemsSprites = {
         'cooking-pot': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 1314,
@@ -2624,6 +2648,7 @@ var itemsSprites = {
         'bone-claws': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 1752,
@@ -2636,6 +2661,7 @@ var itemsSprites = {
         'bone-flute': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 2190,
@@ -2648,6 +2674,7 @@ var itemsSprites = {
         'stock-hut': {
             options: {
                 type: 'item',
+                itemType: 'building',
             },
             frame: {
                 x: 0,
@@ -2660,6 +2687,7 @@ var itemsSprites = {
         whip: {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 438,
@@ -2672,6 +2700,7 @@ var itemsSprites = {
         'fire-stick': {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 876,
@@ -2681,9 +2710,10 @@ var itemsSprites = {
             },
             rotate: 0,
         },
-        stone: {
+        rock: {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 1314,
@@ -2696,6 +2726,7 @@ var itemsSprites = {
         bola: {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 1752,
@@ -2708,6 +2739,7 @@ var itemsSprites = {
         boomerang: {
             options: {
                 type: 'item',
+                itemType: 'weapon',
             },
             frame: {
                 x: 2190,
@@ -2720,6 +2752,7 @@ var itemsSprites = {
         'stone-hammer': {
             options: {
                 type: 'item',
+                itemType: 'tool',
             },
             frame: {
                 x: 2628,
@@ -3605,36 +3638,60 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             document.querySelector("player-side-".concat(player.id, " > .health > .value")).innerHTML = 0;
             document.querySelector("player-side-".concat(player.id, " > .stamina > .value")).innerHTML = 0;
         },
-        updatePlayer: function (player, gameData) {
-            var _a, _b, _c, _d, _e, _f;
-            // Player side board
-            var playerSideContainer = document.getElementById("player-side-".concat(player.id));
-            if (!playerSideContainer) {
-                this.getPlayerPanelElement(player.id).insertAdjacentHTML('beforeend', "<div id=\"player-side-".concat(player.id, "\">\n          <div class=\"health\"><span class=\"label\">Health: </span><span class=\"value\"></span></div>\n          <div class=\"stamina\"><span class=\"label\">Stamina: </span><span class=\"value\"></span></div>\n          <div class=\"equipment\"><span class=\"label\">Equipment: </span><span class=\"value\">None</span></div>\n        </div>"));
+        updatePlayers: function (gameData) {
+            var _this = this;
+            Object.values(gameData.characters).forEach(function (character) {
+                var _a, _b, _c, _d;
+                // Player side board
+                var playerSideContainer = document.getElementById("player-side-".concat(character.playerId));
+                var characterSideId = "player-side-".concat(character.playerId, "-").concat(character.name);
+                if (!playerSideContainer) {
+                    _this.getPlayerPanelElement(character.playerId).insertAdjacentHTML('beforeend', "<div id=\"".concat(characterSideId, "\" class=\"character-side-container\">\n            <div class=\"character-name\">").concat(character.name, "</div>\n            <div class=\"health\"><span class=\"label\">Health: </span><span class=\"value\"></span></div>\n            <div class=\"stamina\"><span class=\"label\">Stamina: </span><span class=\"value\"></span></div>\n            <div class=\"equipment\"><span class=\"label\">Equipment: </span><span class=\"value\">None</span></div>\n          </div>"));
+                }
+                else {
+                    playerSideContainer.querySelector("#".concat(characterSideId, " .health .value")).innerHTML = character.health;
+                    playerSideContainer.querySelector("#".concat(characterSideId, " .stamina .value")).innerHTML = character.stamina;
+                    playerSideContainer.querySelector("#".concat(characterSideId, " .equipment .value")).innerHTML = (_b = (_a = character.equipment) === null || _a === void 0 ? void 0 : _a.join(', ')) !== null && _b !== void 0 ? _b : 'None';
+                }
+                // Player main board
+                if (!document.getElementById("player-".concat(character.name))) {
+                    document.getElementById('players-container').insertAdjacentHTML('beforeend', "<div id=\"player-".concat(character.name, "\" class=\"player-card\">\n              <div class=\"card\"></div>\n              <div class=\"color-marker\" style=\"background-color: #").concat(character.playerColor, "\"></div>\n              <div class=\"character\"></div>\n              <div class=\"health\" style=\"background-color: #").concat(character.playerColor, ";left: ").concat(((_c = character.health) !== null && _c !== void 0 ? _c : 0) * 21 + 127, "px\"></div>\n              <div class=\"stamina\" style=\"background-color: #").concat(character.playerColor, ";left: ").concat(((_d = character.stamina) !== null && _d !== void 0 ? _d : 0) * 21 + 127, "px\"></div>\n              <div class=\"weapon\"></div>\n              <div class=\"tool\"></div>\n              </div>"));
+                    renderImage("character-board", document.querySelector("#player-".concat(character.name, " > .card")), 4);
+                }
+                renderImage(character.name, document.querySelector("#player-".concat(character.name, " > .character")), 4, 'replace');
+                var usedSlot;
+                var item1 = itemsSprites.sprites[character.equipment[0]];
+                var item2 = itemsSprites.sprites[character.equipment[1]];
+                if (item1) {
+                    usedSlot = item1.options.itemType;
+                    renderImage(item1.options.name, document.querySelector("#player-".concat(character.name, " > .").concat(item1.options.itemType)), 4, 'replace');
+                }
+                if (item2) {
+                    var otherSlot = usedSlot === 'tool' ? 'weapon' : 'tool';
+                    renderImage(item2.options.name, document.querySelector("#player-".concat(character.name, " > .").concat(usedSlot === item1.options.itemType ? otherSlot : item1.options.itemType)), 4, 'replace');
+                }
+            });
+        },
+        enableClick: function (elem) {
+            if (elem.classList.contains('disabled')) {
+                elem.classList.remove('disabled');
             }
-            else {
-                // playerSideContainer.querySelector(`#player-${player.id} .health .value`).innerHTML = gameData.characters[0].health;
-                // playerSideContainer.querySelector(`#player-${player.id} .stamina .value`).innerHTML = gameData.characters[0].stamina;
-                // playerSideContainer.querySelector(`#player-${player.id} .equipment .value`).innerHTML =
-                //   gameData.characters[0].equipment?.join(', ') ?? 'None';
-            }
-            // Player main board
-            if (!document.getElementById("player-".concat(player.id))) {
-                document.getElementById('players-container').insertAdjacentHTML('beforeend', "<div id=\"player-".concat(player.id, "\" class=\"player-card\">\n            <div class=\"card\"></div>\n            <div class=\"color-marker\" style=\"background-color: #").concat(player.color, "\"></div>\n            <div class=\"character\"></div>\n            <div class=\"health\" style=\"background-color: #").concat(player.color, ";left: ").concat(((_c = (_b = (_a = gameData.characters) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.health) !== null && _c !== void 0 ? _c : 0) * 21 + 127, "px\"></div>\n            <div class=\"stamina\" style=\"background-color: #").concat(player.color, ";left: ").concat(((_f = (_e = (_d = gameData.characters) === null || _d === void 0 ? void 0 : _d[0]) === null || _e === void 0 ? void 0 : _e.stamina) !== null && _f !== void 0 ? _f : 0) * 21 + 127, "px\"></div>\n            <div class=\"weapon\"></div>\n            <div class=\"tool\"></div>\n            </div>"));
-                renderImage("character-board", document.querySelector("#player-".concat(player.id, " > .card")), 4);
-            }
-            renderImage("Gronk", document.querySelector("#player-".concat(player.id, " > .character")), 4, 'replace');
-            renderImage("club", document.querySelector("#player-".concat(player.id, " > .weapon")), 4, 'replace');
-            renderImage("club", document.querySelector("#player-".concat(player.id, " > .tool")), 4, 'replace');
+        },
+        disableClick: function (elem) {
+            if (!elem.classList.contains('disabled'))
+                elem.classList.add('disabled');
         },
         addClickListener: function (elem, name, callback) {
             elem.tabIndex = '0';
-            elem.addEventListener('click', callback);
-            elem.addEventListener('onKeyDown', function (e) {
-                if (e.key === 'Enter')
+            elem.addEventListener('click', function () {
+                if (!elem.classList.contains('disabled'))
                     callback();
             });
-            elem.style.cursor = 'pointer';
+            elem.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && !elem.classList.contains('disabled'))
+                    callback();
+            });
+            elem.classList.add('clickable');
             elem.role = 'button';
             elem['aria-label'] = name;
         },
@@ -3685,8 +3742,15 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             });
             this.updateResources(gameData);
         },
-        setupCharacterSelections: function (elem, gameData) {
+        setupCharacterSelections: function (gameData) {
             var _this = this;
+            var playArea = document.getElementById('game_play_area');
+            playArea.parentElement.insertAdjacentHTML('beforeend', "<div id=\"character-selector\" class=\"dlid-container\"></div>");
+            var elem = document.getElementById('character-selector');
+            if (gameData.gamestate.name === 'characterSelect')
+                playArea.style.display = 'none';
+            else
+                elem.style.display = 'none';
             Object.keys(charactersSprites.sprites)
                 .filter(function (d) { return charactersSprites.sprites[d].options.type === 'character'; })
                 .sort()
@@ -3700,29 +3764,55 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                         _this.mySelectedCharacters.splice(i, 1);
                     }
                     else {
-                        _this.mySelectedCharacters.push(characterName);
-                        _this.bgaPerformAction('actCharacterClicked', {
-                            character1: (_a = _this.mySelectedCharacters) === null || _a === void 0 ? void 0 : _a[0],
-                            character2: (_b = _this.mySelectedCharacters) === null || _b === void 0 ? void 0 : _b[1],
-                        });
+                        if (_this.mySelectedCharacters.length >= _this.selectCharacterCount) {
+                            _this.mySelectedCharacters[_this.mySelectedCharacters.length - 1] = characterName;
+                        }
+                        else {
+                            _this.mySelectedCharacters.push(characterName);
+                        }
                     }
+                    _this.bgaPerformAction('actCharacterClicked', {
+                        character1: (_a = _this.mySelectedCharacters) === null || _a === void 0 ? void 0 : _a[0],
+                        character2: (_b = _this.mySelectedCharacters) === null || _b === void 0 ? void 0 : _b[1],
+                    });
                 });
             });
         },
-        setup: function (gameData) {
+        updateCharacterSelections: function (gameData) {
             var _this = this;
+            var elem = document.getElementById('character-selector');
+            var myCharacters = this.selectedCharacters
+                .filter(function (d) { return d.player_id == gameui.player_id; })
+                .map(function (d) { return d.character_name; })
+                .sort(function (a, b) { return _this.mySelectedCharacters.indexOf(a) - _this.mySelectedCharacters.indexOf(b); });
+            this.mySelectedCharacters = myCharacters;
+            var characterLookup = this.selectedCharacters.reduce(function (acc, d) {
+                var _a;
+                return (__assign(__assign({}, acc), (_a = {}, _a[d.character_name] = d, _a)));
+            }, {});
+            elem.querySelectorAll('.characters-card').forEach(function (card) {
+                var character = characterLookup[card.getAttribute('name')];
+                if (character) {
+                    card.style.setProperty('--player-color', '#' + character.player_color);
+                    card.classList.add('selected');
+                    if (character.player_id != gameui.player_id)
+                        _this.disableClick(card);
+                }
+                else {
+                    card.classList.remove('selected');
+                    _this.enableClick(card);
+                }
+            });
+        },
+        setup: function (gameData) {
+            console.log(gameData);
             var knowledgeTree = 'normal';
             var mode = 'normal';
             this.dontPreloadImage('upgrades-spritesheet.png');
-            console.log(gameData);
+            this.setupCharacterSelections(gameData);
             var playArea = document.getElementById('game_play_area');
-            playArea.style.display = 'none';
-            playArea.parentElement.insertAdjacentHTML('beforeend', "<div id=\"character-container\" class=\"dlid-container\"></div>");
-            this.setupCharacterSelections(document.getElementById('character-container'), gameData);
             playArea.insertAdjacentHTML('beforeend', "<div id=\"players-container\" class=\"dlid-container\"></div>");
-            Object.values(gameData.players).forEach(function (player) {
-                _this.updatePlayer(player, gameData);
-            });
+            this.updatePlayers(gameData);
             this.setupBoard(gameData);
             // renderImage(`board`, playArea);
             playArea.insertAdjacentHTML('beforeend', "<div id=\"track-container\" class=\"dlid-container\"></div>");
@@ -3746,6 +3836,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         onEnteringState: function (stateName, args) {
             console.log('Entering state: ' + stateName, args);
             switch (stateName) {
+                case 'characterSelect':
+                    this.selectedCharacters = args.args.characters;
+                    this.updateCharacterSelections();
                 case 'dummy':
                     break;
             }
@@ -3757,7 +3850,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             console.log('Leaving state: ' + stateName);
             switch (stateName) {
                 case 'characterSelect':
-                    dojo.style('character-select', 'display', 'none');
+                    dojo.style('character-selector', 'display', 'none');
+                    dojo.style('game_play_area', 'display', '');
                     break;
                 // case 'dummy':
                 //   break;
@@ -3842,15 +3936,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         notif_characterClicked: function (notif) {
             console.log('notif_characterClicked');
             console.log(notif);
+            this.selectedCharacters = notif.args.characters;
+            this.updateCharacterSelections();
         },
         // TODO: from this point and below, you can write your game notifications handling methods
         notif_tokenUsed: function (notif) {
-            var _this = this;
             console.log('notif_tokenUsed');
             console.log(notif);
-            Object.values(notif.args.gameData.players).forEach(function (player) {
-                _this.updatePlayer(player, notif.args.gameData);
-            });
+            this.updatePlayers(notif.args.gameData);
             this.updateResources(notif.args.gameData);
             // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
             // TODO: play the card in the user interface.

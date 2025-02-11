@@ -12,24 +12,45 @@
  * DontLetItDie stylesheet
  *
  */
- #game_play_area{
+.clickable{
+    cursor: pointer;
+}
+.clickable.disabled{
+    cursor: unset;
+}
+#game_play_area{
     margin: 1em;
- }
- #game_play_area.hide{
+}
+#game_play_area.hide{
     display: none;
- }
- /* Character Start */
- .character-selector{
-    display: flex !important;
-    flex-flow: wrap;
+}
+/* Character Start */
+#character-selector{
+    display: flex;
+    gap: 1rem;
+    margin: auto;
+    flex-flow: row wrap;
     justify-content: center;
-    gap: 1em;
-    margin-bottom: 1em;
- }
- 
- /* Character Card Stop */
+}
+#character-selector .characters-card{
+    border: 3px solid #000;
+}
+#character-selector .characters-card.selected{
+    border: 3px solid var(--player-color);
+}
+/* Character Card Stop */
 
- /* Player Card Start */
+/* Player Card Start */
+.character-side-container{
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+.character-name{
+    font-size: 16px;
+    text-decoration: underline;
+    margin-bottom: 2px;
+}
+
 #players-container{
     display: flex;
     flex-flow: wrap;
@@ -104,7 +125,7 @@
 }
 .board {
     position: relative;
-    place-self: anchor-center;
+    /* place-self: anchor-center; */
 }
 .board .gather {
     position: absolute;
