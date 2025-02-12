@@ -56,8 +56,6 @@
     flex-flow: wrap;
     justify-content: center;
     gap: 1em;
-    grid-template-columns: 1fr 1fr;
-    display: grid
 ;
 }
 .player-card{
@@ -172,6 +170,7 @@
 } */
 .card.boards-card {
     background-image: url(img/boards-spritesheet.png);
+    position: relative;
 }
 .card.characters-card {
     background-image: url(img/characters-spritesheet.png);
@@ -214,3 +213,17 @@
     align-items: center;
     justify-content: center;
 }
+
+/* Track Board Start*/
+#track-marker{
+    border-radius: 50%;
+    position: absolute;
+    top: 236px;
+    left: 164px;
+    width: 2rem;
+    height: 2rem;
+    background-color: #307c42;
+    border: 1px solid #000;
+    transition: top, transform 1.5s linear;
+}
+/* Track Board Stop*/

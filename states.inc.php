@@ -57,26 +57,24 @@ $machinestates = [
         'description' => '',
         'type' => 'manager',
         'action' => 'stGameSetup',
-        'transitions' => ['' => 97],
+        'transitions' => ['' => 2],
     ],
-    97 => [
+    2 => [
         'name' => 'characterSelect',
         'description' => clienttranslate('Waiting for other players'),
         'descriptionmyturn' => clienttranslate('Select a character'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionCount',
         'possibleactions' => ['actChooseCharacters', 'actCharacterClicked'],
-        'transitions' => ['start' => 2],
-        'action' => 'stMakeEveryoneActive',
+        'transitions' => ['start' => 10],
+        'action' => 'stSelectCharacter',
     ],
-    // Note: ID=2 => your first state
-
-    2 => [
+    10 => [
         'name' => 'playerTurn',
         'description' => clienttranslate('${actplayer} must choose an action or pass'),
-        'descriptionmyturn' => clienttranslate('${you} must choose an action or pass'),
+        'descriptionmyturn' => clienttranslate('${you} can'),
         'type' => 'activeplayer',
-        'args' => 'argPlayableActions',
+        'args' => 'argPlayerState',
         'possibleactions' => [
             // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
             'actDrawGather',
@@ -90,32 +88,40 @@ $machinestates = [
             'actTrade',
             'actPass',
         ],
-        'transitions' => ['playCard' => 3, 'pass' => 4],
+        'transitions' => ['playCard' => 11, 'pass' => 15],
     ],
-    3 => [
+    11 => [
         'name' => 'evaluateCard',
         'description' => clienttranslate('Resolving Event'),
         'descriptionmyturn' => clienttranslate('Resolving Event'),
         'type' => 'game',
         'possibleactions' => [],
-        'transitions' => ['playCard' => 2, 'pass' => 2],
+        'transitions' => ['playCard' => 10, 'pass' => 10],
     ],
 
-    4 => [
+    15 => [
         'name' => 'nextPlayer',
         'description' => '',
         'type' => 'game',
         'action' => 'stNextPlayer',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'nextPlayer' => 2, 'morningPhase' => 98],
+        'transitions' => ['endGame' => 99, 'nextPlayer' => 10, 'morningPhase' => 30],
     ],
-    98 => [
-        'name' => 'morningPhase',
-        'description' => '',
+    20 => [
+        'name' => 'nightPhase',
+        'description' => clienttranslate('It\'s night time'),
         'type' => 'game',
-        'action' => 'stNextPlayer',
+        'action' => 'stNightPhase',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'nextPlayer' => 2],
+        'transitions' => ['endGame' => 99, 'morning' => 30],
+    ],
+    30 => [
+        'name' => 'morningPhase',
+        'description' => clienttranslate('Morning has arrived'),
+        'type' => 'game',
+        'action' => 'stMorningPhase',
+        'updateGameProgression' => true,
+        'transitions' => ['endGame' => 99, 'activePhase' => 10],
     ],
 
     // Final state.

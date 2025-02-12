@@ -4,6 +4,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Bow And Arrow',
       },
       frame: {
         x: 0,
@@ -17,6 +18,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'building',
+        name: 'Medical Hut',
       },
       frame: {
         x: 438,
@@ -30,6 +32,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Bone Club',
       },
       frame: {
         x: 876,
@@ -43,6 +46,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Bone Scythe',
       },
       frame: {
         x: 1314,
@@ -56,6 +60,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Bag',
       },
       frame: {
         x: 1752,
@@ -69,6 +74,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Bone Armor',
       },
       frame: {
         x: 2190,
@@ -82,6 +88,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'building',
+        name: 'Camp Walls',
       },
       frame: {
         x: 0,
@@ -94,6 +101,7 @@ const itemsSprites = {
     fire: {
       options: {
         type: 'game-piece',
+        name: 'Fire',
       },
       frame: {
         x: 438,
@@ -107,6 +115,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Hide Armor',
       },
       frame: {
         x: 876,
@@ -120,6 +129,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'building',
+        name: 'Knowledge Hut',
       },
       frame: {
         x: 1314,
@@ -132,6 +142,7 @@ const itemsSprites = {
     skull: {
       options: {
         type: 'game-piece',
+        name: 'Skull',
       },
       frame: {
         x: 1752,
@@ -145,6 +156,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Hatchet',
       },
       frame: {
         x: 2190,
@@ -158,6 +170,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Club',
       },
       frame: {
         x: 0,
@@ -171,6 +184,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'building',
+        name: 'Cooking Hut',
       },
       frame: {
         x: 438,
@@ -184,6 +198,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Carving Knife',
       },
       frame: {
         x: 876,
@@ -196,6 +211,7 @@ const itemsSprites = {
     'item-back': {
       options: {
         type: 'back',
+        name: 'Item Back',
       },
       frame: {
         x: 1314,
@@ -209,6 +225,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Sling Shot',
       },
       frame: {
         x: 1752,
@@ -222,6 +239,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Pick Axe',
       },
       frame: {
         x: 2190,
@@ -235,6 +253,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'building',
+        name: 'Planning Hut',
       },
       frame: {
         x: 0,
@@ -248,6 +267,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Spear',
       },
       frame: {
         x: 438,
@@ -261,6 +281,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Sharp Stick',
       },
       frame: {
         x: 876,
@@ -274,6 +295,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'building',
+        name: 'Shelter',
       },
       frame: {
         x: 1314,
@@ -287,6 +309,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Rock Knife',
       },
       frame: {
         x: 1752,
@@ -299,6 +322,7 @@ const itemsSprites = {
     'item-back-hindrance': {
       options: {
         type: 'item',
+        name: 'Item Back Hindrance',
       },
       frame: {
         x: 2190,
@@ -312,6 +336,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Mortar And Pestle',
       },
       frame: {
         x: 0,
@@ -325,6 +350,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Bandage',
       },
       frame: {
         x: 438,
@@ -338,6 +364,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Skull Shield',
       },
       frame: {
         x: 876,
@@ -351,6 +378,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Cooking Pot',
       },
       frame: {
         x: 1314,
@@ -364,6 +392,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Bone Claws',
       },
       frame: {
         x: 1752,
@@ -377,6 +406,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Bone Flute',
       },
       frame: {
         x: 2190,
@@ -390,6 +420,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'building',
+        name: 'Stock Hut',
       },
       frame: {
         x: 0,
@@ -403,6 +434,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Whip',
       },
       frame: {
         x: 438,
@@ -416,6 +448,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Fire Stick',
       },
       frame: {
         x: 876,
@@ -429,6 +462,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Rock',
       },
       frame: {
         x: 1314,
@@ -442,6 +476,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Bola',
       },
       frame: {
         x: 1752,
@@ -455,6 +490,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
+        name: 'Boomerang',
       },
       frame: {
         x: 2190,
@@ -468,6 +504,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'tool',
+        name: 'Stone Hammer',
       },
       frame: {
         x: 2628,

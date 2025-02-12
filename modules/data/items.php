@@ -79,7 +79,6 @@ $itemsData = [
     'item-back' => [
         'deck' => 'item',
         'type' => 'back',
-        'expansion' => 'default',
     ],
     'sling-shot' => [
         'deck' => 'item',

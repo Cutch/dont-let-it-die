@@ -1,1 +1,44 @@
-{}
+{
+    "100": {
+        "name": "Expansion",
+        "values": {
+            "0": {
+                "name": "Base"
+            },
+            "1": {
+                "name": "Hindrance Expansion"
+            }
+        },
+        "default": 0
+    },
+    "101": {
+        "name": "Difficulty",
+        "values": {
+            "0": {
+                "name": "Easy"
+            },
+            "1": {
+                "name": "Normal"
+            },
+            "2": {
+                "name": "Normal+"
+            },
+            "3": {
+                "name": "Hard"
+            }
+        },
+        "default": 1
+    },
+    "102": {
+        "name": "Track Difficulty",
+        "values": {
+            "0": {
+                "name": "Normal"
+            },
+            "1": {
+                "name": "Hard"
+            }
+        },
+        "default": 0
+    }
+}

@@ -31,11 +31,10 @@ const actionMappings = {
 define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], function (dojo, declare) {
   return declare('bgagame.dontletitdie', ebg.core.gamegui, {
     constructor: function () {
-      // Here, you can init the global variables of your user interface
-      // Example:
-      // this.myGlobalValue = 0;/
+      // Used For character selection
       this.selectedCharacters = [];
       this.mySelectedCharacters = [];
+      this.data = [];
     },
 
     /*
@@ -50,64 +49,81 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           
           "gameData" argument contains all datas retrieved by your "getAllDatas" PHP method.
       */
-    renderPlayer: function (player) {
-      document.querySelector(`player-side-${player.id} > .health > .value`).innerHTML = 0;
-      document.querySelector(`player-side-${player.id} > .stamina > .value`).innerHTML = 0;
-    },
     updatePlayers: function (gameData) {
-      Object.values(gameData.characters).forEach((character) => {
+      // If character selection, keep removing characters
+      console.log(gameData);
+      if (gameData.gamestate.name !== 'characterSelect')
+        document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
+      const scale = 3;
+      Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character) => {
         // Player side board
-        const playerSideContainer = document.getElementById(`player-side-${character.playerId}`);
+        const playerPanel = this.getPlayerPanelElement(character.playerId);
+
         const characterSideId = `player-side-${character.playerId}-${character.name}`;
+        const playerSideContainer = document.getElementById(characterSideId);
         if (!playerSideContainer) {
-          this.getPlayerPanelElement(character.playerId).insertAdjacentHTML(
+          playerPanel.insertAdjacentHTML(
             'beforeend',
             `<div id="${characterSideId}" class="character-side-container">
             <div class="character-name">${character.name}</div>
-            <div class="health"><span class="label">Health: </span><span class="value"></span></div>
-            <div class="stamina"><span class="label">Stamina: </span><span class="value"></span></div>
-            <div class="equipment"><span class="label">Equipment: </span><span class="value">None</span></div>
+            <div class="health"><span class="label">Health: </span><span class="value">${character.health}</span></div>
+            <div class="stamina"><span class="label">Stamina: </span><span class="value">${character.stamina}</span></div>
+            <div class="equipment"><span class="label">Equipment: </span><span class="value">${
+              character.equipment.map((d) => this.data[d].options.name).join(', ') || 'None'
+            }</span></div>
           </div>`,
           );
         } else {
-          playerSideContainer.querySelector(`#${characterSideId} .health .value`).innerHTML = character.health;
-          playerSideContainer.querySelector(`#${characterSideId} .stamina .value`).innerHTML = character.stamina;
-          playerSideContainer.querySelector(`#${characterSideId} .equipment .value`).innerHTML = character.equipment?.join(', ') ?? 'None';
+          playerSideContainer.querySelector(`.health .value`).innerHTML = character.health;
+          playerSideContainer.querySelector(`.stamina .value`).innerHTML = character.stamina;
+          playerSideContainer.querySelector(`.equipment .value`).innerHTML =
+            character.equipment.map((d) => this.data[d].options.name).join(', ') || 'None';
         }
         // Player main board
-        if (!document.getElementById(`player-${character.name}`)) {
-          document.getElementById('players-container').insertAdjacentHTML(
-            'beforeend',
-            `<div id="player-${character.name}" class="player-card">
+        if (gameData?.gamestate?.name !== 'characterSelect') {
+          if (!document.getElementById(`player-${character.name}`)) {
+            document.getElementById('players-container').insertAdjacentHTML(
+              'beforeend',
+              `<div id="player-${character.name}" class="player-card">
               <div class="card"></div>
               <div class="color-marker" style="background-color: #${character.playerColor}"></div>
               <div class="character"></div>
-              <div class="health" style="background-color: #${character.playerColor};left: ${(character.health ?? 0) * 21 + 127}px"></div>
-              <div class="stamina" style="background-color: #${character.playerColor};left: ${(character.stamina ?? 0) * 21 + 127}px"></div>
-              <div class="weapon"></div>
-              <div class="tool"></div>
+              <div class="health" style="background-color: #${character.playerColor};left: ${
+                ((character.health ?? 0) * 21 * 4) / scale + (127 * 4) / scale
+              }px;top: ${(13 * 4) / scale}px"></div>
+              <div class="stamina" style="background-color: #${character.playerColor};left: ${
+                ((character.stamina ?? 0) * 21 * 4) / scale + (127 * 4) / scale
+              }px;top: ${(38 * 4) / scale}px"></div>
+              <div class="weapon" style="top: ${(60 * 4) / scale}px;left: ${(122 * 4) / scale}px"></div>
+              <div class="tool" style="top: ${(60 * 4) / scale}px;left: ${(241 * 4) / scale}px"></div>
               </div>`,
-          );
-          renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), 4);
-        }
-        renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), 4, 'replace');
-        let usedSlot;
-        const item1 = itemsSprites.sprites[character.equipment[0]];
-        const item2 = itemsSprites.sprites[character.equipment[1]];
-        if (item1) {
-          usedSlot = item1.options.itemType;
-          renderImage(item1.options.name, document.querySelector(`#player-${character.name} > .${item1.options.itemType}`), 4, 'replace');
-        }
-        if (item2) {
-          const otherSlot = usedSlot === 'tool' ? 'weapon' : 'tool';
-          renderImage(
-            item2.options.name,
-            document.querySelector(
-              `#player-${character.name} > .${usedSlot === item1.options.itemType ? otherSlot : item1.options.itemType}`,
-            ),
-            4,
-            'replace',
-          );
+            );
+            renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), scale);
+          }
+          renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), scale, 'replace');
+          let usedSlot;
+          const item1 = this.data[character.equipment[0]];
+          const item2 = this.data[character.equipment[1]];
+          if (item1) {
+            usedSlot = item1.options.itemType;
+            renderImage(
+              character.equipment[0],
+              document.querySelector(`#player-${character.name} > .${item1.options.itemType}`),
+              scale,
+              'replace',
+            );
+          }
+          if (item2) {
+            const otherSlot = usedSlot === 'tool' ? 'weapon' : 'tool';
+            renderImage(
+              character.equipment[1],
+              document.querySelector(
+                `#player-${character.name} > .${usedSlot === item1.options.itemType ? otherSlot : item1.options.itemType}`,
+              ),
+              scale,
+              'replace',
+            );
+          }
         }
       });
     },
@@ -193,8 +209,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       const elem = document.getElementById('character-selector');
       if (gameData.gamestate.name === 'characterSelect') playArea.style.display = 'none';
       else elem.style.display = 'none';
-      Object.keys(charactersSprites.sprites)
-        .filter((d) => charactersSprites.sprites[d].options.type === 'character')
+      Object.keys(this.data)
+        .filter((d) => this.data[d].options.type === 'character')
         .sort()
         .forEach((characterName) => {
           renderImage(characterName, elem, 2, 'append');
@@ -220,27 +236,48 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     updateCharacterSelections: function (gameData) {
       const elem = document.getElementById('character-selector');
       const myCharacters = this.selectedCharacters
-        .filter((d) => d.player_id == gameui.player_id)
-        .map((d) => d.character_name)
+        .filter((d) => d.playerId == gameui.player_id)
+        .map((d) => d.name)
         .sort((a, b) => this.mySelectedCharacters.indexOf(a) - this.mySelectedCharacters.indexOf(b));
       this.mySelectedCharacters = myCharacters;
-      const characterLookup = this.selectedCharacters.reduce((acc, d) => ({ ...acc, [d.character_name]: d }), {});
+      const characterLookup = this.selectedCharacters.reduce((acc, d) => ({ ...acc, [d.name]: d }), {});
       elem.querySelectorAll('.characters-card').forEach((card) => {
         const character = characterLookup[card.getAttribute('name')];
         if (character) {
-          card.style.setProperty('--player-color', '#' + character.player_color);
+          card.style.setProperty('--player-color', '#' + character.playerColor);
           card.classList.add('selected');
-          if (character.player_id != gameui.player_id) this.disableClick(card);
+          if (character.playerId != gameui.player_id) this.disableClick(card);
         } else {
           card.classList.remove('selected');
           this.enableClick(card);
         }
       });
+      this.updatePlayers(gameData);
+    },
+    updateTrack: function (gameData) {
+      let trackContainer = document.getElementById('track-container');
+      if (!trackContainer) {
+        const playArea = document.getElementById('game_play_area');
+        playArea.insertAdjacentHTML('beforeend', `<div id="track-container" class="dlid-container"></div>`);
+        trackContainer = document.getElementById('track-container');
+        renderImage(`track-${gameData.trackDifficulty}`, document.getElementById('track-container'), 2, 'insert');
+        trackContainer
+          .querySelector(`.track-${gameData.trackDifficulty}`)
+          .insertAdjacentHTML('beforeend', `<div id="track-marker" class="marker"></div>`);
+      }
+      const marker = document.getElementById('track-marker');
+      marker.style.top = `${(gameData.game.day - 1) * 35 + 236}px`;
     },
     setup: function (gameData) {
       console.log(gameData);
-      const knowledgeTree = 'normal';
-      const mode = 'normal';
+      expansionI = gameData.expansionList.indexOf(gameData.expansion);
+      this.data = Object.keys(allSprites).reduce((acc, k) => {
+        const d = allSprites[k];
+        d.options = d.options ?? {};
+        if (d.options.expansion && gameData.expansionList.indexOf(d.options.expansion) > expansionI) return acc;
+        return { ...acc, [k]: d };
+      }, {});
+      console.log(this.data);
       this.dontPreloadImage('upgrades-spritesheet.png');
 
       this.setupCharacterSelections(gameData);
@@ -250,13 +287,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updatePlayers(gameData);
       this.setupBoard(gameData);
       // renderImage(`board`, playArea);
-      playArea.insertAdjacentHTML('beforeend', `<div id="track-container" class="dlid-container"></div>`);
-      renderImage(`track-${mode}`, document.getElementById('track-container'));
-      // renderImage(`dice`, document.getElementById('track-container'));
-      // renderImage("bow-and-arrow", playArea);
+      this.updateTrack(gameData);
       // Setting up player boards
       playArea.insertAdjacentHTML('beforeend', `<div id="knowledge-container" class="dlid-container"></div>`);
-      renderImage(`knowledge-tree-${knowledgeTree}`, document.getElementById('knowledge-container'));
+      renderImage(`knowledge-tree-${gameData.difficulty}`, document.getElementById('knowledge-container'));
       playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid-container"></div>`);
       renderImage(`instructions`, document.getElementById('instructions-container'));
 
@@ -273,12 +307,18 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     //                  You can use this method to perform some user interface changes at this moment.
     //
     onEnteringState: function (stateName, args) {
-      console.log('Entering state: ' + stateName, args);
+      args.args['gamestate'] = { name: stateName };
 
+      console.log('Entering state: ' + stateName, args);
       switch (stateName) {
         case 'characterSelect':
           this.selectedCharacters = args.args.characters;
-          this.updateCharacterSelections();
+          this.updateCharacterSelections(args.args);
+          break;
+        case 'playerTurn':
+          this.updatePlayers(args.args);
+          this.updateTrack(args.args);
+          break;
         case 'dummy':
           break;
       }
@@ -289,7 +329,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     //
     onLeavingState: function (stateName) {
       console.log('Leaving state: ' + stateName);
-
       switch (stateName) {
         case 'characterSelect':
           dojo.style('character-selector', 'display', 'none');
@@ -311,7 +350,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (this.isCurrentPlayerActive()) {
         switch (stateName) {
           case 'playerTurn':
-            const actions = args.actions; // returned by the argPlayableActions
+            const actions = args.actions; // returned by the argPlayerState
 
             // Add test action buttons in the action status bar, simulating a card click:
             if (actions)
@@ -383,19 +422,22 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.notifqueue.setSynchronous('tokenUsed', 1000);
       //
     },
-
+    notificationWrapper: function (notif) {
+      notif.args = notif.args ?? {};
+      notif.args.gamestate = { name: notif.type };
+    },
     // TODO: from this point and below, you can write your game notifications handling methods
     notif_characterClicked: function (notif) {
-      console.log('notif_characterClicked');
-      console.log(notif);
+      this.notificationWrapper(notif);
+      console.log('notif_characterClicked', notif);
       this.selectedCharacters = notif.args.characters;
-      this.updateCharacterSelections();
+      this.updateCharacterSelections(notif.args);
     },
 
     // TODO: from this point and below, you can write your game notifications handling methods
     notif_tokenUsed: function (notif) {
-      console.log('notif_tokenUsed');
-      console.log(notif);
+      this.notificationWrapper(notif);
+      console.log('notif_tokenUsed', notif);
       this.updatePlayers(notif.args.gameData);
       this.updateResources(notif.args.gameData);
 
