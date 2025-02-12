@@ -1368,7 +1368,7 @@ namespace {
         /**
          * Translation function using appropriate gettext domain.
          */
-        protected function _(string $text): string
+        public function _(string $text): string
         {            
             return '';
         }

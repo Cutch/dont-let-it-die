@@ -56,7 +56,6 @@
     flex-flow: wrap;
     justify-content: center;
     gap: 1em;
-;
 }
 .player-card{
     position: relative;
