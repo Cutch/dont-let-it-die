@@ -1,0 +1,77 @@
+#board-container {
+  position: relative;
+}
+#board-container .fire-wood {
+  position: absolute;
+  top: 34px;
+  left: 62px;
+}
+.board {
+  position: relative;
+  /* place-self: anchor-center; */
+}
+.board .gather {
+  position: absolute;
+  top: 34px;
+  left: 189px;
+}
+.board .forage {
+  position: absolute;
+  top: 34px;
+  left: 324px;
+}
+.board .harvest {
+  position: absolute;
+  top: 34px;
+  left: 460px;
+}
+.board .hunt {
+  position: absolute;
+  top: 34px;
+  left: 596px;
+}
+.action-button .stamina {
+  color: #ffff00;
+  margin-left: 0.25em;
+}
+/* Board Container Stop */
+.dlid-container {
+  margin: 0 auto 1rem;
+  place-items: anchor-center;
+}
+.tokens {
+  display: flex;
+  gap: 1em;
+  flex-flow: row wrap;
+}
+.token {
+  position: relative;
+}
+.counter {
+  border-radius: 50%;
+  border: 2px solid black;
+  background-color: white;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1.5em;
+  height: 1.5em;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Track Board Start*/
+#track-marker {
+  border-radius: 50%;
+  position: absolute;
+  top: 236px;
+  left: 164px;
+  width: 2rem;
+  height: 2rem;
+  background-color: #307c42;
+  border: 1px solid #000;
+  transition: top 1.5s linear, transform 1.5s linear;
+}
+/* Track Board Stop*/

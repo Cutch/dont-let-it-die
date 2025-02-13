@@ -41,7 +41,7 @@ class CharacterSelection
                 )
             ) > 0
         ) {
-            throw new BgaUserException($this->game->_('Character Selected By Another Player'));
+            throw new BgaUserException($this->game->translate('Character Selected By Another Player'));
         }
         // Remove player's previous selected
         $this->game::DbQuery("DELETE FROM `character` WHERE player_id = $playerId");
@@ -90,11 +90,37 @@ class CharacterSelection
             $count = 1;
         }
         if (sizeof(array_filter($characters)) > $count) {
-            throw new BgaUserException($this->game->_('Too many characters selected'));
+            throw new BgaUserException($this->game->translate('Too many characters selected'));
         }
         if ($checkIfNotEnough && sizeof(array_filter($characters)) != $count) {
-            throw new BgaUserException($this->game->_('Not enough characters selected'));
+            throw new BgaUserException($this->game->translate('Not enough characters selected'));
         }
+    }
+    private function setTurnOrder($playerId, $selectedCharacters)
+    {
+        // Set the character turn order
+        $turnOrder = $this->game->globals->get('turnOrder');
+        $players = $this->game->loadPlayersBasicInfos();
+        $playerNo = ((int) $players[$playerId]['player_no']) - 1;
+        $playerCount = sizeof($players);
+        if ($playerCount == 3) {
+            foreach ($selectedCharacters as $index => $value) {
+                $turnOrder[$playerNo + $index + ($playerNo > 0 ? 1 : 0)] = $value;
+            }
+        } elseif ($playerCount == 1) {
+            foreach ($selectedCharacters as $index => $value) {
+                $turnOrder[$playerNo + $index] = $value;
+            }
+        } elseif ($playerCount == 2) {
+            foreach ($selectedCharacters as $index => $value) {
+                $turnOrder[$playerNo * 2 + $index] = $value;
+            }
+        } elseif ($playerCount == 4) {
+            foreach ($selectedCharacters as $index => $value) {
+                $turnOrder[$playerNo + $index] = $value;
+            }
+        }
+        $this->game->globals->set('turnOrder', $turnOrder);
     }
     public function actChooseCharacters(): void
     {
@@ -122,29 +148,7 @@ class CharacterSelection
         // $this->game->initCharacters($playerId);
         $this->game->notify->all('chooseCharacters', clienttranslate($message), array_merge($results, $selectedCharactersArgs));
 
-        // Set the character turn order
-        $turnOrder = $this->game->globals->get('turnOrder');
-        $players = $this->game->loadPlayersBasicInfos();
-        $playerNo = ((int) $players[$playerId]['player_no']) - 1;
-        $playerCount = sizeof($players);
-        if ($playerCount == 3) {
-            foreach ($selectedCharacters as $index => $value) {
-                $turnOrder[$playerNo + $index + ($playerNo > 0 ? 1 : 0)] = $value;
-            }
-        } elseif ($playerCount == 1) {
-            foreach ($selectedCharacters as $index => $value) {
-                $turnOrder[$playerNo + $index] = $value;
-            }
-        } elseif ($playerCount == 2) {
-            foreach ($selectedCharacters as $index => $value) {
-                $turnOrder[$playerNo * 2 + $index] = $value;
-            }
-        } elseif ($playerCount == 4) {
-            foreach ($selectedCharacters as $index => $value) {
-                $turnOrder[$playerNo + $index] = $value;
-            }
-        }
-        $this->game->globals->set('turnOrder', $turnOrder);
+        $this->setTurnOrder($playerId, $selectedCharacters);
         // $waiting = sizeof(array_values($this->game->getCollectionFromDb('SELECT 1 FROM `character` WHERE `confirmed` = 0'))) > 0;
         // if ($waiting) {
         //     $this->game->gamestate->nextState('start');

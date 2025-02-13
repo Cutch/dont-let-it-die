@@ -1,0 +1,52 @@
+/**
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * DontLetItDie implementation : © Cutch <Your email address here>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ *
+ * dontletitdie.css
+ *
+ * DontLetItDie stylesheet
+ *
+ */
+
+.clickable {
+  cursor: pointer;
+}
+.clickable.disabled {
+  cursor: unset;
+}
+#game_play_area {
+  margin: 1em;
+}
+#game_play_area.hide {
+  display: none;
+}
+/* Character Start */
+#character-selector {
+  display: flex;
+  gap: 1rem;
+  margin: auto;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+#character-selector .characters-card {
+  border: 3px solid #000;
+}
+#character-selector .characters-card.selected {
+  border: 3px solid var(--player-color);
+}
+/* Character Card Stop */
+
+/* character Container Start */
+#character-container {
+  display: flex;
+  gap: 1rem;
+  margin: auto;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+/* Character Container Stop */

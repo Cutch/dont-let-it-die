@@ -35,6 +35,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.selectedCharacters = [];
       this.mySelectedCharacters = [];
       this.data = [];
+      this.decks = {};
     },
 
     /*
@@ -80,7 +81,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             character.equipment.map((d) => this.data[d].options.name).join(', ') || 'None';
         }
         // Player main board
-        if (gameData?.gamestate?.name !== 'characterSelect') {
+        if (gameData.gamestate.name !== 'characterSelect') {
           if (!document.getElementById(`player-${character.name}`)) {
             document.getElementById('players-container').insertAdjacentHTML(
               'beforeend',
@@ -88,18 +89,29 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               <div class="card"></div>
               <div class="color-marker" style="background-color: #${character.playerColor}"></div>
               <div class="character"></div>
-              <div class="health" style="background-color: #${character.playerColor};left: ${
-                ((character.health ?? 0) * 21 * 4) / scale + (127 * 4) / scale
-              }px;top: ${(13 * 4) / scale}px"></div>
-              <div class="stamina" style="background-color: #${character.playerColor};left: ${
-                ((character.stamina ?? 0) * 21 * 4) / scale + (127 * 4) / scale
-              }px;top: ${(38 * 4) / scale}px"></div>
+              <div class="max-health max-marker"></div>
+              <div class="health marker"></div>
+              <div class="max-stamina max-marker"></div>
+              <div class="stamina marker"></div>
               <div class="weapon" style="top: ${(60 * 4) / scale}px;left: ${(122 * 4) / scale}px"></div>
               <div class="tool" style="top: ${(60 * 4) / scale}px;left: ${(241 * 4) / scale}px"></div>
               </div>`,
             );
             renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), scale);
           }
+          document.querySelector(`#player-${character.name} .max-health.max-marker`).style = `left: ${
+            ((character.maxHealth ?? 0) * 21 * 4) / scale + (123 * 4) / scale
+          }px;top: ${(7.5 * 4) / scale}px`;
+          document.querySelector(`#player-${character.name} .health.marker`).style = `background-color: #${character.playerColor};left: ${
+            ((character.health ?? 0) * 21 * 4) / scale + (123 * 4) / scale
+          }px;top: ${(7.5 * 4) / scale}px`;
+          document.querySelector(`#player-${character.name} .max-stamina.max-marker`).style = `left: ${
+            ((character.maxStamina ?? 0) * 21 * 4) / scale + (123 * 4) / scale
+          }px;top: ${(32 * 4) / scale}px`;
+          document.querySelector(`#player-${character.name} .stamina.marker`).style = `background-color: #${character.playerColor};left: ${
+            ((character.stamina ?? 0) * 21 * 4) / scale + (123 * 4) / scale
+          }px;top: ${(32 * 4) / scale}px`;
+
           renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), scale, 'replace');
           let usedSlot;
           const item1 = this.data[character.equipment[0]];
@@ -148,7 +160,27 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       elem['aria-label'] = name;
     },
     updateResources: function (gameData) {
-      let elem = document.querySelector(`#discoverable-container .tokens`);
+      let elem = document.querySelector(`#board-container .fire-wood`);
+      elem.innerHTML = '';
+      this.updateResource('wood', elem, gameData.game?.['fireWood'] ?? 0);
+
+      // Shared Resource Pool
+      const resources = ['wood', 'rock', 'fiber', 'bone', 'meat', 'berry', 'hide'];
+      elem = document.querySelector(`#shared-resource-container .tokens`);
+      if (!elem) {
+        document
+          .getElementById('game_play_area')
+          .insertAdjacentHTML(
+            'beforeend',
+            `<div id="shared-resource-container" class="dlid-container"><h3>Shared Resources</h3><div class="tokens"></div></div>`,
+          );
+        elem = document.querySelector(`#shared-resource-container .tokens`);
+      }
+      elem.innerHTML = '';
+      resources.forEach((name) => this.updateResource(name, elem, gameData.game?.[name] ?? 0));
+
+      // Available Resource Pool
+      elem = document.querySelector(`#discoverable-container .tokens`);
       if (!elem) {
         document
           .getElementById('game_play_area')
@@ -158,20 +190,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           );
         elem = document.querySelector(`#discoverable-container .tokens`);
       }
-      this.updateResource('wood', elem, gameData);
-      this.updateResource('stone', elem, gameData);
-      this.updateResource('fiber', elem, gameData);
-      this.updateResource('bone', elem, gameData);
-      this.updateResource('meat', elem, gameData);
-      this.updateResource('berry', elem, gameData);
-      this.updateResource('hide', elem, gameData);
+      elem.innerHTML = '';
+      resources.forEach((name) => this.updateResource(name, elem, gameData.resourcesAvailable?.[name] ?? 0));
     },
-    updateResource: function (name, elem, gameData) {
-      elem.insertAdjacentHTML(
-        'beforeend',
-        `<div class="token ${name}"><div class="counter">${gameData.resourcesAvailable?.[name] ?? 0}</div></div>`,
-      );
-      renderImage(name, elem.querySelector(`#discoverable-container .token.${name}`), 2, 'insert');
+    updateResource: function (name, elem, count) {
+      elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter">${count}</div></div>`);
+      renderImage(name, elem.querySelector(`.token.${name}`), 2, 'insert');
     },
     setupBoard: function (gameData) {
       this.firstPlayer = gameData.playerorder[0];
@@ -180,24 +204,37 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         .getElementById('game_play_area')
         .insertAdjacentHTML(
           'beforeend',
-          `<div id="board-container" class="dlid-container"><div class="board"><div class="tokens"></div><div class="gather"></div><div class="forage"></div><div class="harvest"></div><div class="hunt"></div></div></div>`,
+          `<div id="board-container" class="dlid-container"><div class="board"><div class="fire-wood"></div><div class="gather"></div><div class="forage"></div><div class="harvest"></div><div class="hunt"></div></div></div>`,
         );
 
       renderImage(`board`, document.querySelector(`#board-container > .board`), 2, 'insert');
-      renderImage(`gather-back`, document.querySelector(`.board > .gather`), 4, 'replace');
-      renderImage(`forage-back`, document.querySelector(`.board > .forage`), 4, 'replace');
-      renderImage(`harvest-back`, document.querySelector(`.board > .harvest`), 4, 'replace');
-      renderImage(`hunt-back`, document.querySelector(`.board > .hunt`), 4, 'replace');
-      this.addClickListener(document.querySelector(`.board > .gather`), 'Gather Deck', () => {
+      if (!this.decks['gather']) {
+        this.decks['gather'] = new Deck('gather', document.querySelector(`.board > .gather`), 4);
+        if (gameData.decksDiscards['gather']?.name) this.decks['gather'].setDiscard(gameData.decksDiscards['gather'].name);
+      }
+      if (!this.decks['forage']) {
+        this.decks['forage'] = new Deck('forage', document.querySelector(`.board > .forage`), 4);
+        if (gameData.decksDiscards['forage']?.name) this.decks['forage'].setDiscard(gameData.decksDiscards['forage'].name);
+      }
+      if (!this.decks['harvest']) {
+        this.decks['harvest'] = new Deck('harvest', document.querySelector(`.board > .harvest`), 4);
+        if (gameData.decksDiscards['harvest']?.name) this.decks['harvest'].setDiscard(gameData.decksDiscards['harvest'].name);
+      }
+      if (!this.decks['hunt']) {
+        this.decks['hunt'] = new Deck('hunt', document.querySelector(`.board > .hunt`), 4);
+        if (gameData.decksDiscards['hunt']?.name) this.decks['hunt'].setDiscard(gameData.decksDiscards['hunt'].name);
+      }
+
+      this.addClickListener(document.querySelector(`.board .gather-back`), 'Gather Deck', () => {
         this.bgaPerformAction('actDrawGather');
       });
-      this.addClickListener(document.querySelector(`.board > .forage`), 'Forage Deck', () => {
+      this.addClickListener(document.querySelector(`.board .forage-back`), 'Forage Deck', () => {
         this.bgaPerformAction('actDrawForage');
       });
-      this.addClickListener(document.querySelector(`.board > .harvest`), 'Harvest Deck', () => {
+      this.addClickListener(document.querySelector(`.board .harvest-back`), 'Harvest Deck', () => {
         this.bgaPerformAction('actDrawHarvest');
       });
-      this.addClickListener(document.querySelector(`.board > .hunt`), 'Hunt Deck', () => {
+      this.addClickListener(document.querySelector(`.board .hunt-back`), 'Hunt Deck', () => {
         this.bgaPerformAction('actDrawHunt');
       });
 
@@ -261,6 +298,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         playArea.insertAdjacentHTML('beforeend', `<div id="track-container" class="dlid-container"></div>`);
         trackContainer = document.getElementById('track-container');
         renderImage(`track-${gameData.trackDifficulty}`, document.getElementById('track-container'), 2, 'insert');
+
         trackContainer
           .querySelector(`.track-${gameData.trackDifficulty}`)
           .insertAdjacentHTML('beforeend', `<div id="track-marker" class="marker"></div>`);
@@ -299,14 +337,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       // Setup game notifications to handle (see "setupNotifications" method below)
       this.setupNotifications();
     },
-
     ///////////////////////////////////////////////////
     //// Game & client states
 
     // onEnteringState: this method is called each time we are entering into a new game state.
     //                  You can use this method to perform some user interface changes at this moment.
     //
-    onEnteringState: function (stateName, args) {
+    onEnteringState: function (stateName, args = {}) {
+      args.args = args.args ?? {};
       args.args['gamestate'] = { name: stateName };
 
       console.log('Entering state: ' + stateName, args);
@@ -318,6 +356,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'playerTurn':
           this.updatePlayers(args.args);
           this.updateTrack(args.args);
+          break;
+        case 'drawCard':
+          this.decks[args.args.deck].drawCard(args.args.card.id);
           break;
         case 'dummy':
           break;
@@ -360,7 +401,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 ),
               );
 
-            this.statusBar.addActionButton(_('Pass'), () => this.bgaPerformAction('actPass'), { color: 'secondary' });
+            this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
             break;
           case 'characterSelect':
             const playerCount = Object.keys(args.players).length;
@@ -422,13 +463,16 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.notifqueue.setSynchronous('tokenUsed', 1000);
       //
     },
-    notificationWrapper: function (notif) {
+    notificationWrapper: function (notif, state) {
       notif.args = notif.args ?? {};
-      notif.args.gamestate = { name: notif.type };
+      notif.args.gamestate = { name: state };
+      if (notif.args.gameData) {
+        notif.args.gameData.gamestate = { name: state };
+      }
     },
     // TODO: from this point and below, you can write your game notifications handling methods
     notif_characterClicked: function (notif) {
-      this.notificationWrapper(notif);
+      this.notificationWrapper(notif, 'characterSelect');
       console.log('notif_characterClicked', notif);
       this.selectedCharacters = notif.args.characters;
       this.updateCharacterSelections(notif.args);
@@ -436,7 +480,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
     // TODO: from this point and below, you can write your game notifications handling methods
     notif_tokenUsed: function (notif) {
-      this.notificationWrapper(notif);
+      this.notificationWrapper(notif, 'playerTurn');
       console.log('notif_tokenUsed', notif);
       this.updatePlayers(notif.args.gameData);
       this.updateResources(notif.args.gameData);

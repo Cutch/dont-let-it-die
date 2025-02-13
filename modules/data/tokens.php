@@ -52,6 +52,7 @@ $tokensData = [
     'berry' => [
         'count' => 8,
         'type' => 'resource',
+        'name' => 'Berry',
         'cookable' => true,
         'actEat' => [
             'count' => 3,
@@ -61,6 +62,7 @@ $tokensData = [
     'berry-cooked' => [
         'cooked' => 'berry',
         'type' => 'resource',
+        'name' => 'Cooked Berry',
         'actEat' => [
             'count' => 2,
             'health' => 2,
@@ -69,10 +71,12 @@ $tokensData = [
     'bone' => [
         'count' => 8,
         'type' => 'resource',
+        'name' => 'Bone',
     ],
     'dino-egg' => [
         'count' => 8,
         'type' => 'resource',
+        'name' => 'Dino Egg',
         'cookable' => true,
         'actEat' => [
             'count' => 2,
@@ -84,6 +88,7 @@ $tokensData = [
     'dino-egg-cooked' => [
         'cooked' => 'dino-egg',
         'type' => 'resource',
+        'name' => 'Cooked Dino Egg',
         'actEat' => [
             'count' => 2,
             'health' => 3,
@@ -94,6 +99,7 @@ $tokensData = [
     'fish' => [
         'count' => 8,
         'type' => 'resource',
+        'name' => 'Fish',
         'cookable' => true,
         'actEat' => [
             'count' => 2,
@@ -103,6 +109,7 @@ $tokensData = [
     'fish-cooked' => [
         'cooked' => 'fish',
         'type' => 'resource',
+        'name' => 'Cooked Fish',
         'actEat' => [
             'count' => 1,
             'health' => 2,
@@ -112,6 +119,7 @@ $tokensData = [
         'count' => 8,
         'cookable' => true,
         'type' => 'resource',
+        'name' => 'Meat',
         'actEat' => [
             'count' => 2,
             'health' => 1,
@@ -120,6 +128,7 @@ $tokensData = [
     'meat-cooked' => [
         'cooked' => 'meat',
         'type' => 'resource',
+        'name' => 'Cooked Cooked',
         'actEat' => [
             'count' => 1,
             'health' => 2,
@@ -128,55 +137,67 @@ $tokensData = [
     'fkp' => [
         'count' => 40,
         'type' => 'resource',
+        'name' => 'Fire Knowledge Point',
     ],
     'fkp-unlocked' => [
         'count' => 1,
         'type' => 'resource',
+        'name' => 'Unlocked Fire Knowledge Point',
     ],
     'gem-1' => [
         'count' => 1,
         'type' => 'resource',
+        'name' => 'Gem',
         'expansion' => 'hindrance',
     ],
     'gem-2' => [
         'count' => 1,
         'type' => 'resource',
+        'name' => 'Gem',
         'expansion' => 'hindrance',
     ],
     'gem-3' => [
         'count' => 1,
         'type' => 'resource',
+        'name' => 'Gem',
         'expansion' => 'hindrance',
     ],
     'fiber' => [
         'count' => 8,
         'type' => 'resource',
+        'name' => 'Fiber',
     ],
     'hide' => [
         'count' => 8,
         'type' => 'resource',
+        'name' => 'Hide',
     ],
-    'herbs' => [
+    'herb' => [
         'count' => 8,
         'type' => 'resource',
+        'name' => 'Herb',
         'expansion' => 'hindrance',
     ],
-    'stone' => [
+    'rock' => [
         'count' => 8,
         'type' => 'resource',
+        'name' => 'Rock',
     ],
     'stew' => [
         'count' => 3,
         'type' => 'resource',
+        'name' => 'Stew',
         'expansion' => 'hindrance',
     ],
     'trap' => [
         'count' => 2,
         'type' => 'resource',
+        'name' => 'Trap',
         'expansion' => 'hindrance',
     ],
     'wood' => [
         'count' => 8,
         'type' => 'resource',
+        'name' => 'Wood',
     ],
 ];

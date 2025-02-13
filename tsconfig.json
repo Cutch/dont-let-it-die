@@ -19,6 +19,7 @@
       "src/assets/upgrades-spritesheet.js",
       "src/assets/index.js",
       "src/utils/images.js",
+      "src/utils/deck.js",
       "src/dontletitdie.js"
     ]
 }

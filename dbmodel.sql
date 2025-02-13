@@ -14,11 +14,66 @@
 -- Note: The database schema is created from this file when the game starts. If you modify this file,
 --       you have to restart a game to see your changes in database.
 -- Example 1: create a standard "card" table to be used with the "Deck" tools (see example game "hearts"):
-CREATE TABLE IF NOT EXISTS `card` (
+CREATE TABLE IF NOT EXISTS `gather` (
     `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `card_name` varchar(20) NOT NULL,
     `card_type` varchar(16) NOT NULL,
-    `card_type_arg` int(11) NOT NULL,
+    `card_type_arg` varchar(20) NOT NULL,
+    `card_location` varchar(16) NOT NULL,
+    `card_location_arg` int(11) NOT NULL,
+    PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+CREATE TABLE IF NOT EXISTS `harvest` (
+    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `card_type` varchar(16) NOT NULL,
+    `card_type_arg` varchar(20) NOT NULL,
+    `card_location` varchar(16) NOT NULL,
+    `card_location_arg` int(11) NOT NULL,
+    PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+CREATE TABLE IF NOT EXISTS `hunt` (
+    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `card_type` varchar(16) NOT NULL,
+    `card_type_arg` varchar(20) NOT NULL,
+    `card_location` varchar(16) NOT NULL,
+    `card_location_arg` int(11) NOT NULL,
+    PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+CREATE TABLE IF NOT EXISTS `forage` (
+    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `card_type` varchar(16) NOT NULL,
+    `card_type_arg` varchar(20) NOT NULL,
+    `card_location` varchar(16) NOT NULL,
+    `card_location_arg` int(11) NOT NULL,
+    PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+CREATE TABLE IF NOT EXISTS `explore` (
+    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `card_type` varchar(16) NOT NULL,
+    `card_type_arg` varchar(20) NOT NULL,
+    `card_location` varchar(16) NOT NULL,
+    `card_location_arg` int(11) NOT NULL,
+    PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+CREATE TABLE IF NOT EXISTS `nightevent` (
+    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `card_type` varchar(16) NOT NULL,
+    `card_type_arg` varchar(20) NOT NULL,
+    `card_location` varchar(16) NOT NULL,
+    `card_location_arg` int(11) NOT NULL,
+    PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+CREATE TABLE IF NOT EXISTS `dayevent` (
+    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `card_type` varchar(16) NOT NULL,
+    `card_type_arg` varchar(20) NOT NULL,
+    `card_location` varchar(16) NOT NULL,
+    `card_location_arg` int(11) NOT NULL,
+    PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+CREATE TABLE IF NOT EXISTS `hindrance` (
+    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `card_type` varchar(16) NOT NULL,
+    `card_type_arg` varchar(20) NOT NULL,
     `card_location` varchar(16) NOT NULL,
     `card_location_arg` int(11) NOT NULL,
     PRIMARY KEY (`card_id`)
