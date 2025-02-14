@@ -1,4 +1,7 @@
 <?php
+
+use Bga\Games\DontLetItDie\Game;
+
 if (!function_exists('getUsePerDay')) {
     function getUsePerDay($item, $game)
     {
@@ -48,7 +51,7 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Bone Scythe',
         'itemType' => 'tool',
-        'onDraw' => function ($item, $card, $game) {
+        'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'fiber') {
                 $game->globals->set('fiber', $game->globals->get('fiber') + 1);
                 $this->notify->all(
@@ -69,7 +72,7 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Bag',
         'itemType' => 'tool',
-        'onDraw' => function ($item, $card, $game) {
+        'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'berry') {
                 $game->globals->set('berry', $game->globals->get('berry') + 1);
                 $this->notify->all(
@@ -90,10 +93,10 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Bone Armor',
         'itemType' => 'tool',
-        'onUse' => function ($item, $game) {
+        'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
-        'requires' => function ($item, $game) {
+        'requires' => function (Game $game, $item) {
             return getUsePerDay($item, $game) < 2;
         },
     ],
@@ -116,10 +119,10 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Hide Armor',
         'itemType' => 'tool',
-        'onUse' => function ($item, $game) {
+        'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
-        'requires' => function ($item, $game) {
+        'requires' => function (Game $game, $item) {
             return getUsePerDay($item, $game) < 1;
         },
     ],
@@ -130,10 +133,10 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Knowledge Hut',
         'itemType' => 'building',
-        'onUse' => function ($item, $game) {
+        'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
-        'requires' => function ($item, $game) {
+        'requires' => function (Game $game, $item) {
             return getUsePerDay($item, $game) < 1;
         },
     ],
@@ -148,7 +151,7 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Hatchet',
         'itemType' => 'tool',
-        'onDraw' => function ($item, $card, $game) {
+        'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'wood') {
                 $game->globals->set('wood', $game->globals->get('wood') + 1);
                 $this->notify->all(
@@ -187,7 +190,7 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Carving Knife',
         'itemType' => 'tool',
-        'onDraw' => function ($item, $card, $game) {
+        'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'meat') {
                 $game->globals->set('meat', $game->globals->get('meat') + 1);
                 $this->notify->all(
@@ -215,10 +218,10 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 3,
         'damage' => 2,
-        'requires' => function ($item, $game) {
+        'requires' => function (Game $game, $item) {
             return $game->globals->get('rock') > 0;
         },
-        'onUse' => function ($item, $game) {
+        'onUse' => function (Game $game, $item) {
             $game->globals->set('rock', $game->globals->get('rock') - 1);
             $this->notify->all(
                 'usedItem',
@@ -237,7 +240,7 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Pick Axe',
         'itemType' => 'tool',
-        'onDraw' => function ($item, $card, $game) {
+        'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'rock') {
                 $game->globals->set('rock', $game->globals->get('rock') + 1);
                 $this->notify->all(
@@ -258,10 +261,10 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Planning Hut',
         'itemType' => 'building',
-        'onUse' => function ($item, $game) {
+        'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
-        'requires' => function ($item, $game) {
+        'requires' => function (Game $game, $item) {
             return getUsePerDay($item, $game) < 2;
         },
     ],
@@ -361,10 +364,10 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => 'Bone Flute',
         'itemType' => 'tool',
-        'onUse' => function ($item, $game) {
+        'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
-        'requires' => function ($item, $game) {
+        'requires' => function (Game $game, $item) {
             return getUsePerDay($item, $game) < 1;
         },
     ],
@@ -410,8 +413,8 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 1,
         'damage' => 2,
-        'onUse' => function ($item, $game) {
-            $game->characters->updateCharacterData($game->characters->getActivateCharacter()['character_name'], function (&$data) use (
+        'onUse' => function (Game $game, $item) {
+            $game->character->updateCharacterData($game->character->getActivateCharacter()['character_name'], function (&$data) use (
                 $item
             ) {
                 if ($item['id'] == $data['item_2_name']) {
@@ -450,10 +453,10 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 2,
         'damage' => 2,
-        'onUse' => function ($item, $game) {
+        'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
-        'requires' => function ($item, $game) {
+        'requires' => function (Game $game, $item) {
             return getUsePerDay($item, $game) < 1;
         },
     ],

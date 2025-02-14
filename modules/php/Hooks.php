@@ -10,17 +10,20 @@ class Hooks
     private Game $game;
     public function __construct(Game $game)
     {
-        // $hooks = ['onGetValidPlayerActions', 'onMorning', 'onNight', 'onDraw', 'onEncounter', 'onEat', 'onCraft'];
         $this->game = $game;
     }
     private function callHooks($functionName, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
     {
         $lastNightCard = $this->game->globals->get('lastNightCard');
-        $array = [$this->game->data->decks[$lastNightCard]];
-        $this->game->character->getAllCharacterData();
-        foreach ($array as $i => $data) {
+        $building = $this->game->globals->get('building');
+        $characters = $this->game->character->getAllCharacterData();
+        $equipment = array_filter($characters['equipment'], function ($c) {
+            return $c['isActive'];
+        })[0]['equipment'];
+        $array = [$this->game->data->decks[$lastNightCard], $this->game->data->decks[$building], ...$characters, ...$equipment];
+        foreach ($array as $i => $object) {
             if (isset($data[$functionName])) {
-                $data[$functionName]($this->game, $data1, $data2 = null, $data3 = null, $data4);
+                $object[$functionName]($this->game, $object, $data1, $data2 = null, $data3 = null, $data4);
             }
         }
     }
@@ -62,6 +65,11 @@ class Hooks
         $this->callHooks(__FUNCTION__, $card);
     }
     function onRollDie(&$data)
+    {
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onInvestigateFire(&$data)
     {
         $this->callHooks(__FUNCTION__, $data);
         return $data;

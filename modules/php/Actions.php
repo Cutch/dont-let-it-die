@@ -79,7 +79,7 @@ class Actions
                 'stamina' => 3,
                 'requires' => function () use ($game) {
                     return sizeof(
-                        array_filter($game->character->listActiveEquipment(), function ($data) {
+                        array_filter($game->character->getActiveEquipment(), function ($data) {
                             return $data['itemType'] == 'tool' && !in_array($data['id'], ['mortar-and-pestle', 'bandage']);
                         })
                     ) > 0;
@@ -89,7 +89,7 @@ class Actions
                 'stamina' => 3,
                 'requires' => function () use ($game) {
                     return sizeof(
-                        array_filter($game->character->listActiveEquipment(), function ($data) {
+                        array_filter($game->character->getActiveEquipment(), function ($data) {
                             return $data['itemType'] == 'weapon';
                         })
                     ) > 0;
@@ -126,7 +126,7 @@ class Actions
             'actUseItem' => [
                 'requires' => function () use ($game) {
                     return sizeof(
-                        array_filter($game->character->listActiveEquipment(), function ($data) {
+                        array_filter($game->character->getActiveEquipment(), function ($data) {
                             return $data['itemType'] == 'tool';
                         })
                     ) > 0;

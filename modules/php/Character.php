@@ -77,15 +77,19 @@ class Character
         if (isset($this->cachedData[$name])) {
             return $this->cachedData[$name];
         } else {
-            $turnOrder = $this->game->globals->get('turnOrder');
+            extract($this->game->globals->getAll('turnNo', 'turnOrder'));
+            $characterName = $turnOrder[$turnNo];
             $characterData = $this->game->getCollectionFromDb(
                 "SELECT c.*, player_color FROM `character` c INNER JOIN `player` p ON p.player_id = c.player_id WHERE character_name = '$name'"
             )[$name];
             $_this = $this;
-            $characterData['equipment'] = array_map(function ($itemName) use ($_this) {
-                return ['id' => $itemName, ...$_this->game->data->items[$itemName]];
+            $characterData['id'] = $characterData['character_name'];
+            $isActive = $characterName == $characterData['character_name'];
+            $characterData['isActive'] = $isActive;
+            $characterData['isFirst'] = isset($turnOrder[0]) && $turnOrder[0] == $characterData['character_name'];
+            $characterData['equipment'] = array_map(function ($itemName) use ($_this, $isActive) {
+                return ['id' => $itemName, 'isActive' => $isActive, ...$_this->game->data->items[$itemName]];
             }, array_filter([$characterData['item_1_name'], $characterData['item_2_name'], $characterData['item_3_name']]));
-            $characterData['is_first'] = isset($turnOrder[0]) && $turnOrder[0] == $characterData['character_name'];
             $this->cachedData[$name] = $characterData;
             return $characterData;
         }
@@ -122,7 +126,7 @@ class Character
         $character = $turnOrder[$turnNo];
         return $this->getCharacterData($character);
     }
-    public function listActiveEquipment(): array
+    public function getActiveEquipment(): array
     {
         $character = $this->getActivateCharacter();
         return $character['equipment'];
@@ -201,7 +205,7 @@ class Character
         return array_map(function ($char) {
             return [
                 'name' => $char['character_name'],
-                'isFirst' => $char['is_first'],
+                'isFirst' => $char['isFirst'],
                 'equipment' => array_filter([$char['item_1_name'], $char['item_2_name'], $char['item_3_name']]),
                 'playerColor' => $char['player_color'],
                 'playerId' => $char['player_id'],

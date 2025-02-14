@@ -100,6 +100,10 @@ class Game extends \Table
     {
         return $this->_($str);
     }
+    public function activeCharacterEventLog($message, $arg = [])
+    {
+        $this->notify->all('activeCharacter', clienttranslate('${player_name} - {character_name} ' . $message), $arg);
+    }
     public function nightEventLog($message, $arg = [])
     {
         $this->notify->all('nightEvent', clienttranslate($message), $arg);
@@ -125,7 +129,7 @@ class Game extends \Table
         }
         $value = max($this->hooks->onRollDie($value), 0);
         if ($character) {
-            $this->notify->all('rollFireDie', clienttranslate('${player_name} - {character_name} fire die rolled a ${value}'), [
+            $this->notify->all('rollFireDie', clienttranslate('${player_name} - {character_name} rolled a ${value}'), [
                 'value' => $value == 0 ? 'blank' : $value,
                 'character_name' => $character['character_name'],
             ]);
@@ -150,10 +154,19 @@ class Game extends \Table
     }
     public function actEat(): void
     {
+        $type = 'berry';
+        $amount = 3;
         $this->actions->validateCanRunAction('actEat');
-        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} ate'), [
-            'gameData' => $this->getAllDatas(),
-        ]);
+        $data = ['amount' => $amount, 'type' => $type, 'health' => $this->data->tokens[$type]['health']];
+        $this->hooks->onEat($data);
+        $this->notify->all(
+            'tokenUsed',
+            clienttranslate('${player_name} - ${character_name} ate ${amount} ${type} and gained ${health} health'),
+            [
+                'gameData' => $this->getAllDatas(),
+                ...$data,
+            ]
+        );
     }
     public function actAddWood(): void
     {
@@ -221,7 +234,77 @@ class Game extends \Table
     }
     public function stResolveEncounter()
     {
-        $this->gamestate->setPlayersMultiactive([], 'playerTurn');
+        extract($this->globals->get('state'));
+        $tools = array_filter($this->character->getActiveEquipment()['equipment'], function ($item) {
+            return isset($item['onEncounter']) && !(!array_key_exists('requires', $item) || $item['requires']());
+        });
+        if (sizeof($tools) >= 2) {
+            $weapon = $this->globals->get('useTools');
+            if ($weapon) {
+                $this->globals->set('chooseWeapon', null);
+            } else {
+                // TODO: Ask if want to use tools
+                $this->globals->set('useTools', $weapons);
+                $this->gamestate->nextState('whichTool');
+                return;
+            }
+        }
+        $weapons = array_filter($this->character->getActiveEquipment()['equipment'], function ($item) {
+            return $item['type'] == 'weapon';
+        });
+        $weapon = null;
+        if (sizeof($weapons) >= 2) {
+            $weapon = $this->globals->get('chooseWeapon');
+            if ($weapon) {
+                $this->globals->set('chooseWeapon', null);
+            } else {
+                // TODO: Ask gronk if you want to combine two weapons or pick one
+                // Highest range, lowest damage for combine
+                $this->globals->set('chooseWeapon', $weapons);
+                $this->gamestate->nextState('whichWeapon');
+                return;
+            }
+        } else {
+            $weapon = $weapons[0];
+        }
+        $data = $this->hooks->onEncounter([
+            'name' => $card['name'],
+            'encounterDamage' => $card['damage'], // Unused, maybe in logging
+            'encounterHealth' => $card['health'],
+            'escape' => false,
+            'characterRange' => $weapon['range'],
+            'characterDamage' => $weapon['damage'],
+            'willTakeDamage' => $card['damage'],
+            'willReceiveMeat' => $card['health'],
+            'stamina' => 0,
+        ]);
+        if ($data['stamina'] != 0) {
+            $this->character->adjustActiveStamina($data['stamina']);
+        }
+        if ($data['escape']) {
+            $this->activeCharacterEventLog('escaped from a ${name}', $data);
+        } elseif ($data['encounterHealth'] <= $data['characterDamage']) {
+            $damageTaken = 0;
+            if ($data['characterRange'] > 1) {
+                $damageTaken = 0;
+            } else {
+                $damageTaken = max($data['willTakeDamage'], 1);
+            }
+            if ($damageTaken != 0) {
+                $this->character->adjustActiveHealth($damageTaken);
+            }
+            $this->adjustResource('meat', $data['willReceiveMeat']);
+            $this->activeCharacterEventLog('defeated a ${name}, took ${damageTaken} damage and gained ${willReceiveMeat} meat', [
+                ...$data,
+                'damageTaken' => $damageTaken,
+            ]);
+        } else {
+            $this->character->adjustActiveHealth($data['willTakeDamage']);
+            $this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);
+        }
+
+        $this->gamestate->nextState('playerTurn');
+        // $this->gamestate->setPlayersMultiactive([], 'playerTurn');
     }
     public function argResolveEncounter()
     {
