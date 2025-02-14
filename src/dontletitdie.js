@@ -27,6 +27,7 @@ const actionMappings = {
   actEat: 'Eat',
   actCook: 'Cook',
   actTrade: 'Trade',
+  actUseSkill: 'Use Skill',
 };
 define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], function (dojo, declare) {
   return declare('bgagame.dontletitdie', ebg.core.gamegui, {
@@ -90,27 +91,33 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               <div class="color-marker" style="background-color: #${character.playerColor}"></div>
               <div class="character"></div>
               <div class="max-health max-marker"></div>
-              <div class="health marker"></div>
+              <div class="health marker fa fa-heart"></div>
               <div class="max-stamina max-marker"></div>
-              <div class="stamina marker"></div>
+              <div class="stamina marker fa fa-bolt"></div>
               <div class="weapon" style="top: ${(60 * 4) / scale}px;left: ${(122 * 4) / scale}px"></div>
               <div class="tool" style="top: ${(60 * 4) / scale}px;left: ${(241 * 4) / scale}px"></div>
+              <div class="first-player-marker"></div>
               </div>`,
             );
             renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), scale);
+            renderImage('skull', document.querySelector(`#player-${character.name} > .first-player-marker`), 8, 'replace');
           }
-          document.querySelector(`#player-${character.name} .max-health.max-marker`).style = `left: ${
-            ((character.maxHealth ?? 0) * 21 * 4) / scale + (123 * 4) / scale
-          }px;top: ${(7.5 * 4) / scale}px`;
+          document.querySelector(`#player-${character.name} > .first-player-marker`).style['display'] = character?.isFirst
+            ? 'block'
+            : 'none';
+
+          document.querySelector(`#player-${character.name} .max-health.max-marker`).style = `left: ${Math.round(
+            ((character.maxHealth ?? 0) * 20.75 * 4) / scale + (126.5 * 4) / scale,
+          )}px;top: ${Math.round((10 * 4) / scale)}px`;
           document.querySelector(`#player-${character.name} .health.marker`).style = `background-color: #${character.playerColor};left: ${
-            ((character.health ?? 0) * 21 * 4) / scale + (123 * 4) / scale
-          }px;top: ${(7.5 * 4) / scale}px`;
-          document.querySelector(`#player-${character.name} .max-stamina.max-marker`).style = `left: ${
-            ((character.maxStamina ?? 0) * 21 * 4) / scale + (123 * 4) / scale
-          }px;top: ${(32 * 4) / scale}px`;
+            Math.round(((character.health ?? 0) * 20.75 * 4) / scale + (126.5 * 4) / scale) + 2
+          }px;top: ${Math.round((10 * 4) / scale) + 2}px`;
+          document.querySelector(`#player-${character.name} .max-stamina.max-marker`).style = `left: ${Math.round(
+            ((character.maxStamina ?? 0) * 20.75 * 4) / scale + (126.5 * 4) / scale,
+          )}px;top: ${Math.round((34.5 * 4) / scale)}px`;
           document.querySelector(`#player-${character.name} .stamina.marker`).style = `background-color: #${character.playerColor};left: ${
-            ((character.stamina ?? 0) * 21 * 4) / scale + (123 * 4) / scale
-          }px;top: ${(32 * 4) / scale}px`;
+            Math.round(((character.stamina ?? 0) * 20.75 * 4) / scale + (126.5 * 4) / scale) + 2
+          }px;top: ${Math.round((34.5 * 4) / scale) + 2}px`;
 
           renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), scale, 'replace');
           let usedSlot;
@@ -199,43 +206,33 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     },
     setupBoard: function (gameData) {
       this.firstPlayer = gameData.playerorder[0];
+      const decks = [
+        { name: 'gather', expansion: 'base' },
+        { name: 'forage', expansion: 'base' },
+        { name: 'harvest', expansion: 'base' },
+        { name: 'hunt', expansion: 'base' },
+      ].filter((d) => this.expansions.includes(d.expansion));
       // Main board
       document
         .getElementById('game_play_area')
         .insertAdjacentHTML(
           'beforeend',
-          `<div id="board-container" class="dlid-container"><div class="board"><div class="fire-wood"></div><div class="gather"></div><div class="forage"></div><div class="harvest"></div><div class="hunt"></div></div></div>`,
+          `<div id="board-container" class="dlid-container"><div class="board"><div class="fire-wood"></div>${decks
+            .map((d) => `<div class="${d.name}"></div>`)
+            .join('')}</div></div>`,
         );
 
       renderImage(`board`, document.querySelector(`#board-container > .board`), 2, 'insert');
-      if (!this.decks['gather']) {
-        this.decks['gather'] = new Deck('gather', document.querySelector(`.board > .gather`), 4);
-        if (gameData.decksDiscards['gather']?.name) this.decks['gather'].setDiscard(gameData.decksDiscards['gather'].name);
-      }
-      if (!this.decks['forage']) {
-        this.decks['forage'] = new Deck('forage', document.querySelector(`.board > .forage`), 4);
-        if (gameData.decksDiscards['forage']?.name) this.decks['forage'].setDiscard(gameData.decksDiscards['forage'].name);
-      }
-      if (!this.decks['harvest']) {
-        this.decks['harvest'] = new Deck('harvest', document.querySelector(`.board > .harvest`), 4);
-        if (gameData.decksDiscards['harvest']?.name) this.decks['harvest'].setDiscard(gameData.decksDiscards['harvest'].name);
-      }
-      if (!this.decks['hunt']) {
-        this.decks['hunt'] = new Deck('hunt', document.querySelector(`.board > .hunt`), 4);
-        if (gameData.decksDiscards['hunt']?.name) this.decks['hunt'].setDiscard(gameData.decksDiscards['hunt'].name);
-      }
+      decks.forEach(({ name: deck }) => {
+        if (!this.decks[deck]) {
+          const uppercaseDeck = deck[0].toUpperCase() + deck.slice(1);
+          this.decks[deck] = new Deck(deck, document.querySelector(`.board > .${deck}`), 4);
+          this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
 
-      this.addClickListener(document.querySelector(`.board .gather-back`), 'Gather Deck', () => {
-        this.bgaPerformAction('actDrawGather');
-      });
-      this.addClickListener(document.querySelector(`.board .forage-back`), 'Forage Deck', () => {
-        this.bgaPerformAction('actDrawForage');
-      });
-      this.addClickListener(document.querySelector(`.board .harvest-back`), 'Harvest Deck', () => {
-        this.bgaPerformAction('actDrawHarvest');
-      });
-      this.addClickListener(document.querySelector(`.board .hunt-back`), 'Hunt Deck', () => {
-        this.bgaPerformAction('actDrawHunt');
+          this.addClickListener(document.querySelector(`.board .${deck}-back`), `${uppercaseDeck} Deck`, () => {
+            this.bgaPerformAction(`actDraw${uppercaseDeck}`);
+          });
+        }
       });
 
       this.updateResources(gameData);
@@ -293,11 +290,22 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     },
     updateTrack: function (gameData) {
       let trackContainer = document.getElementById('track-container');
+      const decks = [
+        { name: 'night-event', expansion: 'base' },
+        { name: 'day-event', expansion: 'base' },
+        { name: 'mental-hindrance', expansion: 'hindrance' },
+        { name: 'physical-hindrance', expansion: 'hindrance' },
+      ].filter((d) => this.expansions.includes(d.expansion));
       if (!trackContainer) {
         const playArea = document.getElementById('game_play_area');
-        playArea.insertAdjacentHTML('beforeend', `<div id="track-container" class="dlid-container"></div>`);
+        playArea.insertAdjacentHTML(
+          'beforeend',
+          `<div id="track-container" class="dlid-container"><div id="event-deck-container">${decks
+            .map((d) => `<div class="${d.name}"></div>`)
+            .join('')}</div></div>`,
+        );
         trackContainer = document.getElementById('track-container');
-        renderImage(`track-${gameData.trackDifficulty}`, document.getElementById('track-container'), 2, 'insert');
+        renderImage(`track-${gameData.trackDifficulty}`, trackContainer, 2, 'insert');
 
         trackContainer
           .querySelector(`.track-${gameData.trackDifficulty}`)
@@ -305,10 +313,19 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       }
       const marker = document.getElementById('track-marker');
       marker.style.top = `${(gameData.game.day - 1) * 35 + 236}px`;
+
+      const eventDeckContainer = document.getElementById('event-deck-container');
+      decks.forEach(({ name: deck }) => {
+        if (!this.decks[deck]) {
+          this.decks[deck] = new Deck(deck, eventDeckContainer.querySelector(`.${deck}`), 3, 'horizontal');
+          if (gameData.decksDiscards[deck]?.name) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+        }
+      });
     },
     setup: function (gameData) {
       console.log(gameData);
       expansionI = gameData.expansionList.indexOf(gameData.expansion);
+      this.expansions = gameData.expansionList.slice(0, expansionI + 1);
       this.data = Object.keys(allSprites).reduce((acc, k) => {
         const d = allSprites[k];
         d.options = d.options ?? {};

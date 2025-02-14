@@ -105,6 +105,7 @@ $charactersData = [
         'slots' => ['weapon', 'tool'],
     ],
     'Rex' => [
+        'expansion' => 'hindrance',
         'type' => 'character',
         'health' => '5',
         'stamina' => '7',

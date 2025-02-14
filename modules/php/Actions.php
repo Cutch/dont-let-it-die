@@ -78,13 +78,21 @@ class Actions
             'actDrawHarvest' => [
                 'stamina' => 3,
                 'requires' => function () use ($game) {
-                    return in_array('tool', $game->character->listActiveEquipmentTypes());
+                    return sizeof(
+                        array_filter($game->character->listActiveEquipment(), function ($data) {
+                            return $data['itemType'] == 'tool' && !in_array($data['id'], ['mortar-and-pestle', 'bandage']);
+                        })
+                    ) > 0;
                 },
             ],
             'actDrawHunt' => [
                 'stamina' => 3,
                 'requires' => function () use ($game) {
-                    return in_array('weapon', $game->character->listActiveEquipmentTypes());
+                    return sizeof(
+                        array_filter($game->character->listActiveEquipment(), function ($data) {
+                            return $data['itemType'] == 'weapon';
+                        })
+                    ) > 0;
                 },
             ],
             'actCraft' => [
@@ -107,20 +115,43 @@ class Actions
                     return $wood > 0;
                 },
             ],
+            'actUseSkill' => [
+                'requires' => function () use ($game) {
+                    $game->character->getActivateCharacter();
+                    return isset($game->character['skills']);
+                },
+            ],
         ];
         $this->encounterActions = [
             'actUseItem' => [
                 'requires' => function () use ($game) {
-                    return in_array('tool', $game->character->listActiveEquipmentTypes());
+                    return sizeof(
+                        array_filter($game->character->listActiveEquipment(), function ($data) {
+                            return $data['itemType'] == 'tool';
+                        })
+                    ) > 0;
                 },
             ],
-            'actUseSpecial' => [
+            'actUseSkill' => [
                 'requires' => function () use ($game) {
-                    return in_array('tool', $game->character->listActiveEquipmentTypes());
+                    return isset($game->character['skills']);
                 },
             ],
         ];
         $this->game = $game;
+    }
+    public function setup()
+    {
+        $this->resetTurnActions();
+    }
+
+    public function resetTurnActions()
+    {
+        $this->game->globals->set('turnActions', []);
+    }
+    public function getTurnActions()
+    {
+        return $this->game->globals->get('turnActions');
     }
     /**
      * Get character stamina cost
@@ -129,7 +160,7 @@ class Actions
      */
     public function getStaminaCost($action): int
     {
-        return $this->playerActions[$action]['stamina'];
+        return $this->game->hooks->onGetStaminaCost($this->playerActions[$action]['stamina']);
     }
     public function validateCanRunAction($action)
     {
@@ -141,6 +172,13 @@ class Actions
         if (!(!array_key_exists('requires', $this->playerActions[$action]) || $this->playerActions[$action]['requires']())) {
             throw new BgaUserException($this->game->translate('Can\'t use this action'));
         }
+        $validPlayerActions = $this->getValidPlayerActions();
+        if (!isset($validPlayerActions[$action])) {
+            throw new BgaUserException($this->game->translate('This action can not be used this turn'));
+        }
+        $turnActions = $this->game->globals->get('turnActions');
+        $turnActions[$action] = ($turnActions[$action] ?? 0) + 1;
+        $this->game->globals->set('turnActions', $turnActions);
     }
     public function getValidPlayerActions()
     {
@@ -153,16 +191,18 @@ class Actions
             },
             ARRAY_FILTER_USE_BOTH
         );
-        return array_column(
-            array_map(
-                function ($k, $v) {
-                    return [$k, $this->getStaminaCost($k)];
-                },
-                array_keys($validActionsFiltered),
-                $validActionsFiltered
-            ),
-            1,
-            0
+        return $this->game->hooks->onGetValidPlayerActions(
+            array_column(
+                array_map(
+                    function ($k, $v) {
+                        return [$k, $this->getStaminaCost($k)];
+                    },
+                    array_keys($validActionsFiltered),
+                    $validActionsFiltered
+                ),
+                1,
+                0
+            )
         );
     }
     public function getValidEncounterActions()

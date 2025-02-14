@@ -1,9 +1,10 @@
 const decksSprites = {
   sprites: {
-    "explore-7_0": {
+    'explore-7_0': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1,
@@ -13,10 +14,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_1": {
+    'explore-7_1': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 310,
@@ -26,10 +28,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_10": {
+    'explore-7_10': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 619,
@@ -39,10 +42,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_11": {
+    'explore-7_11': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 928,
@@ -52,10 +56,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_12": {
+    'explore-7_12': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1237,
@@ -65,10 +70,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_13": {
+    'explore-7_13': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1546,
@@ -78,10 +84,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_14": {
+    'explore-7_14': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1855,
@@ -91,10 +98,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_15": {
+    'explore-7_15': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2164,
@@ -104,10 +112,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_4": {
+    'explore-7_4': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2473,
@@ -117,10 +126,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_5": {
+    'explore-7_5': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2782,
@@ -130,10 +140,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_6": {
+    'explore-7_6': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 3091,
@@ -143,10 +154,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_7": {
+    'explore-7_7': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 3400,
@@ -156,10 +168,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_8": {
+    'explore-7_8': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1,
@@ -169,10 +182,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-7_9": {
+    'explore-7_9': {
       options: {
-        type: "card",
-        deck: "explore",
+        type: 'card',
+        deck: 'explore',
+        expansion: 'hindrance',
       },
       frame: {
         x: 310,
@@ -182,10 +196,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "explore-back": {
+    'explore-back': {
       options: {
-        deck: "explore",
-        type: "back",
+        deck: 'explore',
+        expansion: 'hindrance',
+        type: 'back',
       },
       frame: {
         x: 619,
@@ -195,10 +210,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-7_10": {
+    'forage-7_10': {
       options: {
-        type: "card",
-        deck: "forage",
+        type: 'card',
+        deck: 'forage',
       },
       frame: {
         x: 928,
@@ -208,10 +223,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-7_11": {
+    'forage-7_11': {
       options: {
-        type: "card",
-        deck: "forage",
+        type: 'card',
+        deck: 'forage',
       },
       frame: {
         x: 1237,
@@ -221,10 +236,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-7_12": {
+    'forage-7_12': {
       options: {
-        type: "card",
-        deck: "forage",
+        type: 'card',
+        deck: 'forage',
       },
       frame: {
         x: 1546,
@@ -234,10 +249,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-7_13": {
+    'forage-7_13': {
       options: {
-        type: "card",
-        deck: "forage",
+        type: 'card',
+        deck: 'forage',
       },
       frame: {
         x: 1855,
@@ -247,10 +262,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-7_14": {
+    'forage-7_14': {
       options: {
-        type: "card",
-        deck: "forage",
+        type: 'card',
+        deck: 'forage',
       },
       frame: {
         x: 2164,
@@ -260,10 +275,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-7_15": {
+    'forage-7_15': {
       options: {
-        type: "card",
-        deck: "forage",
+        type: 'card',
+        deck: 'forage',
       },
       frame: {
         x: 2473,
@@ -273,10 +288,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-7_4": {
+    'forage-7_4': {
       options: {
-        type: "card",
-        deck: "forage",
+        type: 'card',
+        deck: 'forage',
       },
       frame: {
         x: 2782,
@@ -286,10 +301,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-7_8": {
+    'forage-7_8': {
       options: {
-        type: "card",
-        deck: "forage",
+        type: 'card',
+        deck: 'forage',
       },
       frame: {
         x: 3091,
@@ -299,10 +314,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-7_9": {
+    'forage-7_9': {
       options: {
-        type: "card",
-        deck: "forage",
+        type: 'card',
+        deck: 'forage',
       },
       frame: {
         x: 3400,
@@ -312,10 +327,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "forage-back": {
+    'forage-back': {
       options: {
-        deck: "forage",
-        type: "back",
+        deck: 'forage',
+        type: 'back',
       },
       frame: {
         x: 1,
@@ -325,10 +340,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-7_10": {
+    'gather-7_10': {
       options: {
-        type: "card",
-        deck: "gather",
+        type: 'card',
+        deck: 'gather',
       },
       frame: {
         x: 310,
@@ -338,10 +353,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-7_11": {
+    'gather-7_11': {
       options: {
-        type: "card",
-        deck: "gather",
+        type: 'card',
+        deck: 'gather',
       },
       frame: {
         x: 619,
@@ -351,10 +366,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-7_12": {
+    'gather-7_12': {
       options: {
-        type: "card",
-        deck: "gather",
+        type: 'card',
+        deck: 'gather',
       },
       frame: {
         x: 928,
@@ -364,10 +379,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-7_13": {
+    'gather-7_13': {
       options: {
-        type: "card",
-        deck: "gather",
+        type: 'card',
+        deck: 'gather',
       },
       frame: {
         x: 1237,
@@ -377,10 +392,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-7_14": {
+    'gather-7_14': {
       options: {
-        type: "card",
-        deck: "gather",
+        type: 'card',
+        deck: 'gather',
       },
       frame: {
         x: 1546,
@@ -390,10 +405,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-7_15": {
+    'gather-7_15': {
       options: {
-        type: "card",
-        deck: "gather",
+        type: 'card',
+        deck: 'gather',
       },
       frame: {
         x: 1855,
@@ -403,10 +418,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-7_4": {
+    'gather-7_4': {
       options: {
-        type: "card",
-        deck: "gather",
+        type: 'card',
+        deck: 'gather',
       },
       frame: {
         x: 2164,
@@ -416,10 +431,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-7_8": {
+    'gather-7_8': {
       options: {
-        type: "card",
-        deck: "gather",
+        type: 'card',
+        deck: 'gather',
       },
       frame: {
         x: 2473,
@@ -429,10 +444,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-7_9": {
+    'gather-7_9': {
       options: {
-        type: "card",
-        deck: "gather",
+        type: 'card',
+        deck: 'gather',
       },
       frame: {
         x: 2782,
@@ -442,10 +457,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "gather-back": {
+    'gather-back': {
       options: {
-        deck: "gather",
-        type: "back",
+        deck: 'gather',
+        type: 'back',
       },
       frame: {
         x: 3091,
@@ -455,10 +470,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_10": {
+    'harvest-7_10': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 3400,
@@ -468,10 +483,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_11": {
+    'harvest-7_11': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 1,
@@ -481,10 +496,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_12": {
+    'harvest-7_12': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 310,
@@ -494,10 +509,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_13": {
+    'harvest-7_13': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 619,
@@ -507,10 +522,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_14": {
+    'harvest-7_14': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 928,
@@ -520,10 +535,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_15": {
+    'harvest-7_15': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 1237,
@@ -533,10 +548,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_4": {
+    'harvest-7_4': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 1546,
@@ -546,10 +561,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_5": {
+    'harvest-7_5': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 1855,
@@ -559,10 +574,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_8": {
+    'harvest-7_8': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 2164,
@@ -572,10 +587,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-7_9": {
+    'harvest-7_9': {
       options: {
-        type: "card",
-        deck: "harvest",
+        type: 'card',
+        deck: 'harvest',
       },
       frame: {
         x: 2473,
@@ -585,10 +600,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "harvest-back": {
+    'harvest-back': {
       options: {
-        deck: "harvest",
-        type: "back",
+        deck: 'harvest',
+        type: 'back',
       },
       frame: {
         x: 2782,
@@ -598,10 +613,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_10": {
+    'hunt-7_10': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 3091,
@@ -611,10 +626,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_11": {
+    'hunt-7_11': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 3400,
@@ -624,10 +639,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_12": {
+    'hunt-7_12': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 1,
@@ -637,10 +652,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_13": {
+    'hunt-7_13': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 310,
@@ -650,10 +665,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_14": {
+    'hunt-7_14': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 619,
@@ -663,10 +678,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_15": {
+    'hunt-7_15': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 928,
@@ -676,10 +691,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_4": {
+    'hunt-7_4': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 1237,
@@ -689,10 +704,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_5": {
+    'hunt-7_5': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 1546,
@@ -702,10 +717,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_6": {
+    'hunt-7_6': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 1855,
@@ -715,10 +730,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_7": {
+    'hunt-7_7': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 2164,
@@ -728,10 +743,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_8": {
+    'hunt-7_8': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 2473,
@@ -741,10 +756,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-7_9": {
+    'hunt-7_9': {
       options: {
-        type: "card",
-        deck: "hunt",
+        type: 'card',
+        deck: 'hunt',
       },
       frame: {
         x: 2782,
@@ -754,10 +769,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "hunt-back": {
+    'hunt-back': {
       options: {
-        deck: "hunt",
-        type: "back",
+        deck: 'hunt',
+        type: 'back',
       },
       frame: {
         x: 3091,
@@ -767,10 +782,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_0": {
+    'night-event-7_0': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3400,
@@ -780,10 +795,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_1": {
+    'night-event-7_1': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1,
@@ -793,10 +808,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_10": {
+    'night-event-7_10': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 310,
@@ -806,10 +821,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_11": {
+    'night-event-7_11': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 619,
@@ -819,10 +834,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_12": {
+    'night-event-7_12': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 928,
@@ -832,10 +847,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_13": {
+    'night-event-7_13': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1237,
@@ -845,10 +860,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_14": {
+    'night-event-7_14': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1546,
@@ -858,10 +873,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_15": {
+    'night-event-7_15': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1855,
@@ -871,10 +886,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_2": {
+    'night-event-7_2': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 2164,
@@ -884,10 +899,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_3": {
+    'night-event-7_3': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 2473,
@@ -897,10 +912,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_4": {
+    'night-event-7_4': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 2782,
@@ -910,10 +925,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_5": {
+    'night-event-7_5': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3091,
@@ -923,10 +938,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_6": {
+    'night-event-7_6': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3400,
@@ -936,10 +951,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_7": {
+    'night-event-7_7': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1,
@@ -949,10 +964,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_8": {
+    'night-event-7_8': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 310,
@@ -962,10 +977,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-7_9": {
+    'night-event-7_9': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 619,
@@ -975,7 +990,11 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event": {
+    'night-event-back': {
+      options: {
+        type: 'back',
+        deck: 'night-event',
+      },
       frame: {
         x: 928,
         y: 2671,
@@ -984,10 +1003,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_0": {
+    'night-event-8_0': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1237,
@@ -997,10 +1016,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_1": {
+    'night-event-8_1': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1546,
@@ -1010,10 +1029,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_10": {
+    'night-event-8_10': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1855,
@@ -1023,10 +1042,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_11": {
+    'night-event-8_11': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 2164,
@@ -1036,10 +1055,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_12": {
+    'night-event-8_12': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 2473,
@@ -1049,10 +1068,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_13": {
+    'night-event-8_13': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 2782,
@@ -1062,10 +1081,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_14": {
+    'night-event-8_14': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3091,
@@ -1075,10 +1094,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_15": {
+    'night-event-8_15': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3400,
@@ -1088,10 +1107,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_2": {
+    'night-event-8_2': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1,
@@ -1101,10 +1120,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_3": {
+    'night-event-8_3': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 310,
@@ -1114,10 +1133,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_4": {
+    'night-event-8_4': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 619,
@@ -1127,10 +1146,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_5": {
+    'night-event-8_5': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 928,
@@ -1140,10 +1159,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_6": {
+    'night-event-8_6': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1237,
@@ -1153,10 +1172,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_7": {
+    'night-event-8_7': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1546,
@@ -1166,10 +1185,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-8_8": {
+    'night-event-8_8': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 1855,
@@ -1179,10 +1198,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_9": {
+    'night-event-9_9': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 2164,
@@ -1192,10 +1211,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_10": {
+    'night-event-9_10': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 2473,
@@ -1205,10 +1224,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_11": {
+    'night-event-9_11': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 2782,
@@ -1218,10 +1237,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_12": {
+    'night-event-9_12': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3091,
@@ -1231,10 +1250,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_13": {
+    'night-event-9_13': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3400,
@@ -1244,10 +1263,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_14": {
+    'night-event-9_14': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3709,
@@ -1257,10 +1276,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_15": {
+    'night-event-9_15': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3709,
@@ -1270,10 +1289,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_4": {
+    'night-event-9_4': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3709,
@@ -1283,10 +1302,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_5": {
+    'night-event-9_5': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3709,
@@ -1296,10 +1315,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_6": {
+    'night-event-9_6': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3709,
@@ -1309,10 +1328,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-9_8": {
+    'night-event-9_8': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3709,
@@ -1322,10 +1341,10 @@ const decksSprites = {
       },
       rotate: 0,
     },
-    "night-event-10_9": {
+    'night-event-10_9': {
       options: {
-        type: "card",
-        deck: "night-event",
+        type: 'card',
+        deck: 'night-event',
       },
       frame: {
         x: 3709,
@@ -1337,13 +1356,13 @@ const decksSprites = {
     },
   },
   meta: {
-    version: "1.0",
-    image: "decks-spritesheet.png",
-    css: "decks-card",
+    version: '1.0',
+    image: 'decks-spritesheet.png',
+    css: 'decks-card',
     size: {
       w: 4017,
       h: 3560,
     },
-    scale: "1",
+    scale: '1',
   },
 };

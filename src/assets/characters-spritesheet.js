@@ -158,6 +158,7 @@ const charactersSprites = {
     },
     Rex: {
       options: {
+        expansion: 'hindrance',
         type: 'character',
       },
       frame: {
@@ -223,8 +224,8 @@ const charactersSprites = {
       },
     },
     Tiku: {
-      expansion: 'hindrance',
       options: {
+        expansion: 'hindrance',
         type: 'character',
       },
       frame: {

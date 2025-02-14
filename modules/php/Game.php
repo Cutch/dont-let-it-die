@@ -22,19 +22,20 @@ use BgaUserException;
 use Exception;
 
 require_once APP_GAMEMODULE_PATH . 'module/table/table.game.php';
-include dirname(__DIR__) . '/php/Data.php';
-include dirname(__DIR__) . '/php/Actions.php';
-include dirname(__DIR__) . '/php/CharacterSelection.php';
-include dirname(__DIR__) . '/php/Character.php';
-include dirname(__DIR__) . '/php/GameData.php';
+include_once dirname(__DIR__) . '/php/Data.php';
+include_once dirname(__DIR__) . '/php/Actions.php';
+include_once dirname(__DIR__) . '/php/CharacterSelection.php';
+include_once dirname(__DIR__) . '/php/Character.php';
+include_once dirname(__DIR__) . '/php/GameData.php';
 class Game extends \Table
 {
     public Character $character;
     public Actions $actions;
     private CharacterSelection $characterSelection;
     public Data $data;
-    private Decks $decks;
+    public Decks $decks;
     private GameData $gameData;
+    public Hooks $hooks;
     public static array $expansionList = ['base', 'hindrance'];
     /**
      * Your global variables labels:
@@ -61,11 +62,18 @@ class Game extends \Table
         $this->character = new Character($this);
         $this->characterSelection = new CharacterSelection($this);
         $this->gameData = new GameData($this);
+        $this->hooks = new Hooks($this);
         // automatically complete notification args when needed
         $this->notify->addDecorator(function (string $message, array $args) {
+            if (!isset($args['character_name']) && str_contains($message, '${character_name}')) {
+                $args['character_name'] = $this->character->getActivateCharacter()['character_name'];
+            }
             if (!isset($args['player_name']) && str_contains($message, '${player_name}')) {
                 if (isset($args['player_id'])) {
                     $args['player_name'] = $this->getPlayerNameById($args['player_id']);
+                } elseif (isset($args['character_name'])) {
+                    $playerId = (int) $this->character->getCharacterData($args['character_name'])['player_id'];
+                    $args['player_name'] = $this->getPlayerNameById($playerId);
                 } else {
                     $playerId = (int) $this->getActivePlayerId();
                     $args['player_name'] = $this->getPlayerNameById($playerId);
@@ -73,9 +81,6 @@ class Game extends \Table
             }
             if (isset($args['resource']) && !isset($args['resource_name']) && str_contains($message, '${resource_name}')) {
                 $args['resource_name'] = $this->getPlayerNameById($args['resource']);
-            }
-            if (!isset($args['character_name']) && str_contains($message, '${character_name}')) {
-                $args['character_name'] = $this->character->getActivateCharacter()['character_name'];
             }
             return $args;
         });
@@ -94,6 +99,42 @@ class Game extends \Table
     public function translate(string $str)
     {
         return $this->_($str);
+    }
+    public function nightEventLog($message, $arg = [])
+    {
+        $this->notify->all('nightEvent', clienttranslate($message), $arg);
+    }
+    public function adjustResource($resourceType, $change)
+    {
+        $currentCount = $this->globals->get($resourceType);
+        $newValue = max(min($currentCount + $change, $this->data->tokens[$resourceType]['count']), 0);
+        $this->globals->set($resourceType, $newValue);
+        $difference = $currentCount - $newValue + $change;
+        return $difference;
+    }
+    public function rollFireDie($character = null): array
+    {
+        $rand = rand(1, 6);
+        $value = 0;
+        if ($rand == 6) {
+            $value = 3;
+        } elseif ($rand == 5) {
+            $value = 2;
+        } elseif ($rand > 1) {
+            $value = 1;
+        }
+        $value = max($this->hooks->onRollDie($value), 0);
+        if ($character) {
+            $this->notify->all('rollFireDie', clienttranslate('${player_name} - {character_name} fire die rolled a ${value}'), [
+                'value' => $value == 0 ? 'blank' : $value,
+                'character_name' => $character['character_name'],
+            ]);
+        } else {
+            $this->notify->all('rollFireDie', clienttranslate('The fire die rolled a ${value}'), [
+                'value' => $value == 0 ? 'blank' : $value,
+            ]);
+        }
+        return $value;
     }
     public function actCharacterClicked(
         string $character1 = null,
@@ -147,7 +188,7 @@ class Game extends \Table
         $staminaCost = $this->actions->getStaminaCost('actDraw' . ucfirst($deck));
         $character = $this->character->getActivateCharacter();
         $card = $this->decks->pickCard($deck);
-        $this->character->updateCharacterData($character['character_name'], function ($data) use ($staminaCost) {
+        $this->character->updateCharacterData($character['character_name'], function (&$data) use ($staminaCost) {
             $data['stamina'] -= $staminaCost;
         });
         $this->notify->all('cardDrawn', clienttranslate('${player_name} - ${character_name} drew from the ${deck} deck'), [
@@ -184,7 +225,7 @@ class Game extends \Table
     }
     public function argResolveEncounter()
     {
-        $validActions = $this->actions->getValidPlayerActions();
+        $validActions = $this->actions->getValidEncounterActions();
         $result = [
             'actions' => $validActions,
         ];
@@ -198,11 +239,7 @@ class Game extends \Table
         $character = $this->character->getActivateCharacter();
         extract($this->globals->get('state'));
         if ($card['deckType'] == 'resource') {
-            $resourceCount = $this->globals->get($card['resourceType']);
-            $this->globals->set(
-                $card['resourceType'],
-                min($resourceCount + $card['count'], $this->data->tokens[$card['resourceType']]['count'])
-            );
+            $this->adjustResource($card['resourceType'], $card['count']);
 
             $this->notify->all('foundResource', clienttranslate('${player_name} - ${character_name} found ${count} ${name}'), [
                 'player_id' => $character['player_id'],
@@ -234,6 +271,11 @@ class Game extends \Table
             $this->gamestate->nextState('playerTurn');
         } elseif ($card['deckType'] == 'hindrance') {
             $this->gamestate->nextState('playerTurn');
+        } elseif ($card['deckType'] == 'night-event') {
+            $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
+                'deck' => str_replace('-', ' ', $deck),
+            ]);
+            $this->gamestate->nextState('morning');
         } else {
             $this->gamestate->nextState('playerTurn');
         }
@@ -249,6 +291,7 @@ class Game extends \Table
     public function argPlayerState(): array
     {
         $validActions = $this->actions->getValidPlayerActions();
+        // var_dump($validActions);
         $result = [
             'actions' => $validActions,
             'currentCharacter' => $this->character->getActivateCharacter()['character_name'],
@@ -307,7 +350,7 @@ class Game extends \Table
         $card = $this->decks->pickCard('night-event');
         $this->globals->set('lastNightCard', $card);
         $this->globals->set('state', ['card' => $card, 'deck' => 'night-event']);
-        $this->gamestate->nextState('morning');
+        $this->gamestate->nextState('drawCard');
     }
     public function stMorningPhase()
     {
@@ -316,17 +359,16 @@ class Game extends \Table
             $this->gamestate->nextState('endGame'); // Fail
         }
         $woodNeeded = (int) (($day - 1) / 3) + 1 - ($day >= 12 ? 1 : 0);
-        $wood = $this->globals->get('wood');
-        if ($wood < $woodNeeded) {
+        if ($this->adjustResource('wood', -$woodNeeded) != 0) {
             $this->gamestate->nextState('endGame'); // Fail
         }
-        $this->globals->set('wood', $wood - $woodNeeded);
+        $this->actions->resetTurnActions();
+        $this->character->rotateTurnOrder();
         $this->gamestate->nextState('tradePhase');
     }
     public function stTradePhase()
     {
         $this->gamestate->setAllPlayersMultiactive();
-        // $this->rotateTurnOrder();
         // $this->gamestate->nextState('activePhase');
     }
 
@@ -367,7 +409,7 @@ class Game extends \Table
     {
         $result['characters'] = $this->character->getMarshallCharacters();
     }
-    protected function getDecks(&$result): void
+    public function getDecks(&$result): void
     {
         $data = $this->decks->getDecksData();
         $result['decks'] = $data['decks'];
@@ -431,8 +473,7 @@ class Game extends \Table
         $this->getAllPlayers($result);
         $this->getDecks($result);
         $this->getGameData($result);
-        if ($this->gamestate->state()['name'] === 'playerTurn') {
-        }
+
         return $result;
     }
 

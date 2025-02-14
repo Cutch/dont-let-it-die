@@ -88,7 +88,7 @@ $machinestates = [
             'actCook',
             'actTrade',
             'actEndTurn',
-            'actUseSpecial',
+            'actUseSkill',
         ],
         'transitions' => ['drawCard' => 11, 'endTurn' => 15],
     ],

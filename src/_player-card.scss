@@ -26,10 +26,19 @@
   border-radius: 50%;
   border: 1px solid;
 }
+.player-card .first-player-marker {
+  position: absolute;
+  bottom: -1rem;
+  left: -1rem;
+}
+.player-card .first-player-marker > .card {
+  border-radius: unset;
+  border: unset;
+}
 .player-card .character {
   position: absolute;
-  top: 10px;
-  left: 9px;
+  top: 14px;
+  left: 13px;
 }
 .player-card .weapon {
   position: absolute;
@@ -46,7 +55,7 @@
   width: 1.25em;
   height: 1.25em;
   transition: top 1s linear, left 1s linear, transform 1s linear;
-  border: 3px solid black;
+  border: 3px solid rgb(205, 205, 205);
   border-radius: 50%;
 }
 .player-card .marker {
@@ -54,8 +63,12 @@
   width: 1.25em;
   height: 1.25em;
   transition: top 1s linear, left 1s linear, transform 1s linear;
-  border: 3px solid #000;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px;
+  box-shadow: inset 0px 0px 0px 1px #000;
 }
 // .player-card .health {
 //   top: 13px;

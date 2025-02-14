@@ -1,14 +1,16 @@
 <?php
-function getUsePerDay($item, $game)
-{
-    $dailyUseItems = $game->globals->get('dailyUseItems');
-    return $dailyUseItems[$item['id']] || 0;
-}
-function usePerDay($item, $game)
-{
-    $dailyUseItems = $game->globals->get('dailyUseItems');
-    $dailyUseItems[$item['id']] = ($dailyUseItems[$item['id']] || 0) + 1;
-    $game->globals->set('dailyUseItems', $dailyUseItems);
+if (!function_exists('getUsePerDay')) {
+    function getUsePerDay($item, $game)
+    {
+        $dailyUseItems = $game->globals->get('dailyUseItems');
+        return $dailyUseItems[$item['id']] || 0;
+    }
+    function usePerDay($item, $game)
+    {
+        $dailyUseItems = $game->globals->get('dailyUseItems');
+        $dailyUseItems[$item['id']] = ($dailyUseItems[$item['id']] || 0) + 1;
+        $game->globals->set('dailyUseItems', $dailyUseItems);
+    }
 }
 $itemsData = [
     'bow-and-arrow' => [
@@ -128,6 +130,12 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Knowledge Hut',
         'itemType' => 'building',
+        'onUse' => function ($item, $game) {
+            usePerDay($item, $game);
+        },
+        'requires' => function ($item, $game) {
+            return getUsePerDay($item, $game) < 1;
+        },
     ],
     'skull' => [
         'type' => 'game-piece',
@@ -250,6 +258,12 @@ $itemsData = [
         'type' => 'deck',
         'name' => 'Planning Hut',
         'itemType' => 'building',
+        'onUse' => function ($item, $game) {
+            usePerDay($item, $game);
+        },
+        'requires' => function ($item, $game) {
+            return getUsePerDay($item, $game) < 2;
+        },
     ],
     'spear' => [
         'deck' => 'item',
@@ -397,7 +411,7 @@ $itemsData = [
         'range' => 1,
         'damage' => 2,
         'onUse' => function ($item, $game) {
-            $game->characters->updateCharacterData($game->characters->getActivateCharacter()['character_name'], function ($data) use (
+            $game->characters->updateCharacterData($game->characters->getActivateCharacter()['character_name'], function (&$data) use (
                 $item
             ) {
                 if ($item['id'] == $data['item_2_name']) {

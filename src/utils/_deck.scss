@@ -1,3 +1,6 @@
+.deck {
+  position: relative;
+}
 .flip-card {
   background-color: transparent;
   perspective: 1000px; /* Remove this if you don't want the 3D effect */
@@ -14,10 +17,21 @@
 .flipped-card {
   background-color: transparent;
   position: absolute;
-  top: 110%;
-  left: 0;
   right: 0;
   bottom: 0;
+}
+.flipped-card.horizontal {
+  top: 0;
+  left: 110%;
+}
+.flipped-card.vertical {
+  top: 110%;
+  left: 0;
+}
+.empty-discard {
+  border-radius: 10px;
+  background-color: #83838357;
+  box-shadow: inset 0px 0px 0px 2px #838383;
 }
 /* This container is needed to position the front and back side */
 .flip-card-inner {

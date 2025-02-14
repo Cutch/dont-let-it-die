@@ -7,13 +7,27 @@ class Decks
 {
     private Game $game;
     private $decks;
-    private static $decksNames = ['harvest', 'forage', 'hunt', 'gather', 'explore', 'day-event', 'night-event', 'hindrance'];
+    private static $decksNames = [
+        'harvest',
+        'forage',
+        'hunt',
+        'gather',
+        'explore',
+        'day-event',
+        'night-event',
+        'physical-hindrance',
+        'mental-hindrance',
+    ];
     public function __construct($game)
     {
         $this->game = $game;
         foreach (self::$decksNames as $i => $deck) {
             $this->decks[$deck] = $this->game->initDeck(str_replace('-', '', $deck));
         }
+    }
+    public function getAllDeckNames(): array
+    {
+        return self::$decksNames;
     }
     public function setup()
     {
@@ -24,6 +38,10 @@ class Decks
     public function pickCard(string $deck): array
     {
         $topCard = $this->decks[$deck]->getCardOnTop('deck');
+        if (!$topCard) {
+            $this->shuffleInDiscard($deck);
+            $topCard = $this->decks[$deck]->getCardOnTop('deck');
+        }
         $this->decks[$deck]->moveCards([$topCard['id']], 'discard');
         $card = $this->getCard($topCard['type_arg']);
         return $card;
@@ -87,5 +105,35 @@ class Decks
             );
         }
         return $result;
+    }
+    public function shuffleInDiscard($deck, $notify = true): void
+    {
+        $this->decks[$deck]->moveAllCardsInLocation('discard', 'deck');
+        $this->decks[$deck]->shuffle('deck');
+        $result = ['deck' => str_replace('-', ' ', $deck)];
+        $this->game->getDecks($result);
+        if ($notify) {
+            $this->game->notify->all('shuffle', clienttranslate('The ${deck} deck is out of cards, shuffling'), $result);
+        }
+    }
+    public function discardCards($deck, $callback): void
+    {
+        $deckCount = $this->decks[$deck]->countCardsInLocation('deck');
+        $cards = $this->decks[$deck]->getCardOnTop($deckCount, 'deck');
+
+        $cards = array_filter($cards, function ($card) use ($callback) {
+            $callback($this->getCard($card['id']));
+        });
+        $this->decks[$deck]->moveCards(
+            [
+                array_map(function ($card) {
+                    return $card['id'];
+                }, $cards),
+            ],
+            'discard'
+        );
+        if ($deckCount - sizeof($cards) == 0) {
+            $this->shuffleInDiscard($deck);
+        }
     }
 }

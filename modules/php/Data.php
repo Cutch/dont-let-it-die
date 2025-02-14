@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
-
 class Data
 {
     public array $decks;

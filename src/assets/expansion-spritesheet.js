@@ -1,9 +1,9 @@
 const expansionSprites = {
   sprites: {
-    "day-event-back": {
+    'day-event-back': {
       options: {
-        type: "back",
-        deck: "day-event",
+        type: 'back',
+        deck: 'day-event',
       },
       frame: {
         x: 1,
@@ -13,9 +13,9 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "fish-rule": {
+    'fish-rule': {
       options: {
-        type: "instruction",
+        type: 'instruction',
       },
       frame: {
         x: 441,
@@ -25,10 +25,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_0": {
+    'day-event_1_0': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 881,
@@ -38,10 +38,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_1": {
+    'day-event_1_1': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 1321,
@@ -51,10 +51,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_10": {
+    'day-event_1_10': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 1761,
@@ -64,10 +64,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_11": {
+    'day-event_1_11': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 2201,
@@ -77,10 +77,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_3": {
+    'day-event_1_3': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 1,
@@ -90,7 +90,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "daylight-rule": {
+    'daylight-rule': {
       frame: {
         x: 441,
         y: 443,
@@ -99,10 +99,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_5": {
+    'day-event_1_5': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 881,
@@ -112,10 +112,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_6": {
+    'day-event_1_6': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 1321,
@@ -125,10 +125,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_7": {
+    'day-event_1_7': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 1761,
@@ -138,10 +138,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_8": {
+    'day-event_1_8': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 2201,
@@ -151,10 +151,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "day-event_1_9": {
+    'day-event_1_9': {
       options: {
-        type: "card",
-        deck: "day-event",
+        type: 'card',
+        deck: 'day-event',
       },
       frame: {
         x: 1,
@@ -166,8 +166,9 @@ const expansionSprites = {
     },
     hindrance_1_0: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 441,
@@ -179,8 +180,9 @@ const expansionSprites = {
     },
     hindrance_1_1: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 881,
@@ -192,8 +194,9 @@ const expansionSprites = {
     },
     hindrance_1_10: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'mental-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1321,
@@ -205,8 +208,9 @@ const expansionSprites = {
     },
     hindrance_1_11: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'mental-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1761,
@@ -218,8 +222,9 @@ const expansionSprites = {
     },
     hindrance_1_2: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2201,
@@ -231,8 +236,9 @@ const expansionSprites = {
     },
     hindrance_1_3: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'mental-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1,
@@ -244,8 +250,9 @@ const expansionSprites = {
     },
     hindrance_1_4: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'mental-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 441,
@@ -257,8 +264,9 @@ const expansionSprites = {
     },
     hindrance_1_5: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 881,
@@ -270,8 +278,9 @@ const expansionSprites = {
     },
     hindrance_1_6: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'mental-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1321,
@@ -283,8 +292,9 @@ const expansionSprites = {
     },
     hindrance_1_7: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'mental-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1761,
@@ -296,8 +306,9 @@ const expansionSprites = {
     },
     hindrance_1_8: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'mental-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2201,
@@ -309,8 +320,9 @@ const expansionSprites = {
     },
     hindrance_1_9: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'mental-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1,
@@ -320,10 +332,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "physical-hindrance-back": {
+    'physical-hindrance-back': {
       options: {
-        type: "back",
-        deck: "physical-hindrance",
+        type: 'back',
+        deck: 'physical-hindrance',
       },
       frame: {
         x: 441,
@@ -333,10 +345,10 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    "mental-hindrance-back": {
+    'mental-hindrance-back': {
       options: {
-        type: "back",
-        deck: "mental-hindrance",
+        type: 'back',
+        deck: 'mental-hindrance',
       },
       frame: {
         x: 881,
@@ -348,8 +360,9 @@ const expansionSprites = {
     },
     hindrance_1_0: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1321,
@@ -361,8 +374,9 @@ const expansionSprites = {
     },
     hindrance_1_1: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1761,
@@ -374,8 +388,9 @@ const expansionSprites = {
     },
     hindrance_1_10: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2201,
@@ -387,8 +402,9 @@ const expansionSprites = {
     },
     hindrance_1_11: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1,
@@ -400,8 +416,9 @@ const expansionSprites = {
     },
     hindrance_1_2: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 441,
@@ -413,8 +430,9 @@ const expansionSprites = {
     },
     hindrance_1_3: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 881,
@@ -426,8 +444,9 @@ const expansionSprites = {
     },
     hindrance_1_4: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1321,
@@ -439,8 +458,9 @@ const expansionSprites = {
     },
     hindrance_1_5: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 1761,
@@ -452,8 +472,9 @@ const expansionSprites = {
     },
     hindrance_1_6: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2201,
@@ -465,8 +486,9 @@ const expansionSprites = {
     },
     hindrance_1_7: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2641,
@@ -478,8 +500,9 @@ const expansionSprites = {
     },
     hindrance_1_8: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2641,
@@ -491,8 +514,9 @@ const expansionSprites = {
     },
     hindrance_1_9: {
       options: {
-        type: "card",
-        deck: "hindrance",
+        type: 'card',
+        deck: 'physical-hindrance',
+        expansion: 'hindrance',
       },
       frame: {
         x: 2641,
@@ -504,13 +528,13 @@ const expansionSprites = {
     },
   },
   meta: {
-    version: "1.0",
-    image: "expansion-spritesheet.png",
-    css: "expansion-card",
+    version: '1.0',
+    image: 'expansion-spritesheet.png',
+    css: 'expansion-card',
     size: {
       w: 3080,
       h: 2652,
     },
-    scale: "1",
+    scale: '1',
   },
 };

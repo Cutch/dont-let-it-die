@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS `character` (
     `player_id` int(10) unsigned NOT NULL,
     `item_1_name` varchar(20) NULL,
     `item_2_name` varchar(20) NULL,
+    `item_3_name` varchar(20) NULL,
     `stamina` int(1) UNSIGNED DEFAULT 0,
     `max_stamina` int(1) UNSIGNED DEFAULT 0,
     `health` int(1) UNSIGNED DEFAULT 0,

@@ -149,10 +149,7 @@ class CharacterSelection
         $this->game->notify->all('chooseCharacters', clienttranslate($message), array_merge($results, $selectedCharactersArgs));
 
         $this->setTurnOrder($playerId, $selectedCharacters);
-        // $waiting = sizeof(array_values($this->game->getCollectionFromDb('SELECT 1 FROM `character` WHERE `confirmed` = 0'))) > 0;
-        // if ($waiting) {
-        //     $this->game->gamestate->nextState('start');
-        // }
+
         // Deactivate player, and move to next state if none are active
         $this->game->gamestate->setPlayerNonMultiactive($playerId, 'start');
     }
