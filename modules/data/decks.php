@@ -502,7 +502,7 @@ $decksData = [
     'night-event-7_2' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onGetValidPlayerActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $object, &$data) {
             $charactersWithStamina = array_filter($game->character->getAllCharacterData(), function ($data) {
                 return $data['stamina'] > 0;
             });
@@ -610,7 +610,7 @@ $decksData = [
         'onUse' => function (Game $game, $object) {
             $game->nightEventLog('Only 2 investigate fire action can be taken tomorrow');
         },
-        'onGetValidPlayerActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $object, &$data) {
             if ($game->actions->getTurnActions()['actInvestigateFire'] > 0) {
                 unset($data['actInvestigateFire']);
             }
@@ -619,7 +619,7 @@ $decksData = [
     'night-event-8_11' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onGetValidPlayerActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $object, &$data) {
             // Stamina skills can't be used
             $game->nightEventLog('Bad mushrooms make some character skills not work tomorrow');
         },
@@ -708,7 +708,7 @@ $decksData = [
                 $game->character->unequipEquipment($char['character_name'], $char['equipment']);
             }
         },
-        'onGetValidPlayerActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $object, &$data) {
             unset($data['actItems']);
         },
     ],
@@ -718,7 +718,7 @@ $decksData = [
         'onUse' => function (Game $game, $object) {
             $game->nightEventLog('Can\'t investigate the fire tomorrow, it\'s too hot');
         },
-        'onGetValidPlayerActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $object, &$data) {
             unset($data['actInvestigateFire']);
         },
     ],
@@ -789,7 +789,7 @@ $decksData = [
         'onUse' => function (Game $game, $object) {
             $game->nightEventLog('No exploring tomorrow');
         },
-        'onGetValidPlayerActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $object, &$data) {
             if ($game->actions->getTurnActions()['actDrawExplore'] > 0) {
                 unset($data['actDrawExplore']);
             }
@@ -814,7 +814,7 @@ $decksData = [
         'onUse' => function (Game $game, $object) {
             $game->nightEventLog('Actions outside of camp are harder tomorrow');
         },
-        'onGetValidPlayerActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $object, &$data) {
             $data['actDrawForage'] += 1;
             $data['actDrawExplore'] += 1;
             $data['actDrawHunt'] += 1;
@@ -829,7 +829,7 @@ $decksData = [
         'onUse' => function (Game $game, $object) {
             $game->nightEventLog('Unable to craft tomorrow');
         },
-        'onGetValidPlayerActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $object, &$data) {
             unset($data['actCraft']);
         },
     ],
@@ -883,7 +883,7 @@ $decksData = [
         'onUse' => function (Game $game, $object) {
             $game->nightEventLog('Unable to trade with tribes tomorrow');
         },
-        'onGetValidPlayerActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $object, &$data) {
             unset($data['actTrade']);
         },
     ],

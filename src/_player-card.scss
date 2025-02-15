@@ -42,26 +42,25 @@
 }
 .player-card .weapon {
   position: absolute;
-  top: 60px;
-  left: 122px;
 }
 .player-card .tool {
   position: absolute;
-  top: 60px;
-  left: 241px;
+}
+.player-card .slot3 {
+  position: absolute;
 }
 .player-card .max-marker {
   position: absolute;
-  width: 1.25em;
-  height: 1.25em;
+  width: 20px;
+  height: 20px;
   transition: top 1s linear, left 1s linear, transform 1s linear;
   border: 3px solid rgb(205, 205, 205);
   border-radius: 50%;
 }
 .player-card .marker {
   position: absolute;
-  width: 1.25em;
-  height: 1.25em;
+  width: 20px;
+  height: 20px;
   transition: top 1s linear, left 1s linear, transform 1s linear;
   border-radius: 50%;
   display: flex;

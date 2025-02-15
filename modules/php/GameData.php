@@ -30,9 +30,11 @@ class GameData
     }
     public function setup()
     {
+        $this->game->globals->set('buildings', []);
         $this->game->globals->set('fireWood', 0);
         $this->game->globals->set('state', []);
-        $this->game->globals->set('lastNightCard', '');
+        $this->game->globals->set('unlocks', []);
+        $this->game->globals->set('activeNightCards', []);
         $this->game->globals->set('day', 1);
         $this->game->globals->set('wood', 0);
         $this->game->globals->set('bone', 0);

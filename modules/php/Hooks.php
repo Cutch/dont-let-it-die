@@ -14,24 +14,31 @@ class Hooks
     }
     private function callHooks($functionName, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
     {
-        $lastNightCard = $this->game->globals->get('lastNightCard');
-        $building = $this->game->globals->get('building');
+        $unlocks = $this->game->getUnlockedKnowledge();
+        $activeNightCards = $this->game->getActiveNightCards();
+        $buildings = $this->game->getBuildings();
         $characters = $this->game->character->getAllCharacterData();
-        $equipment = array_filter($characters['equipment'], function ($c) {
+        $equipment = array_filter($characters, function ($c) {
             return $c['isActive'];
         })[0]['equipment'];
-        $array = [$this->game->data->decks[$lastNightCard], $this->game->data->decks[$building], ...$characters, ...$equipment];
+        $array = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$equipment];
         foreach ($array as $i => $object) {
             if (isset($data[$functionName])) {
                 $object[$functionName]($this->game, $object, $data1, $data2 = null, $data3 = null, $data4);
             }
         }
     }
-    function onGetValidPlayerActions(&$data)
+    function onGetValidActions(&$data)
     {
         $this->callHooks(__FUNCTION__, $data);
+        return $data;
     }
-    function onGetStaminaCost(&$data)
+    function onGetActionStaminaCost(&$data)
+    {
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onGetActionSelectable(&$data)
     {
         $this->callHooks(__FUNCTION__, $data);
         return $data;

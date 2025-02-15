@@ -141,7 +141,7 @@ $tokensData = [
     ],
     'fkp-unlocked' => [
         'count' => 1,
-        'type' => 'resource',
+        'type' => 'marker',
         'name' => 'Unlocked Fire Knowledge Point',
     ],
     'gem-1' => [

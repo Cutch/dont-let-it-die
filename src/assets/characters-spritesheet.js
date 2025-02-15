@@ -246,7 +246,7 @@ const charactersSprites = {
         h: 628,
       },
     },
-    DiceThing: {
+    AlternateUpgradeTrack: {
       options: {
         type: 'instructions',
       },

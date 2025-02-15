@@ -8,19 +8,21 @@ class Data
     public array $characters;
     public array $tokens;
     public array $boards;
+    public array $knowledgeTree;
     public array $items;
     public array $upgrades;
     public array $expansion;
 
     public function __construct(Game $game)
     {
-        include dirname(__DIR__) . '/data/boards.php';
-        include dirname(__DIR__) . '/data/characters.php';
-        include dirname(__DIR__) . '/data/decks.php';
-        include dirname(__DIR__) . '/data/expansion.php';
-        include dirname(__DIR__) . '/data/items.php';
-        include dirname(__DIR__) . '/data/tokens.php';
-        include dirname(__DIR__) . '/data/upgrades.php';
+        include dirname(__DIR__) . '/data/Boards.php';
+        include dirname(__DIR__) . '/data/Characters.php';
+        include dirname(__DIR__) . '/data/Decks.php';
+        include dirname(__DIR__) . '/data/Expansion.php';
+        include dirname(__DIR__) . '/data/KnowledgeTree.php';
+        include dirname(__DIR__) . '/data/Items.php';
+        include dirname(__DIR__) . '/data/Tokens.php';
+        include dirname(__DIR__) . '/data/Upgrades.php';
         $expansion = $game->getExpansion();
         $expansionI = array_search($expansion, $game::$expansionList);
         $expansionList = $game::$expansionList;
@@ -30,12 +32,20 @@ class Data
             }
             return array_search($data['expansion'], $expansionList) <= $expansionI;
         };
-        $this->decks = array_filter($decksData, $expansionFilter);
-        $this->characters = array_filter($charactersData, $expansionFilter);
-        $this->tokens = array_filter($tokensData, $expansionFilter);
-        $this->boards = array_filter($boardsData, $expansionFilter);
-        $this->items = array_filter($itemsData, $expansionFilter);
-        $this->upgrades = array_filter($upgradesData, $expansionFilter);
-        $this->expansion = array_filter($expansionData, $expansionFilter);
+        $this->decks = $this->addId(array_filter($decksData, $expansionFilter));
+        $this->characters = $this->addId(array_filter($charactersData, $expansionFilter));
+        $this->tokens = $this->addId(array_filter($tokensData, $expansionFilter));
+        $this->boards = $this->addId(array_filter($boardsData, $expansionFilter));
+        $this->knowledgeTree = $this->addId(array_filter($knowledgeTreeData, $expansionFilter));
+        $this->items = $this->addId(array_filter($itemsData, $expansionFilter));
+        $this->upgrades = $this->addId(array_filter($upgradesData, $expansionFilter));
+        $this->expansion = $this->addId(array_filter($expansionData, $expansionFilter));
+    }
+    function addId($data)
+    {
+        array_walk($data, function (&$v, $k) {
+            $v['id'] = $k;
+        });
+        return $data;
     }
 }

@@ -99,9 +99,9 @@ $machinestates = [
         'type' => 'game',
         'args' => 'argDrawCard',
         'action' => 'stDrawCard',
-        'transitions' => ['resolveEncounter' => 12, 'playerTurn' => 10],
+        'transitions' => ['resolveEncounter' => 20, 'playerTurn' => 10],
     ],
-    12 => [
+    20 => [
         'name' => 'resolveEncounter',
         'description' => clienttranslate('Resolving Encounter'),
         'descriptionmyturn' => clienttranslate('Resolving Encounter'),
@@ -109,26 +109,35 @@ $machinestates = [
         'action' => 'stResolveEncounter',
         'args' => 'argResolveEncounter',
         'possibleactions' => ['actChooseResource', 'actUseItem'],
+        'transitions' => ['postEncounter' => 21],
+    ],
+    21 => [
+        'name' => 'postEncounter',
+        'description' => clienttranslate('Resolving Encounter'),
+        'descriptionmyturn' => clienttranslate('Resolving Encounter'),
+        'type' => 'activeplayer',
+        'action' => 'stPostEncounter',
+        'args' => 'argResolveEncounter',
+        'possibleactions' => ['actChooseResource', 'actUseItem'],
         'transitions' => ['playerTurn' => 10],
     ],
-
     15 => [
         'name' => 'nextCharacter',
         'description' => '',
         'type' => 'game',
         'action' => 'stNextCharacter',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'nextCharacter' => 10, 'morningPhase' => 30],
+        'transitions' => ['endGame' => 99, 'nextCharacter' => 10, 'morningPhase' => 50],
     ],
-    20 => [
+    30 => [
         'name' => 'nightPhase',
         'description' => clienttranslate('It\'s night time'),
         'type' => 'game',
         'action' => 'stNightPhase',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'morning' => 30],
+        'transitions' => ['endGame' => 99, 'morning' => 50],
     ],
-    30 => [
+    50 => [
         'name' => 'morningPhase',
         'description' => clienttranslate('Morning has arrived'),
         'type' => 'game',

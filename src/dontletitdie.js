@@ -54,12 +54,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     updatePlayers: function (gameData) {
       // If character selection, keep removing characters
       console.log(gameData);
-      if (gameData.gamestate.name !== 'characterSelect')
+      if (gameData.gamestate.name === 'characterSelect')
         document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
       const scale = 3;
       Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character) => {
         // Player side board
         const playerPanel = this.getPlayerPanelElement(character.playerId);
+        const equipments = character.equipment.map((d) => this.data[d]);
 
         const characterSideId = `player-side-${character.playerId}-${character.name}`;
         const playerSideContainer = document.getElementById(characterSideId);
@@ -71,15 +72,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             <div class="health"><span class="label">Health: </span><span class="value">${character.health}</span></div>
             <div class="stamina"><span class="label">Stamina: </span><span class="value">${character.stamina}</span></div>
             <div class="equipment"><span class="label">Equipment: </span><span class="value">${
-              character.equipment.map((d) => this.data[d].options.name).join(', ') || 'None'
+              equipments.map((d) => d.options.name).join(', ') || 'None'
             }</span></div>
           </div>`,
           );
         } else {
           playerSideContainer.querySelector(`.health .value`).innerHTML = character.health;
           playerSideContainer.querySelector(`.stamina .value`).innerHTML = character.stamina;
-          playerSideContainer.querySelector(`.equipment .value`).innerHTML =
-            character.equipment.map((d) => this.data[d].options.name).join(', ') || 'None';
+          playerSideContainer.querySelector(`.equipment .value`).innerHTML = equipments.map((d) => d.options.name).join(', ') || 'None';
         }
         // Player main board
         if (gameData.gamestate.name !== 'characterSelect') {
@@ -95,7 +95,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               <div class="max-stamina max-marker"></div>
               <div class="stamina marker fa fa-bolt"></div>
               <div class="weapon" style="top: ${(60 * 4) / scale}px;left: ${(122 * 4) / scale}px"></div>
-              <div class="tool" style="top: ${(60 * 4) / scale}px;left: ${(241 * 4) / scale}px"></div>
+              <div class="tool" style="top: ${(60 * 4) / scale}px;left: ${(242.5 * 4) / scale}px"></div>
+              <div class="slot3" style="top: ${(80 * 4) / scale}px;left: ${(183 * 4) / scale}px"></div>
               <div class="first-player-marker"></div>
               </div>`,
             );
@@ -120,28 +121,23 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           }px;top: ${Math.round((34.5 * 4) / scale) + 2}px`;
 
           renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), scale, 'replace');
-          let usedSlot;
-          const item1 = this.data[character.equipment[0]];
-          const item2 = this.data[character.equipment[1]];
-          if (item1) {
-            usedSlot = item1.options.itemType;
-            renderImage(
-              character.equipment[0],
-              document.querySelector(`#player-${character.name} > .${item1.options.itemType}`),
-              scale,
-              'replace',
-            );
+          const renderedItems = [];
+          const weapon = equipments.find((d) => d.options.itemType === 'weapon');
+          if (weapon) {
+            renderedItems.push(weapon);
+            renderImage(weapon.id, document.querySelector(`#player-${character.name} > .${weapon.options.itemType}`), scale, 'replace');
           }
-          if (item2) {
-            const otherSlot = usedSlot === 'tool' ? 'weapon' : 'tool';
-            renderImage(
-              character.equipment[1],
-              document.querySelector(
-                `#player-${character.name} > .${usedSlot === item1.options.itemType ? otherSlot : item1.options.itemType}`,
-              ),
-              scale,
-              'replace',
-            );
+
+          const tool = equipments.find((d) => d.options.itemType === 'tool');
+          if (tool) {
+            renderedItems.push(tool);
+            renderImage(tool.id, document.querySelector(`#player-${character.name} > .${tool.options.itemType}`), scale, 'replace');
+          }
+
+          const item3 = equipments.find((d) => !renderedItems.includes(d));
+          if (item3) {
+            renderedItems.push(item3);
+            renderImage(item3.id, document.querySelector(`#player-${character.name} > .${item3.options.itemType}`), scale, 'replace');
           }
         }
       });

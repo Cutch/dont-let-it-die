@@ -1,65 +1,65 @@
 const boardsSprites = {
   sprites: {
-    "character-board": {
+    'character-board': {
       frame: {
         x: 1,
         y: 1,
-        w: 722,
-        h: 1468,
+        w: 720,
+        h: 1466,
       },
       rotate: 90,
     },
-    "knowledge-tree-normal+": {
+    'knowledge-tree-easy': {
       frame: {
-        x: 1449,
-        y: 1,
-        w: 722,
-        h: 1468,
+        x: 725,
+        y: 1471,
+        w: 720,
+        h: 1466,
       },
       rotate: 90,
     },
-    "knowledge-tree-hard": {
-      frame: {
-        x: 2173,
-        y: 1,
-        w: 722,
-        h: 1468,
-      },
-      rotate: 90,
-    },
-    "knowledge-tree-normal": {
+    'knowledge-tree-normal': {
       frame: {
         x: 2897,
         y: 1,
-        w: 722,
-        h: 1468,
+        w: 720,
+        h: 1466,
       },
       rotate: 90,
     },
-    "knowledge-tree-easy": {
+    'knowledge-tree-normal+': {
       frame: {
-        x: 725,
-        y: 1471,
-        w: 722,
-        h: 1468,
+        x: 1449,
+        y: 1,
+        w: 720,
+        h: 1466,
       },
       rotate: 90,
     },
-    "track-normal": {
+    'knowledge-tree-hard': {
+      frame: {
+        x: 2173,
+        y: 1,
+        w: 720,
+        h: 1466,
+      },
+      rotate: 90,
+    },
+    'track-normal': {
       frame: {
         x: 725,
         y: 1,
-        w: 722,
-        h: 1468,
+        w: 720,
+        h: 1466,
       },
       rotate: 0,
     },
-    "track-hard": {
+    'track-hard': {
       frame: {
         x: 1,
         y: 1471,
-        w: 722,
-        h: 1468,
+        w: 720,
+        h: 1466,
       },
       rotate: 0,
     },
@@ -67,8 +67,8 @@ const boardsSprites = {
       frame: {
         x: 1449,
         y: 1471,
-        w: 722,
-        h: 1468,
+        w: 720,
+        h: 1466,
       },
       rotate: 90,
     },
@@ -76,8 +76,8 @@ const boardsSprites = {
       frame: {
         x: 2173,
         y: 1471,
-        w: 722,
-        h: 1468,
+        w: 720,
+        h: 1466,
       },
       rotate: 90,
     },
@@ -92,13 +92,13 @@ const boardsSprites = {
     },
   },
   meta: {
-    version: "1.0",
-    image: "boards-spritesheet.png",
-    css: "boards-card",
+    version: '1.0',
+    image: 'boards-spritesheet.png',
+    css: 'boards-card',
     size: {
       w: 3620,
       h: 2940,
     },
-    scale: "1",
+    scale: '1',
   },
 };

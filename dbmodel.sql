@@ -70,7 +70,15 @@ CREATE TABLE IF NOT EXISTS `dayevent` (
     `card_location_arg` int(11) NOT NULL,
     PRIMARY KEY (`card_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
-CREATE TABLE IF NOT EXISTS `hindrance` (
+CREATE TABLE IF NOT EXISTS `physicalhindrance` (
+    `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `card_type` varchar(16) NOT NULL,
+    `card_type_arg` varchar(20) NOT NULL,
+    `card_location` varchar(16) NOT NULL,
+    `card_location_arg` int(11) NOT NULL,
+    PRIMARY KEY (`card_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+CREATE TABLE IF NOT EXISTS `mentalhindrance` (
     `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `card_type` varchar(16) NOT NULL,
     `card_type_arg` varchar(20) NOT NULL,
@@ -81,9 +89,9 @@ CREATE TABLE IF NOT EXISTS `hindrance` (
 CREATE TABLE IF NOT EXISTS `character` (
     `character_name` varchar(10) NOT NULL,
     `player_id` int(10) unsigned NOT NULL,
-    `item_1_name` varchar(20) NULL,
-    `item_2_name` varchar(20) NULL,
-    `item_3_name` varchar(20) NULL,
+    `item_1` varchar(20) NULL,
+    `item_2` varchar(20) NULL,
+    `item_3` varchar(20) NULL,
     `stamina` int(1) UNSIGNED DEFAULT 0,
     `max_stamina` int(1) UNSIGNED DEFAULT 0,
     `health` int(1) UNSIGNED DEFAULT 0,

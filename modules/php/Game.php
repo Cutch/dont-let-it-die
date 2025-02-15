@@ -152,11 +152,25 @@ class Game extends \Table
     {
         $this->characterSelection->actChooseCharacters();
     }
-    public function actEat(): void
+    public function actSpendFKP(array $resources, $knowledgeId): void
     {
-        $type = 'berry';
-        $amount = 3;
-        $this->actions->validateCanRunAction('actEat');
+        $this->actions->validateCanRunAction('actEat', $resources);
+        $amount = 0;
+        foreach ($resources as $type => $count) {
+            $amount += $count;
+            $this->adjustResource($type, -$count);
+        }
+        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} spent ${amount} knowledge on'), [
+            'gameData' => $this->getAllDatas(),
+            'amount' => $amount,
+            'knowledgeId' => $knowledgeId,
+        ]);
+    }
+    public function actEat(array $resources): void
+    {
+        $this->actions->validateCanRunAction('actEat', $resources);
+        $type = array_keys($resources)[0];
+        $amount = $resources[$type];
         $data = ['amount' => $amount, 'type' => $type, 'health' => $this->data->tokens[$type]['health']];
         $this->hooks->onEat($data);
         $this->notify->all(
@@ -198,7 +212,7 @@ class Game extends \Table
     public function actDraw(string $deck): void
     {
         $this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
-        $staminaCost = $this->actions->getStaminaCost('actDraw' . ucfirst($deck));
+        $staminaCost = $this->actions->getActionStaminaCost('actDraw' . ucfirst($deck));
         $character = $this->character->getActivateCharacter();
         $card = $this->decks->pickCard($deck);
         $this->character->updateCharacterData($character['character_name'], function (&$data) use ($staminaCost) {
@@ -232,11 +246,15 @@ class Game extends \Table
     {
         return $this->globals->get('state');
     }
+    public function stPostEncounter()
+    {
+        $this->gamestate->nextState('playerTurn');
+    }
     public function stResolveEncounter()
     {
         extract($this->globals->get('state'));
         $tools = array_filter($this->character->getActiveEquipment()['equipment'], function ($item) {
-            return isset($item['onEncounter']) && !(!array_key_exists('requires', $item) || $item['requires']());
+            return isset($item['onEncounter']) && !(!array_key_exists('requires', $item) || $item['requires']($item));
         });
         if (sizeof($tools) >= 2) {
             $weapon = $this->globals->get('useTools');
@@ -303,12 +321,12 @@ class Game extends \Table
             $this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);
         }
 
-        $this->gamestate->nextState('playerTurn');
+        $this->gamestate->nextState('postEncounter');
         // $this->gamestate->setPlayersMultiactive([], 'playerTurn');
     }
     public function argResolveEncounter()
     {
-        $validActions = $this->actions->getValidEncounterActions();
+        $validActions = $this->actions->getValidActions('encounter');
         $result = [
             'actions' => $validActions,
         ];
@@ -373,8 +391,7 @@ class Game extends \Table
     }
     public function argPlayerState(): array
     {
-        $validActions = $this->actions->getValidPlayerActions();
-        // var_dump($validActions);
+        $validActions = $this->actions->getValidActions('player');
         $result = [
             'actions' => $validActions,
             'currentCharacter' => $this->character->getActivateCharacter()['character_name'],
@@ -423,7 +440,6 @@ class Game extends \Table
     public function stSelectCharacter()
     {
         $this->gamestate->setAllPlayersMultiactive();
-        // var_dump($this->gamestate->getActivePlayerList());
         foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
             $this->giveExtraTime((int) $playerId, 500);
         }
@@ -431,7 +447,7 @@ class Game extends \Table
     public function stNightPhase()
     {
         $card = $this->decks->pickCard('night-event');
-        $this->globals->set('lastNightCard', $card);
+        $this->setActiveNightCard($card['id']);
         $this->globals->set('state', ['card' => $card, 'deck' => 'night-event']);
         $this->gamestate->nextState('drawCard');
     }
@@ -525,6 +541,43 @@ class Game extends \Table
     {
         $expansionMapping = self::$expansionList;
         return $expansionMapping[$this->getGameStateValue('expansion')];
+    }
+    public function getBuildings(): array
+    {
+        $buildings = $this->globals->get('buildings');
+        return array_map(function ($building) {
+            return $this->data->items[$building];
+        }, $buildings);
+    }
+    public function addBuilding($buildingId): void
+    {
+        $array = $this->globals->get('buildings');
+        array_push($array, $buildingId);
+        $this->globals->set('buildings', $array);
+    }
+    public function getActiveNightCards(): array
+    {
+        $activeNightCards = $this->globals->get('activeNightCards');
+        return array_map(function ($cardId) {
+            return $this->data->decks[$cardId];
+        }, $activeNightCards);
+    }
+    public function setActiveNightCard($cardId): void
+    {
+        $this->globals->set('activeNightCards', [$cardId]);
+    }
+    public function getUnlockedKnowledge(): array
+    {
+        $unlocks = $this->globals->get('unlocks');
+        return array_map(function ($unlock) {
+            return $this->data->knowledgeTree[$unlock];
+        }, $unlocks);
+    }
+    public function unlockedKnowledge($knowledgeId): void
+    {
+        $array = $this->globals->get('unlocks');
+        array_push($array, $knowledgeId);
+        $this->globals->set('unlocks', $array);
     }
     public function getDifficulty()
     {

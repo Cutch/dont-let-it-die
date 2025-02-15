@@ -13,9 +13,9 @@ class Character
     private static array $characterColumns = [
         'character_name',
         'player_id',
-        'item_1_name',
-        'item_2_name',
-        'item_3_name',
+        'item_1',
+        'item_2',
+        'item_3',
         'stamina',
         'max_stamina',
         'health',
@@ -51,6 +51,7 @@ class Character
     public function updateAllCharacterData($callback)
     {
         $turnOrder = $this->game->globals->get('turnOrder');
+        $turnOrder = array_values(array_filter($turnOrder));
         foreach ($turnOrder as $i => $name) {
             // Pull from db if needed
             $data = $this->getCharacterData($name);
@@ -70,7 +71,8 @@ class Character
     public function getAllCharacterData(): array
     {
         $turnOrder = $this->game->globals->get('turnOrder');
-        return array_map('getCharacterData', $turnOrder);
+        $turnOrder = array_values(array_filter($turnOrder));
+        return array_map([$this, 'getCharacterData'], $turnOrder);
     }
     public function getCharacterData($name): array
     {
@@ -78,7 +80,8 @@ class Character
             return $this->cachedData[$name];
         } else {
             extract($this->game->globals->getAll('turnNo', 'turnOrder'));
-            $characterName = $turnOrder[$turnNo];
+            $turnOrder = array_values(array_filter($turnOrder));
+            $characterName = isset($turnOrder[$turnNo]) ?? $turnOrder[$turnNo];
             $characterData = $this->game->getCollectionFromDb(
                 "SELECT c.*, player_color FROM `character` c INNER JOIN `player` p ON p.player_id = c.player_id WHERE character_name = '$name'"
             )[$name];
@@ -89,7 +92,7 @@ class Character
             $characterData['isFirst'] = isset($turnOrder[0]) && $turnOrder[0] == $characterData['character_name'];
             $characterData['equipment'] = array_map(function ($itemName) use ($_this, $isActive) {
                 return ['id' => $itemName, 'isActive' => $isActive, ...$_this->game->data->items[$itemName]];
-            }, array_filter([$characterData['item_1_name'], $characterData['item_2_name'], $characterData['item_3_name']]));
+            }, array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']]));
             $this->cachedData[$name] = $characterData;
             return $characterData;
         }
@@ -98,26 +101,26 @@ class Character
     {
         $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
             $equipment = array_combine($data['equipment'], $equipment);
-            $data['item_1_name'] = isset($equipment) ? $equipment[0] : null;
-            $data['item_2_name'] = isset($equipment) ? $equipment[1] : null;
-            $data['item_3_name'] = isset($equipment) ? $equipment[2] : null;
+            $data['item_1'] = isset($equipment) ? $equipment[0] : null;
+            $data['item_2'] = isset($equipment) ? $equipment[1] : null;
+            $data['item_3'] = isset($equipment) ? $equipment[2] : null;
         });
     }
     public function unequipEquipment($characterName, $equipment): void
     {
         $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
             $equipment = array_diff($data['equipment'], array_intersect($data['equipment'], $equipment));
-            $data['item_1_name'] = isset($equipment) ? $equipment[0] : null;
-            $data['item_2_name'] = isset($equipment) ? $equipment[1] : null;
-            $data['item_3_name'] = isset($equipment) ? $equipment[2] : null;
+            $data['item_1'] = isset($equipment) ? $equipment[0] : null;
+            $data['item_2'] = isset($equipment) ? $equipment[1] : null;
+            $data['item_3'] = isset($equipment) ? $equipment[2] : null;
         });
     }
     public function setCharacterEquipment($characterName, $equipment): void
     {
         $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
-            $data['item_1_name'] = isset($equipment) ? $equipment[0] : null;
-            $data['item_2_name'] = isset($equipment) ? $equipment[1] : null;
-            $data['item_3_name'] = isset($equipment) ? $equipment[2] : null;
+            $data['item_1'] = isset($equipment) ? $equipment[0] : null;
+            $data['item_2'] = isset($equipment) ? $equipment[1] : null;
+            $data['item_3'] = isset($equipment) ? $equipment[2] : null;
         });
     }
     public function getActivateCharacter(): array
@@ -206,7 +209,7 @@ class Character
             return [
                 'name' => $char['character_name'],
                 'isFirst' => $char['isFirst'],
-                'equipment' => array_filter([$char['item_1_name'], $char['item_2_name'], $char['item_3_name']]),
+                'equipment' => array_filter([$char['item_1'], $char['item_2'], $char['item_3']]),
                 'playerColor' => $char['player_color'],
                 'playerId' => $char['player_id'],
                 'stamina' => $char['stamina'],

@@ -8,8 +8,8 @@ const tokenSprites = {
       frame: {
         x: 0,
         y: 0,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '1-unlocked': {
@@ -20,8 +20,8 @@ const tokenSprites = {
       frame: {
         x: 113,
         y: 0,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '2-token': {
@@ -32,8 +32,8 @@ const tokenSprites = {
       frame: {
         x: 226,
         y: 0,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '2-unlocked': {
@@ -44,8 +44,8 @@ const tokenSprites = {
       frame: {
         x: 339,
         y: 0,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '3-token': {
@@ -56,8 +56,8 @@ const tokenSprites = {
       frame: {
         x: 452,
         y: 0,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '3-unlocked': {
@@ -68,8 +68,8 @@ const tokenSprites = {
       frame: {
         x: 0,
         y: 113,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '4-token': {
@@ -80,8 +80,8 @@ const tokenSprites = {
       frame: {
         x: 113,
         y: 113,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '4-unlocked': {
@@ -92,8 +92,8 @@ const tokenSprites = {
       frame: {
         x: 226,
         y: 113,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '5-token': {
@@ -104,8 +104,8 @@ const tokenSprites = {
       frame: {
         x: 339,
         y: 113,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '5-unlocked': {
@@ -116,8 +116,8 @@ const tokenSprites = {
       frame: {
         x: 452,
         y: 113,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '6-token': {
@@ -128,8 +128,8 @@ const tokenSprites = {
       frame: {
         x: 0,
         y: 226,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     '6-unlocked': {
@@ -140,8 +140,8 @@ const tokenSprites = {
       frame: {
         x: 113,
         y: 226,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     berry: {
@@ -152,8 +152,8 @@ const tokenSprites = {
       frame: {
         x: 226,
         y: 226,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     'berry-cooked': {
@@ -164,8 +164,8 @@ const tokenSprites = {
       frame: {
         x: 339,
         y: 226,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     bone: {
@@ -176,8 +176,8 @@ const tokenSprites = {
       frame: {
         x: 452,
         y: 226,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     'dino-egg': {
@@ -188,8 +188,8 @@ const tokenSprites = {
       frame: {
         x: 0,
         y: 339,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     'dino-egg-cooked': {
@@ -200,8 +200,8 @@ const tokenSprites = {
       frame: {
         x: 113,
         y: 339,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     fish: {
@@ -212,8 +212,8 @@ const tokenSprites = {
       frame: {
         x: 226,
         y: 339,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     'fish-cooked': {
@@ -224,8 +224,8 @@ const tokenSprites = {
       frame: {
         x: 339,
         y: 339,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     fkp: {
@@ -236,8 +236,8 @@ const tokenSprites = {
       frame: {
         x: 452,
         y: 339,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     'fkp-unlocked': {
@@ -248,8 +248,8 @@ const tokenSprites = {
       frame: {
         x: 0,
         y: 452,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     'gem-1': {
@@ -260,8 +260,8 @@ const tokenSprites = {
       frame: {
         x: 113,
         y: 452,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     'gem-2': {
@@ -272,8 +272,8 @@ const tokenSprites = {
       frame: {
         x: 226,
         y: 452,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     'gem-3': {
@@ -284,8 +284,8 @@ const tokenSprites = {
       frame: {
         x: 339,
         y: 452,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     fiber: {
@@ -296,8 +296,8 @@ const tokenSprites = {
       frame: {
         x: 452,
         y: 452,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     hide: {
@@ -308,8 +308,8 @@ const tokenSprites = {
       frame: {
         x: 565,
         y: 0,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     'meat-cooked': {
@@ -320,8 +320,8 @@ const tokenSprites = {
       frame: {
         x: 565,
         y: 113,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     herb: {
@@ -332,8 +332,8 @@ const tokenSprites = {
       frame: {
         x: 565,
         y: 226,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     meat: {
@@ -344,8 +344,8 @@ const tokenSprites = {
       frame: {
         x: 565,
         y: 339,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     rock: {
@@ -356,8 +356,8 @@ const tokenSprites = {
       frame: {
         x: 565,
         y: 452,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     stew: {
@@ -368,8 +368,8 @@ const tokenSprites = {
       frame: {
         x: 0,
         y: 565,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     trap: {
@@ -380,8 +380,8 @@ const tokenSprites = {
       frame: {
         x: 113,
         y: 565,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
     wood: {
@@ -392,8 +392,8 @@ const tokenSprites = {
       frame: {
         x: 226,
         y: 565,
-        w: 113,
-        h: 113,
+        w: 111,
+        h: 111,
       },
     },
   },

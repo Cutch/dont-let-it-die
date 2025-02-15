@@ -23,6 +23,7 @@ class CharacterSelection
         $characters = [$character1, $character2, $character3, $character4];
         $this->validateCharacterCount(false, $characters);
         $playerId = $this->game->getCurrentPlayer();
+        $this->setTurnOrder($playerId, array_filter($characters));
         // Check if already selected
         $escapedCharacterList = join(
             ', ',
@@ -57,7 +58,7 @@ class CharacterSelection
                 }, array_filter($characters))
             );
             $this->game::DbQuery(
-                "INSERT INTO `character` (`character_name`, `player_id`, `stamina`, `health`, `max_health`, `max_stamina`, `item_1_name`) VALUES $values"
+                "INSERT INTO `character` (`character_name`, `player_id`, `stamina`, `health`, `max_health`, `max_stamina`, `item_1`) VALUES $values"
             );
         }
         // Notify Players
@@ -104,20 +105,20 @@ class CharacterSelection
         $playerNo = ((int) $players[$playerId]['player_no']) - 1;
         $playerCount = sizeof($players);
         if ($playerCount == 3) {
-            foreach ($selectedCharacters as $index => $value) {
-                $turnOrder[$playerNo + $index + ($playerNo > 0 ? 1 : 0)] = $value;
+            for ($i = 0; $i < ($playerNo > 0 ? 2 : 1); $i++) {
+                $turnOrder[$playerNo + $i + ($playerNo > 0 ? 1 : 0)] = isset($selectedCharacters[$i]) ? $selectedCharacters[$i] : null;
             }
         } elseif ($playerCount == 1) {
-            foreach ($selectedCharacters as $index => $value) {
-                $turnOrder[$playerNo + $index] = $value;
+            for ($i = 0; $i < 4; $i++) {
+                $turnOrder[$playerNo + $i] = isset($selectedCharacters[$i]) ? $selectedCharacters[$i] : null;
             }
         } elseif ($playerCount == 2) {
-            foreach ($selectedCharacters as $index => $value) {
-                $turnOrder[$playerNo * 2 + $index] = $value;
+            for ($i = 0; $i < 2; $i++) {
+                $turnOrder[$playerNo * 2 + $i] = isset($selectedCharacters[$i]) ? $selectedCharacters[$i] : null;
             }
         } elseif ($playerCount == 4) {
-            foreach ($selectedCharacters as $index => $value) {
-                $turnOrder[$playerNo + $index] = $value;
+            for ($i = 0; $i < 1; $i++) {
+                $turnOrder[$playerNo + $i] = isset($selectedCharacters[$i]) ? $selectedCharacters[$i] : null;
             }
         }
         $this->game->globals->set('turnOrder', $turnOrder);
@@ -143,12 +144,12 @@ class CharacterSelection
             }
             $message = $message . '${character' . ($index + 1) . '}';
         }
+
+        $this->setTurnOrder($playerId, $selectedCharacters);
         $results = ['player_id' => $playerId];
         $this->game->getAllCharacters($results);
         // $this->game->initCharacters($playerId);
         $this->game->notify->all('chooseCharacters', clienttranslate($message), array_merge($results, $selectedCharactersArgs));
-
-        $this->setTurnOrder($playerId, $selectedCharacters);
 
         // Deactivate player, and move to next state if none are active
         $this->game->gamestate->setPlayerNonMultiactive($playerId, 'start');

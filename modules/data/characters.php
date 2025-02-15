@@ -40,7 +40,7 @@ $charactersData = [
         'stamina' => '7',
         'name' => 'Grub',
         'slots' => ['weapon', 'tool'],
-        'onGetValidPlayerActions' => function (Game $game, $char, &$data) {
+        'onGetValidActions' => function (Game $game, $char, &$data) {
             if ($char['isActive']) {
                 unset($data['actDrawHunt']);
             }
@@ -155,11 +155,10 @@ $charactersData = [
                 },
             ],
         ],
-        'onGetValidPlayerActions' => function (Game $game, $char, &$data) {
-            // Include bones in calc
-        },
-        'actSpendFKP' => function (Game $game, $char, &$data) {
-            // Include bones in calc
+        'onGetActionSelectable' => function (Game $game, $char, &$data) {
+            if ($data['action'] == 'actSpendFKP') {
+                $data['selectable'] = ['fkp', 'bones'];
+            }
         },
         'onRollDie' => function (Game $game, $char, &$data) {
             if ($char['isActive'] && $data == 1) {
@@ -234,7 +233,7 @@ $charactersData = [
                 },
             ],
         ],
-        'onGetValidPlayerActions' => function (Game $game, $char, &$data) {
+        'onGetValidActions' => function (Game $game, $char, &$data) {
             if ($char['isActive']) {
                 unset($data['actDrawHunt']);
                 unset($data['actDrawForage']);
@@ -247,6 +246,40 @@ $charactersData = [
         'stamina' => '5',
         'name' => 'Ayla',
         'slots' => ['weapon', 'tool'],
+        'onGetActionStaminaCost' => function (Game $game, $char, &$data) {
+            if ($char['isActive'] && $data['action'] == 'actDrawHunt') {
+                $data['stamina'] = 2;
+            }
+        },
+        'skills' => [
+            [
+                'name' => 'Gain 1 Wood',
+                'stamina' => 1,
+                'onUse' => function (Game $game, $char) {
+                    $game->adjustResource('berry', -1);
+                    $game->adjustResource('fiber', 1);
+                    $game->activeCharacterEventLog('converted 1 raw berry to 1 fiber');
+                },
+                'requires' => function (Game $game, $char) {
+                    return $char['isActive'] && $game->globals->get('berry') > 0;
+                },
+            ],
+            [
+                'name' => 'Heal 2',
+                'stamina' => 0,
+                'state' => 'postEncounter',
+                'onUse' => function (Game $game, $char) {
+                    usePerDay($char, $game);
+                    $game->character->adjustActiveHealth(2);
+                    $game->activeCharacterEventLog('healed by 2');
+                },
+                'requires' => function (Game $game, $char) {
+                    if ($char['isActive']) {
+                        return getUsePerDay($char, $game) < 1;
+                    }
+                },
+            ],
+        ],
     ],
     'River' => [
         'type' => 'character',
@@ -254,6 +287,27 @@ $charactersData = [
         'stamina' => '4',
         'name' => 'River',
         'slots' => ['weapon', 'tool'],
+        'onGetActionStaminaCost' => function (Game $game, $char, &$data) {
+            if ($char['isActive'] && $data['action'] == 'actInvestigateFIre' && getUsePerDay($char, $game) < 1) {
+                $data['stamina'] = 0;
+            }
+        },
+        'onInvestigateFire' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                usePerDay($char, $game);
+            }
+        },
+        'onEncounter' => function (Game $game, $char, &$data) {
+            if ($char['isActive'] && $data['name'] == 'Nothing') {
+                $game->adjustResource('fkp', 2);
+                $game->activeCharacterEventLog('received 2 fkp');
+            }
+        },
+        'onGetActionSelectable' => function (Game $game, $char, &$data) {
+            if ($data['action'] == 'actEat') {
+                $data['selectable'] = ['berry', 'berry-cooked'];
+            }
+        },
     ],
     'Sig' => [
         'type' => 'character',
@@ -346,7 +400,7 @@ $charactersData = [
         'name' => 'Vog',
         'slots' => ['weapon', 'tool'],
     ],
-    'DiceThing' => [
+    'AlternateUpgradeTrack' => [
         'type' => 'instructions',
     ],
     'back-character' => [

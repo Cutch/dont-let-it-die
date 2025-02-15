@@ -28,16 +28,18 @@
 /* Character Start */
 #character-selector {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   margin: auto;
   flex-flow: row wrap;
   justify-content: center;
 }
 #character-selector .characters-card {
-  border: 3px solid #000;
+  border: 1px solid #000;
+  margin: 4px;
 }
 #character-selector .characters-card.selected {
-  border: 3px solid var(--player-color);
+  border: 5px solid var(--player-color);
+  margin: 0;
 }
 /* Character Card Stop */
 
