@@ -24,6 +24,12 @@ $itemsData = [
         'itemType' => 'weapon',
         'damage' => 100,
         'range' => 2,
+        'cost' => [
+            'fiber' => 2,
+            'rock' => 2,
+            'wood' => 1,
+            'hide' => 1,
+        ],
     ],
     'medical-hut' => [
         'type' => 'item',
@@ -31,6 +37,12 @@ $itemsData = [
         'count' => 1,
         'name' => 'Medical Hut',
         'itemType' => 'building',
+        'cost' => [
+            'fiber' => 3,
+            'rock' => 3,
+            'hide' => 3,
+            'bone' => 2,
+        ],
     ],
     'bone-club' => [
         'type' => 'item',
@@ -40,6 +52,12 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 3,
         'damage' => 1,
+        'cost' => [
+            'fiber' => 1,
+            'rock' => 1,
+            'wood' => 1,
+            'bone' => 2,
+        ],
     ],
     'bone-scythe' => [
         'type' => 'item',
@@ -47,6 +65,10 @@ $itemsData = [
         'count' => 2,
         'name' => 'Bone Scythe',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 2,
+            'bone' => 2,
+        ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'fiber') {
                 $game->globals->set('fiber', $game->globals->get('fiber') + 1);
@@ -67,6 +89,10 @@ $itemsData = [
         'count' => 2,
         'name' => 'Bag',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 2,
+            'hide' => 1,
+        ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'berry') {
                 $game->globals->set('berry', $game->globals->get('berry') + 1);
@@ -87,6 +113,11 @@ $itemsData = [
         'count' => 2,
         'name' => 'Bone Armor',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 1,
+            'bone' => 3,
+            'rock' => 1,
+        ],
         'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
@@ -100,6 +131,11 @@ $itemsData = [
         'count' => 1,
         'name' => 'Camp Walls',
         'itemType' => 'building',
+        'cost' => [
+            'fiber' => 3,
+            'rock' => 3,
+            'bone' => 2,
+        ],
     ],
     'fire' => [
         'type' => 'game-piece',
@@ -111,6 +147,10 @@ $itemsData = [
         'count' => 2,
         'name' => 'Hide Armor',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 1,
+            'hide' => 2,
+        ],
         'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
@@ -124,6 +164,12 @@ $itemsData = [
         'count' => 1,
         'name' => 'Knowledge Hut',
         'itemType' => 'building',
+        'cost' => [
+            'fiber' => 3,
+            'rock' => 3,
+            'hide' => 2,
+            'bone' => 2,
+        ],
         'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
@@ -141,6 +187,11 @@ $itemsData = [
         'count' => 2,
         'name' => 'Hatchet',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 2,
+            'wood' => 1,
+            'rock' => 2,
+        ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'wood') {
                 $game->globals->set('wood', $game->globals->get('wood') + 1);
@@ -163,6 +214,9 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 1,
         'damage' => 1,
+        'cost' => [
+            'wood' => 1,
+        ],
     ],
     'cooking-hut' => [
         'type' => 'item',
@@ -170,6 +224,12 @@ $itemsData = [
         'count' => 1,
         'name' => 'Cooking Hut',
         'itemType' => 'building',
+        'cost' => [
+            'fiber' => 3,
+            'rock' => 3,
+            'hide' => 2,
+            'bone' => 2,
+        ],
     ],
     'carving-knife' => [
         'type' => 'item',
@@ -177,6 +237,11 @@ $itemsData = [
         'count' => 2,
         'name' => 'Carving Knife',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 2,
+            'rock' => 2,
+            'bone' => 1,
+        ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'meat') {
                 $game->globals->set('meat', $game->globals->get('meat') + 1);
@@ -204,6 +269,11 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 3,
         'damage' => 2,
+        'cost' => [
+            'fiber' => 1,
+            'hide' => 1,
+            'wood' => 1,
+        ],
         'requires' => function (Game $game, $item) {
             return $game->globals->get('rock') > 0;
         },
@@ -225,6 +295,11 @@ $itemsData = [
         'count' => 2,
         'name' => 'Pick Axe',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 2,
+            'wood' => 1,
+            'rock' => 1,
+        ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'rock') {
                 $game->globals->set('rock', $game->globals->get('rock') + 1);
@@ -245,6 +320,12 @@ $itemsData = [
         'count' => 1,
         'name' => 'Planning Hut',
         'itemType' => 'building',
+        'cost' => [
+            'fiber' => 3,
+            'rock' => 3,
+            'hide' => 2,
+            'bone' => 2,
+        ],
         'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
@@ -260,6 +341,11 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 2,
         'damage' => 2,
+        'cost' => [
+            'fiber' => 1,
+            'rock' => 2,
+            'wood' => 1,
+        ],
     ],
     'sharp-stick' => [
         'type' => 'item',
@@ -269,6 +355,10 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 1,
         'damage' => 1,
+        'cost' => [
+            'wood' => 1,
+            'rock' => 1,
+        ],
     ],
     'shelter' => [
         'type' => 'item',
@@ -276,6 +366,12 @@ $itemsData = [
         'count' => 1,
         'name' => 'Shelter',
         'itemType' => 'building',
+        'cost' => [
+            'fiber' => 3,
+            'rock' => 3,
+            'hide' => 2,
+            'bone' => 2,
+        ],
     ],
     'rock-knife' => [
         'type' => 'item',
@@ -285,6 +381,10 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 2,
         'damage' => 1,
+        'cost' => [
+            'fiber' => 1,
+            'rock' => 2,
+        ],
     ],
     'item-back-hindrance' => [
         'type' => 'item',
@@ -299,6 +399,9 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => 'Mortar And Pestle',
         'itemType' => 'tool',
+        'cost' => [
+            'rock' => 3,
+        ],
     ],
     'bandage' => [
         'type' => 'item',
@@ -306,15 +409,21 @@ $itemsData = [
         'count' => 2,
         'name' => 'Bandage',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 1,
+            'hide' => 1,
+            'herb' => 1,
+        ],
     ],
     'skull-shield' => [
         'type' => 'item',
-        'craftingLevel' => 0,
+        'craftingLevel' => 4,
         'count' => 1,
         'expansion' => 'hindrance',
         'name' => 'Skull Shield',
         'itemType' => 'tool',
         'character' => 'Faye',
+        'cost' => [],
     ],
     'cooking-pot' => [
         'type' => 'item',
@@ -323,6 +432,11 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => 'Cooking Pot',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 2,
+            'rock' => 2,
+            'bone' => 2,
+        ],
     ],
     'bone-claws' => [
         'type' => 'item',
@@ -330,6 +444,10 @@ $itemsData = [
         'count' => 2,
         'name' => 'Bone Claws',
         'itemType' => 'tool',
+        'cost' => [
+            'rock' => 2,
+            'bone' => 2,
+        ],
     ],
     'bone-flute' => [
         'type' => 'item',
@@ -338,6 +456,10 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => 'Bone Flute',
         'itemType' => 'tool',
+        'cost' => [
+            'hide' => 1,
+            'bone' => 2,
+        ],
         'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
@@ -352,6 +474,12 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => 'Stock Hut',
         'itemType' => 'building',
+        'cost' => [
+            'fiber' => 3,
+            'rock' => 3,
+            'hide' => 2,
+            'bone' => 2,
+        ],
     ],
     'whip' => [
         'type' => 'item',
@@ -362,10 +490,14 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 2,
         'damage' => 1,
+        'cost' => [
+            'fiber' => 3,
+            'hide' => 2,
+        ],
     ],
     'fire-stick' => [
         'type' => 'item',
-        'craftingLevel' => 0,
+        'craftingLevel' => 4,
         'count' => 1,
         'expansion' => 'hindrance',
         'name' => 'Fire Stick',
@@ -373,6 +505,7 @@ $itemsData = [
         'range' => 0,
         'damage' => 1,
         'character' => 'Rex',
+        'cost' => [],
     ],
     'rock' => [
         'type' => 'item',
@@ -383,6 +516,9 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 1,
         'damage' => 2,
+        'cost' => [
+            'rock' => 1,
+        ],
         'onUse' => function (Game $game, $item) {
             $game->character->updateCharacterData($game->character->getActivateCharacter()['character_name'], function (&$data) use (
                 $item
@@ -411,6 +547,10 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 2,
         'damage' => 2,
+        'cost' => [
+            'fiber' => 2,
+            'rock' => 2,
+        ],
     ],
     'boomerang' => [
         'type' => 'item',
@@ -421,6 +561,11 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 2,
         'damage' => 2,
+        'cost' => [
+            'rock' => 2,
+            'hide' => 2,
+            'wood' => 1,
+        ],
         'onUse' => function (Game $game, $item) {
             usePerDay($item, $game);
         },
@@ -435,5 +580,10 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => 'Stone Hammer',
         'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 2,
+            'rock' => 2,
+            'wood' => 1,
+        ],
     ],
 ];

@@ -37,7 +37,7 @@ $gameinfos = [
     // 'not_recommend_player_number' => array( 2, 3 ),      // <= example: this is not recommended to play this game with 2 or 3 players
 
     // Estimated game duration, in minutes (used only for the launch, afterward the real duration is computed)
-    'estimated_duration' => 30,
+    'estimated_duration' => 90,
 
     // Time in second add to a player when "giveExtraTime" is called (speed profile = fast)
     'fast_additional_time' => 30,
@@ -67,7 +67,7 @@ $gameinfos = [
     'is_beta' => 1,
 
     // Is this game cooperative (all players wins together or loose together)
-    'is_coop' => 0,
+    'is_coop' => 1,
 
     // Language dependency. If false or not set, there is no language dependency. If true, all players at the table must speak the same language.
     // If an array of shortcode languages such as array( 1 => 'en', 2 => 'fr', 3 => 'it' ) then all players at the table must speak the same language, and this language must be one of the listed languages.

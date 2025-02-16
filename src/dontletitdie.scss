@@ -1,5 +1,20 @@
-@use 'main';
-@use 'boards';
-@use 'player-card';
-@use 'utils/deck';
-@use 'utils/images';
+@use 'sass:meta';
+
+.dlid {
+  @include meta.load-css('main');
+  @include meta.load-css('boards');
+  @include meta.load-css('player-card');
+  @include meta.load-css('player-side-panel');
+  @include meta.load-css('utils/deck');
+  @include meta.load-css('utils/images');
+}
+
+.action-button .dlid__stamina {
+  color: #ffff00;
+  margin-left: 0.25em;
+}
+
+.dlid__container {
+  margin: 0 auto 1rem;
+  place-items: anchor-center;
+}

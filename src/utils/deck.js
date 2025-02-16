@@ -5,8 +5,9 @@ class Deck {
     this.style = style;
     this.deck = deck;
     this.div.classList.add('deck');
-    renderImage(`${this.deck}-back`, this.div, this.scale, 'replace');
-    this.div.insertAdjacentHTML('beforeend', `<div class="flipped-card ${this.style === 'vertical' ? 'vertical' : 'horizontal'}"></div>`);
+    this.div.classList.add(this.style === 'vertical' ? 'vertical' : 'horizontal');
+    renderImage(`${this.deck}-back`, this.div, { scale: this.scale, pos: 'replace' });
+    this.div.insertAdjacentHTML('beforeend', `<div class="flipped-card"></div>`);
     this.drawing = [];
     this.topDiscard = null;
     this.setDiscard(this.topDiscard);
@@ -14,10 +15,10 @@ class Deck {
   setDiscard(cardId) {
     if (!cardId) {
       const { width, height } = getSpriteSize(`${this.deck}-back`, this.scale);
-      this.div.querySelector(
-        `.flipped-card`,
-      ).innerHTML = `<div class="empty-discard" style="width: ${width}px;height: ${height}px;"></div>`;
-    } else renderImage(cardId, this.div.querySelector(`.flipped-card`), this.scale, 'replace');
+      this.div.querySelector(`.flipped-card`).innerHTML = `<div class="empty-discard" style="width: ${width}px;height: ${height}px;">${_(
+        'Discard',
+      )}</div>`;
+    } else renderImage(cardId, this.div.querySelector(`.flipped-card`), { scale: this.scale, pos: 'replace' });
     this.topDiscard = cardId;
   }
   drawCard(cardId) {
@@ -34,8 +35,8 @@ class Deck {
   </div>
   </div>`,
     );
-    renderImage(`${this.deck}-back`, this.div.querySelector(`.flip-card-front`), this.scale, 'replace');
-    renderImage(cardId, this.div.querySelector(`.flip-card-back`), this.scale, 'replace');
+    renderImage(`${this.deck}-back`, this.div.querySelector(`.flip-card-front`), { scale: this.scale, pos: 'replace' });
+    renderImage(cardId, this.div.querySelector(`.flip-card-back`), { scale: this.scale, pos: 'replace' });
     setTimeout(() => {
       this.div.querySelector(`.flip-card`).classList.add('flip');
       setTimeout(() => {

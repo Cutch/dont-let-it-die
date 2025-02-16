@@ -64,7 +64,7 @@ class CharacterSelection
         // Notify Players
         $results = [];
         $this->game->getAllCharacters($results);
-        $this->game->notify->all('characterClicked', '', $results);
+        $this->game->notify->all('characterClicked', '', ['gameData' => $results]);
     }
     private function validateCharacterCount(bool $checkIfNotEnough, array $characters)
     {
@@ -149,7 +149,11 @@ class CharacterSelection
         $results = ['player_id' => $playerId];
         $this->game->getAllCharacters($results);
         // $this->game->initCharacters($playerId);
-        $this->game->notify->all('chooseCharacters', clienttranslate($message), array_merge($results, $selectedCharactersArgs));
+        $this->game->notify->all(
+            'chooseCharacters',
+            clienttranslate($message),
+            array_merge(['gameData' => $results], $selectedCharactersArgs)
+        );
 
         // Deactivate player, and move to next state if none are active
         $this->game->gamestate->setPlayerNonMultiactive($playerId, 'start');

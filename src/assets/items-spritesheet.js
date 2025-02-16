@@ -147,7 +147,7 @@ const itemsSprites = {
       frame: {
         x: 1752,
         y: 440,
-        w: 436,
+        w: 434,
         h: 438,
       },
       rotate: 0,

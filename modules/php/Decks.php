@@ -110,10 +110,13 @@ class Decks
     {
         $this->decks[$deck]->moveAllCardsInLocation('discard', 'deck');
         $this->decks[$deck]->shuffle('deck');
-        $result = ['deck' => str_replace('-', ' ', $deck)];
-        $this->game->getDecks($result);
+        $results = [];
+        $this->game->getDecks($results);
         if ($notify) {
-            $this->game->notify->all('shuffle', clienttranslate('The ${deck} deck is out of cards, shuffling'), $result);
+            $this->game->notify->all('shuffle', clienttranslate('The ${deck} deck is out of cards, shuffling'), [
+                'gameData' => $results,
+                'deck' => str_replace('-', ' ', $deck),
+            ]);
         }
     }
     public function discardCards($deck, $callback): void

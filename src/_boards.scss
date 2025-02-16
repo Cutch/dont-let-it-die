@@ -30,15 +30,7 @@
   top: 30px;
   left: 600px;
 }
-.action-button .stamina {
-  color: #ffff00;
-  margin-left: 0.25em;
-}
 /* Board Container Stop */
-.dlid-container {
-  margin: 0 auto 1rem;
-  place-items: anchor-center;
-}
 .tokens {
   display: flex;
   gap: 1em;
@@ -72,7 +64,7 @@
   border-radius: 50%;
   position: absolute;
   top: 236px;
-  left: 164px;
+  left: 166px;
   width: 2rem;
   height: 2rem;
   background-color: #307c42;
@@ -86,3 +78,10 @@
   gap: 1rem;
 }
 /* Track Board Stop*/
+
+#items-container {
+  display: flex;
+  flex-flow: wrap;
+  justify-content: center;
+  gap: 1em;
+}

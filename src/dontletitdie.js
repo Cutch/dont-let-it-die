@@ -57,7 +57,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (gameData.gamestate.name === 'characterSelect')
         document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
       const scale = 3;
-      Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character) => {
+      Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character, i) => {
         // Player side board
         const playerPanel = this.getPlayerPanelElement(character.playerId);
         const equipments = character.equipment.map((d) => this.data[d]);
@@ -68,23 +68,36 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           playerPanel.insertAdjacentHTML(
             'beforeend',
             `<div id="${characterSideId}" class="character-side-container">
-            <div class="character-name">${character.name}</div>
-            <div class="health"><span class="label">Health: </span><span class="value">${character.health}</span></div>
-            <div class="stamina"><span class="label">Stamina: </span><span class="value">${character.stamina}</span></div>
+            <div class="character-name">${character.name}<span class="first-player-marker"></span></div>
+            <div class="health"><div class="fa fa-heart"></div><span class="label">Health: </span><span class="value">${
+              character.health
+            }</span></div>
+            <div class="stamina"><div class="fa fa-bolt"></div><span class="label">Stamina: </span><span class="value">${
+              character.stamina
+            }</span></div>
             <div class="equipment"><span class="label">Equipment: </span><span class="value">${
               equipments.map((d) => d.options.name).join(', ') || 'None'
             }</span></div>
           </div>`,
           );
+          renderImage('skull', document.querySelector(`#${characterSideId} .first-player-marker`), {
+            scale: 20,
+            pos: 'replace',
+            card: false,
+            css: 'side-panel-skull',
+          });
         } else {
           playerSideContainer.querySelector(`.health .value`).innerHTML = character.health;
           playerSideContainer.querySelector(`.stamina .value`).innerHTML = character.stamina;
           playerSideContainer.querySelector(`.equipment .value`).innerHTML = equipments.map((d) => d.options.name).join(', ') || 'None';
+          playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
         }
         // Player main board
         if (gameData.gamestate.name !== 'characterSelect') {
-          if (!document.getElementById(`player-${character.name}`)) {
-            document.getElementById('players-container').insertAdjacentHTML(
+          const container = document.getElementById(`player-container-${Math.floor(i / 2) + 1}`);
+          if (container && !document.getElementById(`player-${character.name}`)) {
+            console.log('Creating initial payer container', gameData);
+            container.insertAdjacentHTML(
               'beforeend',
               `<div id="player-${character.name}" class="player-card">
               <div class="card"></div>
@@ -100,9 +113,15 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               <div class="first-player-marker"></div>
               </div>`,
             );
-            renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), scale);
-            renderImage('skull', document.querySelector(`#player-${character.name} > .first-player-marker`), 8, 'replace');
+            renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), { scale });
+            renderImage('skull', document.querySelector(`#player-${character.name} > .first-player-marker`), { scale: 8, pos: 'replace' });
           }
+          document.querySelector(`#player-${character.name} .card`).style['outline'] = character?.isActive
+            ? `5px solid #${character.playerColor}`
+            : '';
+          document.querySelector(`#${characterSideId} .first-player-marker`).style['display'] = character?.isFirst
+            ? 'inline-block'
+            : 'none';
           document.querySelector(`#player-${character.name} > .first-player-marker`).style['display'] = character?.isFirst
             ? 'block'
             : 'none';
@@ -112,32 +131,41 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           )}px;top: ${Math.round((10 * 4) / scale)}px`;
           document.querySelector(`#player-${character.name} .health.marker`).style = `background-color: #${character.playerColor};left: ${
             Math.round(((character.health ?? 0) * 20.75 * 4) / scale + (126.5 * 4) / scale) + 2
-          }px;top: ${Math.round((10 * 4) / scale) + 2}px`;
+          }px;top: ${Math.round((10 * 4) / scale) + 2 + (character.health == 0 ? (3 * 4) / scale : 0)}px`;
           document.querySelector(`#player-${character.name} .max-stamina.max-marker`).style = `left: ${Math.round(
             ((character.maxStamina ?? 0) * 20.75 * 4) / scale + (126.5 * 4) / scale,
           )}px;top: ${Math.round((34.5 * 4) / scale)}px`;
           document.querySelector(`#player-${character.name} .stamina.marker`).style = `background-color: #${character.playerColor};left: ${
             Math.round(((character.stamina ?? 0) * 20.75 * 4) / scale + (126.5 * 4) / scale) + 2
-          }px;top: ${Math.round((34.5 * 4) / scale) + 2}px`;
+          }px;top: ${Math.round((34.5 * 4) / scale) + 2 - (character.stamina == 0 ? (3 * 4) / scale : 0)}px`;
 
-          renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), scale, 'replace');
+          renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), { scale, pos: 'replace' });
           const renderedItems = [];
           const weapon = equipments.find((d) => d.options.itemType === 'weapon');
           if (weapon) {
             renderedItems.push(weapon);
-            renderImage(weapon.id, document.querySelector(`#player-${character.name} > .${weapon.options.itemType}`), scale, 'replace');
+            renderImage(weapon.id, document.querySelector(`#player-${character.name} > .${weapon.options.itemType}`), {
+              scale,
+              pos: 'replace',
+            });
           }
 
           const tool = equipments.find((d) => d.options.itemType === 'tool');
           if (tool) {
             renderedItems.push(tool);
-            renderImage(tool.id, document.querySelector(`#player-${character.name} > .${tool.options.itemType}`), scale, 'replace');
+            renderImage(tool.id, document.querySelector(`#player-${character.name} > .${tool.options.itemType}`), {
+              scale,
+              pos: 'replace',
+            });
           }
 
           const item3 = equipments.find((d) => !renderedItems.includes(d));
           if (item3) {
             renderedItems.push(item3);
-            renderImage(item3.id, document.querySelector(`#player-${character.name} > .${item3.options.itemType}`), scale, 'replace');
+            renderImage(item3.id, document.querySelector(`#player-${character.name} > .${item3.options.itemType}`), {
+              scale,
+              pos: 'replace',
+            });
           }
         }
       });
@@ -166,16 +194,17 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       let elem = document.querySelector(`#board-container .fire-wood`);
       elem.innerHTML = '';
       this.updateResource('wood', elem, gameData.game?.['fireWood'] ?? 0);
+      // <div class="fa fa-exclamation-triangle"></div>;
 
       // Shared Resource Pool
-      const resources = ['wood', 'rock', 'fiber', 'bone', 'meat', 'berry', 'hide'];
+      const resources = ['wood', 'rock', 'fiber', 'bone', 'meat', 'berry', 'hide', 'fkp'];
       elem = document.querySelector(`#shared-resource-container .tokens`);
       if (!elem) {
         document
           .getElementById('game_play_area')
           .insertAdjacentHTML(
             'beforeend',
-            `<div id="shared-resource-container" class="dlid-container"><h3>Shared Resources</h3><div class="tokens"></div></div>`,
+            `<div id="shared-resource-container" class="dlid__container"><h3>Shared Resources</h3><div class="tokens"></div></div>`,
           );
         elem = document.querySelector(`#shared-resource-container .tokens`);
       }
@@ -189,7 +218,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           .getElementById('game_play_area')
           .insertAdjacentHTML(
             'beforeend',
-            `<div id="discoverable-container" class="dlid-container"><h3>Discoverable Resources</h3><div class="tokens"></div></div>`,
+            `<div id="discoverable-container" class="dlid__container"><h3>Discoverable Resources</h3><div class="tokens"></div></div>`,
           );
         elem = document.querySelector(`#discoverable-container .tokens`);
       }
@@ -198,7 +227,28 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     },
     updateResource: function (name, elem, count) {
       elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter">${count}</div></div>`);
-      renderImage(name, elem.querySelector(`.token.${name}`), 2, 'insert');
+      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
+    },
+    updateItems: function (gameData) {
+      // Shared Resource Pool
+      const resources = ['wood', 'rock', 'fiber', 'bone', 'meat', 'berry', 'hide', 'fkp'];
+      // Available Resource Pool
+      elem = document.querySelector(`#items-container .tokens`);
+      if (!elem) {
+        document
+          .getElementById('game_play_area')
+          .insertAdjacentHTML(
+            'beforeend',
+            `<div id="items-container" class="dlid__container"><h3>Discoverable Resources</h3><div class="tokens"></div></div>`,
+          );
+        elem = document.querySelector(`#items-container .tokens`);
+      }
+      elem.innerHTML = '';
+      resources.forEach((name) => this.updateItem(name, elem, gameData.resourcesAvailable?.[name] ?? 0));
+    },
+    updateItem: function (name, elem, count) {
+      elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter">${count}</div></div>`);
+      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
     },
     setupBoard: function (gameData) {
       this.firstPlayer = gameData.playerorder[0];
@@ -213,12 +263,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         .getElementById('game_play_area')
         .insertAdjacentHTML(
           'beforeend',
-          `<div id="board-container" class="dlid-container"><div class="board"><div class="fire-wood"></div>${decks
+          `<div id="board-container" class="dlid__container"><div class="board"><div class="fire-wood"></div>${decks
             .map((d) => `<div class="${d.name}"></div>`)
             .join('')}</div></div>`,
         );
 
-      renderImage(`board`, document.querySelector(`#board-container > .board`), 2, 'insert');
+      renderImage(`board`, document.querySelector(`#board-container > .board`), { scale: 2, pos: 'insert' });
       decks.forEach(({ name: deck }) => {
         if (!this.decks[deck]) {
           const uppercaseDeck = deck[0].toUpperCase() + deck.slice(1);
@@ -235,7 +285,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     },
     setupCharacterSelections: function (gameData) {
       const playArea = document.getElementById('game_play_area');
-      playArea.parentElement.insertAdjacentHTML('beforeend', `<div id="character-selector" class="dlid-container"></div>`);
+      playArea.parentElement.insertAdjacentHTML('beforeend', `<div id="character-selector" class="dlid__container"></div>`);
       const elem = document.getElementById('character-selector');
       if (gameData.gamestate.name === 'characterSelect') playArea.style.display = 'none';
       else elem.style.display = 'none';
@@ -243,7 +293,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         .filter((d) => this.data[d].options.type === 'character')
         .sort()
         .forEach((characterName) => {
-          renderImage(characterName, elem, 2, 'append');
+          renderImage(characterName, elem, { scale: 2, pos: 'append' });
           this.addClickListener(elem.querySelector(`.${characterName}`), characterName, () => {
             const i = this.mySelectedCharacters.indexOf(characterName);
             if (i >= 0) {
@@ -296,12 +346,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         const playArea = document.getElementById('game_play_area');
         playArea.insertAdjacentHTML(
           'beforeend',
-          `<div id="track-container" class="dlid-container"><div id="event-deck-container">${decks
+          `<div id="track-container" class="dlid__container"><div id="event-deck-container">${decks
             .map((d) => `<div class="${d.name}"></div>`)
             .join('')}</div></div>`,
         );
         trackContainer = document.getElementById('track-container');
-        renderImage(`track-${gameData.trackDifficulty}`, trackContainer, 2, 'insert');
+        renderImage(`track-${gameData.trackDifficulty}`, trackContainer, { scale: 2, pos: 'insert' });
 
         trackContainer
           .querySelector(`.track-${gameData.trackDifficulty}`)
@@ -319,7 +369,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       });
     },
     setup: function (gameData) {
-      console.log(gameData);
+      document.getElementById('game_play_area_wrap').classList.add('dlid');
+      document.getElementById('right-side').classList.add('dlid');
+
       expansionI = gameData.expansionList.indexOf(gameData.expansion);
       this.expansions = gameData.expansionList.slice(0, expansionI + 1);
       this.data = Object.keys(allSprites).reduce((acc, k) => {
@@ -328,22 +380,24 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         if (d.options.expansion && gameData.expansionList.indexOf(d.options.expansion) > expansionI) return acc;
         return { ...acc, [k]: d };
       }, {});
-      console.log(this.data);
-      this.dontPreloadImage('upgrades-spritesheet.png');
 
       this.setupCharacterSelections(gameData);
       const playArea = document.getElementById('game_play_area');
 
-      playArea.insertAdjacentHTML('beforeend', `<div id="players-container" class="dlid-container"></div>`);
+      playArea.insertAdjacentHTML(
+        'beforeend',
+        `<div id="players-container" class="dlid__container"><div id="player-container-1" class="inner-container"></div><div id="player-container-2" class="inner-container"></div></div>`,
+      );
       this.updatePlayers(gameData);
       this.setupBoard(gameData);
       // renderImage(`board`, playArea);
       this.updateTrack(gameData);
       // Setting up player boards
-      playArea.insertAdjacentHTML('beforeend', `<div id="knowledge-container" class="dlid-container"></div>`);
+      playArea.insertAdjacentHTML('beforeend', `<div id="knowledge-container" class="dlid__container"></div>`);
       renderImage(`knowledge-tree-${gameData.difficulty}`, document.getElementById('knowledge-container'));
-      playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid-container"></div>`);
+      playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid__container"></div>`);
       renderImage(`instructions`, document.getElementById('instructions-container'));
+      playArea.insertAdjacentHTML('beforeend', `<div id="items-container" class="dlid__container"></div>`);
 
       // TODO: Set up your game interface here, according to "gameData"
 
@@ -368,6 +422,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           break;
         case 'playerTurn':
           this.updatePlayers(args.args);
+          this.updateResources(args.args);
           this.updateTrack(args.args);
           break;
         case 'drawCard':
@@ -399,22 +454,22 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     //                        action status bar (ie: the HTML links in the status bar).
     //
     onUpdateActionButtons: function (stateName, args) {
-      console.log('onUpdateActionButtons: ' + stateName, args);
+      const actions = args?.actions;
+      console.log('onUpdateActionButtons', actions, stateName);
+      $isActive = this.isCurrentPlayerActive();
+      if ($isActive && stateName && actions != null) {
+        this.removeActionButtons();
 
-      if (this.isCurrentPlayerActive()) {
+        // Add test action buttons in the action status bar, simulating a card click:
+        if (actions)
+          Object.keys(actions).forEach((action) =>
+            this.statusBar.addActionButton(`${_(actionMappings[action])} <i class="fa fa-bolt dlid__stamina"></i> ${actions[action]}`, () =>
+              this.bgaPerformAction(action),
+            ),
+          );
         switch (stateName) {
-          case 'playerTurn':
-            const actions = args.actions; // returned by the argPlayerState
-
-            // Add test action buttons in the action status bar, simulating a card click:
-            if (actions)
-              Object.keys(actions).forEach((action) =>
-                this.statusBar.addActionButton(`${_(actionMappings[action])} <i class="fa fa-bolt stamina"></i> ${actions[action]}`, () =>
-                  this.bgaPerformAction(action),
-                ),
-              );
-
-            this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
+          case 'tradePhase':
+            this.statusBar.addActionButton(_('Done'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
             break;
           case 'characterSelect':
             const playerCount = Object.keys(args.players).length;
@@ -433,7 +488,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               this.statusBar.addActionButton(_('Confirm ${x} characters').replace('${x}', this.selectCharacterCount), () =>
                 this.bgaPerformAction('actChooseCharacters'),
               );
-
+            break;
+          default:
+            if ($isActive) this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
             break;
         }
       }
@@ -465,42 +522,46 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       console.log('notifications subscriptions setup');
 
       // TODO: here, associate your game notifications with local methods
-      dojo.subscribe('characterClicked', this, 'notif_characterClicked');
+      dojo.subscribe('characterClicked', this, 'notification_characterClicked');
+      dojo.subscribe('updateGameData', this, 'notification_updateGameData');
       // Example 1: standard notification handling
-      // dojo.subscribe( 'tokenUsed', this, "notif_tokenUsed" );
+      // dojo.subscribe( 'tokenUsed', this, "notification_tokenUsed" );
 
       // Example 2: standard notification handling + tell the user interface to wait
       //            during 3 seconds after calling the method in order to let the players
       //            see what is happening in the game.
-      dojo.subscribe('tokenUsed', this, 'notif_tokenUsed');
+      dojo.subscribe('tokenUsed', this, 'notification_tokenUsed');
       this.notifqueue.setSynchronous('tokenUsed', 1000);
       //
     },
-    notificationWrapper: function (notif, state) {
-      notif.args = notif.args ?? {};
-      notif.args.gamestate = { name: state };
-      if (notif.args.gameData) {
-        notif.args.gameData.gamestate = { name: state };
+    notificationWrapper: function (notification, state) {
+      notification.args = notification.args ?? {};
+      notification.args.gamestate = { name: state };
+      if (notification.args.gameData) {
+        notification.args.gameData.gamestate = { name: state };
       }
     },
-    // TODO: from this point and below, you can write your game notifications handling methods
-    notif_characterClicked: function (notif) {
-      this.notificationWrapper(notif, 'characterSelect');
-      console.log('notif_characterClicked', notif);
-      this.selectedCharacters = notif.args.characters;
-      this.updateCharacterSelections(notif.args);
+    notification_updateGameData: function (notification) {
+      this.notificationWrapper(notification, 'updateGameData');
+      console.log('notification_updateGameData', notification);
+      this.updatePlayers(notification.args.gameData);
+      this.updateResources(notification.args.gameData);
+      if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
     },
 
-    // TODO: from this point and below, you can write your game notifications handling methods
-    notif_tokenUsed: function (notif) {
-      this.notificationWrapper(notif, 'playerTurn');
-      console.log('notif_tokenUsed', notif);
-      this.updatePlayers(notif.args.gameData);
-      this.updateResources(notif.args.gameData);
+    notification_characterClicked: function (notification) {
+      this.notificationWrapper(notification, 'characterSelect');
+      console.log('notification_characterClicked', notification);
+      this.selectedCharacters = notification.args.gameData.characters;
+      this.updateCharacterSelections(notification.args);
+    },
 
-      // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-
-      // TODO: play the card in the user interface.
+    notification_tokenUsed: function (notification) {
+      this.notificationWrapper(notification, 'playerTurn');
+      console.log('notification_tokenUsed', notification);
+      this.updatePlayers(notification.args.gameData);
+      this.updateResources(notification.args.gameData);
+      if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
     },
   });
 });

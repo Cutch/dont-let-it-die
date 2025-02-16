@@ -42,30 +42,42 @@ class Character
             foreach ($data as $key => $value) {
                 if (in_array($key, self::$characterColumns)) {
                     $values[] = "`{$key}` = '{$value}'";
+                    $this->cachedData[$name][$key] = $value;
                 }
             }
             $values = implode(',', $values);
             $this->game::DbQuery("UPDATE `character` SET {$values} WHERE character_name = '$name'");
+            $this->game->notify->all('updateGameData', '', [
+                'gameData' => $this->game->getAllDatas(),
+            ]);
         }
     }
     public function updateAllCharacterData($callback)
     {
         $turnOrder = $this->game->globals->get('turnOrder');
         $turnOrder = array_values(array_filter($turnOrder));
+        $hasUpdate = false;
         foreach ($turnOrder as $i => $name) {
             // Pull from db if needed
             $data = $this->getCharacterData($name);
             if (!$callback($data)) {
+                $hasUpdate = true;
                 // Update db
                 $values = [];
                 foreach ($data as $key => $value) {
                     if (in_array($key, self::$characterColumns)) {
                         $values[] = "`{$key}` = '{$value}'";
+                        $this->cachedData[$name][$key] = $value;
                     }
                 }
                 $values = implode(',', $values);
                 $this->game::DbQuery("UPDATE `character` SET {$values} WHERE character_name = '$name'");
             }
+        }
+        if ($hasUpdate) {
+            $this->game->notify->all('updateGameData', '', [
+                'gameData' => $this->game->getAllDatas(),
+            ]);
         }
     }
     public function getAllCharacterData(): array
@@ -74,25 +86,30 @@ class Character
         $turnOrder = array_values(array_filter($turnOrder));
         return array_map([$this, 'getCharacterData'], $turnOrder);
     }
+    public function getCalculatedData($characterData): array
+    {
+        extract($this->game->globals->getAll('turnNo', 'turnOrder'));
+        $turnOrder = array_values(array_filter($turnOrder));
+        $isActive = $turnOrder[$turnNo] == $characterData['character_name'];
+        $characterData['isActive'] = $isActive;
+        $characterData['isFirst'] = isset($turnOrder[0]) && $turnOrder[0] == $characterData['character_name'];
+        $characterData['id'] = $characterData['character_name'];
+        $_this = $this;
+        $characterData['equipment'] = array_map(function ($itemName) use ($_this, $isActive) {
+            return ['id' => $itemName, 'isActive' => $isActive, ...$_this->game->data->items[$itemName]];
+        }, array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']]));
+        return $characterData;
+    }
     public function getCharacterData($name): array
     {
         if (isset($this->cachedData[$name])) {
-            return $this->cachedData[$name];
+            return $this->getCalculatedData($this->cachedData[$name]);
         } else {
-            extract($this->game->globals->getAll('turnNo', 'turnOrder'));
-            $turnOrder = array_values(array_filter($turnOrder));
-            $characterName = isset($turnOrder[$turnNo]) ?? $turnOrder[$turnNo];
-            $characterData = $this->game->getCollectionFromDb(
-                "SELECT c.*, player_color FROM `character` c INNER JOIN `player` p ON p.player_id = c.player_id WHERE character_name = '$name'"
-            )[$name];
-            $_this = $this;
-            $characterData['id'] = $characterData['character_name'];
-            $isActive = $characterName == $characterData['character_name'];
-            $characterData['isActive'] = $isActive;
-            $characterData['isFirst'] = isset($turnOrder[0]) && $turnOrder[0] == $characterData['character_name'];
-            $characterData['equipment'] = array_map(function ($itemName) use ($_this, $isActive) {
-                return ['id' => $itemName, 'isActive' => $isActive, ...$_this->game->data->items[$itemName]];
-            }, array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']]));
+            $characterData = $this->getCalculatedData(
+                $this->game->getCollectionFromDb(
+                    "SELECT c.*, player_color FROM `character` c INNER JOIN `player` p ON p.player_id = c.player_id WHERE character_name = '$name'"
+                )[$name]
+            );
             $this->cachedData[$name] = $characterData;
             return $characterData;
         }
@@ -100,7 +117,7 @@ class Character
     public function equipEquipment($characterName, $equipment): void
     {
         $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
-            $equipment = array_combine($data['equipment'], $equipment);
+            $equipment = [...$data['equipment'], ...$equipment];
             $data['item_1'] = isset($equipment) ? $equipment[0] : null;
             $data['item_2'] = isset($equipment) ? $equipment[1] : null;
             $data['item_3'] = isset($equipment) ? $equipment[2] : null;
@@ -150,7 +167,7 @@ class Character
     public function isLastCharacter()
     {
         extract($this->game->globals->getAll('turnNo', 'turnOrder'));
-        return sizeof($turnOrder) == $turnNo - 1;
+        return sizeof($turnOrder) == $turnNo + 1;
     }
     public function rotateTurnOrder(): void
     {
@@ -209,6 +226,7 @@ class Character
             return [
                 'name' => $char['character_name'],
                 'isFirst' => $char['isFirst'],
+                'isActive' => $char['isActive'],
                 'equipment' => array_filter([$char['item_1'], $char['item_2'], $char['item_3']]),
                 'playerColor' => $char['player_color'],
                 'playerId' => $char['player_id'],

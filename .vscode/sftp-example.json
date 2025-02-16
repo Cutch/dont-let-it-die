@@ -1,0 +1,28 @@
+{
+    "name": "BGA",
+    "host": "1.studio.boardgamearena.com",
+    "protocol": "sftp",
+    "port": 2022,
+    "username": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "remotePath": "/dontletitdie/",
+    "uploadOnSave": true,
+    "ignore": [
+        ".vscode",
+        ".git",
+        ".gitignore",
+        ".DS_Store",
+        "src",
+        "_ide_helper.php",
+        "upload.js"
+    ],
+    "syncOption": {
+        "skipCreate": false,
+        "delete": true
+    },
+    "watcher": {
+        "files": "**/*.{js,css}",
+        "autoUpload": true,
+        "autoDelete": true
+    }
+}

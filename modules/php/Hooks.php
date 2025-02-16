@@ -18,9 +18,11 @@ class Hooks
         $activeNightCards = $this->game->getActiveNightCards();
         $buildings = $this->game->getBuildings();
         $characters = $this->game->character->getAllCharacterData();
-        $equipment = array_filter($characters, function ($c) {
-            return $c['isActive'];
-        })[0]['equipment'];
+        $equipment = array_values(
+            array_filter($characters, function ($c) {
+                return $c['isActive'];
+            })
+        )[0]['equipment'];
         $array = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$equipment];
         foreach ($array as $i => $object) {
             if (isset($data[$functionName])) {

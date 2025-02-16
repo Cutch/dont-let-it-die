@@ -134,7 +134,6 @@ $machinestates = [
         'description' => clienttranslate('It\'s night time'),
         'type' => 'game',
         'action' => 'stNightPhase',
-        'updateGameProgression' => true,
         'transitions' => ['endGame' => 99, 'morning' => 50],
     ],
     50 => [
@@ -143,7 +142,15 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stMorningPhase',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'activePhase' => 10],
+        'transitions' => ['endGame' => 99, 'tradePhase' => 60],
+    ],
+    60 => [
+        'name' => 'tradePhase',
+        'description' => clienttranslate('Trade Items'),
+        'type' => 'multipleactiveplayer',
+        'action' => 'stTradePhase',
+        'possibleactions' => ['actEquipItem', 'actUnEquipItem', 'actTradeItem', 'actConfirmTradeItem', 'actDone'],
+        'transitions' => ['activePhase' => 10],
     ],
 
     // Final state.
