@@ -69,13 +69,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             'beforeend',
             `<div id="${characterSideId}" class="character-side-container">
             <div class="character-name">${character.name}<span class="first-player-marker"></span></div>
-            <div class="health"><div class="fa fa-heart"></div><span class="label">Health: </span><span class="value">${
+            <div class="health line"><div class="fa fa-heart"></div><span class="label">Health: </span><span class="value">${
               character.health
             }</span></div>
-            <div class="stamina"><div class="fa fa-bolt"></div><span class="label">Stamina: </span><span class="value">${
+            <div class="stamina line"><div class="fa fa-bolt"></div><span class="label">Stamina: </span><span class="value">${
               character.stamina
             }</span></div>
-            <div class="equipment"><span class="label">Equipment: </span><span class="value">${
+            <div class="equipment line"><div class="fa fa-cog"></div><span class="label">Equipment: </span><span class="value">${
               equipments.map((d) => d.options.name).join(', ') || 'None'
             }</span></div>
           </div>`,
@@ -193,9 +193,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     updateResources: function (gameData) {
       let elem = document.querySelector(`#board-container .fire-wood`);
       elem.innerHTML = '';
-      this.updateResource('wood', elem, gameData.game?.['fireWood'] ?? 0);
-      // <div class="fa fa-exclamation-triangle"></div>;
-
+      this.updateResource('wood', elem, gameData.game?.['fireWood'] ?? 0, {
+        warn: (gameData.game?.['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
+      });
       // Shared Resource Pool
       const resources = ['wood', 'rock', 'fiber', 'bone', 'meat', 'berry', 'hide', 'fkp'];
       elem = document.querySelector(`#shared-resource-container .tokens`);
@@ -225,29 +225,30 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       elem.innerHTML = '';
       resources.forEach((name) => this.updateResource(name, elem, gameData.resourcesAvailable?.[name] ?? 0));
     },
-    updateResource: function (name, elem, count) {
-      elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter">${count}</div></div>`);
+    updateResource: function (name, elem, count, { warn = false } = {}) {
+      elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
+      if (warn) elem.insertAdjacentHTML('beforeend', `<div class="fa fa-exclamation-triangle warning dot"></div>`);
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
     },
     updateItems: function (gameData) {
+      gameData.builtEquipment;
       // Shared Resource Pool
-      const resources = ['wood', 'rock', 'fiber', 'bone', 'meat', 'berry', 'hide', 'fkp'];
       // Available Resource Pool
-      elem = document.querySelector(`#items-container .tokens`);
+      elem = document.querySelector(`#items-container .items`);
       if (!elem) {
         document
           .getElementById('game_play_area')
           .insertAdjacentHTML(
             'beforeend',
-            `<div id="items-container" class="dlid__container"><h3>Discoverable Resources</h3><div class="tokens"></div></div>`,
+            `<div id="items-container" class="dlid__container"><h3>Craftable Items</h3><div class="items"></div></div>`,
           );
-        elem = document.querySelector(`#items-container .tokens`);
+        elem = document.querySelector(`#items-container .items`);
       }
       elem.innerHTML = '';
-      resources.forEach((name) => this.updateItem(name, elem, gameData.resourcesAvailable?.[name] ?? 0));
+      Object.keys(gameData.availableEquipment).forEach((name) => this.updateItem(name, elem, gameData.availableEquipment?.[name] ?? 0));
     },
     updateItem: function (name, elem, count) {
-      elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter">${count}</div></div>`);
+      elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
     },
     setupBoard: function (gameData) {
@@ -397,7 +398,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       renderImage(`knowledge-tree-${gameData.difficulty}`, document.getElementById('knowledge-container'));
       playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid__container"></div>`);
       renderImage(`instructions`, document.getElementById('instructions-container'));
-      playArea.insertAdjacentHTML('beforeend', `<div id="items-container" class="dlid__container"></div>`);
+      this.updateItems(gameData);
 
       // TODO: Set up your game interface here, according to "gameData"
 
@@ -423,6 +424,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'playerTurn':
           this.updatePlayers(args.args);
           this.updateResources(args.args);
+          this.updateItems(args.args);
           this.updateTrack(args.args);
           break;
         case 'drawCard':
@@ -546,6 +548,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       console.log('notification_updateGameData', notification);
       this.updatePlayers(notification.args.gameData);
       this.updateResources(notification.args.gameData);
+      this.updateItems(notification.args.gameData);
       if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
     },
 
@@ -561,6 +564,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       console.log('notification_tokenUsed', notification);
       this.updatePlayers(notification.args.gameData);
       this.updateResources(notification.args.gameData);
+      this.updateItems(notification.args.gameData);
       if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
     },
   });

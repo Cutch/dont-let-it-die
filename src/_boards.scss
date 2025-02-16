@@ -39,19 +39,29 @@
 .token {
   position: relative;
 }
-.counter {
+.dot {
   border-radius: 50%;
-  border: 2px solid black;
+  border: 1px solid black;
   background-color: white;
   position: absolute;
-  top: 0;
-  right: 0;
   width: 1.5em;
   height: 1.5em;
   color: black;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+.counter {
+  top: 0;
+  right: 0;
+  transform: translateX(50%);
+}
+.warning {
+  top: 0;
+  left: 0;
+  transform: translateX(-50%);
 }
 
 /* Track Board Start*/
@@ -79,7 +89,7 @@
 }
 /* Track Board Stop*/
 
-#items-container {
+#items-container .items {
   display: flex;
   flex-flow: wrap;
   justify-content: center;

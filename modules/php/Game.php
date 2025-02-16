@@ -111,7 +111,8 @@ class Game extends \Table
     public function adjustResource($resourceType, $change)
     {
         $currentCount = $this->globals->get($resourceType);
-        $newValue = max(min($currentCount + $change, $this->data->tokens[$resourceType]['count']), 0);
+        $maxCount = isset($this->data->tokens[$resourceType]['count']) ? $this->data->tokens[$resourceType]['count'] : 999;
+        $newValue = max(min($currentCount + $change, $maxCount), 0);
         $this->globals->set($resourceType, $newValue);
         $difference = $currentCount - $newValue + $change;
         return $difference;
@@ -412,11 +413,8 @@ class Game extends \Table
         $result = [
             'actions' => $validActions,
             'currentCharacter' => $this->character->getActivateCharacter()['character_name'],
+            ...$this->getAllDatas(),
         ];
-        $this->getAllCharacters($result);
-        $this->getAllPlayers($result);
-        $this->getDecks($result);
-        $this->getGameData($result);
         return $result;
     }
 
@@ -469,13 +467,18 @@ class Game extends \Table
         $this->globals->set('state', ['card' => $card, 'deck' => 'night-event']);
         $this->gamestate->nextState('drawCard');
     }
+    public function getFirewoodCost()
+    {
+        $day = $this->globals->get('day');
+        return (int) (($day - 1) / 3) + 1 - ($day >= 12 ? 1 : 0);
+    }
     public function stMorningPhase()
     {
         $day = $this->globals->get('day');
         if ($day == 14) {
             $this->gamestate->nextState('endGame'); // Fail
         }
-        $woodNeeded = (int) (($day - 1) / 3) + 1 - ($day >= 12 ? 1 : 0);
+        $woodNeeded = $this->getFirewoodCost();
 
         if ($this->adjustResource('fireWood', -$woodNeeded) != 0) {
             $this->gamestate->nextState('endGame'); // Fail
@@ -537,16 +540,28 @@ class Game extends \Table
     {
         $campEquipment = $this->globals->get('campEquipment');
 
-        $equippedEquipment = array_map(function ($data) {
-            return array_map(function ($d) {
-                return $d['id'];
-            }, $data->equipment);
-        }, $this->character->getAllCharacterData());
-        return array_count_values([...$campEquipment, ...$equippedEquipment]);
+        $equippedEquipment = array_merge(
+            [],
+            ...array_map(function ($data) {
+                return array_map(function ($d) {
+                    return $d['id'];
+                }, $data['equipment']);
+            }, $this->character->getAllCharacterData())
+        );
+        return array_count_values(array_values([...$campEquipment, ...$equippedEquipment]));
     }
     public function getItemData(&$result): void
     {
-        $result['availableEquipment'] = $this->getCraftedItems();
+        $result['builtEquipment'] = $this->getCraftedItems();
+        $selectable = $this->actions->getActionSelectable('actCraft');
+        $result['availableEquipment'] = array_combine(
+            array_map(function ($d) {
+                return $d['id'];
+            }, $selectable),
+            array_map(function ($d) {
+                return $d['count'] - (isset($result['builtEquipment']) ? $result['builtEquipment'] : 0);
+            }, $selectable)
+        );
     }
     protected function getGameData(&$result): void
     {
@@ -637,6 +652,7 @@ class Game extends \Table
             'expansion' => $this->getExpansion(),
             'difficulty' => $this->getDifficulty(),
             'trackDifficulty' => $this->getTrackDifficulty(),
+            'fireWoodCost' => $this->getFirewoodCost(),
         ];
         switch ($this->gamestate->state()['name']) {
             case 'playerTurn':
@@ -650,6 +666,7 @@ class Game extends \Table
         $this->getAllPlayers($result);
         $this->getDecks($result);
         $this->getGameData($result);
+        $this->getItemData($result);
 
         return $result;
     }

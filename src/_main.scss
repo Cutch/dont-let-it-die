@@ -41,7 +41,18 @@
   border: 5px solid var(--player-color);
   margin: 0;
 }
+.warning {
+  animation: red-color-transition 2s infinite;
+}
 /* Character Card Stop */
+
+h3 {
+  background: #fff;
+  padding: 0.25rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 0 2px black;
+  margin-bottom: 10px;
+}
 
 /* character Container Start */
 // #character-container {
@@ -52,3 +63,16 @@
 //   justify-content: center;
 // }
 /* Character Container Stop */
+@keyframes red-color-transition {
+  0% {
+    color: #000;
+  }
+
+  70% {
+    color: red;
+  }
+
+  to {
+    color: #000;
+  }
+}

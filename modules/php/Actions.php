@@ -126,7 +126,9 @@ class Actions
                         array_filter(
                             $game->data->items,
                             function ($v, $k) use ($craftingLevel, $craftedItems) {
-                                return $v['type'] == 'item' && $v['craftingLevel'] <= $craftingLevel && $v['count'] < $craftedItems[$k];
+                                return $v['type'] == 'item' &&
+                                    $v['craftingLevel'] <= $craftingLevel &&
+                                    (!isset($craftedItems[$k]) || $v['count'] < $craftedItems[$k]);
                             },
                             ARRAY_FILTER_USE_BOTH
                         )
