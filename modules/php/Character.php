@@ -94,6 +94,14 @@ class Character
         $characterData['isActive'] = $isActive;
         $characterData['isFirst'] = isset($turnOrder[0]) && $turnOrder[0] == $characterData['character_name'];
         $characterData['id'] = $characterData['character_name'];
+        array_walk($this->game->data->characters[$characterData['id']], function ($v, $k) use (&$characterData) {
+            if (str_starts_with($k, 'on') || in_array($k, ['slots', 'skills'])) {
+                // if ($k == 'skills') {
+                //     var_dump(json_encode($v));
+                // }
+                $characterData[$k] = $v;
+            }
+        });
         $_this = $this;
         $characterData['equipment'] = array_map(function ($itemName) use ($_this, $isActive) {
             return ['id' => $itemName, 'isActive' => $isActive, ...$_this->game->data->items[$itemName]];

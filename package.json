@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "dontletitdie.js",
   "scripts": {
+    "start": "npm run watch",
     "build:ts": "tsc",
     "build:scss": "sass --no-source-map src/dontletitdie.scss dontletitdie.css",
     "watch:ts": "tsc --watch",

@@ -6,13 +6,12 @@ if (!function_exists('getUsePerDay')) {
     function getUsePerDay($item, $game)
     {
         $dailyUseItems = $game->globals->get('dailyUseItems');
-        return $dailyUseItems[$item['id']] || 0;
+        return isset($dailyUseItems[$item['id']]) ? $dailyUseItems[$item['id']] : 0;
     }
     function usePerDay($item, $game)
     {
-        $dailyUseItems = $game->globals->get('dailyUseItems');
-        $dailyUseItems[$item['id']] = ($dailyUseItems[$item['id']] || 0) + 1;
-        $game->globals->set('dailyUseItems', $dailyUseItems);
+        $count = getUsePerDay($item, $game) + 1;
+        $game->globals->set('dailyUseItems', $count);
     }
 }
 $itemsData = [

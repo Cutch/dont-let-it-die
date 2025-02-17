@@ -194,6 +194,15 @@ class Game extends \Table
             'gameData' => $this->getAllDatas(),
         ]);
     }
+    public function actUseSkill(string $skillId): void
+    {
+        $this->actions->validateCanRunAction('actUseSkill', $skillId);
+        $character = $this->character->getActivateCharacter();
+        $this->notify->all('skillUsed', clienttranslate('${player_name} - ${character_name} used the skill ${skill_name}'), [
+            'gameData' => $this->getAllDatas(),
+            'skill_name' => $character['skills'][$skillId]['name'],
+        ]);
+    }
     public function actDrawGather(): void
     {
         $this->actDraw('gather');
@@ -216,19 +225,29 @@ class Game extends \Table
         $character = $this->character->getActivateCharacter();
         $roll = $this->rollFireDie($character);
         $this->adjustResource('fkp', $roll);
-        $staminaCost = $this->actions->getActionStaminaCost('actInvestigateFire');
-        $this->character->updateCharacterData($character['character_name'], function (&$data) use ($staminaCost) {
-            $data['stamina'] -= $staminaCost;
+        $cost = $this->actions->getActionCost('actInvestigateFire');
+        $this->character->updateCharacterData($character['character_name'], function (&$data) use ($cost) {
+            if (isset($cost['stamina'])) {
+                $data['stamina'] -= $cost['stamina'];
+            }
+            if (isset($cost['health'])) {
+                $data['health'] -= $cost['health'];
+            }
         });
     }
     public function actDraw(string $deck): void
     {
         $this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
-        $staminaCost = $this->actions->getActionStaminaCost('actDraw' . ucfirst($deck));
+        $cost = $this->actions->getActionCost('actDraw' . ucfirst($deck));
         $character = $this->character->getActivateCharacter();
         $card = $this->decks->pickCard($deck);
-        $this->character->updateCharacterData($character['character_name'], function (&$data) use ($staminaCost) {
-            $data['stamina'] -= $staminaCost;
+        $this->character->updateCharacterData($character['character_name'], function (&$data) use ($cost) {
+            if (isset($cost['stamina'])) {
+                $data['stamina'] -= $cost['stamina'];
+            }
+            if (isset($cost['health'])) {
+                $data['health'] -= $cost['health'];
+            }
         });
         $this->notify->all('cardDrawn', clienttranslate('${player_name} - ${character_name} drew from the ${deck} deck'), [
             'player_id' => $character['player_id'],
@@ -657,9 +676,11 @@ class Game extends \Table
         switch ($this->gamestate->state()['name']) {
             case 'playerTurn':
                 $result['actions'] = $this->actions->getValidActions('player');
+                $result['availableSkills'] = $this->actions->getAvailableCharacterSkills();
                 break;
             case 'resolveEncounter':
                 $result['actions'] = $this->actions->getValidActions('encounter');
+                $result['availableSkills'] = $this->actions->getAvailableCharacterSkills();
                 break;
         }
         $this->getAllCharacters($result);

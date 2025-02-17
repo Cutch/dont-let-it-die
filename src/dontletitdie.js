@@ -92,6 +92,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           playerSideContainer.querySelector(`.equipment .value`).innerHTML = equipments.map((d) => d.options.name).join(', ') || 'None';
           playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
         }
+        document.querySelector(`#${characterSideId} .first-player-marker`).style['display'] = character?.isFirst ? 'inline-block' : 'none';
         // Player main board
         if (gameData.gamestate.name !== 'characterSelect') {
           const container = document.getElementById(`player-container-${Math.floor(i / 2) + 1}`);
@@ -119,9 +120,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           document.querySelector(`#player-${character.name} .card`).style['outline'] = character?.isActive
             ? `5px solid #${character.playerColor}`
             : '';
-          document.querySelector(`#${characterSideId} .first-player-marker`).style['display'] = character?.isFirst
-            ? 'inline-block'
-            : 'none';
           document.querySelector(`#player-${character.name} > .first-player-marker`).style['display'] = character?.isFirst
             ? 'block'
             : 'none';
@@ -455,20 +453,41 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
     //
+    getActionCostHTML: function (action) {
+      let cost = '';
+      if (action['stamina']) cost = ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
+      else if (action['health']) cost = ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
+      return cost;
+    },
     onUpdateActionButtons: function (stateName, args) {
       const actions = args?.actions;
-      console.log('onUpdateActionButtons', actions, stateName);
+      // this.currentActions = actions;
+      console.log('onUpdateActionButtons', args, actions, stateName);
       $isActive = this.isCurrentPlayerActive();
       if ($isActive && stateName && actions != null) {
         this.removeActionButtons();
 
         // Add test action buttons in the action status bar, simulating a card click:
         if (actions)
-          Object.keys(actions).forEach((action) =>
-            this.statusBar.addActionButton(`${_(actionMappings[action])} <i class="fa fa-bolt dlid__stamina"></i> ${actions[action]}`, () =>
-              this.bgaPerformAction(action),
-            ),
-          );
+          Object.keys(actions).forEach((action) => {
+            const cost = this.getActionCostHTML(actions[action]);
+            return this.statusBar.addActionButton(`${_(actionMappings[action])}${cost}`, () => {
+              if (action === 'actUseSkill') {
+                this.removeActionButtons();
+                Object.values(args.availableSkills).forEach((skill) => {
+                  const cost = this.getActionCostHTML(skill);
+                  this.statusBar.addActionButton(`${_(skill.name)}${cost}`, () => {
+                    return this.bgaPerformAction(action, { skillId: skill.id });
+                  });
+                });
+                this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
+              } else if (action === 'actTrade') {
+              } else if (action === 'actCraft') {
+              } else {
+                return this.bgaPerformAction(action);
+              }
+            });
+          });
         switch (stateName) {
           case 'tradePhase':
             this.statusBar.addActionButton(_('Done'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });

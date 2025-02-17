@@ -18,11 +18,12 @@ class Hooks
         $activeNightCards = $this->game->getActiveNightCards();
         $buildings = $this->game->getBuildings();
         $characters = $this->game->character->getAllCharacterData();
-        $equipment = array_values(
+        $activeCharacter = array_values(
             array_filter($characters, function ($c) {
                 return $c['isActive'];
             })
-        )[0]['equipment'];
+        );
+        $equipment = isset($activeCharacter[0]) ? $activeCharacter[0]['equipment'] : [];
         $array = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$equipment];
         foreach ($array as $i => $object) {
             if (isset($data[$functionName])) {
@@ -35,7 +36,7 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onGetActionStaminaCost(&$data)
+    function onGetActionCost(&$data)
     {
         $this->callHooks(__FUNCTION__, $data);
         return $data;

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
+include dirname(__DIR__) . '/data/Utils.php';
 class Data
 {
     public array $decks;
@@ -32,20 +33,13 @@ class Data
             }
             return array_search($data['expansion'], $expansionList) <= $expansionI;
         };
-        $this->decks = $this->addId(array_filter($decksData, $expansionFilter));
-        $this->characters = $this->addId(array_filter($charactersData, $expansionFilter));
-        $this->tokens = $this->addId(array_filter($tokensData, $expansionFilter));
-        $this->boards = $this->addId(array_filter($boardsData, $expansionFilter));
-        $this->knowledgeTree = $this->addId(array_filter($knowledgeTreeData, $expansionFilter));
-        $this->items = $this->addId(array_filter($itemsData, $expansionFilter));
-        $this->upgrades = $this->addId(array_filter($upgradesData, $expansionFilter));
-        $this->expansion = $this->addId(array_filter($expansionData, $expansionFilter));
-    }
-    function addId($data)
-    {
-        array_walk($data, function (&$v, $k) {
-            $v['id'] = $k;
-        });
-        return $data;
+        $this->decks = addId(array_filter($decksData, $expansionFilter));
+        $this->characters = addId(array_filter($charactersData, $expansionFilter));
+        $this->tokens = addId(array_filter($tokensData, $expansionFilter));
+        $this->boards = addId(array_filter($boardsData, $expansionFilter));
+        $this->knowledgeTree = addId(array_filter($knowledgeTreeData, $expansionFilter));
+        $this->items = addId(array_filter($itemsData, $expansionFilter));
+        $this->upgrades = addId(array_filter($upgradesData, $expansionFilter));
+        $this->expansion = addId(array_filter($expansionData, $expansionFilter));
     }
 }
