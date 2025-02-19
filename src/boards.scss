@@ -35,6 +35,7 @@
   display: flex;
   gap: 1em;
   flex-flow: row wrap;
+  justify-content: center;
 }
 .token {
   position: relative;
@@ -56,12 +57,12 @@
 .counter {
   top: 0;
   right: 0;
-  transform: translateX(50%);
+  transform: translateX(50%) translateY(-0.5em);
 }
 .warning {
   top: 0;
   left: 0;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-0.5em);
 }
 
 /* Track Board Start*/
@@ -69,16 +70,17 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
+  flex-flow: row wrap;
 }
 #track-marker {
   border-radius: 50%;
   position: absolute;
   top: 236px;
-  left: 166px;
-  width: 2rem;
-  height: 2rem;
-  background-color: #307c42;
-  border: 1px solid #000;
+  left: 167px;
+  width: 1.5em;
+  height: 1.5em;
+  background-color: #000;
+  border: 4px solid #fff;
   transition: top 1.5s linear, transform 1.5s linear;
 }
 #event-deck-container {

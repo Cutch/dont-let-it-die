@@ -6,12 +6,12 @@ const getSpriteSize = (name, scale = 2) => {
   if (rotate) return { width: h / scale, height: w / scale };
   else return { width: w / scale, height: h / scale };
 };
-const renderImage = (name, div, { scale = 2, pos = 'append', card = true, css: extraCss } = {}) => {
+const renderImage = (name, div, { scale = 2, pos = 'append', card = true, css: extraCss = '' } = {}) => {
   // example of adding a div for each player
   if (!allSprites[name]) throw new Error(`Missing image ${name}`);
   const {
     meta: {
-      css,
+      css = '',
       size: { w: spriteWidth, h: spriteHeight },
     },
     frame: { x, y, w, h },
@@ -24,6 +24,21 @@ const renderImage = (name, div, { scale = 2, pos = 'append', card = true, css: e
   const scaledHeight = Math.round(h / scale);
   const scaledSpriteWidth = Math.ceil(spriteWidth / scale);
   const scaledSpriteHeight = Math.ceil(spriteHeight / scale);
+  // if (rotate)
+  //   html = `<div class="card-rotator" style="transform: rotate(${rotate}deg) translate(${scaledWidth + 3}px, ${
+  //     -scaledHeight / 2
+  //   }px);height: ${scaledWidth}px;max-height: ${scaledWidth}px;transform-origin:top;width: ${scaledHeight}px;max-width: ${scaledHeight}px;">
+  //   <div name="${name}-${rotate}" class="image card ${css} ${extraCss} ${
+  //     card ? 'card' : ''
+  //   } ${name}" style="background-size: ${scaledSpriteWidth}px ${scaledSpriteHeight}px;background-position: -${scaledX}px -${scaledY}px;width: 90vw;height: auto; aspect-ratio: ${
+  //     scaledWidth - 1
+  //   } / ${scaledHeight};max-width: ${scaledWidth}px;max-height: ${scaledHeight - 1}px;"></div>
+  //   </div>`;
+  // else
+  //   html = `<div name="${name}" class="image ${css} ${extraCss} ${
+  //     card ? 'card' : ''
+  //   } ${name}" style="background-size: ${scaledSpriteWidth}px ${scaledSpriteHeight}px;background-position: -${scaledX}px -${scaledY}px;width: ${scaledWidth}px;height: ${scaledHeight}px;max-width: ${scaledWidth}px;max-height: ${scaledHeight}px;"></div>`;
+
   if (rotate)
     html = `<div class="card-rotator" style="transform: rotate(${rotate}deg) translate(${scaledWidth + 3}px, ${
       -scaledHeight / 2

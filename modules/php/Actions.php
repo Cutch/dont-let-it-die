@@ -51,8 +51,8 @@ class Actions
                     $variables = $game->globals->getAll();
                     $count = 0;
                     foreach ($array as $key => $value) {
-                        if (isset($variables[$key])) {
-                            $count += $variables[$key];
+                        if (isset($variables[$value])) {
+                            $count += $variables[$value];
                         }
                     }
                     return $count > 0;
@@ -69,11 +69,11 @@ class Actions
                     $variables = $game->globals->getAll();
                     $count = 0;
                     foreach ($array as $key => $value) {
-                        if (isset($variables[$key])) {
-                            $count += $variables[$key];
+                        if (isset($variables[$value['id']])) {
+                            $count += $variables[$value['id']];
                         }
                     }
-                    return $count >= 3;
+                    return $count >= $game->getTradeRatio();
                 },
                 'selectable' => function (Game $game) {
                     return array_values(
@@ -248,8 +248,8 @@ class Actions
                 ];
                 $this->game->hooks->onGetActionCost($actionCost);
                 return $this->checkRequirements($skill) &&
-                    (!isset($cost['stamina']) || $stamina < $actionCost['stamina']) &&
-                    (!isset($cost['health']) || $health < $actionCost['health']);
+                    (!isset($actionCost['stamina']) || $stamina >= $actionCost['stamina']) &&
+                    (!isset($actionCost['health']) || $health >= $actionCost['health']);
             })
         );
     }
@@ -297,6 +297,16 @@ class Actions
             ($actionObj['requires']($this->game, $actionObj, ...$args) &&
                 (!isset($actionObj['state']) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])));
     }
+    public function spendActionCost($action, $subAction = null)
+    {
+        $cost = $this->getActionCost($action, $subAction);
+        if (isset($cost['health'])) {
+            $this->game->character->adjustActiveHealth(-$cost['health']);
+        }
+        if (isset($cost['stamina'])) {
+            $this->game->character->adjustActiveStamina(-$cost['stamina']);
+        }
+    }
     public function validateCanRunAction($action, $subAction = null, ...$args)
     {
         $cost = $this->getActionCost($action, $subAction);
@@ -308,7 +318,7 @@ class Actions
         if (isset($cost['health']) && $health < $cost['health']) {
             throw new BgaUserException($this->game->translate('Not enough health'));
         }
-        if (!$this->checkRequirements($this->getAction($action, $subAction))) {
+        if (!$this->checkRequirements($this->getAction($action, $subAction, ...$args))) {
             throw new BgaUserException($this->game->translate('Can\'t use this action'));
         }
         $validActions = $this->getValidActions();
@@ -328,8 +338,8 @@ class Actions
             $health = $this->game->character->getActiveHealth();
             return in_array($type, $v['type']) &&
                 $this->checkRequirements($v) &&
-                (!isset($cost['stamina']) || $stamina < $actionCost['stamina']) &&
-                (!isset($cost['health']) || $health < $actionCost['health']);
+                (!isset($actionCost['stamina']) || $stamina >= $actionCost['stamina']) &&
+                (!isset($actionCost['health']) || $health >= $actionCost['health']);
         });
         $data = array_column(
             array_map(

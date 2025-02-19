@@ -36,7 +36,24 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.selectedCharacters = [];
       this.mySelectedCharacters = [];
       this.data = [];
+      this.selector = null;
       this.decks = {};
+      this.tradeScreen = new TradeScreen(this);
+      this.craftScreen = new CraftScreen(this);
+      this.resourcesForDisplay = [
+        'wood',
+        'rock',
+        'fiber',
+        'bone',
+        'meat',
+        'meat-cooked',
+        'fish',
+        'fish-cooked',
+        'berry',
+        'berry-cooked',
+        'hide',
+        'fkp',
+      ];
     },
 
     /*
@@ -56,6 +73,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       console.log(gameData);
       if (gameData.gamestate.name === 'characterSelect')
         document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
+      else {
+        if (gameData.characters && !gameData.characters.some((d) => d.name === 'Sig'))
+          this.resourcesForDisplay = this.resourcesForDisplay.filter((d) => !d.includes('fish'));
+      }
       const scale = 3;
       Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character, i) => {
         // Player side board
@@ -108,7 +129,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               <div class="health marker fa fa-heart"></div>
               <div class="max-stamina max-marker"></div>
               <div class="stamina marker fa fa-bolt"></div>
-              <div class="weapon" style="top: ${(60 * 4) / scale}px;left: ${(122 * 4) / scale}px"></div>
+              <div class="weapon" style="top: ${(60 * 4) / scale}px;left: ${(125 * 4) / scale}px"></div>
               <div class="tool" style="top: ${(60 * 4) / scale}px;left: ${(242.5 * 4) / scale}px"></div>
               <div class="slot3" style="top: ${(80 * 4) / scale}px;left: ${(183 * 4) / scale}px"></div>
               <div class="first-player-marker"></div>
@@ -118,7 +139,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             renderImage('skull', document.querySelector(`#player-${character.name} > .first-player-marker`), { scale: 8, pos: 'replace' });
           }
           document.querySelector(`#player-${character.name} .card`).style['outline'] = character?.isActive
-            ? `5px solid #${character.playerColor}`
+            ? `5px solid #fff` //#${character.playerColor}
             : '';
           document.querySelector(`#player-${character.name} > .first-player-marker`).style['display'] = character?.isFirst
             ? 'block'
@@ -176,18 +197,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     disableClick: function (elem) {
       if (!elem.classList.contains('disabled')) elem.classList.add('disabled');
     },
-    addClickListener: function (elem, name, callback) {
-      elem.tabIndex = '0';
-      elem.addEventListener('click', () => {
-        if (!elem.classList.contains('disabled')) callback();
-      });
-      elem.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !elem.classList.contains('disabled')) callback();
-      });
-      elem.classList.add('clickable');
-      elem.role = 'button';
-      elem['aria-label'] = name;
-    },
     updateResources: function (gameData) {
       let elem = document.querySelector(`#board-container .fire-wood`);
       elem.innerHTML = '';
@@ -195,19 +204,18 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         warn: (gameData.game?.['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
       });
       // Shared Resource Pool
-      const resources = ['wood', 'rock', 'fiber', 'bone', 'meat', 'berry', 'hide', 'fkp'];
       elem = document.querySelector(`#shared-resource-container .tokens`);
       if (!elem) {
         document
           .getElementById('game_play_area')
           .insertAdjacentHTML(
             'beforeend',
-            `<div id="shared-resource-container" class="dlid__container"><h3>Shared Resources</h3><div class="tokens"></div></div>`,
+            `<div id="shared-resource-container" class="dlid__container"><h3>${_('Shared Resources')}</h3><div class="tokens"></div></div>`,
           );
         elem = document.querySelector(`#shared-resource-container .tokens`);
       }
       elem.innerHTML = '';
-      resources.forEach((name) => this.updateResource(name, elem, gameData.game?.[name] ?? 0));
+      this.resourcesForDisplay.forEach((name) => this.updateResource(name, elem, gameData.game?.[name] ?? 0));
 
       // Available Resource Pool
       elem = document.querySelector(`#discoverable-container .tokens`);
@@ -216,12 +224,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           .getElementById('game_play_area')
           .insertAdjacentHTML(
             'beforeend',
-            `<div id="discoverable-container" class="dlid__container"><h3>Discoverable Resources</h3><div class="tokens"></div></div>`,
+            `<div id="discoverable-container" class="dlid__container"><h3>${_(
+              'Discoverable Resources',
+            )}</h3><div class="tokens"></div></div>`,
           );
         elem = document.querySelector(`#discoverable-container .tokens`);
       }
       elem.innerHTML = '';
-      resources.forEach((name) => this.updateResource(name, elem, gameData.resourcesAvailable?.[name] ?? 0));
+      this.resourcesForDisplay.forEach((name) => this.updateResource(name, elem, gameData.resourcesAvailable?.[name] ?? 0));
     },
     updateResource: function (name, elem, count, { warn = false } = {}) {
       elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
@@ -229,7 +239,21 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
     },
     updateItems: function (gameData) {
-      gameData.builtEquipment;
+      elem = document.querySelector(`#camp-items-container .items`);
+      if (!elem) {
+        document
+          .getElementById('game_play_area')
+          .insertAdjacentHTML(
+            'beforeend',
+            `<div id="camp-items-container" class="dlid__container"><h3>${_('Camp Items')}</h3><div class="items"></div></div>`,
+          );
+        elem = document.querySelector(`#camp-items-container .items`);
+      }
+      document.getElementById('camp-items-container').style.display = Object.keys(gameData.campEquipment).length > 0 ? '' : 'none';
+      elem.innerHTML = '';
+      Object.keys(gameData.campEquipment).forEach((name) => {
+        this.updateItem(name, elem, gameData.campEquipment?.[name] ?? 0);
+      });
       // Shared Resource Pool
       // Available Resource Pool
       elem = document.querySelector(`#items-container .items`);
@@ -238,7 +262,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           .getElementById('game_play_area')
           .insertAdjacentHTML(
             'beforeend',
-            `<div id="items-container" class="dlid__container"><h3>Craftable Items</h3><div class="items"></div></div>`,
+            `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div></div>`,
           );
         elem = document.querySelector(`#items-container .items`);
       }
@@ -274,7 +298,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           this.decks[deck] = new Deck(deck, document.querySelector(`.board > .${deck}`), 4);
           this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
 
-          this.addClickListener(document.querySelector(`.board .${deck}-back`), `${uppercaseDeck} Deck`, () => {
+          addClickListener(document.querySelector(`.board .${deck}-back`), `${uppercaseDeck} Deck`, () => {
             this.bgaPerformAction(`actDraw${uppercaseDeck}`);
           });
         }
@@ -293,7 +317,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         .sort()
         .forEach((characterName) => {
           renderImage(characterName, elem, { scale: 2, pos: 'append' });
-          this.addClickListener(elem.querySelector(`.${characterName}`), characterName, () => {
+          addClickListener(elem.querySelector(`.${characterName}`), characterName, () => {
             const i = this.mySelectedCharacters.indexOf(characterName);
             if (i >= 0) {
               // Remove selection
@@ -382,6 +406,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       this.setupCharacterSelections(gameData);
       const playArea = document.getElementById('game_play_area');
+      this.selector = new Selector(playArea);
 
       playArea.insertAdjacentHTML(
         'beforeend',
@@ -394,9 +419,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       // Setting up player boards
       playArea.insertAdjacentHTML('beforeend', `<div id="knowledge-container" class="dlid__container"></div>`);
       renderImage(`knowledge-tree-${gameData.difficulty}`, document.getElementById('knowledge-container'));
+      this.updateItems(gameData);
       playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid__container"></div>`);
       renderImage(`instructions`, document.getElementById('instructions-container'));
-      this.updateItems(gameData);
 
       // TODO: Set up your game interface here, according to "gameData"
 
@@ -455,16 +480,16 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     //
     getActionCostHTML: function (action) {
       let cost = '';
-      if (action['stamina']) cost = ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
-      else if (action['health']) cost = ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
+      if (action['stamina'] != null) cost = ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
+      else if (action['health'] != null) cost = ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
       return cost;
     },
     onUpdateActionButtons: function (stateName, args) {
       const actions = args?.actions;
       // this.currentActions = actions;
       console.log('onUpdateActionButtons', args, actions, stateName);
-      $isActive = this.isCurrentPlayerActive();
-      if ($isActive && stateName && actions != null) {
+      const isActive = this.isCurrentPlayerActive();
+      if (isActive && stateName && actions != null) {
         this.removeActionButtons();
 
         // Add test action buttons in the action status bar, simulating a card click:
@@ -482,7 +507,48 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 });
                 this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
               } else if (action === 'actTrade') {
+                this.removeActionButtons();
+                this.tradeScreen.show(args);
+                this.statusBar.addActionButton(_('Trade') + `${cost}`, () => {
+                  if (!this.tradeScreen.hasError()) {
+                    this.bgaPerformAction('actTrade', {
+                      data: JSON.stringify({
+                        offered: this.tradeScreen.getOffered(),
+                        requested: this.tradeScreen.getRequested(),
+                      }),
+                    })
+                      .then(() => this.selector.hide())
+                      .catch(console.error);
+                  }
+                });
+                this.statusBar.addActionButton(
+                  _('Cancel'),
+                  () => {
+                    this.onUpdateActionButtons(stateName, args);
+                    this.selector.hide();
+                  },
+                  { color: 'secondary' },
+                );
               } else if (action === 'actCraft') {
+                this.removeActionButtons();
+                this.craftScreen.show(args);
+                this.statusBar.addActionButton(_('Craft') + `${cost}`, () => {
+                  if (!this.craftScreen.hasError()) {
+                    this.bgaPerformAction('actCraft', {
+                      item: this.craftScreen.getSelectedId(),
+                    })
+                      .then(() => this.selector.hide())
+                      .catch(console.error);
+                  }
+                });
+                this.statusBar.addActionButton(
+                  _('Cancel'),
+                  () => {
+                    this.onUpdateActionButtons(stateName, args);
+                    this.selector.hide();
+                  },
+                  { color: 'secondary' },
+                );
               } else {
                 return this.bgaPerformAction(action);
               }
@@ -511,7 +577,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               );
             break;
           default:
-            if ($isActive) this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
+            if (isActive) this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
             break;
         }
       }

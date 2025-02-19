@@ -108,6 +108,12 @@ class Game extends \Table
     {
         $this->notify->all('nightEvent', clienttranslate($message), $arg);
     }
+    public function getTradeRatio()
+    {
+        $data = ['ratio' => 3];
+        $this->hooks->onGetTradeRatio($data);
+        return $data['ratio'];
+    }
     public function adjustResource($resourceType, $change)
     {
         $currentCount = $this->globals->get($resourceType);
@@ -153,23 +159,142 @@ class Game extends \Table
     {
         $this->characterSelection->actChooseCharacters();
     }
+    public function actCook(array $type): void
+    {
+        $this->actions->validateCanRunAction('actCook', null, $type);
+        $this->adjustResource($type, -1);
+        $this->adjustResource($type . '-cooked', 1);
+        $this->actions->spendActionCost('actCook');
+
+        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} cooked ${amount} ${type}'), [
+            'gameData' => $this->getAllDatas(),
+            'amount' => 1,
+            'type' => $type,
+        ]);
+    }
     public function actSpendFKP(array $resources, $knowledgeId): void
     {
-        $this->actions->validateCanRunAction('actEat', $resources);
+        $this->actions->validateCanRunAction('actSpendFKP', null, $resources);
         $amount = 0;
         foreach ($resources as $type => $count) {
             $amount += $count;
             $this->adjustResource($type, -$count);
         }
+        $this->actions->spendActionCost('actSpendFKP');
         $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} spent ${amount} knowledge on'), [
             'gameData' => $this->getAllDatas(),
             'amount' => $amount,
             'knowledgeId' => $knowledgeId,
         ]);
     }
+    public function actCraft(string $item = null): void
+    {
+        if (!$item) {
+            throw new BgaUserException($this->translate('Select an item'));
+        }
+        $this->actions->validateCanRunAction('actCraft');
+        if (!isset($this->data->items[$item])) {
+            throw new BgaUserException($this->translate('Invalid Item'));
+        }
+        $itemType = $this->data->items[$item]['itemType'];
+        $currentBuildings = $this->globals->get('buildings');
+        if ($itemType == 'building' && sizeof($currentBuildings) > 0) {
+            throw new BgaUserException($this->translate('A building has already been crafted'));
+        }
+        $result = [];
+        $this->getItemData($result);
+        if (!isset($result['availableEquipment'][$item]) || $result['availableEquipment'][$item] == 0) {
+            throw new BgaUserException($this->translate('All of those available items have been crafted'));
+        }
+
+        foreach ($this->data->items[$item]['cost'] as $key => $value) {
+            $this->adjustResource($key, -$value);
+        }
+        $this->actions->spendActionCost('actCraft');
+        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} crafted a ${item_name}'), [
+            'gameData' => $this->getAllDatas(),
+            'item_name' => $this->data->items[$item]['name'],
+        ]);
+        if ($itemType == 'building') {
+            array_push($currentBuildings, $item);
+            $this->globals->set('buildings', $currentBuildings);
+        } else {
+            $character = $this->character->getActivateCharacter();
+            $slotsAllowed = array_count_values($character['slots']);
+            $slotsUsed = array_count_values(
+                array_map(function ($d) {
+                    return $d['itemType'];
+                }, $character['equipment'])
+            );
+            if (
+                (isset($slotsAllowed[$itemType]) ? $slotsAllowed[$itemType] : 0) -
+                    (isset($slotsUsed[$itemType]) ? $slotsUsed[$itemType] : 0) >
+                0
+            ) {
+                $this->character->equipEquipment($character['id'], [$item]);
+            } else {
+                $existingItems = array_map(
+                    function ($d) {
+                        return $d['id'];
+                    },
+                    array_filter($character['equipment'], function ($d) use ($itemType) {
+                        return $d['itemType'] == $itemType;
+                    })
+                );
+                $this->globals->set('state', ['itemType' => $itemType, 'items' => [...$existingItems, $item]]);
+                $this->gamestate->nextState('tooManyItems');
+            }
+            $character = $this->character->getActivateCharacter();
+        }
+    }
+    public function actTrade(string $data): void
+    {
+        extract(json_decode($data, true));
+        $this->actions->validateCanRunAction('actTrade');
+        $offeredSum = 0;
+        foreach ($offered as $key => $value) {
+            $offeredSum += $value;
+        }
+        $requestedSum = 0;
+        foreach ($requested as $key => $value) {
+            $requestedSum += $value;
+        }
+        if ($offeredSum != $this->getTradeRatio()) {
+            throw new BgaUserException(
+                str_replace('${amount}', (string) $this->getTradeRatio(), $this->translate('You must offer ${amount} resources'))
+            );
+        }
+        if ($requestedSum != 1) {
+            throw new BgaUserException($this->translate('You must request only one resource'));
+        }
+        $this->actions->spendActionCost('actTrade');
+        $offeredStr = [];
+        $requestedStr = [];
+        foreach ($offered as $key => $value) {
+            if ($value > 0) {
+                $this->adjustResource($key, -$value);
+                array_push($offeredStr, $this->data->tokens[$key]['name'] . "($value)");
+            }
+        }
+        foreach ($requested as $key => $value) {
+            if ($value > 0) {
+                if (str_contains($key, '-cooked')) {
+                    throw new BgaUserException($this->translate('You cannot trade for a cooked resource'));
+                }
+                $this->adjustResource($key, $value);
+                array_push($requestedStr, $this->data->tokens[$key]['name'] . "($value)");
+            }
+        }
+        // $this->hooks->onTrade($data);
+        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} traded ${offered} for ${requested}'), [
+            'gameData' => $this->getAllDatas(),
+            'offered' => join(', ', $offeredStr),
+            'requested' => join(', ', $requestedStr),
+        ]);
+    }
     public function actEat(array $resources): void
     {
-        $this->actions->validateCanRunAction('actEat', $resources);
+        $this->actions->validateCanRunAction('actEat', null, $resources);
         $type = array_keys($resources)[0];
         $amount = $resources[$type];
         $data = ['amount' => $amount, 'type' => $type, 'health' => $this->data->tokens[$type]['health']];
@@ -198,10 +323,12 @@ class Game extends \Table
     {
         $this->actions->validateCanRunAction('actUseSkill', $skillId);
         $character = $this->character->getActivateCharacter();
+        $skill = $character['skills'][$skillId];
         $this->notify->all('skillUsed', clienttranslate('${player_name} - ${character_name} used the skill ${skill_name}'), [
             'gameData' => $this->getAllDatas(),
-            'skill_name' => $character['skills'][$skillId]['name'],
+            'skill_name' => $skill['name'],
         ]);
+        $skill['onUse']($this, $skill);
     }
     public function actDrawGather(): void
     {
@@ -225,30 +352,15 @@ class Game extends \Table
         $character = $this->character->getActivateCharacter();
         $roll = $this->rollFireDie($character);
         $this->adjustResource('fkp', $roll);
-        $cost = $this->actions->getActionCost('actInvestigateFire');
-        $this->character->updateCharacterData($character['character_name'], function (&$data) use ($cost) {
-            if (isset($cost['stamina'])) {
-                $data['stamina'] -= $cost['stamina'];
-            }
-            if (isset($cost['health'])) {
-                $data['health'] -= $cost['health'];
-            }
-        });
+        $this->actions->spendActionCost('actInvestigateFire');
     }
     public function actDraw(string $deck): void
     {
         $this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
-        $cost = $this->actions->getActionCost('actDraw' . ucfirst($deck));
         $character = $this->character->getActivateCharacter();
         $card = $this->decks->pickCard($deck);
-        $this->character->updateCharacterData($character['character_name'], function (&$data) use ($cost) {
-            if (isset($cost['stamina'])) {
-                $data['stamina'] -= $cost['stamina'];
-            }
-            if (isset($cost['health'])) {
-                $data['health'] -= $cost['health'];
-            }
-        });
+        $this->actions->spendActionCost('actDraw' . ucfirst($deck));
+
         $this->notify->all('cardDrawn', clienttranslate('${player_name} - ${character_name} drew from the ${deck} deck'), [
             'player_id' => $character['player_id'],
             'character_name' => $character['character_name'],
@@ -273,6 +385,10 @@ class Game extends \Table
         $this->gamestate->nextState('endTurn');
     }
 
+    public function argTooManyItems()
+    {
+        return $this->globals->get('state');
+    }
     public function argDrawCard()
     {
         return $this->globals->get('state');
@@ -346,7 +462,7 @@ class Game extends \Table
                 $damageTaken = max($data['willTakeDamage'], 1);
             }
             if ($damageTaken != 0) {
-                $this->character->adjustActiveHealth($damageTaken);
+                $this->character->adjustActiveHealth(-$damageTaken);
             }
             $this->adjustResource('meat', $data['willReceiveMeat']);
             $this->activeCharacterEventLog('defeated a ${name}, took ${damageTaken} damage and gained ${willReceiveMeat} meat', [
@@ -354,7 +470,7 @@ class Game extends \Table
                 'damageTaken' => $damageTaken,
             ]);
         } else {
-            $this->character->adjustActiveHealth($data['willTakeDamage']);
+            $this->character->adjustActiveHealth(-$data['willTakeDamage']);
             $this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);
         }
 
@@ -489,7 +605,11 @@ class Game extends \Table
     public function getFirewoodCost()
     {
         $day = $this->globals->get('day');
-        return (int) (($day - 1) / 3) + 1 - ($day >= 12 ? 1 : 0);
+        if ($this->getTrackDifficulty() == 'normal') {
+            return (int) (($day - 1) / 3) + 1 + ($day == 12 ? 1 : 0);
+        } else {
+            return (int) ($day / 3) + 1 + ($day >= 11 ? 1 : 0) - ($day == 12 ? 1 : 0);
+        }
     }
     public function stMorningPhase()
     {
@@ -498,7 +618,20 @@ class Game extends \Table
             $this->gamestate->nextState('endGame'); // Fail
         }
         $woodNeeded = $this->getFirewoodCost();
+        $difficulty = $this->getTrackDifficulty();
 
+        $healthAmount = 1;
+        if ($difficulty == 'hard') {
+            $healthAmount = 2;
+        }
+        $this->character->adjustAllHealth(-$healthAmount);
+        $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} health'), [
+            'amount' => $healthAmount,
+        ]);
+
+        $this->notify->all('morningPhase', clienttranslate('The fire pit used ${amount} wood'), [
+            'amount' => $woodNeeded,
+        ]);
         if ($this->adjustResource('fireWood', -$woodNeeded) != 0) {
             $this->gamestate->nextState('endGame'); // Fail
         }
@@ -567,11 +700,18 @@ class Game extends \Table
                 }, $data['equipment']);
             }, $this->character->getAllCharacterData())
         );
-        return array_count_values(array_values([...$campEquipment, ...$equippedEquipment]));
+        $equippedCounts = array_count_values(array_values($equippedEquipment));
+        $sums = [];
+        foreach (array_keys($campEquipment + $equippedCounts) as $key) {
+            $sums[$key] =
+                (isset($campEquipment[$key]) ? $campEquipment[$key] : 0) + (isset($equippedCounts[$key]) ? $equippedCounts[$key] : 0);
+        }
+        return $sums;
     }
     public function getItemData(&$result): void
     {
         $result['builtEquipment'] = $this->getCraftedItems();
+        $result['campEquipment'] = $this->globals->get('campEquipment');
         $selectable = $this->actions->getActionSelectable('actCraft');
         $result['availableEquipment'] = array_combine(
             array_map(function ($d) {
@@ -672,6 +812,7 @@ class Game extends \Table
             'difficulty' => $this->getDifficulty(),
             'trackDifficulty' => $this->getTrackDifficulty(),
             'fireWoodCost' => $this->getFirewoodCost(),
+            'tradeRatio' => $this->getTradeRatio(),
         ];
         switch ($this->gamestate->state()['name']) {
             case 'playerTurn':

@@ -13,14 +13,8 @@
  *
  */
 
-.clickable {
-  cursor: pointer;
-}
-.clickable.disabled {
-  cursor: unset;
-}
 #game_play_area {
-  margin: 1em;
+  padding: 1em;
 }
 #game_play_area.hide {
   display: none;

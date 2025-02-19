@@ -1,7 +1,22 @@
 <?php
 
+// class Skill
+// {
+//     public string $id;
+//     public string $characterId;
+//     public function __construct(
+//         public string $name,
+//         public ?string $damage = null,
+//         public ?int $stamina = null,
+//         public Closure $onUse,
+//         public Closure $requires
+//     ) {
+//     }
+//     public function setCharacter($characterId){
+//         $this->characterId = $characterId;
+//     }
+// }
 use Bga\Games\DontLetItDie\Game;
-
 $charactersData = [
     'Gronk' => [
         'type' => 'character',

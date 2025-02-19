@@ -31,6 +31,11 @@ class Hooks
             }
         }
     }
+    function onGetCharacterData(&$data)
+    {
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
     function onGetValidActions(&$data)
     {
         $this->callHooks(__FUNCTION__, $data);
@@ -80,6 +85,11 @@ class Hooks
         return $data;
     }
     function onInvestigateFire(&$data)
+    {
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onGetTradeRatio(&$data)
     {
         $this->callHooks(__FUNCTION__, $data);
         return $data;

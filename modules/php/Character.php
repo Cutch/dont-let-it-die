@@ -106,6 +106,8 @@ class Character
         $characterData['equipment'] = array_map(function ($itemName) use ($_this, $isActive) {
             return ['id' => $itemName, 'isActive' => $isActive, ...$_this->game->data->items[$itemName]];
         }, array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']]));
+
+        // $this->game->hooks->onGetCharacterData($characterData);
         return $characterData;
     }
     public function getCharacterData($name): array
@@ -122,30 +124,30 @@ class Character
             return $characterData;
         }
     }
-    public function equipEquipment($characterName, $equipment): void
+    public function equipEquipment(string $characterName, array $items): void
     {
-        $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
-            $equipment = [...$data['equipment'], ...$equipment];
-            $data['item_1'] = isset($equipment) ? $equipment[0] : null;
-            $data['item_2'] = isset($equipment) ? $equipment[1] : null;
-            $data['item_3'] = isset($equipment) ? $equipment[2] : null;
+        $this->updateCharacterData($characterName, function (&$data) use ($items) {
+            $equipment = [...$data['equipment'], ...$items];
+            $data['item_1'] = isset($equipment[0]) ? $equipment[0] : null;
+            $data['item_2'] = isset($equipment[1]) ? $equipment[1] : null;
+            $data['item_3'] = isset($equipment[2]) ? $equipment[2] : null;
         });
     }
-    public function unequipEquipment($characterName, $equipment): void
+    public function unequipEquipment(string $characterName, array $items): void
     {
-        $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
-            $equipment = array_diff($data['equipment'], array_intersect($data['equipment'], $equipment));
-            $data['item_1'] = isset($equipment) ? $equipment[0] : null;
-            $data['item_2'] = isset($equipment) ? $equipment[1] : null;
-            $data['item_3'] = isset($equipment) ? $equipment[2] : null;
+        $this->updateCharacterData($characterName, function (&$data) use ($items) {
+            $equipment = array_diff($data['equipment'], array_intersect($data['equipment'], $items));
+            $data['item_1'] = isset($equipment[0]) ? $equipment[0] : null;
+            $data['item_2'] = isset($equipment[1]) ? $equipment[1] : null;
+            $data['item_3'] = isset($equipment[2]) ? $equipment[2] : null;
         });
     }
     public function setCharacterEquipment($characterName, $equipment): void
     {
         $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
-            $data['item_1'] = isset($equipment) ? $equipment[0] : null;
-            $data['item_2'] = isset($equipment) ? $equipment[1] : null;
-            $data['item_3'] = isset($equipment) ? $equipment[2] : null;
+            $data['item_1'] = isset($equipment[0]) ? $equipment[0] : null;
+            $data['item_2'] = isset($equipment[1]) ? $equipment[1] : null;
+            $data['item_3'] = isset($equipment[2]) ? $equipment[2] : null;
         });
     }
     public function getActivateCharacter(): array

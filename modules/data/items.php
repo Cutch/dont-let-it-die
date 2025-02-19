@@ -216,6 +216,10 @@ $itemsData = [
         'cost' => [
             'wood' => 1,
         ],
+        'onGetCharacterData' => function (Game $game, $item, $data) {
+            $data['max_stamina'] -= 1;
+            $data['stamina'] = min($data['max_stamina'], $data['stamina']);
+        },
     ],
     'cooking-hut' => [
         'type' => 'item',

@@ -18,8 +18,12 @@
       "src/assets/token-spritesheet.js",
       "src/assets/upgrades-spritesheet.js",
       "src/assets/index.js",
+      "src/utils/clickable.js",
       "src/utils/images.js",
       "src/utils/deck.js",
+      "src/utils/selector.js",
+      "src/screens/craft-screen.js",
+      "src/screens/trade-screen.js",
       "src/dontletitdie.js"
     ]
 }
