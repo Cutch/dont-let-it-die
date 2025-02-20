@@ -19,6 +19,72 @@ const boardsSprites = {
       rotate: 90,
     },
     'knowledge-tree-normal': {
+      upgrades: {
+        'warmth-1': {
+          x: 362,
+          y: 19,
+        },
+        'warmth-2': {
+          x: 512,
+          y: 19,
+        },
+        'warmth-3': {
+          x: 663,
+          y: 19,
+        },
+
+        'cooking-1': {
+          x: 362,
+          y: 89,
+        },
+        'cooking-2': {
+          x: 512,
+          y: 89,
+        },
+        relaxation: {
+          x: 663,
+          y: 89,
+        },
+
+        'crafting-1': {
+          x: 362,
+          y: 162,
+        },
+        'crafting-2': {
+          x: 512,
+          y: 161,
+        },
+        'crafting-3': {
+          x: 663,
+          y: 162,
+        },
+
+        'forage-1': {
+          x: 362,
+          y: 232,
+        },
+        'resource-1': {
+          x: 512,
+          y: 232,
+        },
+        'resource-2': {
+          x: 663,
+          y: 232,
+        },
+
+        'forage-2': {
+          x: 362,
+          y: 300,
+        },
+        'hunt-1': {
+          x: 512,
+          y: 300,
+        },
+        'fire-starter': {
+          x: 663,
+          y: 300,
+        },
+      },
       frame: {
         x: 2897,
         y: 1,

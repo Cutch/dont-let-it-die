@@ -450,7 +450,10 @@ class Game extends \Table
     }
     public function stPostEncounter()
     {
-        $this->gamestate->nextState('playerTurn');
+        $validActions = $this->actions->getValidActions('postEncounter');
+        if (sizeof($validActions) == 0) {
+            $this->gamestate->nextState('playerTurn');
+        }
     }
     public function stResolveEncounter()
     {
@@ -626,20 +629,27 @@ class Game extends \Table
     }
 
     /**
-     * The action method of state `nextCharacter` is called everytime the current game state is set to `nextCharacter`.
+     * The action method of state `nextCharacter` is called every time the current game state is set to `nextCharacter`.
      */
     public function stNextCharacter(): void
     {
         // Retrieve the active player ID.
         $playerId = (int) $this->getActivePlayerId();
-        if ($this->character->isLastCharacter()) {
-            $this->gamestate->nextState('morningPhase');
-        } else {
-            $this->character->activateNextCharacter();
-            $this->giveExtraTime($playerId);
-            $this->gamestate->nextState('nextCharacter');
-
-            $this->notify->all('playerTurn', clienttranslate('${player_name} - ${character_name} begins their turn'), []);
+        while (true) {
+            if ($this->character->isLastCharacter()) {
+                $this->gamestate->nextState('morningPhase');
+                break;
+            } else {
+                $this->character->activateNextCharacter();
+                if ($this->character->getActiveHealth() == 0) {
+                    $this->notify->all('playerTurn', clienttranslate('${player_name} - ${character_name} is incapacitated'), []);
+                } else {
+                    $this->giveExtraTime($playerId);
+                    $this->gamestate->nextState('nextCharacter');
+                    $this->notify->all('playerTurn', clienttranslate('${player_name} - ${character_name} begins their turn'), []);
+                    break;
+                }
+            }
         }
     }
 

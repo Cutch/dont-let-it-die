@@ -270,7 +270,7 @@ class Actions
     }
     /**
      * Get character stamina cost
-     * @return int
+     * @return array
      * @see ./states.inc.php
      */
     public function getActionCost($action, $subAction = null): array

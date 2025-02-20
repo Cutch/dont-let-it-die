@@ -392,11 +392,18 @@ $itemsData = [
             'rock' => 2,
         ],
     ],
-    'item-back-hindrance' => [
+    'stone-hammer' => [
         'type' => 'item',
-        'type' => 'back',
+        'craftingLevel' => 2,
+        'count' => 2,
         'expansion' => 'hindrance',
-        'name' => 'Item Back Hindrance',
+        'name' => 'Stone Hammer',
+        'itemType' => 'tool',
+        'cost' => [
+            'fiber' => 2,
+            'rock' => 2,
+            'wood' => 1,
+        ],
     ],
     'mortar-and-pestle' => [
         'type' => 'item',
@@ -578,18 +585,5 @@ $itemsData = [
         'requires' => function (Game $game, $item) {
             return getUsePerDay($item, $game) < 1;
         },
-    ],
-    'stone-hammer' => [
-        'type' => 'item',
-        'craftingLevel' => 2,
-        'count' => 2,
-        'expansion' => 'hindrance',
-        'name' => 'Stone Hammer',
-        'itemType' => 'tool',
-        'cost' => [
-            'fiber' => 2,
-            'rock' => 2,
-            'wood' => 1,
-        ],
     ],
 ];

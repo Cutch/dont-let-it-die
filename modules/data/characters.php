@@ -282,7 +282,7 @@ $charactersData = [
         },
         'skills' => [
             'skill1' => [
-                'name' => 'Gain 1 Wood',
+                'name' => 'Convert 1 Berry to Fiber',
                 'stamina' => 1,
                 'onUse' => function (Game $game, $skill) {
                     $game->adjustResource('berry', -1);
@@ -306,7 +306,7 @@ $charactersData = [
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    if ($char['isActive']) {
+                    if ($char['isActive'] && $char['health'] < $char['maxHealth']) {
                         return getUsePerDay($char['id'], $game) < 1;
                     }
                 },
