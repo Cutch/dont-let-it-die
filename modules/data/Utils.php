@@ -5,7 +5,7 @@ if (!function_exists('addId')) {
     {
         array_walk($data, function (&$v, $k) {
             $v['id'] = $k;
-            if (isset($v['skills'])) {
+            if (array_key_exists('skills', $v)) {
                 $array = [];
                 array_walk($v['skills'], function ($iv, $ik) use ($k, &$array, $v) {
                     $keyName = $k . $ik;

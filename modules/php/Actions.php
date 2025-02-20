@@ -18,12 +18,12 @@ class Actions
                 'type' => ['player'],
                 'stamina' => 0,
                 'requires' => function (Game $game, $action) use ($_this) {
-                    $variables = $game->globals->getAll();
+                    $variables = $game->gameData->getResources();
                     $array = $_this->getActionSelectable($action['id']);
                     $array = array_filter(
                         $array,
                         function ($v, $k) use ($variables, $_this) {
-                            if (isset($variables[$k])) {
+                            if (array_key_exists($k, $variables)) {
                                 return $v['actEat']['count'] <= $variables[$k];
                             }
                         },
@@ -48,10 +48,10 @@ class Actions
                 'stamina' => 1,
                 'requires' => function (Game $game, $action) use ($_this) {
                     $array = $_this->getActionSelectable($action['id']);
-                    $variables = $game->globals->getAll();
+                    $variables = $game->gameData->getResources();
                     $count = 0;
                     foreach ($array as $key => $value) {
-                        if (isset($variables[$value])) {
+                        if (array_key_exists($value, $variables)) {
                             $count += $variables[$value];
                         }
                     }
@@ -66,7 +66,7 @@ class Actions
                 'stamina' => 1,
                 'requires' => function (Game $game, $action) use ($_this) {
                     $array = $_this->getActionSelectable($action['id']);
-                    $variables = $game->globals->getAll();
+                    $variables = $game->gameData->getResources();
                     $count = 0;
                     foreach ($array as $key => $value) {
                         if (isset($variables[$value['id']])) {
@@ -120,16 +120,22 @@ class Actions
             'actCraft' => [
                 'type' => ['player'],
                 'stamina' => 3,
+                'requires' => function (Game $game) {
+                    $result = [];
+                    $game->getItemData($result);
+                    return sizeof(array_filter(array_values($result['availableEquipment']))) > 0;
+                },
                 'selectable' => function (Game $game) {
                     $craftedItems = $game->getCraftedItems();
-                    $craftingLevel = $game->globals->get('craftingLevel');
+                    $craftingLevel = $game->gameData->getGlobals('craftingLevel');
                     return array_values(
                         array_filter(
                             $game->data->items,
                             function ($v, $k) use ($craftingLevel, $craftedItems) {
+                                // var_dump(json_encode($v['count']), json_encode($craftedItems));
                                 return $v['type'] == 'item' &&
                                     $v['craftingLevel'] <= $craftingLevel &&
-                                    (!isset($craftedItems[$k]) || $v['count'] < $craftedItems[$k]);
+                                    (!array_key_exists($k, $craftedItems) || $craftedItems[$k] < $v['count']);
                             },
                             ARRAY_FILTER_USE_BOTH
                         )
@@ -145,7 +151,7 @@ class Actions
                 'stamina' => 0,
                 'requires' => function (Game $game, $action) use ($_this) {
                     $array = $_this->getActionSelectable($action['id']);
-                    $variables = $game->globals->getAll(...$array);
+                    $variables = $game->gameData->getResources(...$array);
                     return array_sum(
                         array_map(function ($type) use ($variables) {
                             return $variables[$type];
@@ -160,7 +166,7 @@ class Actions
                 'type' => ['player'],
                 'stamina' => 0,
                 'requires' => function (Game $game, $action) use ($_this) {
-                    $wood = $game->globals->get('wood');
+                    $wood = $game->gameData->getResource('wood');
                     return $wood > 0;
                 },
             ],
@@ -183,7 +189,7 @@ class Actions
             'actEquipItem' => [
                 'type' => ['trade'],
                 'requires' => function (Game $game, $action) use ($_this) {
-                    return sizeof($game->globals->get('campEquipment')) > 0;
+                    return sizeof($game->gameData->getGlobals('campEquipment')) > 0;
                 },
             ],
             'actUnEquipItem' => [
@@ -211,7 +217,7 @@ class Actions
     {
         if ($actionId == 'actUseSkill') {
             foreach ($this->game->character->getAllCharacterData() as $k => $char) {
-                if (isset($char['skills']) && isset($char['skills'][$subActionId])) {
+                if (array_key_exists('skills', $char) && isset($char['skills'][$subActionId])) {
                     return $char['skills'][$subActionId];
                 }
             }
@@ -224,8 +230,8 @@ class Actions
     // {
     //     $data = [
     //         'action' => $action,
-    //         'stamina' => isset($this->getAction($action, $subAction)['stamina']) ? $this->getAction($action, $subAction)['stamina'] : null,
-    //         'health' => isset($this->getAction($action, $subAction)['health']) ? $this->getAction($action, $subAction)['health'] : null,
+    //         'stamina' => array_key_exists('stamina', $this->getAction($action, $subAction)) ? $this->getAction($action, $subAction)['stamina'] : null,
+    //         'health' => array_key_exists('health', $this->getAction($action, $subAction)) ? $this->getAction($action, $subAction)['health'] : null,
     //     ];
     //     $this->game->hooks->onGetActionCost($data);
     //     unset($data['action']);
@@ -234,7 +240,7 @@ class Actions
     public function getAvailableCharacterSkills(): array
     {
         $character = $this->game->character->getActivateCharacter();
-        if (!isset($character['skills'])) {
+        if (!array_key_exists('skills', $character)) {
             return [];
         }
         return array_values(
@@ -243,13 +249,13 @@ class Actions
                 $health = $character['health'];
                 $actionCost = [
                     'action' => 'actUseSkill',
-                    'stamina' => isset($skill['stamina']) ? $skill['stamina'] : null,
-                    'health' => isset($skill['health']) ? $skill['health'] : null,
+                    'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
+                    'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
                 ];
                 $this->game->hooks->onGetActionCost($actionCost);
                 return $this->checkRequirements($skill) &&
-                    (!isset($actionCost['stamina']) || $stamina >= $actionCost['stamina']) &&
-                    (!isset($actionCost['health']) || $health >= $actionCost['health']);
+                    (!array_key_exists('stamina', $actionCost) || $stamina >= $actionCost['stamina']) &&
+                    (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
             })
         );
     }
@@ -267,12 +273,16 @@ class Actions
      * @return int
      * @see ./states.inc.php
      */
-    public function getActionCost($action, $subAction = null): ?array
+    public function getActionCost($action, $subAction = null): array
     {
         $data = [
             'action' => $action,
-            'stamina' => isset($this->getAction($action, $subAction)['stamina']) ? $this->getAction($action, $subAction)['stamina'] : null,
-            'health' => isset($this->getAction($action, $subAction)['health']) ? $this->getAction($action, $subAction)['health'] : null,
+            'stamina' => array_key_exists('stamina', $this->getAction($action, $subAction))
+                ? $this->getAction($action, $subAction)['stamina']
+                : null,
+            'health' => array_key_exists('health', $this->getAction($action, $subAction))
+                ? $this->getAction($action, $subAction)['health']
+                : null,
         ];
         $this->game->hooks->onGetActionCost($data);
         unset($data['action']);
@@ -285,25 +295,25 @@ class Actions
 
     public function resetTurnActions()
     {
-        $this->game->globals->set('turnActions', []);
+        $this->game->gameData->set('turnActions', []);
     }
     public function getTurnActions()
     {
-        return $this->game->globals->get('turnActions');
+        return $this->game->gameData->getGlobals('turnActions');
     }
     public function checkRequirements($actionObj, ...$args): bool
     {
         return !array_key_exists('requires', $actionObj) ||
             ($actionObj['requires']($this->game, $actionObj, ...$args) &&
-                (!isset($actionObj['state']) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])));
+                (!array_key_exists('state', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])));
     }
     public function spendActionCost($action, $subAction = null)
     {
         $cost = $this->getActionCost($action, $subAction);
-        if (isset($cost['health'])) {
+        if (array_key_exists('health', $cost)) {
             $this->game->character->adjustActiveHealth(-$cost['health']);
         }
-        if (isset($cost['stamina'])) {
+        if (array_key_exists('stamina', $cost)) {
             $this->game->character->adjustActiveStamina(-$cost['stamina']);
         }
     }
@@ -312,22 +322,22 @@ class Actions
         $cost = $this->getActionCost($action, $subAction);
         $stamina = $this->game->character->getActiveStamina();
         $health = $this->game->character->getActiveHealth();
-        if (isset($cost['stamina']) && $stamina < $cost['stamina']) {
+        if (array_key_exists('stamina', $cost) && $stamina < $cost['stamina']) {
             throw new BgaUserException($this->game->translate('Not enough stamina'));
         }
-        if (isset($cost['health']) && $health < $cost['health']) {
+        if (array_key_exists('health', $cost) && $health < $cost['health']) {
             throw new BgaUserException($this->game->translate('Not enough health'));
         }
         if (!$this->checkRequirements($this->getAction($action, $subAction, ...$args))) {
             throw new BgaUserException($this->game->translate('Can\'t use this action'));
         }
         $validActions = $this->getValidActions();
-        if (!isset($validActions[$action])) {
+        if (!array_key_exists($action, $validActions)) {
             throw new BgaUserException($this->game->translate('This action can not be used this turn'));
         }
-        $turnActions = $this->game->globals->get('turnActions');
+        $turnActions = $this->game->gameData->getGlobals('turnActions');
         $turnActions[$action] = ($turnActions[$action] ?? 0) + 1;
-        $this->game->globals->set('turnActions', $turnActions);
+        $this->game->gameData->set('turnActions', $turnActions);
     }
     public function getValidActions($type = 'player')
     {
@@ -338,8 +348,8 @@ class Actions
             $health = $this->game->character->getActiveHealth();
             return in_array($type, $v['type']) &&
                 $this->checkRequirements($v) &&
-                (!isset($actionCost['stamina']) || $stamina >= $actionCost['stamina']) &&
-                (!isset($actionCost['health']) || $health >= $actionCost['health']);
+                (!array_key_exists('stamina', $actionCost) || $stamina >= $actionCost['stamina']) &&
+                (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
         });
         $data = array_column(
             array_map(

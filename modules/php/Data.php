@@ -28,7 +28,7 @@ class Data
         $expansionI = array_search($expansion, $game::$expansionList);
         $expansionList = $game::$expansionList;
         $expansionFilter = function ($data) use ($expansionI, $expansionList) {
-            if (!isset($data['expansion'])) {
+            if (!array_key_exists('expansion', $data)) {
                 return true;
             }
             return array_search($data['expansion'], $expansionList) <= $expansionI;

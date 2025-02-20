@@ -18,12 +18,15 @@
       "src/assets/token-spritesheet.js",
       "src/assets/upgrades-spritesheet.js",
       "src/assets/index.js",
+      "src/utils/utils.js",
       "src/utils/clickable.js",
       "src/utils/images.js",
       "src/utils/deck.js",
       "src/utils/selector.js",
+      "src/utils/tweening.js",
       "src/screens/craft-screen.js",
       "src/screens/trade-screen.js",
+      "src/screens/too-many-items-screen.js",
       "src/dontletitdie.js"
     ]
 }

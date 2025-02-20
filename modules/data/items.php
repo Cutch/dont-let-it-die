@@ -3,15 +3,16 @@
 use Bga\Games\DontLetItDie\Game;
 
 if (!function_exists('getUsePerDay')) {
-    function getUsePerDay($item, $game)
+    function getUsePerDay(string $itemId, $game)
     {
-        $dailyUseItems = $game->globals->get('dailyUseItems');
-        return isset($dailyUseItems[$item['id']]) ? $dailyUseItems[$item['id']] : 0;
+        $dailyUseItems = $game->gameData->getGlobals('dailyUseItems');
+        return array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] : 0;
     }
-    function usePerDay($item, $game)
+    function usePerDay(string $itemId, $game)
     {
-        $count = getUsePerDay($item, $game) + 1;
-        $game->globals->set('dailyUseItems', $count);
+        $dailyUseItems = $game->gameData->getGlobals('dailyUseItems');
+        $dailyUseItems[$itemId] = array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] + 1 : 1;
+        $game->gameData->set('dailyUseItems', $dailyUseItems);
     }
 }
 $itemsData = [
@@ -70,7 +71,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'fiber') {
-                $game->globals->set('fiber', $game->globals->get('fiber') + 1);
+                $game->gameData->set('fiber', $game->gameData->getResource('fiber') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
@@ -94,7 +95,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'berry') {
-                $game->globals->set('berry', $game->globals->get('berry') + 1);
+                $game->gameData->set('berry', $game->gameData->getResource('berry') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
@@ -193,7 +194,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'wood') {
-                $game->globals->set('wood', $game->globals->get('wood') + 1);
+                $game->gameData->set('wood', $game->gameData->getResource('wood') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
@@ -216,9 +217,11 @@ $itemsData = [
         'cost' => [
             'wood' => 1,
         ],
-        'onGetCharacterData' => function (Game $game, $item, $data) {
-            $data['max_stamina'] -= 1;
-            $data['stamina'] = min($data['max_stamina'], $data['stamina']);
+        'onGetCharacterData' => function (Game $game, $item, &$data) {
+            if ($data['character_name'] == $item['character_name']) {
+                $data['maxStamina'] -= 1;
+                $data['stamina'] = min($data['maxStamina'], $data['stamina']);
+            }
         },
     ],
     'cooking-hut' => [
@@ -247,7 +250,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'meat') {
-                $game->globals->set('meat', $game->globals->get('meat') + 1);
+                $game->gameData->set('meat', $game->gameData->getResource('meat') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
@@ -278,10 +281,10 @@ $itemsData = [
             'wood' => 1,
         ],
         'requires' => function (Game $game, $item) {
-            return $game->globals->get('rock') > 0;
+            return $game->gameData->getResource('rock') > 0;
         },
         'onUse' => function (Game $game, $item) {
-            $game->globals->set('rock', $game->globals->get('rock') - 1);
+            $game->gameData->set('rock', $game->gameData->getResource('rock') - 1);
             $this->notify->all(
                 'usedItem',
                 clienttranslate('${player_name} - ${character_name} used ${item_name} and lost one ${resource_type}'),
@@ -305,7 +308,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'rock') {
-                $game->globals->set('rock', $game->globals->get('rock') + 1);
+                $game->gameData->set('rock', $game->gameData->getResource('rock') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),

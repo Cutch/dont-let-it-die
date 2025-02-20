@@ -24,36 +24,101 @@ use Exception;
 class GameData
 {
     private Game $game;
+    private ?array $resourcesBeforeTransaction = null;
+    private array $cachedGameData = [];
     public function __construct(Game $game)
     {
         $this->game = $game;
+        $this->reload();
+    }
+    public function reload(): void
+    {
+        $this->cachedGameData = $this->game->globals->getAll();
+        if (!$this->resourcesBeforeTransaction && array_key_exists('resources', $this->cachedGameData)) {
+            $this->resourcesBeforeTransaction = $this->cachedGameData['resources'];
+        }
+    }
+    public function getPreviousResources(): array
+    {
+        return $this->resourcesBeforeTransaction;
+    }
+    public function set($name, $value)
+    {
+        $this->game->globals->set($name, $value);
+        $this->cachedGameData[$name] = $value;
+    }
+    public function getGlobals($name): mixed
+    {
+        return $this->cachedGameData[$name];
+    }
+    public function getGlobalsAll(...$names): array
+    {
+        if (sizeof($names) == 0) {
+            return $this->cachedGameData;
+        }
+        return array_filter(
+            $this->cachedGameData,
+            function ($key) use ($names) {
+                return in_array($key, $names);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+    public function setResource($name, $value): void
+    {
+        $this->cachedGameData['resources'][$name] = $value;
+        $this->game->globals->set('resources', $this->cachedGameData['resources']);
+    }
+    public function getResource($name): int
+    {
+        return $this->cachedGameData['resources'][$name];
+    }
+    public function getResources(...$names): array
+    {
+        if (sizeof($names) == 0) {
+            return $this->cachedGameData['resources'];
+        }
+        return array_filter(
+            $this->cachedGameData['resources'],
+            function ($key) use ($names) {
+                return in_array($key, $names);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
     }
     public function setup()
     {
+        $this->game->globals->set('dailyUseItems', []);
         $this->game->globals->set('buildings', []);
-        $this->game->globals->set('fireWood', 0);
         $this->game->globals->set('state', []);
         $this->game->globals->set('unlocks', []);
         $this->game->globals->set('campEquipment', []);
         $this->game->globals->set('activeNightCards', []);
         $this->game->globals->set('day', 1);
-        $this->game->globals->set('wood', 0);
-        $this->game->globals->set('bone', 0);
-        $this->game->globals->set('meat', 0);
-        $this->game->globals->set('meat-cooked', 0);
-        $this->game->globals->set('fish', 0);
-        $this->game->globals->set('fish-cooked', 0);
-        $this->game->globals->set('dino-egg', 0);
-        $this->game->globals->set('dino-egg-cooked', 0);
-        $this->game->globals->set('berry', 0);
-        $this->game->globals->set('berry-cooked', 0);
-        $this->game->globals->set('rock', 0);
-        $this->game->globals->set('stew', 0);
-        $this->game->globals->set('fiber', 0);
-        $this->game->globals->set('hide', 0);
-        $this->game->globals->set('trap', 0);
-        $this->game->globals->set('herb', 0);
-        $this->game->globals->set('fkp', 0);
-        $this->game->globals->set('gem', 0);
+        $this->game->globals->set('craftingLevel', 0);
+        $this->game->gameData->set('turnOrder', []);
+        $this->game->gameData->set('turnNo', 0);
+        $this->game->globals->set('resources', [
+            'fireWood' => 0,
+            'wood' => 0,
+            'bone' => 0,
+            'meat' => 0,
+            'meat-cooked' => 0,
+            'fish' => 0,
+            'fish-cooked' => 0,
+            'dino-egg' => 0,
+            'dino-egg-cooked' => 0,
+            'berry' => 0,
+            'berry-cooked' => 0,
+            'rock' => 0,
+            'stew' => 0,
+            'fiber' => 0,
+            'hide' => 0,
+            'trap' => 0,
+            'herb' => 0,
+            'fkp' => 0,
+            'gem' => 0,
+        ]);
+        $this->reload();
     }
 }

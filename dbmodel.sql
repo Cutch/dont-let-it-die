@@ -93,9 +93,7 @@ CREATE TABLE IF NOT EXISTS `character` (
     `item_2` varchar(20) NULL,
     `item_3` varchar(20) NULL,
     `stamina` int(1) UNSIGNED DEFAULT 0,
-    `max_stamina` int(1) UNSIGNED DEFAULT 0,
     `health` int(1) UNSIGNED DEFAULT 0,
-    `max_health` int(1) UNSIGNED DEFAULT 0,
     `confirmed` int(1) UNSIGNED DEFAULT 0,
     FOREIGN KEY (player_id) REFERENCES player(player_id),
     PRIMARY KEY (`character_name`)

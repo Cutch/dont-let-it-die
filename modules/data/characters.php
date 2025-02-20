@@ -31,7 +31,7 @@ $charactersData = [
                 'stamina' => 0,
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    usePerDay($char, $game);
+                    usePerDay($char['id'], $game);
                     $game->character->adjustActiveStamina(2);
                     $game->character->adjustActiveHealth(-2);
                     $game->activeCharacterEventLog('gained 2 stamina, lost 2 health');
@@ -39,7 +39,7 @@ $charactersData = [
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
-                        return getUsePerDay($char, $game) < 1;
+                        return getUsePerDay($char['id'], $game) < 1;
                     }
                 },
             ],
@@ -96,7 +96,7 @@ $charactersData = [
                 'stamina' => 0,
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    usePerDay($char . 'investigateFire', $game);
+                    usePerDay($char['id'] . 'investigateFire', $game);
                     $game->activeCharacterEventLog('is re-rolling ${active_character_name}\'s fire die', [
                         ...$char,
                         'active_character_name' => $game->character->getActivateCharacter(['character_name']),
@@ -104,7 +104,7 @@ $charactersData = [
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return getUsePerDay($char . 'investigateFire', $game) < 1;
+                    return getUsePerDay($char['id'] . 'investigateFire', $game) < 1;
                 },
             ],
             'skill2' => [
@@ -113,7 +113,7 @@ $charactersData = [
                 'stamina' => 0,
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    usePerDay($char . 'stamina', $game);
+                    usePerDay($char['id'] . 'stamina', $game);
                     $game->activeCharacterEventLog('gave 2 stamina to ${active_character_name}', [
                         ...$char,
                         'active_character_name' => $game->character->getActivateCharacter(['character_name']),
@@ -121,7 +121,7 @@ $charactersData = [
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return !$char['isActive'] && getUsePerDay($char . 'stamina', $game) < 1;
+                    return !$char['isActive'] && getUsePerDay($char['id'] . 'stamina', $game) < 1;
                 },
             ],
         ],
@@ -169,13 +169,13 @@ $charactersData = [
                 'stamina' => 2,
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    usePerDay($char, $game);
+                    usePerDay($char['id'], $game);
                     $game->adjustResource('bone', -1);
                     // TODO: Interrupt and Discard current night event
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return getUsePerDay($char, $game) < 1 && $game->globals->get('bone') > 0;
+                    return getUsePerDay($char['id'], $game) < 1 && $game->gameData->getResource('bone') > 0;
                 },
             ],
         ],
@@ -215,7 +215,7 @@ $charactersData = [
                 'stamina' => 2,
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    usePerDay($char, $game);
+                    usePerDay($char['id'], $game);
                     $game->character->adjustActiveStamina(-2);
                     $game->character->adjustActiveHealth(2);
                     $game->activeCharacterEventLog('gained 2 health, lost 2 stamina');
@@ -224,7 +224,7 @@ $charactersData = [
                     // var_dump(json_encode(['here', $skill]));
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
-                        return getUsePerDay($char, $game) < 1;
+                        return getUsePerDay($char['id'], $game) < 1;
                     }
                 },
             ],
@@ -249,7 +249,7 @@ $charactersData = [
                 'stamina' => 2,
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    usePerDay($char, $game);
+                    usePerDay($char['id'], $game);
                     $game->character->adjustActiveStamina(-2);
                     $game->character->adjustActiveHealth(2);
                     $game->activeCharacterEventLog('gained 1 wood');
@@ -257,7 +257,7 @@ $charactersData = [
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
-                        return getUsePerDay($char, $game) < 1;
+                        return getUsePerDay($char['id'], $game) < 1;
                     }
                 },
             ],
@@ -291,7 +291,7 @@ $charactersData = [
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return $char['isActive'] && $game->globals->get('berry') > 0;
+                    return $char['isActive'] && $game->gameData->getResource('berry') > 0;
                 },
             ],
             'skill2' => [
@@ -300,14 +300,14 @@ $charactersData = [
                 'state' => ['postEncounter'],
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    usePerDay($char, $game);
+                    usePerDay($char['id'], $game);
                     $game->character->adjustActiveHealth(2);
                     $game->activeCharacterEventLog('healed by 2');
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
-                        return getUsePerDay($char, $game) < 1;
+                        return getUsePerDay($char['id'], $game) < 1;
                     }
                 },
             ],
@@ -320,13 +320,13 @@ $charactersData = [
         'name' => 'River',
         'slots' => ['weapon', 'tool'],
         'onGetActionCost' => function (Game $game, $char, &$data) {
-            if ($char['isActive'] && $data['action'] == 'actInvestigateFIre' && getUsePerDay($char, $game) < 1) {
+            if ($char['isActive'] && $data['action'] == 'actInvestigateFIre' && getUsePerDay($char['id'], $game) < 1) {
                 $data['stamina'] = 0;
             }
         },
         'onInvestigateFire' => function (Game $game, $char, &$data) {
             if ($char['isActive']) {
-                usePerDay($char, $game);
+                usePerDay($char['id'], $game);
             }
         },
         'onEncounter' => function (Game $game, $char, &$data) {

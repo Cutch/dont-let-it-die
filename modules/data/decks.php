@@ -647,7 +647,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'onUse' => function (Game $game, $object) {
-            $berries = $game->globals->get('berry');
+            $berries = $game->gameData->getResource('berry');
             if ($berries > 0) {
                 $lostBerries = floor($berries / 2);
                 $game->adjustResource('berry', -$lostBerries);
@@ -726,7 +726,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'onUse' => function (Game $game, $object) {
-            $meat = $game->globals->get('meat');
+            $meat = $game->gameData->getResource('meat');
             if ($meat > 0) {
                 $game->adjustResource('meat', -1);
                 $game->nightEventLog('${count} meat is used to distract some sabertooths', ['count' => 1]);
@@ -867,7 +867,10 @@ $decksData = [
             $this->notify->all('cardDrawn', clienttranslate('Drew 2 from the ${deck} deck'), [
                 'deck' => 'hunt',
             ]);
-            $maxDamage = max(isset($card1['damage']) ? $card1['damage'] : 0, isset($card2['damage']) ? $card2['damage'] : 0);
+            $maxDamage = max(
+                array_key_exists('damage', $card1) ? $card1['damage'] : 0,
+                array_key_exists('damage', $card2) ? $card2['damage'] : 0
+            );
             if ($maxDamage > 0) {
                 $game->nightEventLog('Received ${damage}', ['damage' => $maxDamage]);
                 // Choose tribe member to receive damage

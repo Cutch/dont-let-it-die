@@ -40,6 +40,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.decks = {};
       this.tradeScreen = new TradeScreen(this);
       this.craftScreen = new CraftScreen(this);
+      this.tooManyItemsScreen = new TooManyItemsScreen(this);
       this.resourcesForDisplay = [
         'wood',
         'rock',
@@ -198,28 +199,28 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (!elem.classList.contains('disabled')) elem.classList.add('disabled');
     },
     updateResources: function (gameData) {
-      let elem = document.querySelector(`#board-container .fire-wood`);
-      elem.innerHTML = '';
-      this.updateResource('wood', elem, gameData.game?.['fireWood'] ?? 0, {
+      const firewoodElem = document.querySelector(`#board-container .fire-wood`);
+      firewoodElem.innerHTML = '';
+      this.updateResource('wood', firewoodElem, gameData.game?.['fireWood'] ?? 0, {
         warn: (gameData.game?.['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
       });
       // Shared Resource Pool
-      elem = document.querySelector(`#shared-resource-container .tokens`);
-      if (!elem) {
+      let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
+      if (!sharedElem) {
         document
           .getElementById('game_play_area')
           .insertAdjacentHTML(
             'beforeend',
             `<div id="shared-resource-container" class="dlid__container"><h3>${_('Shared Resources')}</h3><div class="tokens"></div></div>`,
           );
-        elem = document.querySelector(`#shared-resource-container .tokens`);
+        sharedElem = document.querySelector(`#shared-resource-container .tokens`);
       }
-      elem.innerHTML = '';
-      this.resourcesForDisplay.forEach((name) => this.updateResource(name, elem, gameData.game?.[name] ?? 0));
+      sharedElem.innerHTML = '';
+      this.resourcesForDisplay.forEach((name) => this.updateResource(name, sharedElem, gameData.game?.[name] ?? 0));
 
       // Available Resource Pool
-      elem = document.querySelector(`#discoverable-container .tokens`);
-      if (!elem) {
+      let availableElem = document.querySelector(`#discoverable-container .tokens`);
+      if (!availableElem) {
         document
           .getElementById('game_play_area')
           .insertAdjacentHTML(
@@ -228,10 +229,26 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               'Discoverable Resources',
             )}</h3><div class="tokens"></div></div>`,
           );
-        elem = document.querySelector(`#discoverable-container .tokens`);
+        availableElem = document.querySelector(`#discoverable-container .tokens`);
       }
-      elem.innerHTML = '';
-      this.resourcesForDisplay.forEach((name) => this.updateResource(name, elem, gameData.resourcesAvailable?.[name] ?? 0));
+      availableElem.innerHTML = '';
+      this.resourcesForDisplay.forEach((name) => this.updateResource(name, availableElem, gameData.resourcesAvailable?.[name] ?? 0));
+      // this.resourcesForDisplay.forEach((name) => {
+      //   this.tweening.addTween(sharedElem.querySelector(`.token.${name}`), availableElem.querySelector(`.token.${name}`), name);
+      // });
+      const prevResources = gameData['game']['prevResources'];
+      if (prevResources['fireWood'] != null && prevResources['fireWood'] < gameData.game['fireWood']) {
+        this.tweening.addTween(sharedElem.querySelector(`.token.wood`), firewoodElem.querySelector(`.token.wood`), 'wood');
+      } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['fireWood']) {
+        this.tweening.addTween(firewoodElem.querySelector(`.token.wood`), availableElem.querySelector(`.token.wood`), 'wood');
+      }
+      this.resourcesForDisplay.forEach((name) => {
+        if (prevResources[name] != null && prevResources[name] < gameData.game[name]) {
+          this.tweening.addTween(availableElem.querySelector(`.token.${name}`), sharedElem.querySelector(`.token.${name}`), name);
+        } else if (prevResources[name] != null && prevResources[name] > gameData.game[name]) {
+          this.tweening.addTween(sharedElem.querySelector(`.token.${name}`), availableElem.querySelector(`.token.${name}`), name);
+        }
+      });
     },
     updateResource: function (name, elem, count, { warn = false } = {}) {
       elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
@@ -239,35 +256,39 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
     },
     updateItems: function (gameData) {
-      elem = document.querySelector(`#camp-items-container .items`);
-      if (!elem) {
+      let campElem = document.querySelector(`#camp-items-container .items`);
+      if (!campElem) {
         document
           .getElementById('game_play_area')
           .insertAdjacentHTML(
             'beforeend',
             `<div id="camp-items-container" class="dlid__container"><h3>${_('Camp Items')}</h3><div class="items"></div></div>`,
           );
-        elem = document.querySelector(`#camp-items-container .items`);
+        campElem = document.querySelector(`#camp-items-container .items`);
       }
       document.getElementById('camp-items-container').style.display = Object.keys(gameData.campEquipment).length > 0 ? '' : 'none';
-      elem.innerHTML = '';
+      campElem.innerHTML = '';
       Object.keys(gameData.campEquipment).forEach((name) => {
-        this.updateItem(name, elem, gameData.campEquipment?.[name] ?? 0);
+        this.updateItem(name, campElem, gameData.campEquipment?.[name] ?? 0);
       });
       // Shared Resource Pool
       // Available Resource Pool
-      elem = document.querySelector(`#items-container .items`);
-      if (!elem) {
+      let availableElem = document.querySelector(`#items-container .items`);
+      if (!availableElem) {
         document
           .getElementById('game_play_area')
           .insertAdjacentHTML(
             'beforeend',
             `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div></div>`,
           );
-        elem = document.querySelector(`#items-container .items`);
+        availableElem = document.querySelector(`#items-container .items`);
       }
-      elem.innerHTML = '';
-      Object.keys(gameData.availableEquipment).forEach((name) => this.updateItem(name, elem, gameData.availableEquipment?.[name] ?? 0));
+      availableElem.innerHTML = '';
+      const keys = Object.keys(gameData.availableEquipment);
+      keys.forEach((name) => this.updateItem(name, availableElem, gameData.availableEquipment?.[name] ?? 0));
+      if (keys.length === 0) {
+        availableElem.innerHTML = `<b>${_('None Available')}</b>`;
+      }
     },
     updateItem: function (name, elem, count) {
       elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
@@ -404,10 +425,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         return { ...acc, [k]: d };
       }, {});
 
-      this.setupCharacterSelections(gameData);
       const playArea = document.getElementById('game_play_area');
+      this.tweening = new Tweening(playArea);
       this.selector = new Selector(playArea);
-
+      this.setupCharacterSelections(gameData);
       playArea.insertAdjacentHTML(
         'beforeend',
         `<div id="players-container" class="dlid__container"><div id="player-container-1" class="inner-container"></div><div id="player-container-2" class="inner-container"></div></div>`,
@@ -437,9 +458,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     onEnteringState: function (stateName, args = {}) {
       args.args = args.args ?? {};
       args.args['gamestate'] = { name: stateName };
+      const isActive = this.isCurrentPlayerActive();
 
       console.log('Entering state: ' + stateName, args);
       switch (stateName) {
+        case 'tooManyItems':
+          if (isActive) this.tooManyItemsScreen.show(args.args);
+          break;
         case 'characterSelect':
           this.selectedCharacters = args.args.characters;
           this.updateCharacterSelections(args.args);
@@ -464,6 +489,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     onLeavingState: function (stateName) {
       console.log('Leaving state: ' + stateName);
       switch (stateName) {
+        case 'tooManyItems':
+          this.selector.hide();
+          break;
         case 'characterSelect':
           dojo.style('character-selector', 'display', 'none');
           dojo.style('game_play_area', 'display', '');
@@ -555,6 +583,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             });
           });
         switch (stateName) {
+          case 'tooManyItems':
+            this.statusBar.addActionButton(_('Send To Camp'), () => {
+              this.bgaPerformAction('actSendToCamp', { sendToCampId: this.tooManyItemsScreen.getSelectedId() }).then(() =>
+                this.selector.hide(),
+              );
+            });
+            break;
           case 'tradePhase':
             this.statusBar.addActionButton(_('Done'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
             break;
@@ -617,8 +652,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       // Example 2: standard notification handling + tell the user interface to wait
       //            during 3 seconds after calling the method in order to let the players
       //            see what is happening in the game.
+
+      dojo.subscribe('activeCharacter', this, 'notification_tokenUsed');
       dojo.subscribe('tokenUsed', this, 'notification_tokenUsed');
-      this.notifqueue.setSynchronous('tokenUsed', 1000);
+      this.notifqueue.setSynchronous('tokenUsed', 500);
       //
     },
     notificationWrapper: function (notification, state) {

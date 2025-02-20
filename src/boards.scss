@@ -53,6 +53,7 @@
   justify-content: center;
   margin: 0;
   padding: 0;
+  z-index: 1;
 }
 .counter {
   top: 0;
@@ -91,7 +92,7 @@
 }
 /* Track Board Stop*/
 
-#items-container .items {
+.items {
   display: flex;
   flex-flow: wrap;
   justify-content: center;

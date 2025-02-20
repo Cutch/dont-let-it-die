@@ -12,21 +12,29 @@ class Hooks
     {
         $this->game = $game;
     }
+
+    private function flatten(array $array)
+    {
+        $return = [];
+        array_walk($array, function ($a) use (&$return) {
+            $return[] = $a;
+        });
+        return $return;
+    }
     private function callHooks($functionName, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
     {
         $unlocks = $this->game->getUnlockedKnowledge();
         $activeNightCards = $this->game->getActiveNightCards();
         $buildings = $this->game->getBuildings();
-        $characters = $this->game->character->getAllCharacterData();
-        $activeCharacter = array_values(
-            array_filter($characters, function ($c) {
-                return $c['isActive'];
-            })
+        $characters = $this->game->character->getAllCharacterData(true);
+        $equipment = $this->flatten(
+            array_map(function ($c) {
+                return $c['equipment'];
+            }, $characters)
         );
-        $equipment = isset($activeCharacter[0]) ? $activeCharacter[0]['equipment'] : [];
         $array = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$equipment];
         foreach ($array as $i => $object) {
-            if (isset($data[$functionName])) {
+            if (array_key_exists($functionName, $object)) {
                 $object[$functionName]($this->game, $object, $data1, $data2 = null, $data3 = null, $data4);
             }
         }

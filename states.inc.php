@@ -91,7 +91,7 @@ $machinestates = [
             'actEndTurn',
             'actUseSkill',
         ],
-        'transitions' => ['drawCard' => 11, 'tooManyItems' => 12, 'endTurn' => 15],
+        'transitions' => ['drawCard' => 11, 'tooManyItems' => 12, 'eat' => 13, 'endTurn' => 15],
     ],
     11 => [
         'name' => 'drawCard',
@@ -104,11 +104,20 @@ $machinestates = [
     ],
     12 => [
         'name' => 'tooManyItems',
-        'description' => clienttranslate('Selecting an Item'),
+        'description' => clienttranslate('${actplayer}(${currentCharacter}) is selecting an Item'),
         'descriptionmyturn' => clienttranslate('Selecting an Item'),
         'type' => 'activeplayer',
         'args' => 'argTooManyItems',
         'possibleactions' => ['actSendToCamp'],
+        'transitions' => ['playerTurn' => 10],
+    ],
+    13 => [
+        'name' => 'eat',
+        'description' => clienttranslate('${actplayer}(${currentCharacter}) is eating'),
+        'descriptionmyturn' => clienttranslate('What is ${currentCharacter} eating'),
+        'type' => 'activeplayer',
+        'args' => 'argEat',
+        'possibleactions' => ['actEatConfirm', 'actCancel'],
         'transitions' => ['playerTurn' => 10],
     ],
     20 => [

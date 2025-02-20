@@ -54,12 +54,10 @@ class CharacterSelection
                     $startsWith = null;
                     extract($this->game->data->characters[$char]);
                     $char = $this->game::escapeStringForDB($char);
-                    return "('$char', $playerId, $stamina, $health, $health, $stamina, '$startsWith')";
+                    return "('$char', $playerId, $stamina, $health, '$startsWith')";
                 }, array_filter($characters))
             );
-            $this->game::DbQuery(
-                "INSERT INTO `character` (`character_name`, `player_id`, `stamina`, `health`, `max_health`, `max_stamina`, `item_1`) VALUES $values"
-            );
+            $this->game::DbQuery("INSERT INTO `character` (`character_name`, `player_id`, `stamina`, `health`, `item_1`) VALUES $values");
         }
         // Notify Players
         $results = [];
@@ -71,7 +69,7 @@ class CharacterSelection
         // Check for bad character name
         foreach ($characters as $index => $char) {
             if ($char) {
-                if (!isset($this->game->data->characters[$char])) {
+                if (!array_key_exists($char, $this->game->data->characters)) {
                     throw new Exception('Bad value for character');
                 }
             }
@@ -100,28 +98,30 @@ class CharacterSelection
     private function setTurnOrder($playerId, $selectedCharacters)
     {
         // Set the character turn order
-        $turnOrder = $this->game->globals->get('turnOrder');
+        $turnOrder = $this->game->gameData->getGlobals('turnOrder');
         $players = $this->game->loadPlayersBasicInfos();
         $playerNo = ((int) $players[$playerId]['player_no']) - 1;
         $playerCount = sizeof($players);
         if ($playerCount == 3) {
             for ($i = 0; $i < ($playerNo > 0 ? 2 : 1); $i++) {
-                $turnOrder[$playerNo + $i + ($playerNo > 0 ? 1 : 0)] = isset($selectedCharacters[$i]) ? $selectedCharacters[$i] : null;
+                $turnOrder[$playerNo + $i + ($playerNo > 0 ? 1 : 0)] = array_key_exists($i, $selectedCharacters)
+                    ? $selectedCharacters[$i]
+                    : null;
             }
         } elseif ($playerCount == 1) {
             for ($i = 0; $i < 4; $i++) {
-                $turnOrder[$playerNo + $i] = isset($selectedCharacters[$i]) ? $selectedCharacters[$i] : null;
+                $turnOrder[$playerNo + $i] = array_key_exists($i, $selectedCharacters) ? $selectedCharacters[$i] : null;
             }
         } elseif ($playerCount == 2) {
             for ($i = 0; $i < 2; $i++) {
-                $turnOrder[$playerNo * 2 + $i] = isset($selectedCharacters[$i]) ? $selectedCharacters[$i] : null;
+                $turnOrder[$playerNo * 2 + $i] = array_key_exists($i, $selectedCharacters) ? $selectedCharacters[$i] : null;
             }
         } elseif ($playerCount == 4) {
             for ($i = 0; $i < 1; $i++) {
-                $turnOrder[$playerNo + $i] = isset($selectedCharacters[$i]) ? $selectedCharacters[$i] : null;
+                $turnOrder[$playerNo + $i] = array_key_exists($i, $selectedCharacters) ? $selectedCharacters[$i] : null;
             }
         }
-        $this->game->globals->set('turnOrder', $turnOrder);
+        $this->game->gameData->set('turnOrder', $turnOrder);
     }
     public function actChooseCharacters(): void
     {

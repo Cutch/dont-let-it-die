@@ -33,8 +33,8 @@ $gameinfos = [
     'suggest_player_number' => null,
 
     // Discourage players to play with these numbers of players. Must be null if there is no such advice.
-    'not_recommend_player_number' => null,
-    // 'not_recommend_player_number' => array( 2, 3 ),      // <= example: this is not recommended to play this game with 2 or 3 players
+    // 'not_recommend_player_number' => null,
+    'not_recommend_player_number' => [3], // <= example: this is not recommended to play this game with 2 or 3 players
 
     // Estimated game duration, in minutes (used only for the launch, afterward the real duration is computed)
     'estimated_duration' => 90,
@@ -43,10 +43,10 @@ $gameinfos = [
     'fast_additional_time' => 30,
 
     // Time in second add to a player when "giveExtraTime" is called (speed profile = medium)
-    'medium_additional_time' => 40,
+    'medium_additional_time' => 60,
 
     // Time in second add to a player when "giveExtraTime" is called (speed profile = slow)
-    'slow_additional_time' => 90,
+    'slow_additional_time' => 120,
 
     // If you are using a tie breaker in your game (using "player_score_aux"), you must describe here
     // the formula used to compute "player_score_aux". This description will be used as a tooltip to explain

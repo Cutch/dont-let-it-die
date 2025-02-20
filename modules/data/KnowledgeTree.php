@@ -5,20 +5,23 @@ use Bga\Games\DontLetItDie\Game;
 $knowledgeTreeData = [
     'warmth-1' => [
         'name' => 'Warmth 1',
-        'onUse' => function (Game $game, $char) {
-            $game->character->updateAllCharacterData('max_stamina', 1);
+        'onGetCharacterData' => function (Game $game, $item, &$data) {
+            $data['maxStamina'] += 1;
+            $data['stamina'] = min($data['maxStamina'], $data['stamina']);
         },
     ],
     'warmth-2' => [
         'name' => 'Warmth 2',
-        'onUse' => function (Game $game, $char) {
-            $game->character->updateAllCharacterData('max_stamina', 1);
+        'onGetCharacterData' => function (Game $game, $item, &$data) {
+            $data['maxStamina'] += 1;
+            $data['stamina'] = min($data['maxStamina'], $data['stamina']);
         },
     ],
     'warmth-3' => [
         'name' => 'Warmth 3',
-        'onUse' => function (Game $game, $char) {
-            $game->character->updateAllCharacterData('max_stamina', 1);
+        'onGetCharacterData' => function (Game $game, $item, &$data) {
+            $data['maxStamina'] += 1;
+            $data['stamina'] = min($data['maxStamina'], $data['stamina']);
         },
     ],
     'spices' => [
@@ -123,7 +126,7 @@ $knowledgeTreeData = [
     'relaxation' => [
         'name' => 'Relaxation',
         'onUse' => function (Game $game, $char) {
-            $game->character->updateAllCharacterData('max_health', 2);
+            $game->character->updateAllCharacterData('maxHealth', 2);
         },
     ],
 ];

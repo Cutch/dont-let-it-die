@@ -6,7 +6,8 @@ namespace Bga\Games\DontLetItDie;
 class Decks
 {
     private Game $game;
-    private $decks;
+    private array $decks;
+    private array $cachedData = [];
     private static $decksNames = [
         'harvest',
         'forage',
@@ -35,29 +36,6 @@ class Decks
             $this->createDeck($deck);
         }
     }
-    public function pickCard(string $deck): array
-    {
-        $topCard = $this->decks[$deck]->getCardOnTop('deck');
-        if (!$topCard) {
-            $this->shuffleInDiscard($deck);
-            $topCard = $this->decks[$deck]->getCardOnTop('deck');
-        }
-        $this->decks[$deck]->moveCards([$topCard['id']], 'discard');
-        $card = $this->getCard($topCard['type_arg']);
-        return $card;
-    }
-    public function getCard($id): array
-    {
-        $card = $this->game->data->decks[$id];
-        $name = '';
-        if (isset($card['resourceType'])) {
-            $name = $this->game->data->tokens[$card['resourceType']]['name'];
-        }
-        if (isset($card['name'])) {
-            $name = $card['name'];
-        }
-        return array_merge($this->game->data->decks[$id], ['id' => $id, 'name' => $name]);
-    }
     protected function createDeck($type)
     {
         $filtered_cards = array_filter(
@@ -82,34 +60,52 @@ class Decks
         $this->decks[$type]->createCards($cards, 'deck');
         $this->decks[$type]->shuffle('deck');
     }
+    public function getCard($id): array
+    {
+        $card = $this->game->data->decks[$id];
+        $name = '';
+        if (array_key_exists('resourceType', $card)) {
+            $name = $this->game->data->tokens[$card['resourceType']]['name'];
+        }
+        if (array_key_exists('name', $card)) {
+            $name = $card['name'];
+        }
+        return array_merge($this->game->data->decks[$id], ['id' => $id, 'name' => $name]);
+    }
     public function getDecksData(): array
     {
         $result = ['decks' => [], 'decksDiscards' => []];
         foreach (self::$decksNames as $i => $deck) {
             $deck = str_replace('-', '', $deck);
-            $result['decks'] = array_merge(
-                $result['decks'],
-                $this->game->getCollectionFromDb(
+            $deckData = null;
+            $discardData = null;
+            if (array_key_exists($deck, $this->cachedData)) {
+                $deckData = $this->cachedData[$deck]['decks'];
+                $discardData = $this->cachedData[$deck]['decksDiscards'];
+            } else {
+                $deckData = $this->game->getCollectionFromDb(
                     'SELECT `card_type` `type`, `card_location` `loc`, count(1) `count` FROM `' .
                         $deck .
                         '` GROUP BY card_type, card_location'
-                )
-            );
-            $result['decksDiscards'] = array_merge(
-                $result['decksDiscards'],
-                $this->game->getCollectionFromDb(
+                );
+                $discardData = $this->game->getCollectionFromDb(
                     "SELECT `card_type` `type`, `card_type_arg` `name`
                 FROM `$deck` a
                 WHERE `card_location` = 'discard' AND `card_location_arg` = (SELECT MAX(`card_location_arg`) FROM `$deck` b WHERE `card_location` = 'discard')"
-                )
-            );
+                );
+                $this->cachedData[$deck] = ['decks' => $deckData, 'decksDiscards' => $discardData];
+            }
+            $result['decks'] = array_merge($result['decks'], $deckData);
+            $result['decksDiscards'] = array_merge($result['decksDiscards'], $discardData);
         }
+        $this->cachedData = $result;
         return $result;
     }
     public function shuffleInDiscard($deck, $notify = true): void
     {
         $this->decks[$deck]->moveAllCardsInLocation('discard', 'deck');
         $this->decks[$deck]->shuffle('deck');
+        unset($this->cachedData[$deck]);
         $results = [];
         $this->game->getDecks($results);
         if ($notify) {
@@ -118,6 +114,18 @@ class Decks
                 'deck' => str_replace('-', ' ', $deck),
             ]);
         }
+    }
+    public function pickCard(string $deck): array
+    {
+        $topCard = $this->decks[$deck]->getCardOnTop('deck');
+        if (!$topCard) {
+            $this->shuffleInDiscard($deck);
+            $topCard = $this->decks[$deck]->getCardOnTop('deck');
+        }
+        $this->decks[$deck]->moveCards([$topCard['id']], 'discard');
+        $card = $this->getCard($topCard['type_arg']);
+        unset($this->cachedData[$deck]);
+        return $card;
     }
     public function discardCards($deck, $callback): void
     {
@@ -135,6 +143,7 @@ class Decks
             ],
             'discard'
         );
+        unset($this->cachedData[$deck]);
         if ($deckCount - sizeof($cards) == 0) {
             $this->shuffleInDiscard($deck);
         }
