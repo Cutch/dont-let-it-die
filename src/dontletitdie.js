@@ -40,6 +40,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.decks = {};
       this.tradeScreen = new TradeScreen(this);
       this.craftScreen = new CraftScreen(this);
+      this.eatScreen = new EatScreen(this);
       this.tooManyItemsScreen = new TooManyItemsScreen(this);
       this.resourcesForDisplay = [
         'wood',
@@ -201,8 +202,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     updateResources: function (gameData) {
       const firewoodElem = document.querySelector(`#board-container .fire-wood`);
       firewoodElem.innerHTML = '';
-      this.updateResource('wood', firewoodElem, gameData.game?.['fireWood'] ?? 0, {
-        warn: (gameData.game?.['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
+      this.updateResource('wood', firewoodElem, gameData.game['resources']['fireWood'] ?? 0, {
+        warn: (gameData.game['resources']['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
       });
       // Shared Resource Pool
       let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
@@ -216,7 +217,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         sharedElem = document.querySelector(`#shared-resource-container .tokens`);
       }
       sharedElem.innerHTML = '';
-      this.resourcesForDisplay.forEach((name) => this.updateResource(name, sharedElem, gameData.game?.[name] ?? 0));
+      this.resourcesForDisplay.forEach((name) => this.updateResource(name, sharedElem, gameData.game['resources'][name] ?? 0));
 
       // Available Resource Pool
       let availableElem = document.querySelector(`#discoverable-container .tokens`);
@@ -232,21 +233,39 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         availableElem = document.querySelector(`#discoverable-container .tokens`);
       }
       availableElem.innerHTML = '';
-      this.resourcesForDisplay.forEach((name) => this.updateResource(name, availableElem, gameData.resourcesAvailable?.[name] ?? 0));
+      this.resourcesForDisplay
+        .filter((elem) => !elem.includes('-cooked'))
+        .forEach((name) => this.updateResource(name, availableElem, gameData.resourcesAvailable?.[name] ?? 0));
       // this.resourcesForDisplay.forEach((name) => {
       //   this.tweening.addTween(sharedElem.querySelector(`.token.${name}`), availableElem.querySelector(`.token.${name}`), name);
       // });
-      const prevResources = gameData['game']['prevResources'];
-      if (prevResources['fireWood'] != null && prevResources['fireWood'] < gameData.game['fireWood']) {
+      const prevResources = gameData.game['prevResources'];
+      if (prevResources['fireWood'] != null && prevResources['fireWood'] < gameData.game['resources']['fireWood']) {
+        // Wood to Firewood
         this.tweening.addTween(sharedElem.querySelector(`.token.wood`), firewoodElem.querySelector(`.token.wood`), 'wood');
-      } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['fireWood']) {
+      } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['resources']['fireWood']) {
+        // Firewood to Wood
         this.tweening.addTween(firewoodElem.querySelector(`.token.wood`), availableElem.querySelector(`.token.wood`), 'wood');
       }
       this.resourcesForDisplay.forEach((name) => {
-        if (prevResources[name] != null && prevResources[name] < gameData.game[name]) {
-          this.tweening.addTween(availableElem.querySelector(`.token.${name}`), sharedElem.querySelector(`.token.${name}`), name);
-        } else if (prevResources[name] != null && prevResources[name] > gameData.game[name]) {
-          this.tweening.addTween(sharedElem.querySelector(`.token.${name}`), availableElem.querySelector(`.token.${name}`), name);
+        if (prevResources[name] != null && prevResources[name] < gameData.game['resources'][name]) {
+          // Discard to Shared Resources
+          this.tweening.addTween(
+            availableElem.querySelector(`.token.${name.replace('-cooked', '')}`),
+            sharedElem.querySelector(`.token.${name}`),
+            name,
+          );
+        } else if (
+          prevResources[name] != null &&
+          prevResources[name] > gameData.game['resources'][name] &&
+          prevResources[name + '-cooked'] > gameData.game['resources'][name]
+        ) {
+          // Shared Resources to Discard
+          this.tweening.addTween(
+            sharedElem.querySelector(`.token.${name}`),
+            availableElem.querySelector(`.token.${name.replace('-cooked', '')}`),
+            name,
+          );
         }
       });
     },
@@ -566,6 +585,29 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                       item: this.craftScreen.getSelectedId(),
                     })
                       .then(() => this.selector.hide())
+                      .catch(console.error);
+                  }
+                });
+                this.statusBar.addActionButton(
+                  _('Cancel'),
+                  () => {
+                    this.onUpdateActionButtons(stateName, args);
+                    this.selector.hide();
+                  },
+                  { color: 'secondary' },
+                );
+              } else if (action === 'actEat') {
+                this.removeActionButtons();
+                this.eatScreen.show(args);
+                this.statusBar.addActionButton(_('Eat') + `${cost}`, () => {
+                  if (!this.eatScreen.hasError()) {
+                    this.bgaPerformAction('actEat', {
+                      resourceType: this.eatScreen.getSelectedId(),
+                    })
+                      .then(() => {
+                        this.onUpdateActionButtons(stateName, args);
+                        this.selector.hide();
+                      })
                       .catch(console.error);
                   }
                 });

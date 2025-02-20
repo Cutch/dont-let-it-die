@@ -78,22 +78,22 @@ $tokensData = [
         'type' => 'resource',
         'name' => 'Dino Egg',
         'cookable' => true,
+        'expansion' => 'hindrance',
         'actEat' => [
             'count' => 2,
             'health' => 1,
             'stamina' => 1,
-            'expansion' => 'hindrance',
         ],
     ],
     'dino-egg-cooked' => [
         'cooked' => 'dino-egg',
         'type' => 'resource',
         'name' => 'Cooked Dino Egg',
+        'expansion' => 'hindrance',
         'actEat' => [
             'count' => 2,
             'health' => 3,
             'stamina' => 1,
-            'expansion' => 'hindrance',
         ],
     ],
     'fish' => [
@@ -128,7 +128,7 @@ $tokensData = [
     'meat-cooked' => [
         'cooked' => 'meat',
         'type' => 'resource',
-        'name' => 'Cooked Cooked',
+        'name' => 'Cooked Meat',
         'actEat' => [
             'count' => 1,
             'health' => 2,

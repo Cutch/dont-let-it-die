@@ -8,7 +8,7 @@ class TradeScreen {
     const resourceCount = Object.keys(this.resourceSelected).reduce((a, name) => a + this.resourceSelected[name], 0);
     const requestedCount = Object.keys(this.resourceRequested).reduce((a, name) => a + this.resourceRequested[name], 0);
     const error = document.querySelector(`#trade-screen .error`);
-    if (resourceCount < this.tradeRatio) {
+    if (resourceCount != this.tradeRatio) {
       error.innerHTML = _('Select ${tradeRatio} of your resources').replace('${tradeRatio}', this.tradeRatio);
       error.style.visibility = '';
       this.error = true;
@@ -88,7 +88,7 @@ class TradeScreen {
         name,
         tradeElem,
         () => this.resourceSelected[name],
-        () => gameData.game?.[name] ?? 0,
+        () => gameData.game['resources'][name] ?? 0,
         (count, max) => {
           this.resourceSelected[name] = Math.min(max(), count() + 1);
           tradeElem.querySelector(`.token-number-counter.${name} .counter`).innerHTML = `${count()}/${max()}`;

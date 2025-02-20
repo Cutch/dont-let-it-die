@@ -22,9 +22,9 @@ class Actions
                     $array = $_this->getActionSelectable($action['id']);
                     $array = array_filter(
                         $array,
-                        function ($v, $k) use ($variables, $_this) {
-                            if (array_key_exists($k, $variables)) {
-                                return $v['actEat']['count'] <= $variables[$k];
+                        function ($v) use ($variables, $_this) {
+                            if (array_key_exists($v['id'], $variables)) {
+                                return $v['actEat']['count'] <= $variables[$v['id']];
                             }
                         },
                         ARRAY_FILTER_USE_BOTH
@@ -288,11 +288,6 @@ class Actions
         unset($data['action']);
         return $data;
     }
-    public function setup()
-    {
-        $this->resetTurnActions();
-    }
-
     public function resetTurnActions()
     {
         $this->game->gameData->set('turnActions', []);

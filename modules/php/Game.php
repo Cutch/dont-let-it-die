@@ -17,6 +17,7 @@
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
+use Bga\GameFramework\Actions\Types\JsonParam;
 
 use BgaUserException;
 use Exception;
@@ -126,7 +127,7 @@ class Game extends \Table
         $currentCount = $this->gameData->getResource($resourceType);
         $maxCount = isset($this->data->tokens[$resourceType]['count']) ? $this->data->tokens[$resourceType]['count'] : 999;
         $newValue = max(min($currentCount + $change, $maxCount), 0);
-        $this->gameData->set($resourceType, $newValue);
+        $this->gameData->setResource($resourceType, $newValue);
         $difference = $currentCount - $newValue + $change;
         return $difference;
     }
@@ -293,9 +294,9 @@ class Game extends \Table
         $this->gamestate->nextState('playerTurn');
     }
 
-    public function actTrade(string $data): void
+    public function actTrade(#[JsonParam] array $data): void
     {
-        extract(json_decode($data, true));
+        extract($data);
         $this->actions->validateCanRunAction('actTrade');
         $offeredSum = 0;
         foreach ($offered as $key => $value) {
@@ -338,19 +339,28 @@ class Game extends \Table
             'requested' => join(', ', $requestedStr),
         ]);
     }
-    public function actEat(array $resources): void
+
+    public function actEat(string $resourceType): void
     {
-        $this->actions->validateCanRunAction('actEat', null, $resources);
-        $type = array_keys($resources)[0];
-        $amount = $resources[$type];
-        $data = ['amount' => $amount, 'type' => $type, 'health' => $this->data->tokens[$type]['health']];
+        $this->actions->validateCanRunAction('actEat', null, $resourceType);
+        $tokenData = $this->data->tokens[$resourceType];
+        $data = ['type' => $resourceType, ...$tokenData['actEat']];
         $this->hooks->onEat($data);
+        if (array_key_exists('health', $data)) {
+            $this->character->adjustActiveHealth($data['health']);
+        }
+        if (array_key_exists('stamina', $data)) {
+            $this->character->adjustActiveStamina($data['stamina']);
+        }
+        $this->adjustResource($data['type'], -$data['count']);
         $this->notify->all(
             'tokenUsed',
-            clienttranslate('${player_name} - ${character_name} ate ${amount} ${type} and gained ${health} health'),
+            clienttranslate('${player_name} - ${character_name} ate ${count} ${token_name} and gained ${health} health') .
+                (array_key_exists('stamina', $data) ? clienttranslate(' and ${stamina} stamina') : ''),
             [
                 'gameData' => $this->getAllDatas(),
                 ...$data,
+                'token_name' => $tokenData['name'],
             ]
         );
     }
@@ -358,8 +368,8 @@ class Game extends \Table
     {
         $this->actions->validateCanRunAction('actAddWood');
         extract($this->gameData->getResources('fireWood', 'wood'));
-        $this->gameData->set('fireWood', min($fireWood + 1, $this->data->tokens['wood']['count']));
-        $this->gameData->set('wood', max($wood - 1, 0));
+        $this->gameData->setResource('fireWood', min($fireWood + 1, $this->data->tokens['wood']['count']));
+        $this->gameData->setResource('wood', max($wood - 1, 0));
 
         $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} added 1 wood to the fire'), [
             'gameData' => $this->getAllDatas(),
@@ -430,7 +440,6 @@ class Game extends \Table
         // at the end of the action, move to the next state
         $this->gamestate->nextState('endTurn');
     }
-
     public function argTooManyItems()
     {
         return [...$this->gameData->getGlobals('state'), 'actions' => []];
@@ -769,6 +778,9 @@ class Game extends \Table
     {
         $result['builtEquipment'] = $this->getCraftedItems();
         $result['campEquipment'] = array_count_values($this->gameData->getGlobals('campEquipment'));
+        $result['eatableFoods'] = array_map(function ($eatable) {
+            return [...$eatable['actEat'], 'id' => $eatable['id']];
+        }, $this->actions->getActionSelectable('actEat'));
         $selectable = $this->actions->getActionSelectable('actCraft');
         $result['availableEquipment'] = array_combine(
             array_map(function ($d) {
@@ -980,5 +992,29 @@ class Game extends \Table
         }
 
         throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
+    }
+    public function giveResources()
+    {
+        $this->globals->set('resources', [
+            'fireWood' => 4,
+            'wood' => 4,
+            'bone' => 8,
+            'meat' => 4,
+            'meat-cooked' => 4,
+            'fish' => 0,
+            'fish-cooked' => 0,
+            'dino-egg' => 0,
+            'dino-egg-cooked' => 0,
+            'berry' => 4,
+            'berry-cooked' => 4,
+            'rock' => 8,
+            'stew' => 0,
+            'fiber' => 8,
+            'hide' => 8,
+            'trap' => 0,
+            'herb' => 0,
+            'fkp' => 40,
+            'gem' => 0,
+        ]);
     }
 }

@@ -790,9 +790,7 @@ $decksData = [
             $game->nightEventLog('No exploring tomorrow');
         },
         'onGetValidActions' => function (Game $game, $object, &$data) {
-            if ($game->actions->getTurnActions()['actDrawExplore'] > 0) {
-                unset($data['actDrawExplore']);
-            }
+            unset($data['actDrawExplore']);
         },
     ],
     'night-event-9_12' => [

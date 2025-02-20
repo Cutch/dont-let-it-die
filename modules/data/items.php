@@ -71,7 +71,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'fiber') {
-                $game->gameData->set('fiber', $game->gameData->getResource('fiber') + 1);
+                $game->gameData->setResource('fiber', $game->gameData->getResource('fiber') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
@@ -95,7 +95,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'berry') {
-                $game->gameData->set('berry', $game->gameData->getResource('berry') + 1);
+                $game->gameData->setResource('berry', $game->gameData->getResource('berry') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
@@ -194,7 +194,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'wood') {
-                $game->gameData->set('wood', $game->gameData->getResource('wood') + 1);
+                $game->gameData->setResource('wood', $game->gameData->getResource('wood') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
@@ -250,7 +250,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'meat') {
-                $game->gameData->set('meat', $game->gameData->getResource('meat') + 1);
+                $game->gameData->setResource('meat', $game->gameData->getResource('meat') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
@@ -284,7 +284,7 @@ $itemsData = [
             return $game->gameData->getResource('rock') > 0;
         },
         'onUse' => function (Game $game, $item) {
-            $game->gameData->set('rock', $game->gameData->getResource('rock') - 1);
+            $game->gameData->setResource('rock', $game->gameData->getResource('rock') - 1);
             $this->notify->all(
                 'usedItem',
                 clienttranslate('${player_name} - ${character_name} used ${item_name} and lost one ${resource_type}'),
@@ -308,7 +308,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $card) {
             if ($card['resourceType'] == 'rock') {
-                $game->gameData->set('rock', $game->gameData->getResource('rock') + 1);
+                $game->gameData->setResource('rock', $game->gameData->getResource('rock') + 1);
                 $this->notify->all(
                     'usedItem',
                     clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),

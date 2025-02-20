@@ -60,6 +60,16 @@
   right: 0;
   transform: translateX(50%) translateY(-0.5em);
 }
+.stamina-counter {
+  bottom: 0;
+  left: 0;
+  transform: translateX(-50%) translateY(0.5em);
+}
+.health-counter {
+  bottom: 0;
+  right: 0;
+  transform: translateX(50%) translateY(0.5em);
+}
 .warning {
   top: 0;
   left: 0;

@@ -1,0 +1,37 @@
+#eat-screen {
+  margin-top: 1rem;
+  .tokens {
+    gap: 1em;
+    margin: 2em;
+  }
+  .token-block {
+    font-size: 18px;
+    background-color: #e7e7e7;
+    border-radius: 10px;
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    padding: 1em;
+    border: 3px solid #000;
+    user-select: none;
+    .label {
+      color: #000;
+    }
+    .requires {
+      margin-bottom: 2px;
+    }
+    .name {
+      text-decoration: underline;
+      padding: 0 1em 0.5em;
+    }
+    .line {
+      align-self: self-start;
+    }
+    .margin {
+      margin: auto;
+    }
+    .token {
+      margin-top: 0.5em;
+    }
+  }
+}

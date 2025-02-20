@@ -3,7 +3,7 @@
 /*
  * From this file, you can edit the various meta-information of your game.
  *
- * Once you modified the file, don't forget to click on "Reload game informations" from the Control Panel in order in can be taken into account.
+ * Once you modified the file, don't forget to click on "Reload game information" from the Control Panel in order in can be taken into account.
  *
  * See documentation about this file here:
  * http://en.doc.boardgamearena.com/Game_meta-information:_gameinfos.inc.php
@@ -20,7 +20,7 @@ $gameinfos = [
     'publisher_website' => 'https://thunkboardgames.com/',
 
     // Board Game Geek ID of the publisher
-    'publisher_bgg_id' => null,
+    'publisher_bgg_id' => 51276,
 
     // Board game geek ID of the game
     'bgg_id' => 248072,

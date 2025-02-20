@@ -98,6 +98,7 @@ class GameData
         $this->game->globals->set('craftingLevel', 0);
         $this->game->gameData->set('turnOrder', []);
         $this->game->gameData->set('turnNo', 0);
+        $this->game->gameData->set('turnActions', []);
         $this->game->globals->set('resources', [
             'fireWood' => 0,
             'wood' => 0,
