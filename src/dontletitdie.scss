@@ -5,6 +5,7 @@
   @include meta.load-css('utils/deck');
   @include meta.load-css('utils/images');
   @include meta.load-css('utils/selector');
+  @include meta.load-css('utils/tooltip');
   @include meta.load-css('utils/tweening');
   @include meta.load-css('screens/craft-screen');
   @include meta.load-css('screens/eat-screen');

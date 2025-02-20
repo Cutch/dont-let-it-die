@@ -23,6 +23,7 @@
       "src/utils/images.js",
       "src/utils/deck.js",
       "src/utils/selector.js",
+      "src/utils/tooltip.js",
       "src/utils/tweening.js",
       "src/screens/craft-screen.js",
       "src/screens/eat-screen.js",

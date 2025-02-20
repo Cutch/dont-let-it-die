@@ -37,6 +37,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.mySelectedCharacters = [];
       this.data = [];
       this.selector = null;
+      this.tooltip = null;
       this.decks = {};
       this.tradeScreen = new TradeScreen(this);
       this.craftScreen = new CraftScreen(this);
@@ -161,6 +162,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           }px;top: ${Math.round((34.5 * 4) / scale) + 2 - (character.stamina == 0 ? (3 * 4) / scale : 0)}px`;
 
           renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), { scale, pos: 'replace' });
+          addClickListener(document.querySelector(`#player-${character.name} > .character`), character.name, () => {
+            this.tooltip.show();
+            renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+          });
           const renderedItems = [];
           const weapon = equipments.find((d) => d.options.itemType === 'weapon');
           if (weapon) {
@@ -168,6 +173,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             renderImage(weapon.id, document.querySelector(`#player-${character.name} > .${weapon.options.itemType}`), {
               scale: scale / 2,
               pos: 'replace',
+            });
+            addClickListener(document.querySelector(`#player-${character.name} > .${weapon.options.itemType}`), weapon.options.name, () => {
+              this.tooltip.show();
+              renderImage(weapon.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
             });
           }
 
@@ -178,6 +187,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               scale: scale / 2,
               pos: 'replace',
             });
+            addClickListener(document.querySelector(`#player-${character.name} > .${tool.options.itemType}`), tool.options.name, () => {
+              this.tooltip.show();
+              renderImage(tool.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+            });
           }
 
           const item3 = equipments.find((d) => !renderedItems.includes(d));
@@ -186,6 +199,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             renderImage(item3.id, document.querySelector(`#player-${character.name} > .${item3.options.itemType}`), {
               scale: scale / 2,
               pos: 'replace',
+            });
+            addClickListener(document.querySelector(`#player-${character.name} > .${item3.options.itemType}`), item3.options.name, () => {
+              this.tooltip.show();
+              renderImage(item3.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
             });
           }
         }
@@ -335,7 +352,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       decks.forEach(({ name: deck }) => {
         if (!this.decks[deck]) {
           const uppercaseDeck = deck[0].toUpperCase() + deck.slice(1);
-          this.decks[deck] = new Deck(deck, document.querySelector(`.board > .${deck}`), 2);
+          this.decks[deck] = new Deck(this, deck, document.querySelector(`.board > .${deck}`), 2);
           this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
 
           addClickListener(document.querySelector(`.board .${deck}-back`), `${uppercaseDeck} Deck`, () => {
@@ -426,7 +443,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       const eventDeckContainer = document.getElementById('event-deck-container');
       decks.forEach(({ name: deck, scale }) => {
         if (!this.decks[deck]) {
-          this.decks[deck] = new Deck(deck, eventDeckContainer.querySelector(`.${deck}`), scale, 'horizontal');
+          this.decks[deck] = new Deck(this, deck, eventDeckContainer.querySelector(`.${deck}`), scale, 'horizontal');
           if (gameData.decksDiscards[deck]?.name) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
         }
       });
@@ -447,6 +464,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       const playArea = document.getElementById('game_play_area');
       this.tweening = new Tweening(playArea);
       this.selector = new Selector(playArea);
+      this.tooltip = new Tooltip(playArea);
       this.setupCharacterSelections(gameData);
       playArea.insertAdjacentHTML(
         'beforeend',

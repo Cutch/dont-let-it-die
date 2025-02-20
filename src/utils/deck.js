@@ -1,5 +1,6 @@
 class Deck {
-  constructor(deck, div, scale = 4, style = 'vertical') {
+  constructor(game, deck, div, scale = 4, style = 'vertical') {
+    this.game = game;
     this.div = div;
     this.scale = scale;
     this.style = style;
@@ -13,12 +14,19 @@ class Deck {
     this.setDiscard(this.topDiscard);
   }
   setDiscard(cardId) {
+    if (this.cleanup) this.cleanup();
     if (!cardId) {
       const { width, height } = getSpriteSize(`${this.deck}-back`, this.scale);
       this.div.querySelector(`.flipped-card`).innerHTML = `<div class="empty-discard" style="width: ${width}px;height: ${height}px;">${_(
         'Discard',
       )}</div>`;
-    } else renderImage(cardId, this.div.querySelector(`.flipped-card`), { scale: this.scale, pos: 'replace' });
+    } else {
+      renderImage(cardId, this.div.querySelector(`.flipped-card`), { scale: this.scale, pos: 'replace' });
+      this.cleanup = addClickListener(this.div.querySelector(`.flipped-card`), cardId, () => {
+        this.game.tooltip.show();
+        renderImage(cardId, this.game.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+      });
+    }
     this.topDiscard = cardId;
   }
   drawCard(cardId) {
