@@ -114,6 +114,7 @@ const charactersSprites = {
     Sig: {
       options: {
         type: 'character',
+        expansion: 'mini-expansion',
       },
       frame: {
         x: 1577,

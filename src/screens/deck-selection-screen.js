@@ -10,6 +10,11 @@ class DeckSelectionScreen {
     return this.error;
   }
   show(gameData) {
+    const deckScaling = {
+      'day-event': 2,
+      'mental-hindrance': 2,
+      'physical-hindrance': 2,
+    };
     let deckSelectionElem = document.querySelector(`#deck-selection-screen .decks`);
     if (!deckSelectionElem) {
       this.game.selector.show();
@@ -23,32 +28,31 @@ class DeckSelectionScreen {
       deckSelectionElem = document.querySelector(`#deck-selection-screen .decks`);
     }
     deckSelectionElem.innerHTML = '';
-    const renderItem = (name, elem, count, selectCallback) => {
+    const renderItem = (name, elem, selectCallback) => {
       elem.insertAdjacentHTML(
         'beforeend',
         `<div class="token-number-counter ${name}">
-            <div class="token ${name}"><div class="counter dot">${count()}</div></div>
-            <div>`,
+            <div class="token ${name}">
+              <div class="data">
+                <div>${_('Deck')}: ${gameData.decks[name].count}</div>
+                <div>${_('Discard')}: ${gameData.decks[name].discardCount}</div>
+              </div>
+            </div>
+          <div>`,
       );
-      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
-      addClickListener(elem.querySelector(`.token.${name}`), this.game.data[name].options.name, () => selectCallback(count));
+      renderImage(name + '-back', elem.querySelector(`.token.${name}`), { scale: deckScaling[name] ?? 1, pos: 'insert' });
+      addClickListener(elem.querySelector(`.token.${name}`), allSprites[name + '-back'].options.name, () => selectCallback());
     };
     Object.keys(gameData.decks).forEach((deckName) => {
-      renderItem(
-        deckName + '-back',
-        deckSelectionElem,
-        () => gameData.availableEquipment[deckName],
-        (count) => {
-          deckSelectionElem.querySelector(`.token-number-counter.${deckName} .counter`).innerHTML = count();
-          if (this.itemSelected) {
-            document.querySelector(`#deck-selection-screen .token.${this.itemSelected} .card`).style['outline'] = '';
-          }
-          this.itemSelected = deckName;
-          if (this.itemSelected) {
-            document.querySelector(`#deck-selection-screen .token.${deckName} .card`).style['outline'] = `5px solid #fff`;
-          }
-        },
-      );
+      renderItem(deckName, deckSelectionElem, () => {
+        if (this.itemSelected) {
+          document.querySelector(`#deck-selection-screen .token.${this.itemSelected} .card`).style['outline'] = '';
+        }
+        this.itemSelected = deckName;
+        if (this.itemSelected) {
+          document.querySelector(`#deck-selection-screen .token.${deckName} .card`).style['outline'] = `5px solid #fff`;
+        }
+      });
     });
   }
 }

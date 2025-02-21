@@ -1,6 +1,7 @@
 class Deck {
-  constructor(game, deck, div, scale = 4, style = 'vertical') {
+  constructor(game, deck, countData, div, scale = 4, style = 'vertical') {
     this.game = game;
+    this.countData = countData;
     this.div = div;
     this.scale = scale;
     this.style = style;
@@ -9,9 +10,21 @@ class Deck {
     this.div.classList.add(this.style === 'vertical' ? 'vertical' : 'horizontal');
     renderImage(`${this.deck}-back`, this.div, { scale: this.scale, pos: 'replace' });
     this.div.insertAdjacentHTML('beforeend', `<div class="flipped-card"></div>`);
+    this.div
+      .querySelector(`.${this.deck}-back`)
+      .insertAdjacentHTML('beforeend', `<div class="deck-counter dot counter">${this.countData.count}</div>`);
     this.drawing = [];
     this.topDiscard = null;
     this.setDiscard(this.topDiscard);
+  }
+  shuffle() {
+    this.topDiscard = null;
+    this.setDiscard();
+  }
+  updateDeckCounts(countData) {
+    this.countData = countData;
+    this.div.querySelector(`.deck-counter`).innerHTML = this.countData.count;
+    this.div.querySelector(`.discard-counter`).innerHTML = this.countData.discardCount;
   }
   setDiscard(cardId) {
     if (this.cleanup) this.cleanup();
@@ -27,6 +40,9 @@ class Deck {
         renderImage(cardId, this.game.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
       });
     }
+    this.div
+      .querySelector(`.flipped-card`)
+      .insertAdjacentHTML('beforeend', `<div class="discard-counter dot counter">${this.countData.discardCount}</div>`);
     this.topDiscard = cardId;
   }
   drawCard(cardId) {

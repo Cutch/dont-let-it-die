@@ -13,26 +13,29 @@ class Decks
         'forage',
         'hunt',
         'gather',
-        'explore',
         'day-event',
         'night-event',
+        'explore',
         'physical-hindrance',
         'mental-hindrance',
     ];
     public function __construct($game)
     {
         $this->game = $game;
-        foreach (self::$decksNames as $i => $deck) {
+        foreach ($this->getAllDeckNames() as $i => $deck) {
             $this->decks[$deck] = $this->game->initDeck(str_replace('-', '', $deck));
         }
     }
     public function getAllDeckNames(): array
     {
-        return self::$decksNames;
+        $_this = $this;
+        return array_filter(self::$decksNames, function ($name) use ($_this) {
+            return array_key_exists($name . '-back', $_this->game->data->decks);
+        });
     }
     public function setup()
     {
-        foreach (self::$decksNames as $i => $deck) {
+        foreach ($this->getAllDeckNames() as $i => $deck) {
             $this->createDeck($deck);
         }
     }
@@ -41,7 +44,7 @@ class Decks
         $filtered_cards = array_filter(
             $this->game->data->decks,
             function ($v, $k) use ($type) {
-                return $v['deck'] == $type && $v['type'] == 'deck';
+                return $v['type'] == 'deck' && $v['deck'] == $type;
             },
             ARRAY_FILTER_USE_BOTH
         );
@@ -75,30 +78,29 @@ class Decks
     public function getDecksData(): array
     {
         $result = ['decks' => [], 'decksDiscards' => []];
-        foreach (self::$decksNames as $i => $deck) {
-            $deck = str_replace('-', '', $deck);
+        foreach ($this->getAllDeckNames() as $i => $deck) {
             $deckData = null;
             $discardData = null;
             if (array_key_exists($deck, $this->cachedData)) {
                 $deckData = $this->cachedData[$deck]['decks'];
                 $discardData = $this->cachedData[$deck]['decksDiscards'];
             } else {
+                $sqlName = str_replace('-', '', $deck);
                 $deckData = $this->game->getCollectionFromDb(
-                    'SELECT `card_type` `type`, `card_location` `loc`, count(1) `count` FROM `' .
-                        $deck .
-                        '` GROUP BY card_type, card_location'
+                    'SELECT `card_type` `type`, sum(CASE WHEN `card_location` = "deck" THEN 1 ELSE 0 END) `count`, sum(CASE WHEN `card_location` = "discard" THEN 1 ELSE 0 END) `discardCount` FROM `' .
+                        $sqlName .
+                        '`'
                 );
                 $discardData = $this->game->getCollectionFromDb(
                     "SELECT `card_type` `type`, `card_type_arg` `name`
-                FROM `$deck` a
-                WHERE `card_location` = 'discard' AND `card_location_arg` = (SELECT MAX(`card_location_arg`) FROM `$deck` b WHERE `card_location` = 'discard')"
+                FROM `$sqlName` a
+                WHERE `card_location` = 'discard' AND `card_location_arg` = (SELECT MAX(`card_location_arg`) FROM `$sqlName` b WHERE `card_location` = 'discard')"
                 );
                 $this->cachedData[$deck] = ['decks' => $deckData, 'decksDiscards' => $discardData];
             }
             $result['decks'] = array_merge($result['decks'], $deckData);
             $result['decksDiscards'] = array_merge($result['decksDiscards'], $discardData);
         }
-        $this->cachedData = $result;
         return $result;
     }
     public function shuffleInDiscard($deck, $notify = true): void
@@ -109,9 +111,16 @@ class Decks
         $results = [];
         $this->game->getDecks($results);
         if ($notify) {
-            $this->game->notify->all('shuffle', clienttranslate('The ${deck} deck is out of cards, shuffling'), [
+            $this->game->notify->all('shuffle', clienttranslate('The ${deck_name} deck is out of cards, shuffling'), [
                 'gameData' => $results,
                 'deck' => str_replace('-', ' ', $deck),
+                'deckName' => $deck,
+            ]);
+        } else {
+            $this->game->notify->all('shuffle', '', [
+                'gameData' => $results,
+                'deck' => $deck,
+                'deck_name' => str_replace('-', ' ', $deck),
             ]);
         }
     }

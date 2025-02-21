@@ -3,53 +3,66 @@
 $expansionData = [
     'day-event-back' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'back',
     ],
     'fish-rule' => [
         'type' => 'rule',
+        'expansion' => 'mini-expansion',
     ],
     'day-event_1_0' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'day-event_1_1' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'day-event_1_10' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'day-event_1_11' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'day-event_1_3' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'daylight-rule' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'rule',
     ],
     'day-event_1_5' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'day-event_1_6' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'day-event_1_7' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'day-event_1_8' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'day-event_1_9' => [
         'deck' => 'day-event',
+        'expansion' => 'mini-expansion',
         'type' => 'deck',
     ],
     'hindrance_1_0' => [

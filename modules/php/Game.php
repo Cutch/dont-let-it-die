@@ -37,7 +37,7 @@ class Game extends \Table
     public Decks $decks;
     public GameData $gameData;
     public Hooks $hooks;
-    public static array $expansionList = ['base', 'hindrance'];
+    public static array $expansionList = ['base', 'mini-expansion', 'hindrance'];
     /**
      * Your global variables labels:
      *
@@ -299,6 +299,18 @@ class Game extends \Table
         $this->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gamestate->nextState('playerTurn');
     }
+    public function actSelectDeck(string $deckName = null): void
+    {
+        if (!$deckName) {
+            throw new BgaUserException($this->translate('Select a deck'));
+        }
+        $this->hooks->onDeckSelection($deckName);
+        $this->gamestate->nextState('playerTurn');
+    }
+    public function actSelectDeckCancel(): void
+    {
+        $this->gamestate->nextState('playerTurn');
+    }
 
     public function actTrade(#[JsonParam] array $data): void
     {
@@ -386,11 +398,16 @@ class Game extends \Table
         $this->actions->validateCanRunAction('actUseSkill', $skillId);
         $character = $this->character->getActivateCharacter();
         $skill = $character['skills'][$skillId];
-        $skill['onUse']($this, $skill, $character);
-        $this->notify->all('updateGameData', clienttranslate('${player_name} - ${character_name} used the skill ${skill_name}'), [
-            'gameData' => $this->getAllDatas(),
-            'skill_name' => $skill['name'],
-        ]);
+        $result = $skill['onUse']($this, $skill, $character);
+        if (!$result || (array_key_exists('spendActionCost', $result) && $result['spendActionCost'] != false)) {
+            $this->actions->spendActionCost('actUseSkill', $skillId);
+        }
+        if (!$result || (array_key_exists('notify', $result) && $result['notify'] != false)) {
+            $this->notify->all('updateGameData', clienttranslate('${player_name} - ${character_name} used the skill ${skill_name}'), [
+                'gameData' => $this->getAllDatas(),
+                'skill_name' => $skill['name'],
+            ]);
+        }
     }
     public function actUseItem(string $skillId): void
     {
@@ -398,11 +415,20 @@ class Game extends \Table
         $character = $this->character->getActivateCharacter();
         $skills = $this->character->getActiveEquipmentSkills();
         $skill = $skills[$skillId];
-        $skill['onUse']($this, $skill, $character);
-        $this->notify->all('updateGameData', clienttranslate('${player_name} - ${character_name} used the item\'s skill ${skill_name}'), [
-            'gameData' => $this->getAllDatas(),
-            'skill_name' => $skill['name'],
-        ]);
+        $result = $skill['onUse']($this, $skill, $character);
+        if (!$result || (array_key_exists('spendActionCost', $result) && $result['spendActionCost'] != false)) {
+            $this->actions->spendActionCost('actUseItem', $skillId);
+        }
+        if (!$result || (array_key_exists('notify', $result) && $result['notify'] != false)) {
+            $this->notify->all(
+                'updateGameData',
+                clienttranslate('${player_name} - ${character_name} used the item\'s skill ${skill_name}'),
+                [
+                    'gameData' => $this->getAllDatas(),
+                    'skill_name' => $skill['name'],
+                ]
+            );
+        }
     }
     public function actDrawGather(): void
     {
@@ -471,6 +497,13 @@ class Game extends \Table
     public function argTooManyItems()
     {
         return [...$this->gameData->getGlobals('state'), 'actions' => []];
+    }
+    public function argDeckSelection()
+    {
+        $result = ['actions' => []];
+        $this->getDecks($result);
+
+        return $result;
     }
     public function argDrawCard()
     {
@@ -857,6 +890,12 @@ class Game extends \Table
     {
         $expansionMapping = self::$expansionList;
         return $expansionMapping[$this->getGameStateValue('expansion')];
+    }
+    public function isValidExpansion(string $expansion)
+    {
+        $expansionI = array_search($this->getExpansion(), $this::$expansionList);
+        $expansionList = $this::$expansionList;
+        return array_search($expansion, $expansionList) <= $expansionI;
     }
     public function getBuildings(): array
     {

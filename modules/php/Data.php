@@ -24,22 +24,21 @@ class Data
         include dirname(__DIR__) . '/data/Items.php';
         include dirname(__DIR__) . '/data/Tokens.php';
         include dirname(__DIR__) . '/data/Upgrades.php';
-        $expansion = $game->getExpansion();
-        $expansionI = array_search($expansion, $game::$expansionList);
-        $expansionList = $game::$expansionList;
-        $expansionFilter = function ($data) use ($expansionI, $expansionList) {
+        $expansionFilter = function ($data) use ($game) {
             if (!array_key_exists('expansion', $data)) {
                 return true;
             }
-            return array_search($data['expansion'], $expansionList) <= $expansionI;
+            return $game->isValidExpansion($data['expansion']);
         };
-        $this->decks = addId(array_filter($decksData, $expansionFilter));
+        $this->decks = array_merge(
+            addId(array_filter($decksData, $expansionFilter)),
+            addId(array_filter($expansionData, $expansionFilter))
+        );
         $this->characters = addId(array_filter($charactersData, $expansionFilter));
         $this->tokens = addId(array_filter($tokensData, $expansionFilter));
         $this->boards = addId(array_filter($boardsData, $expansionFilter));
         $this->knowledgeTree = addId(array_filter($knowledgeTreeData, $expansionFilter));
         $this->items = addId(array_filter($itemsData, $expansionFilter));
         $this->upgrades = addId(array_filter($upgradesData, $expansionFilter));
-        $this->expansion = addId(array_filter($expansionData, $expansionFilter));
     }
 }

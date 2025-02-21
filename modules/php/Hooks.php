@@ -23,7 +23,12 @@ class Hooks
                 return $c['equipment'];
             }, $characters)
         );
-        $array = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$equipment];
+        $skills = array_merge(
+            ...array_map(function ($c) {
+                return $c['skills'];
+            }, $characters)
+        );
+        $array = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$skills, ...$equipment];
         foreach ($array as $i => $object) {
             if (array_key_exists($functionName, $object)) {
                 $object[$functionName]($this->game, $object, $data1, $data2 = null, $data3 = null, $data4);
@@ -89,6 +94,11 @@ class Hooks
         return $data;
     }
     function onGetTradeRatio(&$data)
+    {
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onDeckSelection(&$data)
     {
         $this->callHooks(__FUNCTION__, $data);
         return $data;

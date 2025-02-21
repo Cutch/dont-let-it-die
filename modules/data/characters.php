@@ -141,8 +141,19 @@ $charactersData = [
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
-                        // TODO: Choose a deck
                         // Shuffle it
+                        $game->gameData->set('state', ['id' => $skill['id']]);
+                        $game->gamestate->nextState('deckSelection');
+                        return ['spendActionCost' => false, 'notify' => false];
+                    }
+                },
+                'onDeckSelection' => function (Game $game, $skill, $deckName) {
+                    if ($game->gameData->getGlobals('state')['id'] == $skill['id']) {
+                        $game->decks->shuffleInDiscard($deckName, false);
+                        $game->actions->spendActionCost('actUseSkill', $skill['id']);
+                        $game->activeCharacterEventLog('shuffled the ${deck} deck using their skill', [
+                            'deck' => $deckName,
+                        ]);
                     }
                 },
             ],
@@ -355,6 +366,7 @@ $charactersData = [
         'stamina' => '5',
         'name' => 'Sig',
         'slots' => ['weapon', 'tool'],
+        'expansion' => 'mini-expansion',
     ],
     'Tara' => [
         'type' => 'character',

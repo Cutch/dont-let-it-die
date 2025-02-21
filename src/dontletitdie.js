@@ -288,7 +288,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     },
     updateResource: function (name, elem, count, { warn = false } = {}) {
       elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
-      if (warn) elem.insertAdjacentHTML('beforeend', `<div class="fa fa-exclamation-triangle warning dot"></div>`);
+      if (warn) elem.insertAdjacentHTML('beforeend', `<div class="fa fa-fire warning dot"></div>`);
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
     },
     updateItems: function (gameData) {
@@ -352,7 +352,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       decks.forEach(({ name: deck }) => {
         if (!this.decks[deck]) {
           const uppercaseDeck = deck[0].toUpperCase() + deck.slice(1);
-          this.decks[deck] = new Deck(this, deck, document.querySelector(`.board > .${deck}`), 2);
+          this.decks[deck] = new Deck(this, deck, gameData.decks[deck], document.querySelector(`.board > .${deck}`), 2);
           this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
 
           addClickListener(document.querySelector(`.board .${deck}-back`), `${uppercaseDeck} Deck`, () => {
@@ -418,7 +418,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       let trackContainer = document.getElementById('track-container');
       const decks = [
         { name: 'night-event', expansion: 'base', scale: 1.5 },
-        { name: 'day-event', expansion: 'base', scale: 3 },
+        { name: 'day-event', expansion: 'mini-expansion', scale: 3 },
         { name: 'mental-hindrance', expansion: 'hindrance', scale: 3 },
         { name: 'physical-hindrance', expansion: 'hindrance', scale: 3 },
       ].filter((d) => this.expansions.includes(d.expansion));
@@ -443,8 +443,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       const eventDeckContainer = document.getElementById('event-deck-container');
       decks.forEach(({ name: deck, scale }) => {
         if (!this.decks[deck]) {
-          this.decks[deck] = new Deck(this, deck, eventDeckContainer.querySelector(`.${deck}`), scale, 'horizontal');
+          this.decks[deck] = new Deck(this, deck, gameData.decks[deck], eventDeckContainer.querySelector(`.${deck}`), scale, 'horizontal');
           if (gameData.decksDiscards[deck]?.name) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+        } else {
+          this.decks[deck].updateDeckCounts(gameData.decks[deck]);
         }
       });
     },
@@ -479,7 +481,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updateItems(gameData);
       playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid__container"></div>`);
       renderImage(`instructions`, document.getElementById('instructions-container'));
-      // this.deckSelectionScreen.show(gameData);
       // TODO: Set up your game interface here, according to "gameData"
 
       // Setup game notifications to handle (see "setupNotifications" method below)
@@ -523,6 +524,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'tooManyItems':
           if (isActive) this.tooManyItemsScreen.show(args.args);
           break;
+        case 'deckSelection':
+          if (isActive) this.deckSelectionScreen.show(args.args);
+          break;
         case 'characterSelect':
           this.selectedCharacters = args.args.characters;
           this.updateCharacterSelections(args.args);
@@ -536,6 +540,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           break;
         case 'drawCard':
           this.decks[args.args.deck].drawCard(args.args.card.id);
+          this.decks[args.args.deck].updateDeckCounts(args.args.decks[deck]);
           break;
         case 'dummy':
           break;
@@ -549,6 +554,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       console.log('Leaving state: ' + stateName);
       switch (stateName) {
         case 'tooManyItems':
+          this.selector.hide();
+          break;
+        case 'deckSelection':
           this.selector.hide();
           break;
         case 'characterSelect':
@@ -681,6 +689,20 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             });
           });
         switch (stateName) {
+          case 'deckSelection':
+            this.statusBar.addActionButton(_('Select Deck'), () => {
+              this.bgaPerformAction('actSelectDeck', { deckName: this.deckSelectionScreen.getSelectedId() }).then(() =>
+                this.selector.hide(),
+              );
+            });
+            this.statusBar.addActionButton(
+              _('Cancel'),
+              () => {
+                this.bgaPerformAction('actSelectDeckCancel').then(() => this.selector.hide());
+              },
+              { color: 'secondary' },
+            );
+            break;
           case 'tooManyItems':
             this.statusBar.addActionButton(_('Send To Camp'), () => {
               this.bgaPerformAction('actSendToCamp', { sendToCampId: this.tooManyItemsScreen.getSelectedId() }).then(() =>
@@ -743,6 +765,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       dojo.subscribe('activeCharacter', this, 'notification_tokenUsed');
       dojo.subscribe('tokenUsed', this, 'notification_tokenUsed');
+      dojo.subscribe('shuffle', this, 'notification_shuffle');
       this.notifqueue.setSynchronous('tokenUsed', 500);
       //
     },
@@ -751,6 +774,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (notification.args.gameData) {
         notification.args.gameData.gamestate = notification.args.gamestate;
       }
+    },
+    notification_shuffle: function (notification) {
+      this.notificationWrapper(notification);
+      console.log('notification_shuffle', notification);
+      this.decks[notification.args.deck].shuffle();
+      this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
     },
     notification_updateGameData: function (notification) {
       this.notificationWrapper(notification);

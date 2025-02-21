@@ -2,6 +2,9 @@
   position: relative;
   display: flex;
   gap: 1rem;
+  .card {
+    position: relative;
+  }
 }
 .deck.horizontal {
   flex-direction: row;
@@ -25,6 +28,7 @@
 }
 .flipped-card {
   background-color: transparent;
+  position: relative;
 }
 .empty-discard {
   border-radius: 10px;
