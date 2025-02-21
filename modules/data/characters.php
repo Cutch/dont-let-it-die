@@ -150,8 +150,11 @@ $charactersData = [
         'onEncounter' => function (Game $game, $char, $data) {
             if ($data['encounterHealth'] <= $data['characterDamage']) {
                 $data['stamina'] += 1;
-                $game->activeCharacterEventLog('game 1 stamina to ${active_character_name}', [
-                    'active_character_name' => $game->character->getActivateCharacter(['character_name']),
+
+                $game->notify->all('activeCharacter', clienttranslate('${character_name} gave 1 stamina to ${active_character_name}'), [
+                    'character_name' => $game->character->getActivateCharacter()['character_name'],
+                    'active_character_name' => $char['character_name'],
+                    'gameData' => $game->getAllDatas(),
                 ]);
             }
         },
@@ -221,7 +224,6 @@ $charactersData = [
                     $game->activeCharacterEventLog('gained 2 health, lost 2 stamina');
                 },
                 'requires' => function (Game $game, $skill) {
-                    // var_dump(json_encode(['here', $skill]));
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
                         return getUsePerDay($char['id'], $game) < 1;
@@ -251,7 +253,7 @@ $charactersData = [
                     $char = $game->character->getCharacterData($skill['characterId']);
                     usePerDay($char['id'], $game);
                     $game->character->adjustActiveStamina(-2);
-                    $game->character->adjustActiveHealth(2);
+                    $game->adjustResource('wood', 1);
                     $game->activeCharacterEventLog('gained 1 wood');
                 },
                 'requires' => function (Game $game, $skill) {
@@ -276,12 +278,14 @@ $charactersData = [
         'name' => 'Ayla',
         'slots' => ['weapon', 'tool'],
         'onGetActionCost' => function (Game $game, $char, &$data) {
+            // Tested
             if ($char['isActive'] && $data['action'] == 'actDrawHunt') {
                 $data['stamina'] = 2;
             }
         },
         'skills' => [
             'skill1' => [
+                // Tested
                 'name' => 'Convert 1 Berry to Fiber',
                 'stamina' => 1,
                 'onUse' => function (Game $game, $skill) {
@@ -295,6 +299,7 @@ $charactersData = [
                 },
             ],
             'skill2' => [
+                // Tested
                 'name' => 'Heal 2',
                 'stamina' => 0,
                 'state' => ['postEncounter'],
@@ -307,7 +312,10 @@ $charactersData = [
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive'] && $char['health'] < $char['maxHealth']) {
-                        return getUsePerDay($char['id'], $game) < 1;
+                        $state = $game->gameData->getGlobals('encounterState');
+                        if ($state['killed']) {
+                            return getUsePerDay($char['id'], $game) < 1;
+                        }
                     }
                 },
             ],

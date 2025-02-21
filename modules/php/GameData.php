@@ -26,6 +26,7 @@ class GameData
     private Game $game;
     private ?array $resourcesBeforeTransaction = null;
     private array $cachedGameData = [];
+    private ?array $cachedGameItems = null;
     public function __construct(Game $game)
     {
         $this->game = $game;
@@ -46,6 +47,19 @@ class GameData
     {
         $this->game->globals->set($name, $value);
         $this->cachedGameData[$name] = $value;
+    }
+    public function getItems(): array
+    {
+        if (!$this->cachedGameItems) {
+            $this->cachedGameItems = $this->game->getCollectionFromDb('SELECT item_id, item_name FROM `item`', true);
+        }
+        return $this->cachedGameItems;
+    }
+    public function createItem(string $itemName): int
+    {
+        $this->game::DbQuery("INSERT INTO item (item_name) VALUES ('$itemName')");
+        $this->cachedGameItems[$this->game::DbGetLastId()] = $itemName;
+        return $this->game::DbGetLastId();
     }
     public function getGlobals($name): mixed
     {
@@ -96,9 +110,9 @@ class GameData
         $this->game->globals->set('activeNightCards', []);
         $this->game->globals->set('day', 1);
         $this->game->globals->set('craftingLevel', 0);
-        $this->game->gameData->set('turnOrder', []);
-        $this->game->gameData->set('turnNo', 0);
-        $this->game->gameData->set('turnActions', []);
+        $this->game->globals->set('turnOrder', []);
+        $this->game->globals->set('turnNo', 0);
+        $this->game->globals->set('turnActions', []);
         $this->game->globals->set('resources', [
             'fireWood' => 0,
             'wood' => 0,

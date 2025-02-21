@@ -51,13 +51,12 @@ class CharacterSelection
             $values = join(
                 ', ',
                 array_map(function ($char) use ($playerId) {
-                    $startsWith = null;
                     extract($this->game->data->characters[$char]);
                     $char = $this->game::escapeStringForDB($char);
-                    return "('$char', $playerId, $stamina, $health, '$startsWith')";
+                    return "('$char', $playerId, $stamina, $health)";
                 }, array_filter($characters))
             );
-            $this->game::DbQuery("INSERT INTO `character` (`character_name`, `player_id`, `stamina`, `health`, `item_1`) VALUES $values");
+            $this->game::DbQuery("INSERT INTO `character` (`character_name`, `player_id`, `stamina`, `health`) VALUES $values");
         }
         // Notify Players
         $results = [];
@@ -136,6 +135,11 @@ class CharacterSelection
         $selectedCharactersArgs = [];
         $message = '${player_name} selected ';
         foreach ($selectedCharacters as $index => $value) {
+            if (array_key_exists('startsWith', $this->game->data->characters[$value])) {
+                $itemId = $this->game->gameData->createItem($this->game->data->characters[$value]['startsWith']);
+                $this->game->character->equipEquipment($value, [$itemId]);
+            }
+
             $selectedCharactersArgs['character' . ($index + 1)] = $value;
             if ($index + 1 == sizeof($selectedCharacters)) {
                 $message = $message . ' and ';

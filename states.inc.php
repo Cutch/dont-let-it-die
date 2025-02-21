@@ -90,6 +90,7 @@ $machinestates = [
             'actTrade',
             'actEndTurn',
             'actUseSkill',
+            'actUseItem',
         ],
         'transitions' => ['drawCard' => 11, 'tooManyItems' => 12, 'endTurn' => 15],
     ],
@@ -127,8 +128,8 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('Resolving Encounter'),
         'type' => 'activeplayer',
         'action' => 'stPostEncounter',
-        'args' => 'argResolveEncounter',
-        'possibleactions' => ['actChooseResource', 'actUseItem'],
+        'args' => 'argPostEncounter',
+        'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => ['playerTurn' => 10],
     ],
     15 => [

@@ -34,7 +34,8 @@ class Character
             $values = [];
             foreach ($data as $key => $value) {
                 if (in_array($key, self::$characterColumns)) {
-                    $values[] = "`{$key}` = '{$value}'";
+                    $sqlValue = $value ? "'{$value}'" : 'NULL';
+                    $values[] = "`{$key}` = {$sqlValue}";
                     $this->cachedData[$name][$key] = $value;
                 }
             }
@@ -94,18 +95,27 @@ class Character
         $underlyingCharacterData = $this->game->data->characters[$characterData['id']];
         $characterData['maxStamina'] = $underlyingCharacterData['stamina'];
         $characterData['maxHealth'] = $underlyingCharacterData['health'];
+
         array_walk($underlyingCharacterData, function ($v, $k) use (&$characterData) {
             if (str_starts_with($k, 'on') || in_array($k, ['slots', 'skills'])) {
                 $characterData[$k] = $v;
             }
         });
         $_this = $this;
-        $characterData['equipment'] = array_map(function ($itemName) use ($_this, $isActive, $characterName) {
-            // var_dump($itemName);
+        $characterData['equipment'] = array_map(function ($itemId) use ($_this, $isActive, $characterName) {
+            $itemName = $this->game->gameData->getItems()[$itemId];
+            $skills = [];
+            array_walk($_this->game->data->items[$itemName]['skills'], function ($v, $k) use ($itemId, &$skills) {
+                $skillId = $k . '_' . $itemId;
+                $v['id'] = $skillId;
+                $skills[$skillId] = $v;
+            });
+
             return [
-                'id' => $itemName,
+                'itemId' => $itemId,
                 'isActive' => $isActive,
                 ...$_this->game->data->items[$itemName],
+                'skills' => $skills,
                 'character_name' => $characterName,
             ];
         }, array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']]));
@@ -133,7 +143,7 @@ class Character
     {
         $this->updateCharacterData($characterName, function (&$data) use ($items) {
             $equippedIds = array_map(function ($d) {
-                return $d['id'];
+                return $d['itemId'];
             }, $data['equipment']);
             $equipment = [...$equippedIds, ...$items];
             $data['item_1'] = array_key_exists(0, $equipment) ? $equipment[0] : null;
@@ -145,7 +155,7 @@ class Character
     {
         $this->updateCharacterData($characterName, function (&$data) use ($items) {
             $equippedIds = array_map(function ($d) {
-                return $d['id'];
+                return $d['itemId'];
             }, $data['equipment']);
             $equipment = array_diff($equippedIds, array_intersect($equippedIds, $items));
             $data['item_1'] = array_key_exists(0, $equipment) ? $equipment[0] : null;
@@ -171,6 +181,19 @@ class Character
     {
         $character = $this->getActivateCharacter();
         return $character['equipment'];
+    }
+    public function getActiveEquipmentSkills()
+    {
+        $character = $this->game->character->getActivateCharacter();
+        $skills = array_merge(
+            ...array_map(function ($item) {
+                if (!array_key_exists('skills', $item)) {
+                    return [];
+                }
+                return $item['skills'];
+            }, $character['equipment'])
+        );
+        return $skills;
     }
     public function activateNextCharacter()
     {
@@ -248,7 +271,7 @@ class Character
                 'name' => $char['character_name'],
                 'isFirst' => $char['isFirst'],
                 'isActive' => $char['isActive'],
-                'equipment' => array_filter([$char['item_1'], $char['item_2'], $char['item_3']]),
+                'equipment' => $char['equipment'],
                 'playerColor' => $char['player_color'],
                 'playerId' => $char['player_id'],
                 'stamina' => $char['stamina'],

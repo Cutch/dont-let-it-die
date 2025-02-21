@@ -122,7 +122,7 @@ class Decks
             $this->shuffleInDiscard($deck);
             $topCard = $this->decks[$deck]->getCardOnTop('deck');
         }
-        $this->decks[$deck]->moveCards([$topCard['id']], 'discard');
+        $this->decks[$deck]->insertCardOnExtremePosition($topCard['id'], 'discard', true);
         $card = $this->getCard($topCard['type_arg']);
         unset($this->cachedData[$deck]);
         return $card;
@@ -135,14 +135,9 @@ class Decks
         $cards = array_filter($cards, function ($card) use ($callback) {
             $callback($this->getCard($card['id']));
         });
-        $this->decks[$deck]->moveCards(
-            [
-                array_map(function ($card) {
-                    return $card['id'];
-                }, $cards),
-            ],
-            'discard'
-        );
+        array_walk(function ($card) use ($deck) {
+            $this->decks[$deck]->insertCardOnExtremePosition($card['id'], 'discard', true);
+        }, $cards);
         unset($this->cachedData[$deck]);
         if ($deckCount - sizeof($cards) == 0) {
             $this->shuffleInDiscard($deck);

@@ -9,7 +9,11 @@ if (!function_exists('addId')) {
                 $array = [];
                 array_walk($v['skills'], function ($iv, $ik) use ($k, &$array, $v) {
                     $keyName = $k . $ik;
-                    $array[$keyName] = ['id' => $keyName, 'characterId' => $v['name'], ...$iv];
+                    if ($v['type'] == 'character') {
+                        $array[$keyName] = ['id' => $keyName, 'characterId' => $v['name'], ...$iv];
+                    } else {
+                        $array[$keyName] = ['id' => $keyName, ...$iv];
+                    }
                 });
                 $v['skills'] = $array;
             }

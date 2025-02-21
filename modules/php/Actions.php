@@ -15,7 +15,7 @@ class Actions
         $_this = $this;
         $this->actions = addId([
             'actEat' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 0,
                 'requires' => function (Game $game, $action) use ($_this) {
                     $variables = $game->gameData->getResources();
@@ -44,7 +44,7 @@ class Actions
                 },
             ],
             'actCook' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 1,
                 'requires' => function (Game $game, $action) use ($_this) {
                     $array = $_this->getActionSelectable($action['id']);
@@ -62,7 +62,7 @@ class Actions
                 },
             ],
             'actTrade' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 1,
                 'requires' => function (Game $game, $action) use ($_this) {
                     $array = $_this->getActionSelectable($action['id']);
@@ -88,15 +88,15 @@ class Actions
                 },
             ],
             'actDrawGather' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 2,
             ],
             'actDrawForage' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 2,
             ],
             'actDrawHarvest' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 3,
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof(
@@ -107,7 +107,7 @@ class Actions
                 },
             ],
             'actDrawHunt' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 3,
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof(
@@ -118,7 +118,7 @@ class Actions
                 },
             ],
             'actCraft' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 3,
                 'requires' => function (Game $game) {
                     $result = [];
@@ -128,13 +128,14 @@ class Actions
                 'selectable' => function (Game $game) {
                     $craftedItems = $game->getCraftedItems();
                     $craftingLevel = $game->gameData->getGlobals('craftingLevel');
+                    $buildings = $game->gameData->getGlobals('buildings');
                     return array_values(
                         array_filter(
                             $game->data->items,
-                            function ($v, $k) use ($craftingLevel, $craftedItems) {
-                                // var_dump(json_encode($v['count']), json_encode($craftedItems));
+                            function ($v, $k) use ($craftingLevel, $craftedItems, $buildings) {
                                 return $v['type'] == 'item' &&
                                     $v['craftingLevel'] <= $craftingLevel &&
+                                    ($v['itemType'] != 'building' || sizeof($buildings) == 0) &&
                                     (!array_key_exists($k, $craftedItems) || $craftedItems[$k] < $v['count']);
                             },
                             ARRAY_FILTER_USE_BOTH
@@ -143,11 +144,11 @@ class Actions
                 },
             ],
             'actInvestigateFire' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 3,
             ],
             'actSpendFKP' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 0,
                 'requires' => function (Game $game, $action) use ($_this) {
                     $array = $_this->getActionSelectable($action['id']);
@@ -163,7 +164,7 @@ class Actions
                 },
             ],
             'actAddWood' => [
-                'type' => ['player'],
+                'state' => ['playerTurn'],
                 'stamina' => 0,
                 'requires' => function (Game $game, $action) use ($_this) {
                     $wood = $game->gameData->getResource('wood');
@@ -171,41 +172,37 @@ class Actions
                 },
             ],
             'actUseSkill' => [
-                'type' => ['player', 'encounter'],
+                'state' => ['playerTurn', 'resolveEncounter', 'postEncounter'],
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof($_this->getAvailableCharacterSkills()) > 0;
                 },
             ],
             'actUseItem' => [
-                'type' => ['encounter'],
+                'state' => ['playerTurn', 'resolveEncounter', 'postEncounter'],
                 'requires' => function (Game $game, $action) use ($_this) {
-                    return sizeof(
-                        array_filter($game->character->getActiveEquipment(), function ($data) {
-                            return $data['itemType'] == 'tool';
-                        })
-                    ) > 0;
+                    return sizeof($_this->getAvailableItemSkills()) > 0;
                 },
             ],
             'actEquipItem' => [
-                'type' => ['trade'],
+                'state' => ['tradePhase'],
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof($game->gameData->getGlobals('campEquipment')) > 0;
                 },
             ],
             'actUnEquipItem' => [
-                'type' => ['trade'],
+                'state' => ['tradePhase'],
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof($game->character->getActivateCharacter()['equipment']) > 0;
                 },
             ],
             'actTradeItem' => [
-                'type' => ['trade'],
+                'state' => ['tradePhase'],
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof($game->character->getActivateCharacter()['equipment']) > 0;
                 },
             ],
             'actConfirmTradeItem' => [
-                'type' => ['trade'],
+                'state' => ['tradePhase'],
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof($game->character->getActivateCharacter()['equipment']) > 0;
                 },
@@ -216,6 +213,13 @@ class Actions
     public function getAction($actionId, $subActionId = null): array
     {
         if ($actionId == 'actUseSkill') {
+            foreach ($this->game->character->getAllCharacterData() as $k => $char) {
+                if (array_key_exists('skills', $char) && isset($char['skills'][$subActionId])) {
+                    return $char['skills'][$subActionId];
+                }
+            }
+            return [];
+        } elseif ($actionId == 'actUseItem') {
             foreach ($this->game->character->getAllCharacterData() as $k => $char) {
                 if (array_key_exists('skills', $char) && isset($char['skills'][$subActionId])) {
                     return $char['skills'][$subActionId];
@@ -253,7 +257,27 @@ class Actions
                     'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
                 ];
                 $this->game->hooks->onGetActionCost($actionCost);
-                return $this->checkRequirements($skill) &&
+                return $this->checkRequirements($skill, $character) &&
+                    (!array_key_exists('stamina', $actionCost) || $stamina >= $actionCost['stamina']) &&
+                    (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
+            })
+        );
+    }
+    public function getAvailableItemSkills(): array
+    {
+        $character = $this->game->character->getActivateCharacter();
+        $skills = $this->game->character->getActiveEquipmentSkills();
+        return array_values(
+            array_filter($skills, function ($skill) use ($character) {
+                $stamina = $character['stamina'];
+                $health = $character['health'];
+                $actionCost = [
+                    'action' => 'actUseItem',
+                    'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
+                    'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
+                ];
+                $this->game->hooks->onGetActionCost($actionCost);
+                return $this->checkRequirements($skill, $character) &&
                     (!array_key_exists('stamina', $actionCost) || $stamina >= $actionCost['stamina']) &&
                     (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
             })
@@ -298,9 +322,8 @@ class Actions
     }
     public function checkRequirements($actionObj, ...$args): bool
     {
-        return !array_key_exists('requires', $actionObj) ||
-            ($actionObj['requires']($this->game, $actionObj, ...$args) &&
-                (!array_key_exists('state', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])));
+        return (!array_key_exists('state', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])) &&
+            (!array_key_exists('requires', $actionObj) || $actionObj['requires']($this->game, $actionObj, ...$args));
     }
     public function spendActionCost($action, $subAction = null)
     {
@@ -334,15 +357,15 @@ class Actions
         $turnActions[$action] = ($turnActions[$action] ?? 0) + 1;
         $this->game->gameData->set('turnActions', $turnActions);
     }
-    public function getValidActions($type = 'player')
+    public function getValidActions()
     {
         // Get some values from the current game situation from the database.
-        $validActionsFiltered = array_filter($this->actions, function ($v) use ($type) {
+        $validActionsFiltered = array_filter($this->actions, function ($v) {
             $actionCost = $this->getActionCost($v['id']);
             $stamina = $this->game->character->getActiveStamina();
             $health = $this->game->character->getActiveHealth();
-            return in_array($type, $v['type']) &&
-                $this->checkRequirements($v) &&
+            // var_dump(json_encode([$v['id']]));
+            return $this->checkRequirements($v) &&
                 (!array_key_exists('stamina', $actionCost) || $stamina >= $actionCost['stamina']) &&
                 (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
         });

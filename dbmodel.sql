@@ -86,15 +86,23 @@ CREATE TABLE IF NOT EXISTS `mentalhindrance` (
     `card_location_arg` int(11) NOT NULL,
     PRIMARY KEY (`card_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+CREATE TABLE IF NOT EXISTS `item` (
+    `item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `item_name` varchar(20) NOT NULL,
+    PRIMARY KEY (`item_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `character` (
     `character_name` varchar(10) NOT NULL,
     `player_id` int(10) unsigned NOT NULL,
-    `item_1` varchar(20) NULL,
-    `item_2` varchar(20) NULL,
-    `item_3` varchar(20) NULL,
+    `item_1` int(10) unsigned NULL,
+    `item_2` int(10) unsigned NULL,
+    `item_3` int(10) unsigned NULL,
     `stamina` int(1) UNSIGNED DEFAULT 0,
     `health` int(1) UNSIGNED DEFAULT 0,
     `confirmed` int(1) UNSIGNED DEFAULT 0,
+    FOREIGN KEY (item_1) REFERENCES item(item_id),
+    FOREIGN KEY (item_2) REFERENCES item(item_id),
+    FOREIGN KEY (item_3) REFERENCES item(item_id),
     FOREIGN KEY (player_id) REFERENCES player(player_id),
     PRIMARY KEY (`character_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;

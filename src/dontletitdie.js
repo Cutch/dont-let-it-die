@@ -39,6 +39,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.selector = null;
       this.tooltip = null;
       this.decks = {};
+      this.deckSelectionScreen = new DeckSelectionScreen(this);
       this.tradeScreen = new TradeScreen(this);
       this.craftScreen = new CraftScreen(this);
       this.eatScreen = new EatScreen(this);
@@ -84,7 +85,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character, i) => {
         // Player side board
         const playerPanel = this.getPlayerPanelElement(character.playerId);
-        const equipments = character.equipment.map((d) => this.data[d]);
+        const equipments = character.equipment.map((d) => this.data[d.id]);
 
         const characterSideId = `player-side-${character.playerId}-${character.name}`;
         const playerSideContainer = document.getElementById(characterSideId);
@@ -121,7 +122,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         if (gameData.gamestate.name !== 'characterSelect') {
           const container = document.getElementById(`player-container-${Math.floor(i / 2) + 1}`);
           if (container && !document.getElementById(`player-${character.name}`)) {
-            console.log('Creating initial payer container', gameData);
             container.insertAdjacentHTML(
               'beforeend',
               `<div id="player-${character.name}" class="player-card">
@@ -479,7 +479,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updateItems(gameData);
       playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid__container"></div>`);
       renderImage(`instructions`, document.getElementById('instructions-container'));
-
+      // this.deckSelectionScreen.show(gameData);
       // TODO: Set up your game interface here, according to "gameData"
 
       // Setup game notifications to handle (see "setupNotifications" method below)
@@ -582,6 +582,22 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         // Add test action buttons in the action status bar, simulating a card click:
         if (actions)
           Object.keys(actions).forEach((action) => {
+            if (action === 'actUseSkill' && stateName === 'postEncounter') {
+              return Object.values(args.availableSkills).forEach((skill) => {
+                const cost = this.getActionCostHTML(skill);
+                this.statusBar.addActionButton(`${_(skill.name)}${cost}`, () => {
+                  return this.bgaPerformAction(action, { skillId: skill.id });
+                });
+              });
+            }
+            if (action === 'actUseItem' && stateName === 'postEncounter') {
+              return Object.values(args.availableItemSkills).forEach((skill) => {
+                const cost = this.getActionCostHTML(skill);
+                this.statusBar.addActionButton(`${_(skill.name)}${cost}`, () => {
+                  return this.bgaPerformAction(action, { skillId: skill.id });
+                });
+              });
+            }
             const cost = this.getActionCostHTML(actions[action]);
             return this.statusBar.addActionButton(`${_(actionMappings[action])}${cost}`, () => {
               if (action === 'actUseSkill') {
@@ -673,6 +689,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             });
             break;
           case 'tradePhase':
+          case 'postEncounter':
             this.statusBar.addActionButton(_('Done'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
             break;
           case 'characterSelect':
@@ -729,15 +746,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.notifqueue.setSynchronous('tokenUsed', 500);
       //
     },
-    notificationWrapper: function (notification, state) {
+    notificationWrapper: function (notification) {
       notification.args = notification.args ?? {};
-      notification.args.gamestate = { name: state };
       if (notification.args.gameData) {
-        notification.args.gameData.gamestate = { name: state };
+        notification.args.gameData.gamestate = notification.args.gamestate;
       }
     },
     notification_updateGameData: function (notification) {
-      this.notificationWrapper(notification, 'updateGameData');
+      this.notificationWrapper(notification);
       console.log('notification_updateGameData', notification);
       this.updatePlayers(notification.args.gameData);
       this.updateResources(notification.args.gameData);
@@ -747,14 +763,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     },
 
     notification_characterClicked: function (notification) {
-      this.notificationWrapper(notification, 'characterSelect');
+      this.notificationWrapper(notification);
       console.log('notification_characterClicked', notification);
       this.selectedCharacters = notification.args.gameData.characters;
       this.updateCharacterSelections(notification.args);
     },
 
     notification_tokenUsed: function (notification) {
-      this.notificationWrapper(notification, 'playerTurn');
+      this.notificationWrapper(notification);
       console.log('notification_tokenUsed', notification);
       this.updatePlayers(notification.args.gameData);
       this.updateResources(notification.args.gameData);

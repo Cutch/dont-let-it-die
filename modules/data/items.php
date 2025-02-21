@@ -151,12 +151,21 @@ $itemsData = [
             'fiber' => 1,
             'hide' => 2,
         ],
-        'onUse' => function (Game $game, $item) {
-            usePerDay($item, $game);
-        },
-        'requires' => function (Game $game, $item) {
-            return getUsePerDay($item, $game) < 1;
-        },
+        'skills' => [
+            'skill1' => [
+                'name' => 'Ignore Damage',
+                'state' => ['postEncounter'],
+                'onUse' => function (Game $game, $skill, $char) {
+                    $state = $game->gameData->getGlobals('encounterState');
+                    $game->character->adjustActiveHealth($state['willTakeDamage']);
+                    usePerDay($char['id'] . $skill['id'], $game);
+                },
+                'requires' => function (Game $game, $skill, $char) {
+                    $state = $game->gameData->getGlobals('encounterState');
+                    return $state['willTakeDamage'] && getUsePerDay($char['id'] . $skill['id'], $game) < 1;
+                },
+            ],
+        ],
     ],
     'knowledge-hut' => [
         'type' => 'item',
