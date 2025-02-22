@@ -5,6 +5,7 @@ namespace Bga\Games\DontLetItDie;
 include dirname(__DIR__) . '/data/Utils.php';
 class Data
 {
+    private Game $game;
     public array $decks;
     public array $characters;
     public array $tokens;
@@ -16,6 +17,7 @@ class Data
 
     public function __construct(Game $game)
     {
+        $this->game = $game;
         include dirname(__DIR__) . '/data/Boards.php';
         include dirname(__DIR__) . '/data/Characters.php';
         include dirname(__DIR__) . '/data/Decks.php';
@@ -40,5 +42,12 @@ class Data
         $this->knowledgeTree = addId(array_filter($knowledgeTreeData, $expansionFilter));
         $this->items = addId(array_filter($itemsData, $expansionFilter));
         $this->upgrades = addId(array_filter($upgradesData, $expansionFilter));
+    }
+    public function getValidKnowledgeTree()
+    {
+        $data = $this->boards['knowledge-tree-' . $this->game->getDifficulty()]['track'];
+        return array_filter($data, function ($v) {
+            return !array_key_exists('requires', $v) || $v['requires']($this->game, $v);
+        });
     }
 }

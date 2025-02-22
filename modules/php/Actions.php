@@ -153,10 +153,16 @@ class Actions
                 'requires' => function (Game $game, $action) use ($_this) {
                     $array = $_this->getActionSelectable($action['id']);
                     $variables = $game->gameData->getResources(...$array);
-                    return array_sum(
+                    $resourceCount = array_sum(
                         array_map(function ($type) use ($variables) {
                             return $variables[$type];
                         }, $array)
+                    );
+                    $availableUnlocks = $game->data->getValidKnowledgeTree();
+                    return sizeof(
+                        array_filter($availableUnlocks, function ($v) use ($resourceCount) {
+                            return $v['cost'] <= $resourceCount;
+                        })
                     ) > 0;
                 },
                 'selectable' => function (Game $game) {

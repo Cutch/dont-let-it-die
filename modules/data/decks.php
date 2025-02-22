@@ -446,7 +446,7 @@ $decksData = [
     'night-event-7_11' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onDraw' => function (Game $game, $object) {
+        'onDraw' => function (Game $game, $object, $deck, $card) {
             $roll = $game->rollFireDie();
             if ($roll == 0) {
                 $game->character->adjustActiveHealth(-1);
@@ -570,6 +570,9 @@ $decksData = [
             $game->nightEventLog('Everyone heals 1 extra when eating tomorrow');
         },
         'onEat' => function (Game $game, &$data) {
+            $data['health'] += 1;
+        },
+        'onGetEatData' => function (Game $game, &$data) {
             $data['health'] += 1;
         },
     ],

@@ -92,7 +92,7 @@ $machinestates = [
             'actUseSkill',
             'actUseItem',
         ],
-        'transitions' => ['drawCard' => 11, 'tooManyItems' => 12, 'deckSelection' => 13, 'endTurn' => 15],
+        'transitions' => ['drawCard' => 11, 'tooManyItems' => 12, 'deckSelection' => 13, 'reRoll' => 14, 'endTurn' => 15],
     ],
     11 => [
         'name' => 'drawCard',
@@ -121,6 +121,16 @@ $machinestates = [
         'possibleactions' => ['actSelectDeck', 'actSelectDeckCancel'],
         'transitions' => ['playerTurn' => 10],
     ],
+
+    // 14 => [
+    //     'name' => 'reRoll',
+    //     'description' => clienttranslate('${actplayer}(${currentCharacter}) rolling dice'),
+    //     'descriptionmyturn' => clienttranslate('Rolling dice'),
+    //     'type' => 'activeplayer',
+    //     'args' => 'argReRoll',
+    //     'possibleactions' => ['actUseSkill', 'actPass'],
+    //     'transitions' => ['playerTurn' => 10],
+    // ],
     20 => [
         'name' => 'resolveEncounter',
         'description' => clienttranslate('Resolving Encounter'),
@@ -139,6 +149,15 @@ $machinestates = [
         'action' => 'stPostEncounter',
         'args' => 'argPostEncounter',
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
+        'transitions' => ['playerTurn' => 10],
+    ],
+    22 => [
+        'name' => 'skillConfirmation',
+        'description' => clienttranslate('${actplayer}(${currentCharacter}) is looking at their skills'),
+        'descriptionmyturn' => clienttranslate('Looking at skills'),
+        'type' => 'multipleactiveplayer',
+        'args' => 'argSkillConfirmation',
+        'possibleactions' => ['actSkillConfirmation', 'onSkillConfirmationCancel'],
         'transitions' => ['playerTurn' => 10],
     ],
     15 => [

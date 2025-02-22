@@ -69,7 +69,7 @@ $itemsData = [
             'fiber' => 2,
             'bone' => 2,
         ],
-        'onDraw' => function (Game $game, $item, $card) {
+        'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'fiber') {
                 $game->gameData->setResource('fiber', $game->gameData->getResource('fiber') + 1);
                 $this->notify->all(
@@ -93,7 +93,7 @@ $itemsData = [
             'fiber' => 2,
             'hide' => 1,
         ],
-        'onDraw' => function (Game $game, $item, $card) {
+        'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'berry') {
                 $game->gameData->setResource('berry', $game->gameData->getResource('berry') + 1);
                 $this->notify->all(
@@ -201,7 +201,7 @@ $itemsData = [
             'wood' => 1,
             'rock' => 2,
         ],
-        'onDraw' => function (Game $game, $item, $card) {
+        'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'wood') {
                 $game->gameData->setResource('wood', $game->gameData->getResource('wood') + 1);
                 $this->notify->all(
@@ -257,7 +257,7 @@ $itemsData = [
             'rock' => 2,
             'bone' => 1,
         ],
-        'onDraw' => function (Game $game, $item, $card) {
+        'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'meat') {
                 $game->gameData->setResource('meat', $game->gameData->getResource('meat') + 1);
                 $this->notify->all(
@@ -315,7 +315,7 @@ $itemsData = [
             'wood' => 1,
             'rock' => 1,
         ],
-        'onDraw' => function (Game $game, $item, $card) {
+        'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'rock') {
                 $game->gameData->setResource('rock', $game->gameData->getResource('rock') + 1);
                 $this->notify->all(

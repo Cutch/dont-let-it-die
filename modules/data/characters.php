@@ -19,6 +19,7 @@
 use Bga\Games\DontLetItDie\Game;
 $charactersData = [
     'Gronk' => [
+        // Done
         'type' => 'character',
         'health' => '7',
         'stamina' => '4',
@@ -52,6 +53,7 @@ $charactersData = [
         },
     ],
     'Grub' => [
+        // Done
         'type' => 'character',
         'health' => '4',
         'stamina' => '7',
@@ -67,9 +69,9 @@ $charactersData = [
                 $data['escape'] = true;
             }
         },
-        'onDraw' => function (Game $game, $char, $deck) {
+        'onDraw' => function (Game $game, $char, $deck, $card) {
             if ($char['isActive'] && $deck == 'gather') {
-                if ($game->adjustResource('fiber', 1) != 0) {
+                if ($game->adjustResource('fiber', 1) == 0) {
                     $game->activeCharacterEventLog('gained 1 fiber');
                 }
             }
@@ -86,25 +88,76 @@ $charactersData = [
                 $data['health'] *= 2;
             }
         },
-        // 'onInvestigateFire' => function (Game $game, &$data) {
-        //     $data['escape'] = true;
-        // },
+        'onGetEatData' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                $data['health'] *= 2;
+            }
+        },
         'skills' => [
             'skill1' => [
                 'name' => 'Re-Roll Fire Die',
-                'state' => ['reRoll'],
+                'state' => ['playerTurn'],
                 'stamina' => 0,
-                'onUse' => function (Game $game, $skill) {
+                'onInvestigateFire' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    usePerDay($char['id'] . 'investigateFire', $game);
-                    $game->activeCharacterEventLog('is re-rolling ${active_character_name}\'s fire die', [
-                        ...$char,
-                        'active_character_name' => $game->character->getActivateCharacter(['character_name']),
-                    ]);
+                    if ($char['isActive'] && $data < 3 && getUsePerDay($char['id'] . 'investigateFire', $game) < 1) {
+                        // If kara is not the character, and the roll is not the max
+                        // usePerDay($char['id'], $game);
+                        $game->addSkillConfirmation($skill);
+                    }
                 },
+                'onSkillConfirmation' => function (Game $game, $skill, $skillId, $data) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($skillId == $skill['id']) {
+                        $game->adjustResource($data['resourceType'], $data['count']);
+                        usePerDay($char['id'] . 'investigateFire', $game);
+                        $game->activeCharacterEventLog('is re-rolling ${active_character_name}\'s fire die', [
+                            ...$char,
+                            'active_character_name' => $game->character->getActivateCharacter(['character_name']),
+                        ]);
+                    }
+                },
+                // 'skills' => [
+                //     'skill1' => [
+                //         'name' => 'Double Resources',
+                //         'state' => ['playerTurn'],
+                //         'stamina' => 3,
+                //         'onDraw' => function (Game $game, $skill, $deck, $card) {
+                //             $char = $game->character->getCharacterData($skill['characterId']);
+                //             if ($char['isActive'] && $card['deckType'] == 'resource') {
+                //                 $game->addSkillConfirmation($skill, $card);
+                //             }
+                //         },
+                //         'onSkillConfirmation' => function (Game $game, $skill, $skillId, $data) {
+                //             if ($skillId == $skill['id']) {
+                //                 $game->adjustResource($data['resourceType'], $data['count']);
+                //             }
+                //         },
+                //     ],
+                // ],
+                // 'onUse' => function (Game $game, $skill) {
+                //     $char = $game->character->getCharacterData($skill['characterId']);
+                //     if ($char['isActive']) {
+                //         // Shuffle it
+                //         $game->gameData->set('state', ['id' => $skill['id']]);
+                //         $game->gamestate->nextState('skillSelection');
+                //         return ['spendActionCost' => false, 'notify' => false];
+                //     }
+                // },
+                // 'onSkillSelection' => function (Game $game, $skill, $deckName) {
+                //     if ($game->gameData->getGlobals('state')['id'] == $skill['id']) {
+                //         $game->decks->shuffleInDiscard($deckName, false);
+                //         $game->actions->spendActionCost('actUseSkill', $skill['id']);
+                //         $game->activeCharacterEventLog('shuffled the ${deck} deck using their skill', [
+                //             'deck' => $deckName,
+                //         ]);
+                //     }
+                // },
+                // 'onUse' => function (Game $game, $skill) {
+                // },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return getUsePerDay($char['id'] . 'investigateFire', $game) < 1;
+                    return !$char['isActive'] && getUsePerDay($char['id'] . 'investigateFire', $game) < 1;
                 },
             ],
             'skill2' => [
@@ -127,6 +180,7 @@ $charactersData = [
         ],
     ],
     'Cron' => [
+        // Done
         'type' => 'character',
         'health' => '5',
         'stamina' => '6',
@@ -195,12 +249,12 @@ $charactersData = [
         ],
         'onGetActionSelectable' => function (Game $game, $char, &$data) {
             if ($data['action'] == 'actSpendFKP') {
-                $data['selectable'] = ['fkp', 'bones'];
+                $data['selectable'] = ['fkp', 'bone'];
             }
         },
         'onRollDie' => function (Game $game, $char, &$data) {
             if ($char['isActive'] && $data == 1) {
-                if ($game->adjustResource('berry', 1) != 0) {
+                if ($game->adjustResource('berry', 1) == 0) {
                     $game->activeCharacterEventLog('gained 1 berry');
                 }
             }
@@ -218,6 +272,7 @@ $charactersData = [
         // If using an herb to clear a physical hindrance gain a health
     ],
     'Ajax' => [
+        // Done
         'type' => 'character',
         'health' => '8',
         'stamina' => '5',
@@ -427,15 +482,54 @@ $charactersData = [
         'health' => '4',
         'stamina' => '6',
         'name' => 'Zeebo',
-        'slots' => ['weapon', 'tool'],
+        'slots' => ['weapon'],
+        'onDraw' => function (Game $game, $char, $deck, $card) {
+            if ($char['isActive'] && $card['type'] == 'berry') {
+                if ($game->character->adjustActiveHealth(1) == 1) {
+                    $game->activeCharacterEventLog('gained 1 health');
+                }
+            }
+        },
+        'skills' => [
+            'skill1' => [
+                'name' => 'Double Resources',
+                'state' => ['playerTurn'],
+                'stamina' => 3,
+                'onDraw' => function (Game $game, $skill, $deck, $card) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($char['isActive'] && $card['deckType'] == 'resource') {
+                        $game->addSkillConfirmation($skill, $card);
+                    }
+                },
+                'onSkillConfirmation' => function (Game $game, $skill, $skillId, $data) {
+                    if ($skillId == $skill['id']) {
+                        $game->adjustResource($data['resourceType'], $data['count']);
+                    }
+                },
+            ],
+        ],
     ],
     'Thunk' => [
+        // Done
         'type' => 'character',
         'health' => '6',
         'stamina' => '6',
         'name' => 'Thunk',
         'startsWith' => 'sharp-stick',
         'slots' => ['weapon', 'tool'],
+        'onGetValidActions' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                unset($data['actDrawForage']);
+                unset($data['actDrawGather']);
+            }
+        },
+        'onDraw' => function (Game $game, $char, $deck, $card) {
+            if ($char['isActive'] && $deck == 'hunt') {
+                if ($game->adjustResource('meat', 1) == 0) {
+                    $game->activeCharacterEventLog('gained 1 meat');
+                }
+            }
+        },
     ],
     'Tiku' => [
         'expansion' => 'hindrance',
@@ -451,6 +545,17 @@ $charactersData = [
         'stamina' => '5',
         'name' => 'Vog',
         'slots' => ['weapon', 'tool'],
+        // TODO: Redirect danger damage to Vog
+        'onGetActionCost' => function (Game $game, $char, &$data) {
+            if ($char['isActive'] && $data['action'] == 'actEat') {
+                $data['stamina'] += 1;
+            }
+        },
+        'onMorning' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                array_push($data['skipMorningDamage'], 'Vog');
+            }
+        },
     ],
     'AlternateUpgradeTrack' => [
         'type' => 'instructions',

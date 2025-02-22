@@ -60,7 +60,8 @@ class Character
                 $values = [];
                 foreach ($data as $key => $value) {
                     if (in_array($key, self::$characterColumns)) {
-                        $values[] = "`{$key}` = '{$value}'";
+                        $sqlValue = $value ? "'{$value}'" : 'NULL';
+                        $values[] = "`{$key}` = {$sqlValue}";
                         $this->cachedData[$name][$key] = $value;
                     }
                 }
@@ -231,16 +232,20 @@ class Character
             $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
         });
     }
-    public function adjustStamina(string $characterName, int $stamina): void
+    public function adjustStamina(string $characterName, int $stamina): int
     {
-        $this->updateCharacterData($characterName, function (&$data) use ($stamina) {
+        $prev = 0;
+        $this->updateCharacterData($characterName, function (&$data) use ($stamina, &$prev) {
+            $prev = $data['stamina'];
             $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
+            $prev = $data['stamina'] - $prev;
         });
+        return $prev;
     }
-    public function adjustActiveStamina(int $stamina): void
+    public function adjustActiveStamina(int $stamina): int
     {
         $characterName = $this->getActivateCharacter()['character_name'];
-        $this->adjustStamina($characterName, $stamina);
+        return $this->adjustStamina($characterName, $stamina);
     }
     public function getActiveHealth(): int
     {
@@ -253,16 +258,20 @@ class Character
             $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
         });
     }
-    public function adjustHealth(string $characterName, int $health): void
+    public function adjustHealth(string $characterName, int $health): int
     {
-        $this->updateCharacterData($characterName, function (&$data) use ($health) {
+        $prev = 0;
+        $this->updateCharacterData($characterName, function (&$data) use ($health, &$prev) {
+            $prev = $data['health'];
             $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
+            $prev = $data['health'] - $prev;
         });
+        return $prev;
     }
-    public function adjustActiveHealth(int $health): void
+    public function adjustActiveHealth(int $health): int
     {
         $characterName = $this->getActivateCharacter()['character_name'];
-        $this->adjustHealth($characterName, $health);
+        return $this->adjustHealth($characterName, $health);
     }
     public function getMarshallCharacters()
     {

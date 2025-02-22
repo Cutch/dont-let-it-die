@@ -257,9 +257,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       //   this.tweening.addTween(sharedElem.querySelector(`.token.${name}`), availableElem.querySelector(`.token.${name}`), name);
       // });
       const prevResources = gameData.game['prevResources'];
+      let skipWood = false;
       if (prevResources['fireWood'] != null && prevResources['fireWood'] < gameData.game['resources']['fireWood']) {
         // Wood to Firewood
         this.tweening.addTween(sharedElem.querySelector(`.token.wood`), firewoodElem.querySelector(`.token.wood`), 'wood');
+        skipWood = true;
       } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['resources']['fireWood']) {
         // Firewood to Wood
         this.tweening.addTween(firewoodElem.querySelector(`.token.wood`), availableElem.querySelector(`.token.wood`), 'wood');
@@ -275,7 +277,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         } else if (
           prevResources[name] != null &&
           prevResources[name] > gameData.game['resources'][name] &&
-          prevResources[name + '-cooked'] > gameData.game['resources'][name]
+          (name !== 'wood' || !skipWood)
+          // prevResources[name + '-cooked'] > gameData.game['resources'][name]
         ) {
           // Shared Resources to Discard
           this.tweening.addTween(
@@ -540,7 +543,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           break;
         case 'drawCard':
           this.decks[args.args.deck].drawCard(args.args.card.id);
-          this.decks[args.args.deck].updateDeckCounts(args.args.decks[deck]);
+          this.decks[args.args.deck].updateDeckCounts(args.args.decks[args.args.deck]);
           break;
         case 'dummy':
           break;
@@ -577,6 +580,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       let cost = '';
       if (action['stamina'] != null) cost = ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
       else if (action['health'] != null) cost = ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
+      else if (action['cost'] != null) cost = ` <i class="fa fa-graduation-cap dlid__fkp"></i> ${action['cost']}`;
       return cost;
     },
     onUpdateActionButtons: function (stateName, args) {
@@ -608,7 +612,16 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             }
             const cost = this.getActionCostHTML(actions[action]);
             return this.statusBar.addActionButton(`${_(actionMappings[action])}${cost}`, () => {
-              if (action === 'actUseSkill') {
+              if (action === 'actSpendFKP') {
+                this.removeActionButtons();
+                Object.values(args.availableUnlocks).forEach((unlock) => {
+                  const cost = this.getActionCostHTML(unlock);
+                  this.statusBar.addActionButton(`${unlock.name}${cost}`, () => {
+                    return this.bgaPerformAction(action, { knowledgeId: unlock.id });
+                  });
+                });
+                this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
+              } else if (action === 'actUseSkill') {
                 this.removeActionButtons();
                 Object.values(args.availableSkills).forEach((skill) => {
                   const cost = this.getActionCostHTML(skill);

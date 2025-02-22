@@ -113,6 +113,7 @@ class GameData
         $this->game->globals->set('turnOrder', []);
         $this->game->globals->set('turnNo', 0);
         $this->game->globals->set('turnActions', []);
+        $this->game->globals->set('skillConfirmationState', []);
         $this->game->globals->set('resources', [
             'fireWood' => 0,
             'wood' => 0,

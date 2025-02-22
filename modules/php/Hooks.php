@@ -25,7 +25,10 @@ class Hooks
         );
         $skills = array_merge(
             ...array_map(function ($c) {
-                return $c['skills'];
+                if (array_key_exists('skills', $c)) {
+                    return $c['skills'];
+                }
+                return [];
             }, $characters)
         );
         $array = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$skills, ...$equipment];
@@ -79,6 +82,11 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
+    function onGetEatData(&$data)
+    {
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
     function onCraft($card)
     {
         $this->callHooks(__FUNCTION__, $card);
@@ -99,6 +107,11 @@ class Hooks
         return $data;
     }
     function onDeckSelection(&$data)
+    {
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onSkillConfirmation(&$data)
     {
         $this->callHooks(__FUNCTION__, $data);
         return $data;

@@ -181,19 +181,36 @@ class Game extends \Table
             'type' => $type,
         ]);
     }
-    public function actSpendFKP(array $resources, $knowledgeId): void
+    public function actSpendFKP(string $knowledgeId): void
     {
-        $this->actions->validateCanRunAction('actSpendFKP', null, $resources);
-        $amount = 0;
-        foreach ($resources as $type => $count) {
-            $amount += $count;
-            $this->adjustResource($type, -$count);
+        $this->actions->validateCanRunAction('actSpendFKP', null);
+
+        $resources = $this->actions->getActionSelectable('actSpendFKP');
+        $variables = $this->gameData->getResources(...$resources);
+        $resourceCount = array_sum(
+            array_map(function ($type) use ($variables) {
+                return $variables[$type];
+            }, $resources)
+        );
+        $availableUnlocks = $this->data->getValidKnowledgeTree();
+
+        if (!array_key_exists($knowledgeId, $availableUnlocks)) {
+            throw new BgaUserException($this->translate('Requirements not met for this unlock'));
+        } elseif (in_array($knowledgeId, $this->getUnlockedKnowledge())) {
+            throw new BgaUserException($this->translate('Already unlocked'));
+        } elseif ($resourceCount < $availableUnlocks[$knowledgeId]['cost']) {
+            throw new BgaUserException($this->translate('Not enough knowledge points'));
         }
+        $cost = -$availableUnlocks[$knowledgeId]['cost'];
+        foreach ($resources as $resource) {
+            $cost = $this->adjustResource($resource, $cost);
+        }
+
         $this->actions->spendActionCost('actSpendFKP');
-        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} spent ${amount} knowledge on'), [
+        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} unlocked ${knowledge_name}'), [
             'gameData' => $this->getAllDatas(),
-            'amount' => $amount,
             'knowledgeId' => $knowledgeId,
+            'knowledge_name' => $this->data->knowledgeTree[$knowledgeId]['name'],
         ]);
     }
     public function actCraft(string $itemName = null): void
@@ -311,7 +328,6 @@ class Game extends \Table
     {
         $this->gamestate->nextState('playerTurn');
     }
-
     public function actTrade(#[JsonParam] array $data): void
     {
         extract($data);
@@ -459,14 +475,15 @@ class Game extends \Table
         $this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
         $character = $this->character->getActivateCharacter();
         $card = $this->decks->pickCard($deck);
-        $this->actions->spendActionCost('actDraw' . ucfirst($deck));
-
         $this->notify->all('cardDrawn', clienttranslate('${player_name} - ${character_name} drew from the ${deck} deck'), [
             'player_id' => $character['player_id'],
             'character_name' => $character['character_name'],
             'deck' => str_replace('-', ' ', $deck),
             'gameData' => $this->getAllDatas(),
         ]);
+        $this->hooks->onDraw($deck, $card);
+        $this->actions->spendActionCost('actDraw' . ucfirst($deck));
+
         $this->gameData->set('state', ['card' => $card, 'deck' => $deck]);
         $this->gamestate->nextState('drawCard');
     }
@@ -507,7 +524,9 @@ class Game extends \Table
     }
     public function argDrawCard()
     {
-        return $this->gameData->getGlobals('state');
+        $result = [...$this->gameData->getGlobals('state')];
+        $this->getDecks($result);
+        return $result;
     }
     public function argPostEncounter()
     {
@@ -670,6 +689,34 @@ class Game extends \Table
         ];
         return $result;
     }
+    public function addSkillConfirmation($skill, $data = null): void
+    {
+        $d = $this->gameData->getGlobals('skillConfirmationState');
+        if (!array_key_exists('skills', $d)) {
+            $d['skills'] = [];
+        }
+        $skill['data'] = $data;
+        array_push($d['skills'], $skill);
+        $this->gameData->set('skillConfirmationState', $d);
+    }
+    public function actSkillConfirmation($skillId): void
+    {
+        $data = $this->gameData->getGlobals('skillConfirmationState');
+        array_walk($data['skills'], function ($v) {
+            $this->hooks->onSkillConfirmation($v['id'], array_key_exists('data', $v) ? $v['data'] : null);
+        });
+        $this->gameData->set('skillConfirmationState', []);
+        $this->gamestate->nextState('playerTurn');
+    }
+    public function onSkillConfirmationCancel(): void
+    {
+        $this->gameData->set('skillConfirmationState', []);
+        $this->gamestate->nextState('playerTurn');
+    }
+    public function argSkillConfirmation(): array
+    {
+        return [...$this->gameData->getGlobals('skillConfirmationState'), 'actions' => []];
+    }
 
     /**
      * Compute and return the current game progression.
@@ -752,16 +799,26 @@ class Game extends \Table
         if ($day == 14) {
             $this->lose(); // Fail
         }
-        $woodNeeded = $this->getFirewoodCost();
         $difficulty = $this->getTrackDifficulty();
-
-        $healthAmount = 1;
+        $health = -1;
         if ($difficulty == 'hard') {
-            $healthAmount = 2;
+            $health = -2;
         }
-        $this->character->adjustAllHealth(-$healthAmount);
+        $data = [
+            'woodNeeded' => $this->getFirewoodCost(),
+            'difficulty' => $difficulty,
+            'health' => $health,
+            'skipMorningDamage' => [],
+        ];
+        $this->hooks->onMorning($data);
+        extract($data);
+        $this->character->updateAllCharacterData(function (&$data) use ($health, $skipMorningDamage) {
+            if (!in_array($data['id'], $skipMorningDamage)) {
+                $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
+            }
+        });
         $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} health'), [
-            'amount' => $healthAmount,
+            'amount' => -$health,
         ]);
 
         $this->notify->all('morningPhase', clienttranslate('The fire pit used ${amount} wood'), [
@@ -849,7 +906,9 @@ class Game extends \Table
         $result['builtEquipment'] = $this->getCraftedItems();
         $result['campEquipment'] = array_count_values($this->gameData->getGlobals('campEquipment'));
         $result['eatableFoods'] = array_map(function ($eatable) {
-            return [...$eatable['actEat'], 'id' => $eatable['id']];
+            $data = [...$eatable['actEat'], 'id' => $eatable['id']];
+            $this->hooks->onGetEatData($data);
+            return $data;
         }, $this->actions->getActionSelectable('actEat'));
         $selectable = $this->actions->getActionSelectable('actCraft');
         $result['availableEquipment'] = array_combine(
@@ -928,7 +987,7 @@ class Game extends \Table
             return $this->data->knowledgeTree[$unlock];
         }, $unlocks);
     }
-    public function unlockedKnowledge($knowledgeId): void
+    public function unlockKnowledge($knowledgeId): void
     {
         $array = $this->gameData->getGlobals('unlocks');
         array_push($array, $knowledgeId);
@@ -954,6 +1013,7 @@ class Game extends \Table
      */
     public function getAllDatas(): array
     {
+        $availableUnlocks = $this->data->getValidKnowledgeTree();
         $result = [
             'expansionList' => self::$expansionList,
             'expansion' => $this->getExpansion(),
@@ -961,6 +1021,9 @@ class Game extends \Table
             'trackDifficulty' => $this->getTrackDifficulty(),
             'fireWoodCost' => $this->getFirewoodCost(),
             'tradeRatio' => $this->getTradeRatio(),
+            'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
+                return ['id' => $id, 'name' => $this->data->knowledgeTree[$id]['name'], 'cost' => $availableUnlocks[$id]['cost']];
+            }, array_keys($availableUnlocks)),
         ];
         if ($this->gamestate->state()['name'] != 'characterSelect') {
             $result['actions'] = $this->actions->getValidActions();
@@ -1067,25 +1130,26 @@ class Game extends \Table
     public function giveResources()
     {
         $this->globals->set('resources', [
-            'fireWood' => 4,
-            'wood' => 4,
+            ...$this->gameData->getResources(),
+            // 'fireWood' => 4,
+            // 'wood' => 4,
             'bone' => 6,
-            'meat' => 4,
-            'meat-cooked' => 4,
-            'fish' => 0,
-            'fish-cooked' => 0,
-            'dino-egg' => 0,
-            'dino-egg-cooked' => 0,
+            // 'meat' => 4,
+            // 'meat-cooked' => 4,
+            // 'fish' => 0,
+            // 'fish-cooked' => 0,
+            // 'dino-egg' => 0,
+            // 'dino-egg-cooked' => 0,
             'berry' => 4,
-            'berry-cooked' => 4,
-            'rock' => 6,
-            'stew' => 0,
-            'fiber' => 6,
-            'hide' => 8,
-            'trap' => 0,
-            'herb' => 0,
-            'fkp' => 40,
-            'gem' => 0,
+            // 'berry-cooked' => 4,
+            // 'rock' => 6,
+            // 'stew' => 0,
+            // 'fiber' => 6,
+            // 'hide' => 8,
+            // 'trap' => 0,
+            // 'herb' => 0,
+            'fkp' => 1,
+            // 'gem' => 0,
         ]);
     }
     public function giveClub()
