@@ -178,13 +178,13 @@ class Actions
                 },
             ],
             'actUseSkill' => [
-                'state' => ['playerTurn', 'resolveEncounter', 'postEncounter'],
+                'state' => ['playerTurn', 'resolveEncounter', 'postEncounter', 'interrupt'],
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof($_this->getAvailableCharacterSkills()) > 0;
                 },
             ],
             'actUseItem' => [
-                'state' => ['playerTurn', 'resolveEncounter', 'postEncounter'],
+                'state' => ['playerTurn', 'resolveEncounter', 'postEncounter', 'interrupt'],
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof($_this->getAvailableItemSkills()) > 0;
                 },

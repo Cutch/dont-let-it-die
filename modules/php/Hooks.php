@@ -8,12 +8,11 @@ use BgaUserException;
 class Hooks
 {
     private Game $game;
+    private bool $checkInterrupt = false;
+    private array $hooks = [];
     public function __construct(Game $game)
     {
         $this->game = $game;
-    }
-    private function callHooks($functionName, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
-    {
         $unlocks = $this->game->getUnlockedKnowledge();
         $activeNightCards = $this->game->getActiveNightCards();
         $buildings = $this->game->getBuildings();
@@ -31,89 +30,118 @@ class Hooks
                 return [];
             }, $characters)
         );
-        $array = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$skills, ...$equipment];
-        foreach ($array as $i => $object) {
+        $this->hooks = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$skills, ...$equipment];
+    }
+    private function callHooks($functionName, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
+    {
+        $hooks = $this->hooks;
+        if ($this->checkInterrupt) {
+            // var_dump($functionName);
+            $hooks = array_filter($hooks, function ($object) use ($data1, $data2, $data3, $data4) {
+                return (!array_key_exists('state', $object) || in_array('interrupt', $object['state'])) &&
+                    (!array_key_exists('interruptState', $object) || in_array($data1['currentState'], $object['interruptState'])) &&
+                    (!array_key_exists('requires', $object) || $object['requires']($this->game, $object, $data1, $data2, $data3, $data4));
+            });
+        }
+        foreach ($hooks as $i => $object) {
             if (array_key_exists($functionName, $object)) {
-                $object[$functionName]($this->game, $object, $data1, $data2 = null, $data3 = null, $data4);
+                $object[$functionName]($this->game, $object, $data1, $data2, $data3, $data4);
             }
         }
+        $this->checkInterrupt = false;
     }
-    function onGetCharacterData(&$data)
+    function onGetCharacterData(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onGetValidActions(&$data)
+    function onGetValidActions(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onGetActionCost(&$data)
+    function onGetActionCost(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onGetActionSelectable(&$data)
+    function onGetActionSelectable(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onMorning(&$data)
+    function onMorning(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onNight(&$data)
+    function onNight(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onDraw($deck, $card)
+    function onDraw($data, $checkInterrupt = false)
     {
-        $this->callHooks(__FUNCTION__, $deck, $card);
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data['deck'], $data['card']);
     }
-    function onEncounter(&$data)
+    function onEncounter(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onEat(&$data)
+    function onEat(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onGetEatData(&$data)
+    function onGetEatData(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onCraft($card)
+    function onCraft($card, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $card);
     }
-    function onRollDie(&$data)
+    function onRollDie(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onInvestigateFire(&$data)
+    function onInvestigateFire(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onGetTradeRatio(&$data)
+    function onGetTradeRatio(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onDeckSelection(&$data)
+    function onDeckSelection(&$data, $checkInterrupt = false)
     {
+        $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onSkillConfirmation(&$data)
+    function onInterrupt(&$data, $activatedSkill, $checkInterrupt = true)
     {
-        $this->callHooks(__FUNCTION__, $data);
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data, $activatedSkill);
         return $data;
     }
 }

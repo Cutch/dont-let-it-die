@@ -96,67 +96,31 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'name' => 'Re-Roll Fire Die',
-                'state' => ['playerTurn'],
+                'state' => ['interrupt'],
+                'interruptState' => ['playerTurn'],
                 'stamina' => 0,
                 'onInvestigateFire' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    if ($char['isActive'] && $data < 3 && getUsePerDay($char['id'] . 'investigateFire', $game) < 1) {
+                    if (!$char['isActive'] && $data['roll'] < 3 && getUsePerDay($char['id'] . 'investigateFire', $game) < 1) {
                         // If kara is not the character, and the roll is not the max
-                        // usePerDay($char['id'], $game);
-                        $game->addSkillConfirmation($skill);
+                        $game->actInterrupt->addSkillInterrupt($skill);
                     }
                 },
-                'onSkillConfirmation' => function (Game $game, $skill, $skillId, $data) {
-                    $char = $game->character->getCharacterData($skill['characterId']);
-                    if ($skillId == $skill['id']) {
-                        $game->adjustResource($data['resourceType'], $data['count']);
-                        usePerDay($char['id'] . 'investigateFire', $game);
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    // var_dump(json_encode([$skill, $data, $activatedSkill]));
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $char = $game->character->getCharacterData($skill['characterId']);
                         $game->activeCharacterEventLog('is re-rolling ${active_character_name}\'s fire die', [
                             ...$char,
-                            'active_character_name' => $game->character->getActivateCharacter(['character_name']),
+                            'active_character_name' => $game->character->getActivateCharacter()['character_name'],
                         ]);
+                        $data['data']['roll'] = $game->rollFireDie($char);
+                        usePerDay($char['id'] . 'investigateFire', $game);
                     }
                 },
-                // 'skills' => [
-                //     'skill1' => [
-                //         'name' => 'Double Resources',
-                //         'state' => ['playerTurn'],
-                //         'stamina' => 3,
-                //         'onDraw' => function (Game $game, $skill, $deck, $card) {
-                //             $char = $game->character->getCharacterData($skill['characterId']);
-                //             if ($char['isActive'] && $card['deckType'] == 'resource') {
-                //                 $game->addSkillConfirmation($skill, $card);
-                //             }
-                //         },
-                //         'onSkillConfirmation' => function (Game $game, $skill, $skillId, $data) {
-                //             if ($skillId == $skill['id']) {
-                //                 $game->adjustResource($data['resourceType'], $data['count']);
-                //             }
-                //         },
-                //     ],
-                // ],
-                // 'onUse' => function (Game $game, $skill) {
-                //     $char = $game->character->getCharacterData($skill['characterId']);
-                //     if ($char['isActive']) {
-                //         // Shuffle it
-                //         $game->gameData->set('state', ['id' => $skill['id']]);
-                //         $game->gamestate->nextState('skillSelection');
-                //         return ['spendActionCost' => false, 'notify' => false];
-                //     }
-                // },
-                // 'onSkillSelection' => function (Game $game, $skill, $deckName) {
-                //     if ($game->gameData->getGlobals('state')['id'] == $skill['id']) {
-                //         $game->decks->shuffleInDiscard($deckName, false);
-                //         $game->actions->spendActionCost('actUseSkill', $skill['id']);
-                //         $game->activeCharacterEventLog('shuffled the ${deck} deck using their skill', [
-                //             'deck' => $deckName,
-                //         ]);
-                //     }
-                // },
-                // 'onUse' => function (Game $game, $skill) {
-                // },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
+                    // var_dump(json_encode([!$char['isActive'], getUsePerDay($char['id'] . 'investigateFire', $game) < 1]));
                     return !$char['isActive'] && getUsePerDay($char['id'] . 'investigateFire', $game) < 1;
                 },
             ],
@@ -169,7 +133,7 @@ $charactersData = [
                     usePerDay($char['id'] . 'stamina', $game);
                     $game->activeCharacterEventLog('gave 2 stamina to ${active_character_name}', [
                         ...$char,
-                        'active_character_name' => $game->character->getActivateCharacter(['character_name']),
+                        'active_character_name' => $game->character->getActivateCharacter()['character_name'],
                     ]);
                 },
                 'requires' => function (Game $game, $skill) {
@@ -233,7 +197,8 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'name' => 'Discard Night Event',
-                'state' => ['nightPhase'],
+                'state' => ['interrupt'],
+                'interruptState' => ['nightPhase'],
                 'stamina' => 2,
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
@@ -493,17 +458,18 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'name' => 'Double Resources',
-                'state' => ['playerTurn'],
+                'state' => ['interrupt'],
+                'interruptState' => ['playerTurn'],
                 'stamina' => 3,
                 'onDraw' => function (Game $game, $skill, $deck, $card) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource') {
-                        $game->addSkillConfirmation($skill, $card);
+                        $game->actInterrupt->addSkillInterrupt($skill);
                     }
                 },
-                'onSkillConfirmation' => function (Game $game, $skill, $skillId, $data) {
-                    if ($skillId == $skill['id']) {
-                        $game->adjustResource($data['resourceType'], $data['count']);
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $game->adjustResource($data['data']['resourceType'], $data['data']['count']);
                     }
                 },
             ],
@@ -556,6 +522,26 @@ $charactersData = [
                 array_push($data['skipMorningDamage'], 'Vog');
             }
         },
+        'skills' => [
+            'skill1' => [
+                'name' => 'Take Damage',
+                'state' => ['interrupt'],
+                'interruptState' => ['playerTurn'],
+                'stamina' => 0,
+                'health' => 0,
+                'onEncounter' => function (Game $game, $skill, $deck, $card) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($char['isActive'] && $card['deckType'] == 'resource') {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $game->adjustResource($data['data']['resourceType'], $data['data']['count']);
+                    }
+                },
+            ],
+        ],
     ],
     'AlternateUpgradeTrack' => [
         'type' => 'instructions',

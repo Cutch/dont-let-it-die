@@ -27,6 +27,42 @@ class GameData
     private ?array $resourcesBeforeTransaction = null;
     private array $cachedGameData = [];
     private ?array $cachedGameItems = null;
+    private static $defaults = [
+        'dailyUseItems' => [],
+        'buildings' => [],
+        'state' => [],
+        'unlocks' => [],
+        'campEquipment' => [],
+        'activeNightCards' => [],
+        'day' => 1,
+        'craftingLevel' => 0,
+        'turnOrder' => [],
+        'turnNo' => 0,
+        'turnActions' => [],
+        'interruptState' => [],
+        'actInterruptState' => [],
+        'resources' => [
+            'fireWood' => 0,
+            'wood' => 0,
+            'bone' => 0,
+            'meat' => 0,
+            'meat-cooked' => 0,
+            'fish' => 0,
+            'fish-cooked' => 0,
+            'dino-egg' => 0,
+            'dino-egg-cooked' => 0,
+            'berry' => 0,
+            'berry-cooked' => 0,
+            'rock' => 0,
+            'stew' => 0,
+            'fiber' => 0,
+            'hide' => 0,
+            'trap' => 0,
+            'herb' => 0,
+            'fkp' => 0,
+            'gem' => 0,
+        ],
+    ];
     public function __construct(Game $game)
     {
         $this->game = $game;
@@ -35,6 +71,9 @@ class GameData
     public function reload(): void
     {
         $this->cachedGameData = $this->game->globals->getAll();
+        if (sizeof($this->cachedGameData) == 0) {
+            $this->cachedGameData = self::$defaults;
+        }
         if (!$this->resourcesBeforeTransaction && array_key_exists('resources', $this->cachedGameData)) {
             $this->resourcesBeforeTransaction = $this->cachedGameData['resources'];
         }
@@ -102,39 +141,9 @@ class GameData
     }
     public function setup()
     {
-        $this->game->globals->set('dailyUseItems', []);
-        $this->game->globals->set('buildings', []);
-        $this->game->globals->set('state', []);
-        $this->game->globals->set('unlocks', []);
-        $this->game->globals->set('campEquipment', []);
-        $this->game->globals->set('activeNightCards', []);
-        $this->game->globals->set('day', 1);
-        $this->game->globals->set('craftingLevel', 0);
-        $this->game->globals->set('turnOrder', []);
-        $this->game->globals->set('turnNo', 0);
-        $this->game->globals->set('turnActions', []);
-        $this->game->globals->set('skillConfirmationState', []);
-        $this->game->globals->set('resources', [
-            'fireWood' => 0,
-            'wood' => 0,
-            'bone' => 0,
-            'meat' => 0,
-            'meat-cooked' => 0,
-            'fish' => 0,
-            'fish-cooked' => 0,
-            'dino-egg' => 0,
-            'dino-egg-cooked' => 0,
-            'berry' => 0,
-            'berry-cooked' => 0,
-            'rock' => 0,
-            'stew' => 0,
-            'fiber' => 0,
-            'hide' => 0,
-            'trap' => 0,
-            'herb' => 0,
-            'fkp' => 0,
-            'gem' => 0,
-        ]);
+        foreach (self::$defaults as $k => $v) {
+            $this->game->globals->set($k, $v);
+        }
         $this->reload();
     }
 }

@@ -37,6 +37,7 @@ class Game extends \Table
     public Decks $decks;
     public GameData $gameData;
     public Hooks $hooks;
+    public ActInterrupt $actInterrupt;
     public static array $expansionList = ['base', 'mini-expansion', 'hindrance'];
     /**
      * Your global variables labels:
@@ -64,6 +65,7 @@ class Game extends \Table
         $this->characterSelection = new CharacterSelection($this);
         $this->gameData = new GameData($this);
         $this->hooks = new Hooks($this);
+        $this->actInterrupt = new ActInterrupt($this);
         // automatically complete notification args when needed
         $this->notify->addDecorator(function (string $message, array $args) {
             $args['gamestate'] = ['name' => $this->gamestate->state()['name']];
@@ -412,17 +414,21 @@ class Game extends \Table
     public function actUseSkill(string $skillId): void
     {
         $this->actions->validateCanRunAction('actUseSkill', $skillId);
-        $character = $this->character->getActivateCharacter();
-        $skill = $character['skills'][$skillId];
-        $result = $skill['onUse']($this, $skill, $character);
-        if (!$result || (array_key_exists('spendActionCost', $result) && $result['spendActionCost'] != false)) {
-            $this->actions->spendActionCost('actUseSkill', $skillId);
-        }
-        if (!$result || (array_key_exists('notify', $result) && $result['notify'] != false)) {
-            $this->notify->all('updateGameData', clienttranslate('${player_name} - ${character_name} used the skill ${skill_name}'), [
-                'gameData' => $this->getAllDatas(),
-                'skill_name' => $skill['name'],
-            ]);
+        if ($this->gamestate->state()['name'] == 'interrupt') {
+            $this->actInterrupt->actInterrupt($skillId);
+        } else {
+            $character = $this->character->getActivateCharacter();
+            $skill = $character['skills'][$skillId];
+            $result = $skill['onUse']($this, $skill, $character);
+            if (!$result || (array_key_exists('spendActionCost', $result) && $result['spendActionCost'] != false)) {
+                $this->actions->spendActionCost('actUseSkill', $skillId);
+            }
+            if (!$result || (array_key_exists('notify', $result) && $result['notify'] != false)) {
+                $this->notify->all('updateGameData', clienttranslate('${player_name} - ${character_name} used the skill ${skill_name}'), [
+                    'gameData' => $this->getAllDatas(),
+                    'skill_name' => $skill['name'],
+                ]);
+            }
         }
     }
     public function actUseItem(string $skillId): void
@@ -464,28 +470,53 @@ class Game extends \Table
     }
     public function actInvestigateFire(): void
     {
-        $this->actions->validateCanRunAction('actInvestigateFire');
-        $character = $this->character->getActivateCharacter();
-        $roll = $this->rollFireDie($character);
-        $this->adjustResource('fkp', $roll);
-        $this->actions->spendActionCost('actInvestigateFire');
+        // var_dump(json_encode(['actInvestigateFire']));
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            [],
+            [$this->hooks, 'onInvestigateFire'],
+            function ($_this) {
+                $_this->actions->validateCanRunAction('actInvestigateFire');
+                $character = $_this->character->getActivateCharacter();
+                $roll = $_this->rollFireDie($character);
+                $_this->actions->spendActionCost('actInvestigateFire');
+                return ['roll' => $roll];
+            },
+            function ($_this, $data) {
+                // var_dump(json_encode(['actInvestigateFire', $data]));
+                $_this->adjustResource('fkp', $data['roll']);
+                $this->notify->all('tokenUsed', '', [
+                    'gameData' => $this->getAllDatas(),
+                ]);
+            }
+        );
     }
     public function actDraw(string $deck): void
     {
-        $this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
-        $character = $this->character->getActivateCharacter();
-        $card = $this->decks->pickCard($deck);
-        $this->notify->all('cardDrawn', clienttranslate('${player_name} - ${character_name} drew from the ${deck} deck'), [
-            'player_id' => $character['player_id'],
-            'character_name' => $character['character_name'],
-            'deck' => str_replace('-', ' ', $deck),
-            'gameData' => $this->getAllDatas(),
-        ]);
-        $this->hooks->onDraw($deck, $card);
-        $this->actions->spendActionCost('actDraw' . ucfirst($deck));
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            [$deck],
+            [$this->hooks, 'onDraw'],
+            function ($_this, $deck) {
+                $_this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
+                $character = $_this->character->getActivateCharacter();
+                $card = $_this->decks->pickCard($deck);
+                $_this->notify->all('cardDrawn', clienttranslate('${player_name} - ${character_name} drew from the ${deck} deck'), [
+                    'player_id' => $character['player_id'],
+                    'character_name' => $character['character_name'],
+                    'deck' => str_replace('-', ' ', $deck),
+                    'gameData' => $_this->getAllDatas(),
+                ]);
+                return ['deck' => $deck, 'card' => $card];
+            },
+            function ($_this, $data) {
+                extract($data);
+                $_this->actions->spendActionCost('actDraw' . ucfirst($deck));
 
-        $this->gameData->set('state', ['card' => $card, 'deck' => $deck]);
-        $this->gamestate->nextState('drawCard');
+                $_this->gameData->set('state', ['card' => $card, 'deck' => $deck]);
+                $_this->gamestate->nextState('drawCard');
+            }
+        );
     }
     public function actEndTurn(): void
     {
@@ -508,6 +539,8 @@ class Game extends \Table
             $this->gamestate->nextState('playerTurn');
         } elseif ($stateName == 'tradePhase') {
             $this->gamestate->nextState('activePhase');
+        } elseif ($stateName == 'interrupt') {
+            $this->actInterrupt->onInterruptCancel();
         }
     }
 
@@ -542,90 +575,101 @@ class Game extends \Table
     }
     public function stResolveEncounter()
     {
-        extract($this->gameData->getGlobals('state'));
-        $tools = array_filter($this->character->getActiveEquipment(), function ($item) {
-            return array_key_exists('onEncounter', $item) && !(!array_key_exists('requires', $item) || $item['requires']($item));
-        });
-        if (sizeof($tools) >= 2) {
-            $weapon = $this->gameData->getGlobals('useTools');
-            if ($weapon) {
-                $this->gameData->set('chooseWeapon', null);
-            } else {
-                // TODO: Ask if want to use tools
-                $this->gameData->set('useTools', $weapons);
-                $this->gamestate->nextState('whichTool');
-                return;
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            [],
+            [$this->hooks, 'onEncounter'],
+            function ($_this) {
+                $card = $_this->gameData->getGlobals('state')['card'];
+                $tools = array_filter($_this->character->getActiveEquipment(), function ($item) {
+                    return array_key_exists('onEncounter', $item) && !(!array_key_exists('requires', $item) || $item['requires']($item));
+                });
+                $weapons = array_filter($this->character->getActiveEquipment(), function ($item) {
+                    return $item['itemType'] == 'weapon';
+                });
+                if (sizeof($tools) >= 2) {
+                    $weapon = $_this->gameData->getGlobals('useTools');
+                    if ($weapon) {
+                        $_this->gameData->set('chooseWeapon', null);
+                    } else {
+                        // TODO: Ask if want to use tools
+                        $_this->gameData->set('useTools', $weapons);
+                        $_this->gamestate->nextState('whichTool');
+                        return;
+                    }
+                }
+                $weapon = null;
+                if (sizeof($weapons) >= 2) {
+                    $weapon = $_this->gameData->getGlobals('chooseWeapon');
+                    if ($weapon) {
+                        $_this->gameData->set('chooseWeapon', null);
+                    } else {
+                        // TODO: Ask gronk if you want to combine two weapons or pick one
+                        // Highest range, lowest damage for combine
+                        $_this->gameData->set('chooseWeapon', $weapons);
+                        $_this->gamestate->nextState('whichWeapon');
+                        return;
+                    }
+                } elseif (sizeof($weapons) >= 1) {
+                    $weapon = $weapons[0];
+                } else {
+                    $weapon = [
+                        'damage' => 0,
+                        'range' => 1,
+                    ];
+                }
+                return [
+                    'name' => $card['name'],
+                    'encounterDamage' => $card['damage'], // Unused, maybe in logging
+                    'encounterHealth' => $card['health'],
+                    'escape' => false,
+                    'characterRange' => $weapon['range'],
+                    'characterDamage' => $weapon['damage'],
+                    'willTakeDamage' => $card['damage'],
+                    'willReceiveMeat' => $card['health'],
+                    'stamina' => 0,
+                    'killed' => false,
+                ];
+            },
+            function ($_this, $data) {
+                if ($data['stamina'] != 0) {
+                    $_this->character->adjustActiveStamina($data['stamina']);
+                }
+                if ($data['escape']) {
+                    $_this->activeCharacterEventLog('escaped from a ${name}', $data);
+                } elseif ($data['encounterHealth'] <= $data['characterDamage']) {
+                    $data['killed'] = true;
+                    $damageTaken = 0;
+                    if ($data['characterRange'] > 1) {
+                        $damageTaken = 0;
+                    } else {
+                        $damageTaken = max($data['willTakeDamage'], 1);
+                    }
+                    if ($damageTaken != 0) {
+                        $_this->character->adjustActiveHealth(-$damageTaken);
+                    }
+                    $_this->adjustResource('meat', $data['willReceiveMeat']);
+                    $_this->activeCharacterEventLog('defeated a ${name}, took ${damageTaken} damage and gained ${willReceiveMeat} meat', [
+                        ...$data,
+                        'damageTaken' => $damageTaken,
+                    ]);
+                } else {
+                    $_this->character->adjustActiveHealth(-$data['willTakeDamage']);
+                    $_this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);
+                }
+                $_this->gameData->set('encounterState', $data);
+                $_this->gamestate->nextState('postEncounter');
             }
-        }
-        $weapons = array_filter($this->character->getActiveEquipment(), function ($item) {
-            return $item['itemType'] == 'weapon';
-        });
-        $weapon = null;
-        if (sizeof($weapons) >= 2) {
-            $weapon = $this->gameData->getGlobals('chooseWeapon');
-            if ($weapon) {
-                $this->gameData->set('chooseWeapon', null);
-            } else {
-                // TODO: Ask gronk if you want to combine two weapons or pick one
-                // Highest range, lowest damage for combine
-                $this->gameData->set('chooseWeapon', $weapons);
-                $this->gamestate->nextState('whichWeapon');
-                return;
-            }
-        } elseif (sizeof($weapons) >= 1) {
-            $weapon = $weapons[0];
-        } else {
-            $weapon = [
-                'damage' => 0,
-                'range' => 1,
-            ];
-        }
-        $data = [
-            'name' => $card['name'],
-            'encounterDamage' => $card['damage'], // Unused, maybe in logging
-            'encounterHealth' => $card['health'],
-            'escape' => false,
-            'characterRange' => $weapon['range'],
-            'characterDamage' => $weapon['damage'],
-            'willTakeDamage' => $card['damage'],
-            'willReceiveMeat' => $card['health'],
-            'stamina' => 0,
-            'killed' => false,
-        ];
-        $this->hooks->onEncounter($data);
-        if ($data['stamina'] != 0) {
-            $this->character->adjustActiveStamina($data['stamina']);
-        }
-        if ($data['escape']) {
-            $this->activeCharacterEventLog('escaped from a ${name}', $data);
-        } elseif ($data['encounterHealth'] <= $data['characterDamage']) {
-            $data['killed'] = true;
-            $damageTaken = 0;
-            if ($data['characterRange'] > 1) {
-                $damageTaken = 0;
-            } else {
-                $damageTaken = max($data['willTakeDamage'], 1);
-            }
-            if ($damageTaken != 0) {
-                $this->character->adjustActiveHealth(-$damageTaken);
-            }
-            $this->adjustResource('meat', $data['willReceiveMeat']);
-            $this->activeCharacterEventLog('defeated a ${name}, took ${damageTaken} damage and gained ${willReceiveMeat} meat', [
-                ...$data,
-                'damageTaken' => $damageTaken,
-            ]);
-        } else {
-            $this->character->adjustActiveHealth(-$data['willTakeDamage']);
-            $this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);
-        }
-        $this->gameData->set('encounterState', $data);
-        $this->gamestate->nextState('postEncounter');
-        // $this->gamestate->setPlayersMultiactive([], 'playerTurn');
+        );
     }
     public function argResolveEncounter()
     {
         $result = [...$this->getAllDatas()];
         return $result;
+    }
+    public function stPlayerTurn()
+    {
+        $this->actInterrupt->checkForInterrupt();
     }
     public function stDrawCard()
     {
@@ -634,7 +678,7 @@ class Game extends \Table
         if ($card['deckType'] == 'resource') {
             $this->adjustResource($card['resourceType'], $card['count']);
 
-            $this->notify->all('foundResource', clienttranslate('${player_name} - ${character_name} found ${count} ${name}'), [
+            $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} found ${count} ${name}'), [
                 'player_id' => $character['player_id'],
                 'character_name' => $character['character_name'],
                 ...$card,
@@ -689,33 +733,37 @@ class Game extends \Table
         ];
         return $result;
     }
-    public function addSkillConfirmation($skill, $data = null): void
+    // public function addSkillInterrupt($skill, $data = null): void
+    // {
+    //     $d = $this->gameData->getGlobals('interruptState');
+    //     if (!array_key_exists('skills', $d)) {
+    //         $d['skills'] = [];
+    //     }
+    //     $skill['data'] = $data;
+    //     array_push($d['skills'], $skill);
+    //     $this->gameData->set('interruptState', $d);
+    // }
+    // public function actInterrupt($skillId): void
+    // {
+    //     $data = $this->gameData->getGlobals('interruptState');
+    //     array_walk($data['skills'], function ($v) {
+    //         $this->hooks->onInterrupt($v['id'], array_key_exists('data', $v) ? $v['data'] : null);
+    //     });
+    //     $this->gameData->set('interruptState', []);
+    //     $this->gamestate->nextState('playerTurn');
+    // }
+    // public function onInterruptCancel(): void
+    // {
+    //     $this->gameData->set('interruptState', []);
+    //     $this->gamestate->nextState('playerTurn');
+    // }
+    public function argInterrupt(): array
     {
-        $d = $this->gameData->getGlobals('skillConfirmationState');
-        if (!array_key_exists('skills', $d)) {
-            $d['skills'] = [];
-        }
-        $skill['data'] = $data;
-        array_push($d['skills'], $skill);
-        $this->gameData->set('skillConfirmationState', $d);
+        return $this->actInterrupt->argInterrupt();
     }
-    public function actSkillConfirmation($skillId): void
+    public function stInterrupt(): void
     {
-        $data = $this->gameData->getGlobals('skillConfirmationState');
-        array_walk($data['skills'], function ($v) {
-            $this->hooks->onSkillConfirmation($v['id'], array_key_exists('data', $v) ? $v['data'] : null);
-        });
-        $this->gameData->set('skillConfirmationState', []);
-        $this->gamestate->nextState('playerTurn');
-    }
-    public function onSkillConfirmationCancel(): void
-    {
-        $this->gameData->set('skillConfirmationState', []);
-        $this->gamestate->nextState('playerTurn');
-    }
-    public function argSkillConfirmation(): array
-    {
-        return [...$this->gameData->getGlobals('skillConfirmationState'), 'actions' => []];
+        $this->actInterrupt->stInterrupt();
     }
 
     /**
@@ -1055,6 +1103,7 @@ class Game extends \Table
      */
     protected function setupNewGame($players, $options = [])
     {
+        $this->gameData->setup();
         // Set the colors of the players with HTML color code. The default below is red/green/blue/orange/brown. The
         // number of colors defined here must correspond to the maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
@@ -1083,7 +1132,6 @@ class Game extends \Table
         $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         $this->reloadPlayersBasicInfos();
         $this->decks->setup();
-        $this->gameData->setup();
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();

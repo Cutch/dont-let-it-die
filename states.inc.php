@@ -75,6 +75,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('${currentCharacter} can'),
         'type' => 'activeplayer',
         'args' => 'argPlayerState',
+        'action' => 'stPlayerTurn',
         'possibleactions' => [
             // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
             'actDrawGather',
@@ -92,7 +93,7 @@ $machinestates = [
             'actUseSkill',
             'actUseItem',
         ],
-        'transitions' => ['drawCard' => 11, 'tooManyItems' => 12, 'deckSelection' => 13, 'reRoll' => 14, 'endTurn' => 15],
+        'transitions' => ['drawCard' => 11, 'tooManyItems' => 12, 'deckSelection' => 13, 'endTurn' => 15, 'interrupt' => 22],
     ],
     11 => [
         'name' => 'drawCard',
@@ -152,13 +153,20 @@ $machinestates = [
         'transitions' => ['playerTurn' => 10],
     ],
     22 => [
-        'name' => 'skillConfirmation',
-        'description' => clienttranslate('${actplayer}(${currentCharacter}) is looking at their skills'),
+        'name' => 'interrupt',
+        'description' => clienttranslate('${actplayer} is looking at their skills'),
         'descriptionmyturn' => clienttranslate('Looking at skills'),
         'type' => 'multipleactiveplayer',
-        'args' => 'argSkillConfirmation',
-        'possibleactions' => ['actSkillConfirmation', 'onSkillConfirmationCancel'],
-        'transitions' => ['playerTurn' => 10],
+        'action' => 'stInterrupt',
+        'args' => 'argInterrupt',
+        'possibleactions' => ['actUseSkill', 'actUseItem', 'onInterruptCancel'],
+        'transitions' => [
+            'playerTurn' => 10,
+            'resolveEncounter' => 20,
+            'postEncounter' => 21,
+            'nightPhase' => 30,
+            'morningPhase' => 50,
+        ],
     ],
     15 => [
         'name' => 'nextCharacter',
@@ -173,7 +181,7 @@ $machinestates = [
         'description' => clienttranslate('It\'s night time'),
         'type' => 'game',
         'action' => 'stNightPhase',
-        'transitions' => ['endGame' => 99, 'morning' => 50],
+        'transitions' => ['endGame' => 99, 'morning' => 50, 'interrupt' => 22],
     ],
     50 => [
         'name' => 'morningPhase',
@@ -181,7 +189,7 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stMorningPhase',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'tradePhase' => 60],
+        'transitions' => ['endGame' => 99, 'tradePhase' => 60, 'interrupt' => 22],
     ],
     60 => [
         'name' => 'tradePhase',

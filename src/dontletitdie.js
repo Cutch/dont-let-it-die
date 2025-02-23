@@ -594,15 +594,16 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         // Add test action buttons in the action status bar, simulating a card click:
         if (actions)
           Object.keys(actions).forEach((action) => {
-            if (action === 'actUseSkill' && stateName === 'postEncounter') {
+            if (action === 'actUseSkill' && ['interrupt', 'postEncounter'].includes(stateName)) {
               return Object.values(args.availableSkills).forEach((skill) => {
                 const cost = this.getActionCostHTML(skill);
                 this.statusBar.addActionButton(`${_(skill.name)}${cost}`, () => {
+                  console.log(action, { skillId: skill.id });
                   return this.bgaPerformAction(action, { skillId: skill.id });
                 });
               });
             }
-            if (action === 'actUseItem' && stateName === 'postEncounter') {
+            if (action === 'actUseItem' && ['interrupt', 'postEncounter'].includes(stateName)) {
               return Object.values(args.availableItemSkills).forEach((skill) => {
                 const cost = this.getActionCostHTML(skill);
                 this.statusBar.addActionButton(`${_(skill.name)}${cost}`, () => {
@@ -722,6 +723,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 this.selector.hide(),
               );
             });
+            break;
+
+          case 'interrupt':
+            this.statusBar.addActionButton(_('Skip'), () => this.bgaPerformAction('actInterruptCancel'), { color: 'secondary' });
             break;
           case 'tradePhase':
           case 'postEncounter':
