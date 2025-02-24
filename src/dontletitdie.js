@@ -542,8 +542,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           this.updateTrack(args.args);
           break;
         case 'drawCard':
-          this.decks[args.args.deck].drawCard(args.args.card.id);
-          this.decks[args.args.deck].updateDeckCounts(args.args.decks[args.args.deck]);
+          if (!args.args.resolving) {
+            this.decks[args.args.deck].drawCard(args.args.card.id);
+            this.decks[args.args.deck].updateDeckCounts(args.args.decks[args.args.deck]);
+          }
           break;
         case 'dummy':
           break;
@@ -565,7 +567,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'characterSelect':
           dojo.style('character-selector', 'display', 'none');
           dojo.style('game_play_area', 'display', '');
-
           break;
 
         // case 'dummy':
@@ -597,8 +598,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             if (action === 'actUseSkill' && ['interrupt', 'postEncounter'].includes(stateName)) {
               return Object.values(args.availableSkills).forEach((skill) => {
                 const cost = this.getActionCostHTML(skill);
-                this.statusBar.addActionButton(`${_(skill.name)}${cost}`, () => {
-                  console.log(action, { skillId: skill.id });
+                this.statusBar.addActionButton(`${_(skill.name)} (${skill.characterId})${cost}`, () => {
                   return this.bgaPerformAction(action, { skillId: skill.id });
                 });
               });
@@ -606,7 +606,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             if (action === 'actUseItem' && ['interrupt', 'postEncounter'].includes(stateName)) {
               return Object.values(args.availableItemSkills).forEach((skill) => {
                 const cost = this.getActionCostHTML(skill);
-                this.statusBar.addActionButton(`${_(skill.name)}${cost}`, () => {
+                this.statusBar.addActionButton(`${_(skill.name)} (${skill.characterId})${cost}`, () => {
                   return this.bgaPerformAction(action, { skillId: skill.id });
                 });
               });
@@ -726,7 +726,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             break;
 
           case 'interrupt':
-            this.statusBar.addActionButton(_('Skip'), () => this.bgaPerformAction('actInterruptCancel'), { color: 'secondary' });
+            this.statusBar.addActionButton(_('Skip'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
             break;
           case 'tradePhase':
           case 'postEncounter':

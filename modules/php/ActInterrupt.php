@@ -23,11 +23,11 @@ class ActInterrupt
         callable $endCallback
     ) {
         $existingData = $this->getState();
-        // var_dump(json_encode($existingData));
         if (!$existingData || !array_key_exists('functionName', $existingData)) {
             // First time calling
+            // var_dump(json_encode(['$startCallback', $this->activatableSkills]));
             $data = $startCallback($this->game, ...$args);
-            $hook($data);
+            $hook($data, false);
             $interruptData = [
                 'data' => $data,
                 'functionName' => $functionName,
@@ -36,6 +36,7 @@ class ActInterrupt
                 'skills' => $this->activatableSkills,
             ];
             if (sizeof($this->activatableSkills) == 0) {
+                // var_dump(json_encode(['exitHook', $this->game->gamestate->state()['name'], 'noSkill']));
                 // No skills can activate
                 $endCallback($this->game, $data, ...$args);
             } else {
@@ -44,11 +45,20 @@ class ActInterrupt
                 $this->game->gamestate->nextState('interrupt');
             }
         } else {
-            $hook($existingData['data']);
+            // var_dump(json_encode(['exitHook', $this->game->gamestate->state()['name']]));
+            $this->setState([]);
+            // Don't need to re-check for interrupts
+            $hook($existingData['data'], false);
             // Calling after skill screen
             $endCallback($this->game, $existingData['data'], ...$existingData['args']);
-            $this->setState([]);
         }
+    }
+    public function isStateResolving(): bool
+    {
+        $existingData = $this->getState();
+        return $existingData &&
+            array_key_exists('currentState', $existingData) &&
+            $existingData['currentState'] == $this->game->gamestate->state()['name'];
     }
     public function checkForInterrupt(): bool
     {
@@ -60,7 +70,7 @@ class ActInterrupt
         }
         return false;
     }
-    private function getState()
+    public function getState()
     {
         return $this->game->gameData->getGlobals('actInterruptState');
     }
@@ -78,7 +88,7 @@ class ActInterrupt
             }, $skills)
         );
     }
-    public function addSkillInterrupt($skill, $data = null): void
+    public function addSkillInterrupt($skill): void
     {
         array_push($this->activatableSkills, $skill);
     }
@@ -89,11 +99,12 @@ class ActInterrupt
 
         $playerIds = $this->getSkillsPlayerIds($skills);
         array_walk($skills, function ($v, $k) use ($skillId, &$skills, &$data) {
+            // var_dump(json_encode([$skillId, $v['id']]));
             if ($skillId == $v['id']) {
+                // var_dump(json_encode(['onInterrupt']));
                 $this->game->hooks->onInterrupt($data, $v);
                 unset($skills[$k]);
                 $skills = array_values($skills);
-                // var_dump([json_encode($skills)]);
             }
         });
         $this->setState([...$data, 'skills' => $skills]);
@@ -109,16 +120,32 @@ class ActInterrupt
     {
         $data = $this->getState();
         $playerId = $this->game->getCurrentPlayer();
+        // var_dump(json_encode([$this->game->gamestate->state()['name'], $data['currentState']]));
         $this->game->gamestate->setPlayerNonMultiactive($playerId, $data['currentState']);
     }
     public function argInterrupt(): array
     {
         $data = $this->getState();
         return [
-            'currentCharacter' => $this->game->character->getActivateCharacter()['character_name'],
+            'currentCharacter' => $this->game->character->getTurnCharacter()['character_name'],
             ...$data,
             'actions' => ['actUseSkill' => []],
-            'availableSkills' => $data['skills'],
+            'availableSkills' => array_map(function ($skill) {
+                $actionCost = [
+                    'action' => 'actUseSkill',
+                    'subAction' => $skill['id'],
+                    'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
+                    'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
+                ];
+                $this->game->hooks->onGetActionCost($actionCost);
+                if (array_key_exists('stamina', $actionCost)) {
+                    $skill['stamina'] = $actionCost['stamina'];
+                }
+                if (array_key_exists('health', $actionCost)) {
+                    $skill['health'] = $actionCost['health'];
+                }
+                return $skill;
+            }, $data['skills']),
         ];
     }
     public function stInterrupt(): void

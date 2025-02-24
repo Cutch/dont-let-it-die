@@ -102,7 +102,7 @@ $machinestates = [
         'type' => 'game',
         'args' => 'argDrawCard',
         'action' => 'stDrawCard',
-        'transitions' => ['resolveEncounter' => 20, 'playerTurn' => 10],
+        'transitions' => ['resolveEncounter' => 20, 'playerTurn' => 10, 'interrupt' => 22],
     ],
     12 => [
         'name' => 'tooManyItems',
@@ -140,7 +140,7 @@ $machinestates = [
         'action' => 'stResolveEncounter',
         'args' => 'argResolveEncounter',
         'possibleactions' => ['actChooseResource', 'actUseItem'],
-        'transitions' => ['postEncounter' => 21],
+        'transitions' => ['postEncounter' => 21, 'interrupt' => 22],
     ],
     21 => [
         'name' => 'postEncounter',
@@ -159,13 +159,14 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'action' => 'stInterrupt',
         'args' => 'argInterrupt',
-        'possibleactions' => ['actUseSkill', 'actUseItem', 'onInterruptCancel'],
+        'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => [
             'playerTurn' => 10,
             'resolveEncounter' => 20,
             'postEncounter' => 21,
             'nightPhase' => 30,
             'morningPhase' => 50,
+            'drawCard' => 11,
         ],
     ],
     15 => [

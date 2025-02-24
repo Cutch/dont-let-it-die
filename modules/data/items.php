@@ -72,14 +72,10 @@ $itemsData = [
         'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'fiber') {
                 $game->gameData->setResource('fiber', $game->gameData->getResource('fiber') + 1);
-                $this->notify->all(
-                    'usedItem',
-                    clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
-                    [
-                        'item_name' => $item['name'],
-                        'resource_type' => $card['resourceType'],
-                    ]
-                );
+                $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                    'item_name' => $item['name'],
+                    'resource_type' => $card['resourceType'],
+                ]);
             }
         },
     ],
@@ -96,14 +92,10 @@ $itemsData = [
         'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'berry') {
                 $game->gameData->setResource('berry', $game->gameData->getResource('berry') + 1);
-                $this->notify->all(
-                    'usedItem',
-                    clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
-                    [
-                        'item_name' => $item['name'],
-                        'resource_type' => $card['resourceType'],
-                    ]
-                );
+                $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                    'item_name' => $item['name'],
+                    'resource_type' => $card['resourceType'],
+                ]);
             }
         },
     ],
@@ -204,14 +196,10 @@ $itemsData = [
         'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'wood') {
                 $game->gameData->setResource('wood', $game->gameData->getResource('wood') + 1);
-                $this->notify->all(
-                    'usedItem',
-                    clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
-                    [
-                        'item_name' => $item['name'],
-                        'resource_type' => $card['resourceType'],
-                    ]
-                );
+                $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                    'item_name' => $item['name'],
+                    'resource_type' => $card['resourceType'],
+                ]);
             }
         },
     ],
@@ -260,14 +248,10 @@ $itemsData = [
         'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'meat') {
                 $game->gameData->setResource('meat', $game->gameData->getResource('meat') + 1);
-                $this->notify->all(
-                    'usedItem',
-                    clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
-                    [
-                        'item_name' => $item['name'],
-                        'resource_type' => $card['resourceType'],
-                    ]
-                );
+                $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                    'item_name' => $item['name'],
+                    'resource_type' => $card['resourceType'],
+                ]);
             }
         },
     ],
@@ -294,14 +278,10 @@ $itemsData = [
         },
         'onUse' => function (Game $game, $item) {
             $game->gameData->setResource('rock', $game->gameData->getResource('rock') - 1);
-            $this->notify->all(
-                'usedItem',
-                clienttranslate('${player_name} - ${character_name} used ${item_name} and lost one ${resource_type}'),
-                [
-                    'item_name' => $item['name'],
-                    'resource_type' => 'rock',
-                ]
-            );
+            $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and lost one ${resource_type}'), [
+                'item_name' => $item['name'],
+                'resource_type' => 'rock',
+            ]);
         },
     ],
     'pick-axe' => [
@@ -318,14 +298,10 @@ $itemsData = [
         'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'rock') {
                 $game->gameData->setResource('rock', $game->gameData->getResource('rock') + 1);
-                $this->notify->all(
-                    'usedItem',
-                    clienttranslate('${player_name} - ${character_name} used ${item_name} and received one ${resource_type}'),
-                    [
-                        'item_name' => $item['name'],
-                        'resource_type' => $card['resourceType'],
-                    ]
-                );
+                $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                    'item_name' => $item['name'],
+                    'resource_type' => $card['resourceType'],
+                ]);
             }
         },
     ],
@@ -542,7 +518,7 @@ $itemsData = [
             'rock' => 1,
         ],
         'onUse' => function (Game $game, $item) {
-            $game->character->updateCharacterData($game->character->getActivateCharacter()['character_name'], function (&$data) use (
+            $game->character->updateCharacterData($game->character->getSubmittingCharacter()['character_name'], function (&$data) use (
                 $item
             ) {
                 if ($item['id'] == $data['item_2']) {
@@ -551,13 +527,9 @@ $itemsData = [
                     $data['item_2'] = null;
                 }
             });
-            $this->notify->all(
-                'usedItem',
-                clienttranslate('${player_name} - ${character_name} used ${item_name} and lost their ${item_name}'),
-                [
-                    'item_name' => $item['name'],
-                ]
-            );
+            $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and lost their ${item_name}'), [
+                'item_name' => $item['name'],
+            ]);
         },
     ],
     'bola' => [

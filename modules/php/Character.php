@@ -9,6 +9,7 @@ use Exception;
 class Character
 {
     private Game $game;
+    private ?string $submittingCharacter = null;
     private array $cachedData = [];
     private static array $characterColumns = [
         'character_name',
@@ -117,7 +118,7 @@ class Character
                 'isActive' => $isActive,
                 ...$_this->game->data->items[$itemName],
                 'skills' => $skills,
-                'character_name' => $characterName,
+                // 'character_name' => $characterName,
             ];
         }, array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']]));
         if (!$_skipHooks) {
@@ -172,7 +173,46 @@ class Character
             $data['item_3'] = array_key_exists(2, $equipment) ? $equipment[2] : null;
         });
     }
-    public function getActivateCharacter(): array
+    public function setSubmittingCharacter($action, $subAction = null): void
+    {
+        if ($action == 'actUseSkill') {
+            $this->submittingCharacter = $this->game->character->getSkill($subAction)['character']['id'];
+        } elseif ($action == 'actUseSkill') {
+            $this->submittingCharacter = $this->game->character->getItem($subAction)['character']['id'];
+        }
+    }
+    public function getSkill($skillId): ?array
+    {
+        $characters = $this->game->character->getAllCharacterData(true);
+        foreach ($characters as $k => $v) {
+            if (array_key_exists('skills', $v)) {
+                if (array_key_exists($skillId, $v['skills'])) {
+                    return ['character' => $v, 'skill' => $v['skills'][$skillId]];
+                }
+            }
+        }
+        return null;
+    }
+    public function getItem($itemId): ?array
+    {
+        $characters = $this->game->character->getAllCharacterData(true);
+        foreach ($characters as $k => $v) {
+            $array = array_filter($v['equipment'], function ($item) use ($itemId) {
+                return $item['itemId'] == $itemId;
+            });
+            if (sizeof($array) > 0) {
+                return ['character' => $v, 'item' => $$array[0]];
+            }
+        }
+        return null;
+    }
+    public function getSubmittingCharacter(): array
+    {
+        return $this->submittingCharacter
+            ? $this->getCharacterData($this->submittingCharacter)
+            : $this->game->character->getTurnCharacter();
+    }
+    public function getTurnCharacter(): array
     {
         extract($this->game->gameData->getGlobalsAll('turnNo', 'turnOrder'));
         $character = $turnOrder[$turnNo];
@@ -180,12 +220,12 @@ class Character
     }
     public function getActiveEquipment(): array
     {
-        $character = $this->getActivateCharacter();
+        $character = $this->getSubmittingCharacter();
         return $character['equipment'];
     }
     public function getActiveEquipmentSkills()
     {
-        $character = $this->game->character->getActivateCharacter();
+        $character = $this->game->character->getSubmittingCharacter();
         $skills = array_merge(
             ...array_map(function ($item) {
                 if (!array_key_exists('skills', $item)) {
@@ -224,7 +264,7 @@ class Character
 
     public function getActiveStamina(): int
     {
-        return (int) $this->getActivateCharacter()['stamina'];
+        return (int) $this->getSubmittingCharacter()['stamina'];
     }
     public function adjustAllStamina(int $stamina): void
     {
@@ -244,12 +284,12 @@ class Character
     }
     public function adjustActiveStamina(int $stamina): int
     {
-        $characterName = $this->getActivateCharacter()['character_name'];
+        $characterName = $this->getSubmittingCharacter()['character_name'];
         return $this->adjustStamina($characterName, $stamina);
     }
     public function getActiveHealth(): int
     {
-        return (int) $this->getActivateCharacter()['health'];
+        return (int) $this->getSubmittingCharacter()['health'];
     }
 
     public function adjustAllHealth(int $health): void
@@ -270,7 +310,7 @@ class Character
     }
     public function adjustActiveHealth(int $health): int
     {
-        $characterName = $this->getActivateCharacter()['character_name'];
+        $characterName = $this->getSubmittingCharacter()['character_name'];
         return $this->adjustHealth($characterName, $health);
     }
     public function getMarshallCharacters()

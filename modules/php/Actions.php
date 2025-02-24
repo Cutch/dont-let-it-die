@@ -198,19 +198,19 @@ class Actions
             'actUnEquipItem' => [
                 'state' => ['tradePhase'],
                 'requires' => function (Game $game, $action) use ($_this) {
-                    return sizeof($game->character->getActivateCharacter()['equipment']) > 0;
+                    return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
                 },
             ],
             'actTradeItem' => [
                 'state' => ['tradePhase'],
                 'requires' => function (Game $game, $action) use ($_this) {
-                    return sizeof($game->character->getActivateCharacter()['equipment']) > 0;
+                    return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
                 },
             ],
             'actConfirmTradeItem' => [
                 'state' => ['tradePhase'],
                 'requires' => function (Game $game, $action) use ($_this) {
-                    return sizeof($game->character->getActivateCharacter()['equipment']) > 0;
+                    return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
                 },
             ],
         ]);
@@ -249,7 +249,7 @@ class Actions
     // }
     public function getAvailableCharacterSkills(): array
     {
-        $character = $this->game->character->getActivateCharacter();
+        $character = $this->game->character->getSubmittingCharacter();
         if (!array_key_exists('skills', $character)) {
             return [];
         }
@@ -259,9 +259,11 @@ class Actions
                 $health = $character['health'];
                 $actionCost = [
                     'action' => 'actUseSkill',
+                    'subAction' => $skill['id'],
                     'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
                     'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
                 ];
+                // var_dump(json_encode(['actUseSkill', $skill['id']]));
                 $this->game->hooks->onGetActionCost($actionCost);
                 return $this->checkRequirements($skill, $character) &&
                     (!array_key_exists('stamina', $actionCost) || $stamina >= $actionCost['stamina']) &&
@@ -271,7 +273,7 @@ class Actions
     }
     public function getAvailableItemSkills(): array
     {
-        $character = $this->game->character->getActivateCharacter();
+        $character = $this->game->character->getSubmittingCharacter();
         $skills = $this->game->character->getActiveEquipmentSkills();
         return array_values(
             array_filter($skills, function ($skill) use ($character) {
@@ -279,6 +281,7 @@ class Actions
                 $health = $character['health'];
                 $actionCost = [
                     'action' => 'actUseItem',
+                    'subAction' => $skill['id'],
                     'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
                     'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
                 ];
@@ -307,6 +310,7 @@ class Actions
     {
         $data = [
             'action' => $action,
+            'subAction' => $subAction,
             'stamina' => array_key_exists('stamina', $this->getAction($action, $subAction))
                 ? $this->getAction($action, $subAction)['stamina']
                 : null,
@@ -343,9 +347,11 @@ class Actions
     }
     public function validateCanRunAction($action, $subAction = null, ...$args)
     {
+        $character = $this->game->character->getSubmittingCharacter();
+
         $cost = $this->getActionCost($action, $subAction);
-        $stamina = $this->game->character->getActiveStamina();
-        $health = $this->game->character->getActiveHealth();
+        $stamina = $character['stamina'];
+        $health = $character['health'];
         if (array_key_exists('stamina', $cost) && $stamina < $cost['stamina']) {
             throw new BgaUserException($this->game->translate('Not enough stamina'));
         }
@@ -367,6 +373,7 @@ class Actions
     {
         // Get some values from the current game situation from the database.
         $validActionsFiltered = array_filter($this->actions, function ($v) {
+            // var_dump(json_encode($v));
             $actionCost = $this->getActionCost($v['id']);
             $stamina = $this->game->character->getActiveStamina();
             $health = $this->game->character->getActiveHealth();

@@ -37,6 +37,7 @@ class Game extends \Table
     public Decks $decks;
     public GameData $gameData;
     public Hooks $hooks;
+    public Encounter $encounter;
     public ActInterrupt $actInterrupt;
     public static array $expansionList = ['base', 'mini-expansion', 'hindrance'];
     /**
@@ -65,24 +66,31 @@ class Game extends \Table
         $this->characterSelection = new CharacterSelection($this);
         $this->gameData = new GameData($this);
         $this->hooks = new Hooks($this);
+        $this->encounter = new Encounter($this);
         $this->actInterrupt = new ActInterrupt($this);
         // automatically complete notification args when needed
         $this->notify->addDecorator(function (string $message, array $args) {
             $args['gamestate'] = ['name' => $this->gamestate->state()['name']];
             if (!array_key_exists('character_name', $args) && str_contains($message, '${character_name}')) {
-                $args['character_name'] = $this->character->getActivateCharacter()['character_name'];
+                $char = $this->character->getSubmittingCharacter();
+                $name = $char['character_name'];
+                $playerName = $this->getPlayerNameById($char['player_id']);
+                $playerColor = $char['player_color'];
+                $args[
+                    'character_name'
+                ] = "<!--PNS--><span class=\"playername\" style=\"color:#$playerColor;\">$name ($playerName)</span><!--PNE-->";
             }
-            if (!array_key_exists('player_name', $args) && str_contains($message, '${player_name}')) {
-                if (array_key_exists('player_id', $args)) {
-                    $args['player_name'] = $this->getPlayerNameById($args['player_id']);
-                } elseif (array_key_exists('character_name', $args)) {
-                    $playerId = (int) $this->character->getCharacterData($args['character_name'])['player_id'];
-                    $args['player_name'] = $this->getPlayerNameById($playerId);
-                } else {
-                    $playerId = (int) $this->getActivePlayerId();
-                    $args['player_name'] = $this->getPlayerNameById($playerId);
-                }
-            }
+            // if (!array_key_exists('player_name', $args) && str_contains($message, '${player_name}')) {
+            //     if (array_key_exists('player_id', $args)) {
+            //         $args['player_name'] = $this->getPlayerNameById($args['player_id']);
+            //     } elseif (array_key_exists('character_name', $args)) {
+            //         $playerId = (int) $this->character->getCharacterData($args['character_name'])['player_id'];
+            //         $args['player_name'] = $this->getPlayerNameById($playerId);
+            //     } else {
+            //         $playerId = (int) $this->getActivePlayerId();
+            //         $args['player_name'] = $this->getPlayerNameById($playerId);
+            //     }
+            // }
             if (
                 array_key_exists('resource', $args) &&
                 !array_key_exists('resource_name', $args) &&
@@ -110,7 +118,7 @@ class Game extends \Table
     }
     public function activeCharacterEventLog($message, $arg = [])
     {
-        $this->notify->all('activeCharacter', clienttranslate('${player_name} - ${character_name} ' . $message), [
+        $this->notify->all('activeCharacter', clienttranslate('${character_name} ' . $message), [
             ...$arg,
             'gameData' => $this->getAllDatas(),
         ]);
@@ -147,9 +155,9 @@ class Game extends \Table
         }
         $value = max($this->hooks->onRollDie($value), 0);
         if ($character) {
-            $this->notify->all('rollFireDie', clienttranslate('${player_name} - ${character_name} rolled a ${value}'), [
+            $this->notify->all('rollFireDie', clienttranslate('${character_name} rolled a ${value}'), [
                 'value' => $value == 0 ? 'blank' : $value,
-                'character_name' => $character['character_name'],
+                // 'character_name' => $character['character_name'],
             ]);
         } else {
             $this->notify->all('rollFireDie', clienttranslate('The fire die rolled a ${value}'), [
@@ -177,7 +185,7 @@ class Game extends \Table
         $this->adjustResource($type . '-cooked', 1);
         $this->actions->spendActionCost('actCook');
 
-        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} cooked ${amount} ${type}'), [
+        $this->notify->all('tokenUsed', clienttranslate('${character_name} cooked ${amount} ${type}'), [
             'gameData' => $this->getAllDatas(),
             'amount' => 1,
             'type' => $type,
@@ -209,7 +217,7 @@ class Game extends \Table
         }
 
         $this->actions->spendActionCost('actSpendFKP');
-        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} unlocked ${knowledge_name}'), [
+        $this->notify->all('tokenUsed', clienttranslate('${character_name} unlocked ${knowledge_name}'), [
             'gameData' => $this->getAllDatas(),
             'knowledgeId' => $knowledgeId,
             'knowledge_name' => $this->data->knowledgeTree[$knowledgeId]['name'],
@@ -241,7 +249,7 @@ class Game extends \Table
             }
         }
         $this->actions->spendActionCost('actCraft');
-        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} crafted a ${item_name}'), [
+        $this->notify->all('tokenUsed', clienttranslate('${character_name} crafted a ${item_name}'), [
             'gameData' => $this->getAllDatas(),
             'item_name' => $this->data->items[$itemName]['name'],
         ]);
@@ -251,7 +259,7 @@ class Game extends \Table
             $this->gameData->set('buildings', $currentBuildings);
         } else {
             $itemId = $this->gameData->createItem($itemName);
-            $character = $this->character->getActivateCharacter();
+            $character = $this->character->getSubmittingCharacter();
             $slotsAllowed = array_count_values($character['slots']);
             $slotsUsed = array_count_values(
                 array_map(function ($d) {
@@ -290,7 +298,7 @@ class Game extends \Table
         if (!in_array($sendToCampId, $items)) {
             throw new BgaUserException($this->translate('Invalid Item'));
         }
-        $character = $this->character->getActivateCharacter();
+        $character = $this->character->getSubmittingCharacter();
         $unchangedItems = array_map(
             function ($d) {
                 return $d['itemId'];
@@ -369,7 +377,7 @@ class Game extends \Table
             }
         }
         // $this->hooks->onTrade($data);
-        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} traded ${offered} for ${requested}'), [
+        $this->notify->all('tokenUsed', clienttranslate('${character_name} traded ${offered} for ${requested}'), [
             'gameData' => $this->getAllDatas(),
             'offered' => join(', ', $offeredStr),
             'requested' => join(', ', $requestedStr),
@@ -391,7 +399,7 @@ class Game extends \Table
         $this->adjustResource($data['type'], -$data['count']);
         $this->notify->all(
             'tokenUsed',
-            clienttranslate('${player_name} - ${character_name} ate ${count} ${token_name} and gained ${health} health') .
+            clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health') .
                 (array_key_exists('stamina', $data) ? clienttranslate(' and ${stamina} stamina') : ''),
             [
                 'gameData' => $this->getAllDatas(),
@@ -407,34 +415,36 @@ class Game extends \Table
         $this->gameData->setResource('fireWood', min($fireWood + 1, $this->data->tokens['wood']['count']));
         $this->gameData->setResource('wood', max($wood - 1, 0));
 
-        $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} added 1 wood to the fire'), [
+        $this->notify->all('tokenUsed', clienttranslate('${character_name} added 1 wood to the fire'), [
             'gameData' => $this->getAllDatas(),
         ]);
     }
     public function actUseSkill(string $skillId): void
     {
+        $this->character->setSubmittingCharacter('actUseSkill', $skillId);
         $this->actions->validateCanRunAction('actUseSkill', $skillId);
+        $res = $this->character->getSkill($skillId);
+        $skill = $res['skill'];
+        $character = $res['character'];
         if ($this->gamestate->state()['name'] == 'interrupt') {
             $this->actInterrupt->actInterrupt($skillId);
-        } else {
-            $character = $this->character->getActivateCharacter();
-            $skill = $character['skills'][$skillId];
-            $result = $skill['onUse']($this, $skill, $character);
-            if (!$result || (array_key_exists('spendActionCost', $result) && $result['spendActionCost'] != false)) {
-                $this->actions->spendActionCost('actUseSkill', $skillId);
-            }
-            if (!$result || (array_key_exists('notify', $result) && $result['notify'] != false)) {
-                $this->notify->all('updateGameData', clienttranslate('${player_name} - ${character_name} used the skill ${skill_name}'), [
-                    'gameData' => $this->getAllDatas(),
-                    'skill_name' => $skill['name'],
-                ]);
-            }
+        }
+        $result = array_key_exists('onUse', $skill) ? $skill['onUse']($this, $skill, $character) : null;
+        if (!$result || !array_key_exists('spendActionCost', $result) || $result['spendActionCost'] != false) {
+            $this->actions->spendActionCost('actUseSkill', $skillId);
+        }
+        if (!$result || !array_key_exists('notify', $result) || $result['notify'] != false) {
+            $this->notify->all('updateGameData', clienttranslate('${character_name} used the skill ${skill_name}'), [
+                'gameData' => $this->getAllDatas(),
+                'skill_name' => $skill['name'],
+            ]);
         }
     }
     public function actUseItem(string $skillId): void
     {
+        $this->character->setSubmittingCharacter('actUseItem', $skillId);
         $this->actions->validateCanRunAction('actUseItem', $skillId);
-        $character = $this->character->getActivateCharacter();
+        $character = $this->character->getSubmittingCharacter();
         $skills = $this->character->getActiveEquipmentSkills();
         $skill = $skills[$skillId];
         $result = $skill['onUse']($this, $skill, $character);
@@ -442,14 +452,10 @@ class Game extends \Table
             $this->actions->spendActionCost('actUseItem', $skillId);
         }
         if (!$result || (array_key_exists('notify', $result) && $result['notify'] != false)) {
-            $this->notify->all(
-                'updateGameData',
-                clienttranslate('${player_name} - ${character_name} used the item\'s skill ${skill_name}'),
-                [
-                    'gameData' => $this->getAllDatas(),
-                    'skill_name' => $skill['name'],
-                ]
-            );
+            $this->notify->all('updateGameData', clienttranslate('${character_name} used the item\'s skill ${skill_name}'), [
+                'gameData' => $this->getAllDatas(),
+                'skill_name' => $skill['name'],
+            ]);
         }
     }
     public function actDrawGather(): void
@@ -477,7 +483,7 @@ class Game extends \Table
             [$this->hooks, 'onInvestigateFire'],
             function ($_this) {
                 $_this->actions->validateCanRunAction('actInvestigateFire');
-                $character = $_this->character->getActivateCharacter();
+                $character = $_this->character->getSubmittingCharacter();
                 $roll = $_this->rollFireDie($character);
                 $_this->actions->spendActionCost('actInvestigateFire');
                 return ['roll' => $roll];
@@ -499,11 +505,11 @@ class Game extends \Table
             [$this->hooks, 'onDraw'],
             function ($_this, $deck) {
                 $_this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
-                $character = $_this->character->getActivateCharacter();
+                // $character = $_this->character->getSubmittingCharacter();
                 $card = $_this->decks->pickCard($deck);
-                $_this->notify->all('cardDrawn', clienttranslate('${player_name} - ${character_name} drew from the ${deck} deck'), [
-                    'player_id' => $character['player_id'],
-                    'character_name' => $character['character_name'],
+                $_this->notify->all('cardDrawn', clienttranslate('${character_name} drew from the ${deck} deck'), [
+                    // 'player_id' => $character['player_id'],
+                    // 'character_name' => $character['character_name'],
                     'deck' => str_replace('-', ' ', $deck),
                     'gameData' => $_this->getAllDatas(),
                 ]);
@@ -524,9 +530,8 @@ class Game extends \Table
         $playerId = (int) $this->getActivePlayerId();
 
         // Notify all players about the choice to pass.
-        $this->notify->all('pass', clienttranslate('${player_name} - ${character_name} ends their turn'), [
+        $this->notify->all('pass', clienttranslate('${character_name} ends their turn'), [
             'player_id' => $playerId,
-            'player_name' => $this->getActivePlayerName(), // remove this line if you uncomment notification decorator
         ]);
 
         // at the end of the action, move to the next state
@@ -557,115 +562,25 @@ class Game extends \Table
     }
     public function argDrawCard()
     {
-        $result = [...$this->gameData->getGlobals('state')];
+        $result = [...$this->gameData->getGlobals('state'), 'resolving' => $this->actInterrupt->isStateResolving()];
         $this->getDecks($result);
         return $result;
     }
     public function argPostEncounter()
     {
-        $result = [...$this->getAllDatas()];
-        return $result;
+        return $this->encounter->argPostEncounter();
     }
     public function stPostEncounter()
     {
-        $validActions = $this->actions->getValidActions();
-        if (sizeof($validActions) == 0) {
-            $this->gamestate->nextState('playerTurn');
-        }
+        $this->encounter->stPostEncounter();
     }
     public function stResolveEncounter()
     {
-        $this->actInterrupt->interruptableFunction(
-            __FUNCTION__,
-            [],
-            [$this->hooks, 'onEncounter'],
-            function ($_this) {
-                $card = $_this->gameData->getGlobals('state')['card'];
-                $tools = array_filter($_this->character->getActiveEquipment(), function ($item) {
-                    return array_key_exists('onEncounter', $item) && !(!array_key_exists('requires', $item) || $item['requires']($item));
-                });
-                $weapons = array_filter($this->character->getActiveEquipment(), function ($item) {
-                    return $item['itemType'] == 'weapon';
-                });
-                if (sizeof($tools) >= 2) {
-                    $weapon = $_this->gameData->getGlobals('useTools');
-                    if ($weapon) {
-                        $_this->gameData->set('chooseWeapon', null);
-                    } else {
-                        // TODO: Ask if want to use tools
-                        $_this->gameData->set('useTools', $weapons);
-                        $_this->gamestate->nextState('whichTool');
-                        return;
-                    }
-                }
-                $weapon = null;
-                if (sizeof($weapons) >= 2) {
-                    $weapon = $_this->gameData->getGlobals('chooseWeapon');
-                    if ($weapon) {
-                        $_this->gameData->set('chooseWeapon', null);
-                    } else {
-                        // TODO: Ask gronk if you want to combine two weapons or pick one
-                        // Highest range, lowest damage for combine
-                        $_this->gameData->set('chooseWeapon', $weapons);
-                        $_this->gamestate->nextState('whichWeapon');
-                        return;
-                    }
-                } elseif (sizeof($weapons) >= 1) {
-                    $weapon = $weapons[0];
-                } else {
-                    $weapon = [
-                        'damage' => 0,
-                        'range' => 1,
-                    ];
-                }
-                return [
-                    'name' => $card['name'],
-                    'encounterDamage' => $card['damage'], // Unused, maybe in logging
-                    'encounterHealth' => $card['health'],
-                    'escape' => false,
-                    'characterRange' => $weapon['range'],
-                    'characterDamage' => $weapon['damage'],
-                    'willTakeDamage' => $card['damage'],
-                    'willReceiveMeat' => $card['health'],
-                    'stamina' => 0,
-                    'killed' => false,
-                ];
-            },
-            function ($_this, $data) {
-                if ($data['stamina'] != 0) {
-                    $_this->character->adjustActiveStamina($data['stamina']);
-                }
-                if ($data['escape']) {
-                    $_this->activeCharacterEventLog('escaped from a ${name}', $data);
-                } elseif ($data['encounterHealth'] <= $data['characterDamage']) {
-                    $data['killed'] = true;
-                    $damageTaken = 0;
-                    if ($data['characterRange'] > 1) {
-                        $damageTaken = 0;
-                    } else {
-                        $damageTaken = max($data['willTakeDamage'], 1);
-                    }
-                    if ($damageTaken != 0) {
-                        $_this->character->adjustActiveHealth(-$damageTaken);
-                    }
-                    $_this->adjustResource('meat', $data['willReceiveMeat']);
-                    $_this->activeCharacterEventLog('defeated a ${name}, took ${damageTaken} damage and gained ${willReceiveMeat} meat', [
-                        ...$data,
-                        'damageTaken' => $damageTaken,
-                    ]);
-                } else {
-                    $_this->character->adjustActiveHealth(-$data['willTakeDamage']);
-                    $_this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);
-                }
-                $_this->gameData->set('encounterState', $data);
-                $_this->gamestate->nextState('postEncounter');
-            }
-        );
+        $this->encounter->stResolveEncounter();
     }
     public function argResolveEncounter()
     {
-        $result = [...$this->getAllDatas()];
-        return $result;
+        return $this->encounter->argResolveEncounter();
     }
     public function stPlayerTurn()
     {
@@ -673,49 +588,71 @@ class Game extends \Table
     }
     public function stDrawCard()
     {
-        $character = $this->character->getActivateCharacter();
-        extract($this->gameData->getGlobals('state'));
-        if ($card['deckType'] == 'resource') {
-            $this->adjustResource($card['resourceType'], $card['count']);
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            [],
+            [$this->hooks, 'onResolveDraw'],
+            function ($_this) {
+                // $character = $this->character->getSubmittingCharacter();
+                // deck,card
+                $state = $this->gameData->getGlobals('state');
+                $deck = $state['deck'];
+                $card = $state['card'];
+                if ($card['deckType'] == 'resource') {
+                    $this->adjustResource($card['resourceType'], $card['count']);
 
-            $this->notify->all('tokenUsed', clienttranslate('${player_name} - ${character_name} found ${count} ${name}'), [
-                'player_id' => $character['player_id'],
-                'character_name' => $character['character_name'],
-                ...$card,
-                'deck' => str_replace('-', ' ', $deck),
-                'gameData' => $this->getAllDatas(),
-            ]);
-            $this->gamestate->nextState('playerTurn');
-        } elseif ($card['deckType'] == 'encounter') {
-            // Change state and check for health/damage modifications
-            $this->notify->all(
-                'cardDrawn',
-                clienttranslate('${player_name} - ${character_name} encountered a ${name} (${health} health, ${damage} damage)'),
-                [
-                    'player_id' => $character['player_id'],
-                    'character_name' => $character['character_name'],
-                    ...$card,
-                    'deck' => str_replace('-', ' ', $deck),
-                ]
-            );
-            $this->gamestate->nextState('resolveEncounter');
-        } elseif ($card['deckType'] == 'nothing') {
-            $this->notify->all('cardDrawn', clienttranslate('${player_name} - ${character_name} did nothing'), [
-                'player_id' => $character['player_id'],
-                'character_name' => $character['character_name'],
-                'deck' => str_replace('-', ' ', $deck),
-            ]);
-            $this->gamestate->nextState('playerTurn');
-        } elseif ($card['deckType'] == 'hindrance') {
-            $this->gamestate->nextState('playerTurn');
-        } elseif ($card['deckType'] == 'night-event') {
-            $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
-                'deck' => str_replace('-', ' ', $deck),
-            ]);
-            $this->gamestate->nextState('morning');
-        } else {
-            $this->gamestate->nextState('playerTurn');
-        }
+                    $this->notify->all('tokenUsed', clienttranslate('${character_name} found ${count} ${name}'), [
+                        // 'player_id' => $character['player_id'],
+                        // 'character_name' => $character['character_name'],
+                        ...$card,
+                        'deck' => str_replace('-', ' ', $deck),
+                        'gameData' => $this->getAllDatas(),
+                    ]);
+                } elseif ($card['deckType'] == 'encounter') {
+                    // Change state and check for health/damage modifications
+                    $this->notify->all(
+                        'cardDrawn',
+                        clienttranslate('${character_name} encountered a ${name} (${health} health, ${damage} damage)'),
+                        [
+                            // 'player_id' => $character['player_id'],
+                            // 'character_name' => $character['character_name'],
+                            ...$card,
+                            'deck' => str_replace('-', ' ', $deck),
+                        ]
+                    );
+                } elseif ($card['deckType'] == 'nothing') {
+                    $this->notify->all('cardDrawn', clienttranslate('${character_name} did nothing'), [
+                        // 'player_id' => $character['player_id'],
+                        // 'character_name' => $character['character_name'],
+                        'deck' => str_replace('-', ' ', $deck),
+                    ]);
+                } elseif ($card['deckType'] == 'hindrance') {
+                } elseif ($card['deckType'] == 'night-event') {
+                    $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
+                        'deck' => str_replace('-', ' ', $deck),
+                    ]);
+                } else {
+                }
+                return $state;
+            },
+            function ($_this, $data) {
+                $deck = $data['deck'];
+                $card = $data['card'];
+                if ($card['deckType'] == 'resource') {
+                    $this->gamestate->nextState('playerTurn');
+                } elseif ($card['deckType'] == 'encounter') {
+                    $this->gamestate->nextState('resolveEncounter');
+                } elseif ($card['deckType'] == 'nothing') {
+                    $this->gamestate->nextState('playerTurn');
+                } elseif ($card['deckType'] == 'hindrance') {
+                    $this->gamestate->nextState('playerTurn');
+                } elseif ($card['deckType'] == 'night-event') {
+                    $this->gamestate->nextState('morning');
+                } else {
+                    $this->gamestate->nextState('playerTurn');
+                }
+            }
+        );
     }
 
     public function argSelectionCount(): array
@@ -728,35 +665,11 @@ class Game extends \Table
     public function argPlayerState(): array
     {
         $result = [
-            'currentCharacter' => $this->character->getActivateCharacter()['character_name'],
+            'currentCharacter' => $this->character->getSubmittingCharacter()['character_name'],
             ...$this->getAllDatas(),
         ];
         return $result;
     }
-    // public function addSkillInterrupt($skill, $data = null): void
-    // {
-    //     $d = $this->gameData->getGlobals('interruptState');
-    //     if (!array_key_exists('skills', $d)) {
-    //         $d['skills'] = [];
-    //     }
-    //     $skill['data'] = $data;
-    //     array_push($d['skills'], $skill);
-    //     $this->gameData->set('interruptState', $d);
-    // }
-    // public function actInterrupt($skillId): void
-    // {
-    //     $data = $this->gameData->getGlobals('interruptState');
-    //     array_walk($data['skills'], function ($v) {
-    //         $this->hooks->onInterrupt($v['id'], array_key_exists('data', $v) ? $v['data'] : null);
-    //     });
-    //     $this->gameData->set('interruptState', []);
-    //     $this->gamestate->nextState('playerTurn');
-    // }
-    // public function onInterruptCancel(): void
-    // {
-    //     $this->gameData->set('interruptState', []);
-    //     $this->gamestate->nextState('playerTurn');
-    // }
     public function argInterrupt(): array
     {
         return $this->actInterrupt->argInterrupt();
@@ -797,11 +710,11 @@ class Game extends \Table
             } else {
                 $this->character->activateNextCharacter();
                 if ($this->character->getActiveHealth() == 0) {
-                    $this->notify->all('playerTurn', clienttranslate('${player_name} - ${character_name} is incapacitated'), []);
+                    $this->notify->all('playerTurn', clienttranslate('${character_name} is incapacitated'), []);
                 } else {
                     $this->giveExtraTime($playerId);
                     $this->gamestate->nextState('nextCharacter');
-                    $this->notify->all('playerTurn', clienttranslate('${player_name} - ${character_name} begins their turn'), []);
+                    $this->notify->all('playerTurn', clienttranslate('${character_name} begins their turn'), []);
                     break;
                 }
             }
@@ -1072,6 +985,7 @@ class Game extends \Table
             'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
                 return ['id' => $id, 'name' => $this->data->knowledgeTree[$id]['name'], 'cost' => $availableUnlocks[$id]['cost']];
             }, array_keys($availableUnlocks)),
+            'resolving' => $this->actInterrupt->isStateResolving(),
         ];
         if ($this->gamestate->state()['name'] != 'characterSelect') {
             $result['actions'] = $this->actions->getValidActions();
@@ -1202,11 +1116,12 @@ class Game extends \Table
     }
     public function giveClub()
     {
-        $this->character->equipEquipment($this->character->getActivateCharacter()['id'], ['club']);
+        $itemId = $this->gameData->createItem('club');
+        $this->character->equipEquipment($this->character->getSubmittingCharacter()['id'], [$itemId]);
     }
     public function resetStamina()
     {
-        $this->character->updateCharacterData($this->character->getActivateCharacter()['id'], function (&$data) {
+        $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
             $data['stamina'] = $data['maxStamina'];
         });
     }

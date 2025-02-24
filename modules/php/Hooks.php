@@ -91,6 +91,11 @@ class Hooks
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data['deck'], $data['card']);
     }
+    function onResolveDraw($data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+    }
     function onEncounter(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
@@ -141,6 +146,7 @@ class Hooks
     function onInterrupt(&$data, $activatedSkill, $checkInterrupt = true)
     {
         $this->checkInterrupt = $checkInterrupt;
+        // var_dump(json_encode([$data, $activatedSkill]));
         $this->callHooks(__FUNCTION__, $data, $activatedSkill);
         return $data;
     }
