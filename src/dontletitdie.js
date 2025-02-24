@@ -260,11 +260,21 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       let skipWood = false;
       if (prevResources['fireWood'] != null && prevResources['fireWood'] < gameData.game['resources']['fireWood']) {
         // Wood to Firewood
-        this.tweening.addTween(sharedElem.querySelector(`.token.wood`), firewoodElem.querySelector(`.token.wood`), 'wood');
+        this.tweening.addTween(
+          sharedElem.querySelector(`.token.wood`),
+          firewoodElem.querySelector(`.token.wood`),
+          'wood',
+          gameData.game['resources']['fireWood'] - prevResources['fireWood'],
+        );
         skipWood = true;
       } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['resources']['fireWood']) {
         // Firewood to Wood
-        this.tweening.addTween(firewoodElem.querySelector(`.token.wood`), availableElem.querySelector(`.token.wood`), 'wood');
+        this.tweening.addTween(
+          firewoodElem.querySelector(`.token.wood`),
+          availableElem.querySelector(`.token.wood`),
+          'wood',
+          prevResources['fireWood'] - gameData.game['resources']['fireWood'],
+        );
       }
       this.resourcesForDisplay.forEach((name) => {
         if (prevResources[name] != null && prevResources[name] < gameData.game['resources'][name]) {
@@ -273,6 +283,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             availableElem.querySelector(`.token.${name.replace('-cooked', '')}`),
             sharedElem.querySelector(`.token.${name}`),
             name,
+            gameData.game['resources'][name] - prevResources[name],
           );
         } else if (
           prevResources[name] != null &&
@@ -285,6 +296,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             sharedElem.querySelector(`.token.${name}`),
             availableElem.querySelector(`.token.${name.replace('-cooked', '')}`),
             name,
+            prevResources[name] - gameData.game['resources'][name],
           );
         }
       });
@@ -784,7 +796,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       dojo.subscribe('activeCharacter', this, 'notification_tokenUsed');
       dojo.subscribe('tokenUsed', this, 'notification_tokenUsed');
       dojo.subscribe('shuffle', this, 'notification_shuffle');
-      this.notifqueue.setSynchronous('tokenUsed', 500);
       //
     },
     notificationWrapper: function (notification) {

@@ -1,11 +1,12 @@
 class Tweening {
   constructor(container) {
     this.container = container;
+    this.tweenId = 0;
   }
-  addTween(elem1, elem2, image, time = 1000) {
+  addTween(elem1, elem2, image, count = 1) {
     const containerRect = this.container.getBoundingClientRect();
 
-    const id = uuidv4();
+    const id = `tween_${++this.tweenId}`;
     this.container.insertAdjacentHTML('beforeend', `<div id="${id}" class="tween"></div>`);
     const tweenElem = document.getElementById(id);
     renderImage(image, tweenElem, { scale: 2 });
@@ -25,6 +26,11 @@ class Tweening {
       setTimeout(() => {
         tweenElem.remove();
       }, 2000);
-    }, 0);
+    }, 100);
+    if (count > 1) {
+      setTimeout(() => {
+        this.addTween(elem1, elem2, image, count - 1);
+      }, 300);
+    }
   }
 }
