@@ -413,6 +413,7 @@ $decksData = [
     'night-event-7_0' => [
         'deck' => 'night-event',
         'type' => 'deck',
+        'eventType' => 'rival-tribe',
         'onUse' => function (Game $game, $object) {
             $roll = $game->rollFireDie();
             $this->adjustResource('fiber', -$roll);
@@ -425,6 +426,7 @@ $decksData = [
     'night-event-7_1' => [
         'deck' => 'night-event',
         'type' => 'deck',
+        'eventType' => 'rival-tribe',
         'onUse' => function (Game $game, $object) {
             $roll = $game->rollFireDie();
             $left = $this->adjustResource('berry-cooked', -$roll);
@@ -521,6 +523,7 @@ $decksData = [
     'night-event-7_4' => [
         'deck' => 'night-event',
         'type' => 'deck',
+        'eventType' => 'rival-tribe',
         'onUse' => function (Game $game, $object) {
             $roll = $game->rollFireDie();
             $this->adjustResource('wood', -$roll);
@@ -533,6 +536,7 @@ $decksData = [
     'night-event-7_5' => [
         'deck' => 'night-event',
         'type' => 'deck',
+        'eventType' => 'rival-tribe',
         'onUse' => function (Game $game, $object) {
             $roll = $game->rollFireDie();
             $this->adjustResource('rock', -$roll);
@@ -545,6 +549,7 @@ $decksData = [
     'night-event-7_6' => [
         'deck' => 'night-event',
         'type' => 'deck',
+        'eventType' => 'rival-tribe',
         'onUse' => function (Game $game, $object) {
             $roll = $game->rollFireDie();
             $left = $this->adjustResource('meat-cooked', -$roll);
@@ -838,6 +843,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'eventType' => 'rival-tribe',
         'onUse' => function (Game $game, $object) {
             $roll = $game->rollFireDie();
             $this->adjustResource('dino-egg', -$roll);
@@ -895,6 +901,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'eventType' => 'rival-tribe',
         'onUse' => function (Game $game, $object) {
             $roll = $game->rollFireDie();
             $this->adjustResource('gem', -$roll);
@@ -908,6 +915,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'eventType' => 'rival-tribe',
         'onUse' => function (Game $game, $object) {
             $roll = $game->rollFireDie();
             $this->adjustResource('herb', -$roll);

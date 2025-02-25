@@ -96,11 +96,21 @@ class Hooks
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
     }
+    function onResolveNightDraw($data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+    }
     function onEncounter(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
         return $data;
+    }
+    function onUseSkill(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
     }
     function onEat(&$data, $checkInterrupt = false)
     {
@@ -143,11 +153,31 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
+    function onResourceSelection(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onResourceSelectionOptions(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
     function onInterrupt(&$data, $activatedSkill, $checkInterrupt = true)
     {
         $this->checkInterrupt = $checkInterrupt;
         // var_dump(json_encode([$data, $activatedSkill]));
         $this->callHooks(__FUNCTION__, $data, $activatedSkill);
         return $data;
+    }
+    public function reconnectHooks(&$jsonData, $underlyingData)
+    {
+        array_walk($underlyingData, function ($v, $k) use (&$jsonData) {
+            if (str_starts_with($k, 'on')) {
+                $jsonData[$k] = $v;
+            }
+        });
     }
 }

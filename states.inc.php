@@ -71,8 +71,8 @@ $machinestates = [
     ],
     10 => [
         'name' => 'playerTurn',
-        'description' => clienttranslate('${currentCharacter}(${actplayer}) is playing'),
-        'descriptionmyturn' => clienttranslate('${currentCharacter} can'),
+        'description' => clienttranslate('${character_name} is playing'),
+        'descriptionmyturn' => clienttranslate('${character_name} can'),
         'type' => 'activeplayer',
         'args' => 'argPlayerState',
         'action' => 'stPlayerTurn',
@@ -93,7 +93,14 @@ $machinestates = [
             'actUseSkill',
             'actUseItem',
         ],
-        'transitions' => ['drawCard' => 11, 'tooManyItems' => 12, 'deckSelection' => 13, 'endTurn' => 15, 'interrupt' => 22],
+        'transitions' => [
+            'drawCard' => 11,
+            'tooManyItems' => 12,
+            'deckSelection' => 13,
+            'resourceSelection' => 14,
+            'endTurn' => 15,
+            'interrupt' => 22,
+        ],
     ],
     11 => [
         'name' => 'drawCard',
@@ -106,7 +113,7 @@ $machinestates = [
     ],
     12 => [
         'name' => 'tooManyItems',
-        'description' => clienttranslate('${actplayer}(${currentCharacter}) is selecting an item'),
+        'description' => clienttranslate('${character_name} is selecting an item'),
         'descriptionmyturn' => clienttranslate('Selecting an item'),
         'type' => 'activeplayer',
         'args' => 'argTooManyItems',
@@ -115,23 +122,22 @@ $machinestates = [
     ],
     13 => [
         'name' => 'deckSelection',
-        'description' => clienttranslate('${actplayer}(${currentCharacter}) is selecting a deck'),
+        'description' => clienttranslate('${character_name} is selecting a deck'),
         'descriptionmyturn' => clienttranslate('Selecting a deck'),
         'type' => 'activeplayer',
         'args' => 'argDeckSelection',
         'possibleactions' => ['actSelectDeck', 'actSelectDeckCancel'],
         'transitions' => ['playerTurn' => 10],
     ],
-
-    // 14 => [
-    //     'name' => 'reRoll',
-    //     'description' => clienttranslate('${actplayer}(${currentCharacter}) rolling dice'),
-    //     'descriptionmyturn' => clienttranslate('Rolling dice'),
-    //     'type' => 'activeplayer',
-    //     'args' => 'argReRoll',
-    //     'possibleactions' => ['actUseSkill', 'actPass'],
-    //     'transitions' => ['playerTurn' => 10],
-    // ],
+    14 => [
+        'name' => 'resourceSelection',
+        'description' => clienttranslate('${character_name} is selecting a resource'),
+        'descriptionmyturn' => clienttranslate('Selecting a resource'),
+        'type' => 'activeplayer',
+        'args' => 'argResourceSelection',
+        'possibleactions' => ['actSelectResource', 'actSelectResourceCancel'],
+        'transitions' => ['playerTurn' => 10],
+    ],
     20 => [
         'name' => 'resolveEncounter',
         'description' => clienttranslate('Resolving Encounter'),
@@ -154,7 +160,7 @@ $machinestates = [
     ],
     22 => [
         'name' => 'interrupt',
-        'description' => clienttranslate('${actplayer} is looking at their skills'),
+        'description' => clienttranslate('${playersString} looking at their skills'),
         'descriptionmyturn' => clienttranslate('Looking at skills'),
         'type' => 'multipleactiveplayer',
         'action' => 'stInterrupt',
@@ -175,15 +181,24 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stNextCharacter',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'nextCharacter' => 10, 'morningPhase' => 50],
+        'transitions' => ['endGame' => 99, 'nextCharacter' => 10, 'nightPhase' => 30],
     ],
     30 => [
         'name' => 'nightPhase',
         'description' => clienttranslate('It\'s night time'),
         'type' => 'game',
         'action' => 'stNightPhase',
-        'transitions' => ['endGame' => 99, 'morning' => 50, 'interrupt' => 22],
+        'transitions' => ['endGame' => 99, 'morningPhase' => 50, 'interrupt' => 22, 'nightDrawCard' => 31],
     ],
+    // 31 => [
+    //     'name' => 'nightDrawCard',
+    //     'description' => clienttranslate('Drawing Card'),
+    //     'descriptionmyturn' => clienttranslate('Drawing Card'),
+    //     'type' => 'game',
+    //     'args' => 'argNightDrawCard',
+    //     'action' => 'stNightDrawCard',
+    //     'transitions' => ['nightPhase' => 10, 'interrupt' => 22],
+    // ],
     50 => [
         'name' => 'morningPhase',
         'description' => clienttranslate('Morning has arrived'),
@@ -203,7 +218,7 @@ $machinestates = [
 
     // Final state.
     // Please do not modify (and do not overload action/args methods).
-    99 => [
+    98 => [
         'name' => 'gameEnd',
         'description' => clienttranslate('End of game'),
         'type' => 'manager',

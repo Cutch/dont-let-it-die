@@ -249,12 +249,21 @@ class Actions
     // }
     public function getAvailableCharacterSkills(): array
     {
-        $character = $this->game->character->getSubmittingCharacter();
-        if (!array_key_exists('skills', $character)) {
-            return [];
-        }
+        $characters = $this->game->character->getAllCharacterData();
+        $skills = array_merge(
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return $c['skills'];
+                }
+                return [];
+            }, $characters)
+        );
+        // if (!array_key_exists('skills', $character)) {
+        //     return [];
+        // }
         return array_values(
-            array_filter($character['skills'], function ($skill) use ($character) {
+            array_filter($skills, function ($skill) {
+                $character = $this->game->character->getCharacterData($skill['characterId']);
                 $stamina = $character['stamina'];
                 $health = $character['health'];
                 $actionCost = [
@@ -322,6 +331,33 @@ class Actions
         unset($data['action']);
         return $data;
     }
+    public function wrapSkills($skills): array
+    {
+        return array_map(function ($skill) {
+            $actionCost = [
+                'action' => 'actUseSkill',
+                'subAction' => $skill['id'],
+                'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
+                'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
+                'perDay' => array_key_exists('perDay', $skill) ? $skill['perDay'] : null,
+                'name' => array_key_exists('name', $skill) ? $skill['name'] : null,
+            ];
+            $this->game->hooks->onGetActionCost($actionCost);
+            if (array_key_exists('stamina', $actionCost)) {
+                $skill['stamina'] = $actionCost['stamina'];
+            }
+            if (array_key_exists('health', $actionCost)) {
+                $skill['health'] = $actionCost['health'];
+            }
+            if (array_key_exists('perDay', $actionCost)) {
+                $skill['perDay'] = $actionCost['perDay'];
+            }
+            if (array_key_exists('name', $actionCost)) {
+                $skill['name'] = $actionCost['name'];
+            }
+            return $skill;
+        }, $skills);
+    }
     public function resetTurnActions()
     {
         $this->game->gameData->set('turnActions', []);
@@ -333,6 +369,7 @@ class Actions
     public function checkRequirements($actionObj, ...$args): bool
     {
         return (!array_key_exists('state', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])) &&
+            !array_key_exists('interruptState', $actionObj) &&
             (!array_key_exists('requires', $actionObj) || $actionObj['requires']($this->game, $actionObj, ...$args));
     }
     public function spendActionCost($action, $subAction = null)

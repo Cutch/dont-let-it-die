@@ -36,7 +36,7 @@ $knowledgeTreeData = [
     'cooking-1' => [
         'name' => clienttranslate('Cooking 1'),
         'onGetActionSelectable' => function (Game $game, $obj, &$data) {
-            if ($data['action'] == 'actEat') {
+            if ($data['action'] == 'actCook') {
                 array_push($data['selectable'], ['berry']);
             }
         },
@@ -44,8 +44,8 @@ $knowledgeTreeData = [
     'cooking-2' => [
         'name' => clienttranslate('Cooking 2'),
         'onGetActionSelectable' => function (Game $game, $obj, &$data) {
-            if ($data['action'] == 'actEat') {
-                array_push($data['selectable'], ['meat', 'fish', 'dino-egg']);
+            if ($data['action'] == 'actCook') {
+                array_push($data['selectable'], 'meat', 'fish', 'dino-egg');
             }
         },
     ],

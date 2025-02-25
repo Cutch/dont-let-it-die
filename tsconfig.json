@@ -28,6 +28,7 @@
       "src/screens/craft-screen.js",
       "src/screens/deck-selection-screen.js",
       "src/screens/eat-screen.js",
+      "src/screens/token-screen.js",
       "src/screens/trade-screen.js",
       "src/screens/too-many-items-screen.js",
       "src/dontletitdie.js"

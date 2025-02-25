@@ -33,6 +33,7 @@ class Encounter
     public function stPostEncounter()
     {
         $validActions = $this->game->actions->getValidActions();
+        $this->game->gameData->set('encounterState', []);
         if (sizeof($validActions) == 0) {
             $this->game->gamestate->nextState('playerTurn');
         }
@@ -57,7 +58,7 @@ class Encounter
     {
         $this->game->actInterrupt->interruptableFunction(
             __FUNCTION__,
-            [],
+            func_get_args(),
             [$this->game->hooks, 'onEncounter'],
             function ($_this) {
                 $card = $_this->gameData->getGlobals('state')['card'];
