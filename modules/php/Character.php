@@ -107,11 +107,13 @@ class Character
         $characterData['equipment'] = array_map(function ($itemId) use ($_this, $isActive, $characterName) {
             $itemName = $this->game->gameData->getItems()[$itemId];
             $skills = [];
-            array_walk($_this->game->data->items[$itemName]['skills'], function ($v, $k) use ($itemId, &$skills) {
-                $skillId = $k . '_' . $itemId;
-                $v['id'] = $skillId;
-                $skills[$skillId] = $v;
-            });
+            if (array_key_exists('skills', $_this->game->data->items[$itemName])) {
+                array_walk($_this->game->data->items[$itemName]['skills'], function ($v, $k) use ($itemId, &$skills) {
+                    $skillId = $k . '_' . $itemId;
+                    $v['id'] = $skillId;
+                    $skills[$skillId] = $v;
+                });
+            }
 
             return [
                 'itemId' => $itemId,
@@ -260,6 +262,7 @@ class Character
         $temp = array_shift($turnOrder);
         array_push($turnOrder, $temp);
         $this->game->gameData->set('turnOrder', $turnOrder);
+        $this->game->gameData->set('turnNo', 0);
     }
 
     public function getActiveStamina(): int

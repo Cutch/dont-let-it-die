@@ -86,17 +86,18 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
+    function onNightDrawCard(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
     function onDraw($data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data['deck'], $data['card']);
     }
     function onResolveDraw($data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-    }
-    function onResolveNightDraw($data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);

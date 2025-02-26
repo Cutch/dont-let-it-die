@@ -501,7 +501,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updateItems(gameData);
       playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid__container"></div>`);
       renderImage(`instructions`, document.getElementById('instructions-container'));
-      // TODO: Set up your game interface here, according to "gameData"
 
       // Setup game notifications to handle (see "setupNotifications" method below)
       this.setupNotifications();
@@ -561,13 +560,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           this.updateKnowledgeTree(args.args);
           this.updateTrack(args.args);
           break;
+        case 'nightDrawCard':
         case 'drawCard':
           if (!args.args.resolving) {
             this.decks[args.args.deck].drawCard(args.args.card.id);
             this.decks[args.args.deck].updateDeckCounts(args.args.decks[args.args.deck]);
           }
-          break;
-        case 'dummy':
           break;
       }
     },
@@ -587,9 +585,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           dojo.style('character-selector', 'display', 'none');
           dojo.style('game_play_area', 'display', '');
           break;
-
-        // case 'dummy':
-        //   break;
       }
     },
 
@@ -803,9 +798,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       
       */
     setupNotifications: function () {
-      console.log('notifications subscriptions setup');
-
-      // TODO: here, associate your game notifications with local methods
       dojo.subscribe('characterClicked', this, 'notification_characterClicked');
       dojo.subscribe('updateGameData', this, 'notification_updateGameData');
       // Example 1: standard notification handling

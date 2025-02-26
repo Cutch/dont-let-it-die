@@ -592,7 +592,7 @@ class Game extends \Table
         if ($stateName == 'postEncounter') {
             $this->gamestate->nextState('playerTurn');
         } elseif ($stateName == 'tradePhase') {
-            $this->gamestate->nextState('activePhase');
+            $this->gamestate->nextState('playerTurn');
         } elseif ($stateName == 'interrupt') {
             $this->actInterrupt->onInterruptCancel();
         }
@@ -633,16 +633,16 @@ class Game extends \Table
         $this->getDecks($result);
         return $result;
     }
-    // public function argNightDrawCard()
-    // {
-    //     $result = [
-    //         ...$this->gameData->getGlobals('state'),
-    //         'resolving' => $this->actInterrupt->isStateResolving(),
-    //         'character_name' => $this->getCharacterHTML(),
-    //     ];
-    //     $this->getDecks($result);
-    //     return $result;
-    // }
+    public function argNightDrawCard()
+    {
+        $result = [
+            ...$this->gameData->getGlobals('state'),
+            'resolving' => $this->actInterrupt->isStateResolving(),
+            'character_name' => $this->getCharacterHTML(),
+        ];
+        $this->getDecks($result);
+        return $result;
+    }
     public function argPostEncounter()
     {
         return $this->encounter->argPostEncounter();
@@ -679,8 +679,6 @@ class Game extends \Table
                     $this->adjustResource($card['resourceType'], $card['count']);
 
                     $this->notify->all('tokenUsed', clienttranslate('${character_name} found ${count} ${name}'), [
-                        // 'player_id' => $character['player_id'],
-                        // 'character_name' => $character['character_name'],
                         ...$card,
                         'deck' => str_replace('-', ' ', $deck),
                         'gameData' => $this->getAllDatas(),
@@ -690,24 +688,13 @@ class Game extends \Table
                     $this->notify->all(
                         'cardDrawn',
                         clienttranslate('${character_name} encountered a ${name} (${health} health, ${damage} damage)'),
-                        [
-                            // 'player_id' => $character['player_id'],
-                            // 'character_name' => $character['character_name'],
-                            ...$card,
-                            'deck' => str_replace('-', ' ', $deck),
-                        ]
+                        [...$card, 'deck' => str_replace('-', ' ', $deck)]
                     );
                 } elseif ($card['deckType'] == 'nothing') {
                     $this->notify->all('cardDrawn', clienttranslate('${character_name} did nothing'), [
-                        // 'player_id' => $character['player_id'],
-                        // 'character_name' => $character['character_name'],
                         'deck' => str_replace('-', ' ', $deck),
                     ]);
                 } elseif ($card['deckType'] == 'hindrance') {
-                } elseif ($card['deckType'] == 'night-event') {
-                    $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
-                        'deck' => str_replace('-', ' ', $deck),
-                    ]);
                 } else {
                 }
                 return $state;
@@ -723,40 +710,53 @@ class Game extends \Table
                     $this->gamestate->nextState('playerTurn');
                 } elseif ($card['deckType'] == 'hindrance') {
                     $this->gamestate->nextState('playerTurn');
-                } elseif ($card['deckType'] == 'night-event') {
-                    $this->gamestate->nextState('morning');
                 } else {
                     $this->gamestate->nextState('playerTurn');
                 }
             }
         );
     }
-    // public function stNightDrawCard()
-    // {
-    //     $this->actInterrupt->interruptableFunction(
-    //         __FUNCTION__,
-    //         func_get_args(),
-    //         [$this->hooks, 'onResolveNightDraw'],
-    //         function (Game $_this) {
-    //             // deck,card
-    //             $state = $this->gameData->getGlobals('state');
-    //             $deck = $state['deck'];
-    //             $card = $state['card'];
-    //             var_dump(json_encode([$deck, $card]));
-    //             return [$state];
-    //         },
-    //         function (Game $_this, $data) {
-    //             $deck = $state['deck'];
-    //             $card = $data['card'];
-    //             if ($deck == 'night-event') {
-    //                 $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
-    //                     'deck' => str_replace('-', ' ', $deck),
-    //                 ]);
-    //             }
-    //             $this->gamestate->nextState('nightPhase');
-    //         }
-    //     );
-    // }
+    public function stNightPhase()
+    {
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onNight'],
+            function (Game $_this) {
+                $card = $this->decks->pickCard('night-event');
+                $this->setActiveNightCard($card['id']);
+                $this->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
+                return ['card' => $card, 'deck' => 'night-event'];
+            },
+            function (Game $_this, $data) {
+                $deck = $data['deck'];
+                $this->gamestate->nextState('nightDrawCard');
+            }
+        );
+    }
+    public function stNightDrawCard()
+    {
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onNightDrawCard'],
+            function (Game $_this) {
+                // deck,card
+                $state = $this->gameData->getGlobals('state');
+                $deck = $state['deck'];
+                $card = $state['card'];
+                $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
+                    'deck' => str_replace('-', ' ', $deck),
+                ]);
+                $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
+
+                return ['state' => $state, 'useResult' => $result];
+            },
+            function (Game $_this, $data) {
+                $this->gamestate->nextState('morningPhase');
+            }
+        );
+    }
 
     public function argSelectionCount(): array
     {
@@ -828,36 +828,6 @@ class Game extends \Table
             $this->giveExtraTime((int) $playerId, 500);
         }
     }
-    public function stNightPhase()
-    {
-        // $this->gamestate->nextState('nightDrawCard');
-
-        $this->actInterrupt->interruptableFunction(
-            __FUNCTION__,
-            func_get_args(),
-            [$this->hooks, 'onResolveNightDraw'],
-            function (Game $_this) {
-                $card = $this->decks->pickCard('night-event');
-                $this->setActiveNightCard($card['id']);
-                // deck,card
-                $state = $this->gameData->getGlobals('state');
-                $deck = $state['deck'];
-                $card = $state['card'];
-                $this->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
-                return ['card' => $card, 'deck' => 'night-event'];
-            },
-            function (Game $_this, $data) {
-                $deck = $data['deck'];
-                // $card = $data['card'];
-                if ($deck == 'night-event') {
-                    $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
-                        'deck' => str_replace('-', ' ', $deck),
-                    ]);
-                }
-                $this->gamestate->nextState('morningPhase');
-            }
-        );
-    }
     public function getFirewoodCost()
     {
         $day = $this->gameData->getGlobals('day');
@@ -880,9 +850,14 @@ class Game extends \Table
     public function stMorningPhase()
     {
         $day = $this->gameData->getGlobals('day');
+        $day += 1;
+        $this->gameData->set('day', $day);
         if ($day == 14) {
             $this->lose(); // Fail
         }
+        $this->notify->all('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
+            'day' => $day,
+        ]);
         $difficulty = $this->getTrackDifficulty();
         $health = -1;
         if ($difficulty == 'hard') {
@@ -900,6 +875,7 @@ class Game extends \Table
             if (!in_array($data['id'], $skipMorningDamage)) {
                 $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
             }
+            $data['stamina'] = $data['maxStamina'];
         });
         $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} health'), [
             'amount' => -$health,
@@ -917,8 +893,8 @@ class Game extends \Table
     }
     public function stTradePhase()
     {
-        $this->gamestate->setPlayersMultiactive([], 'activePhase');
-        // $this->gamestate->nextState('activePhase');
+        $this->gamestate->setPlayersMultiactive([], 'playerTurn');
+        // $this->gamestate->nextState('playerTurn');
     }
 
     /**

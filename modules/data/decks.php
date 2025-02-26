@@ -452,7 +452,7 @@ $decksData = [
             $roll = $game->rollFireDie();
             if ($roll == 0) {
                 $game->character->adjustActiveHealth(-1);
-                $game->nightEventLog('${player_name} - ${character_name} was struck by lightning (1 damage)');
+                $game->nightEventLog('${character_name} was struck by lightning (1 damage)');
             }
         },
     ],
@@ -471,7 +471,7 @@ $decksData = [
                 $roll = $game->rollFireDie($character['character_name'], $character)['value'];
                 if ($roll == 0) {
                     $game->character->adjustHealth($character['character_name'], -1);
-                    $game->nightEventLog('${player_name} - ${character_name} took 1 damage');
+                    $game->nightEventLog('${character_name} took 1 damage');
                     return false;
                 }
                 return true;
@@ -629,7 +629,7 @@ $decksData = [
         'type' => 'deck',
         'onGetValidActions' => function (Game $game, $object, &$data) {
             // Stamina skills can't be used
-            $game->nightEventLog('Bad mushrooms make some character skills not work tomorrow');
+            $game->nightEventLog('Bad mushrooms make some skills not work tomorrow');
         },
     ],
     'night-event-8_12' => [

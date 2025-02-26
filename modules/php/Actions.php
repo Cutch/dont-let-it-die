@@ -369,7 +369,12 @@ class Actions
     public function checkRequirements($actionObj, ...$args): bool
     {
         return (!array_key_exists('state', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])) &&
-            !array_key_exists('interruptState', $actionObj) &&
+            (!array_key_exists('interruptState', $actionObj) ||
+                ($this->game->actInterrupt->getLatestInterruptState() &&
+                    in_array(
+                        $this->game->actInterrupt->getLatestInterruptState()['data']['currentState'],
+                        $actionObj['interruptState']
+                    ))) &&
             (!array_key_exists('requires', $actionObj) || $actionObj['requires']($this->game, $actionObj, ...$args));
     }
     public function spendActionCost($action, $subAction = null)

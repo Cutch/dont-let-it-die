@@ -188,17 +188,18 @@ $machinestates = [
         'description' => clienttranslate('It\'s night time'),
         'type' => 'game',
         'action' => 'stNightPhase',
+        // 'args' => 'argNightPhase',
         'transitions' => ['endGame' => 99, 'morningPhase' => 50, 'interrupt' => 22, 'nightDrawCard' => 31],
     ],
-    // 31 => [
-    //     'name' => 'nightDrawCard',
-    //     'description' => clienttranslate('Drawing Card'),
-    //     'descriptionmyturn' => clienttranslate('Drawing Card'),
-    //     'type' => 'game',
-    //     'args' => 'argNightDrawCard',
-    //     'action' => 'stNightDrawCard',
-    //     'transitions' => ['nightPhase' => 10, 'interrupt' => 22],
-    // ],
+    31 => [
+        'name' => 'nightDrawCard',
+        'description' => clienttranslate('Drawing Night Card'),
+        'descriptionmyturn' => clienttranslate('Drawing Night Card'),
+        'type' => 'game',
+        'args' => 'argNightDrawCard',
+        'action' => 'stNightDrawCard',
+        'transitions' => ['endGame' => 99, 'morningPhase' => 50, 'interrupt' => 22],
+    ],
     50 => [
         'name' => 'morningPhase',
         'description' => clienttranslate('Morning has arrived'),
@@ -213,7 +214,7 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'action' => 'stTradePhase',
         'possibleactions' => ['actEquipItem', 'actUnEquipItem', 'actTradeItem', 'actConfirmTradeItem', 'actDone'],
-        'transitions' => ['activePhase' => 10],
+        'transitions' => ['playerTurn' => 10],
     ],
 
     // Final state.

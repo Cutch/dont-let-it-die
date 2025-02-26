@@ -436,12 +436,6 @@ $charactersData = [
                 $game->activeCharacterEventLog('received 2 fkp');
             }
         },
-        // 'onEncounter' => function (Game $game, $char, &$data) {
-        //     if ($char['isActive'] && $data['name'] == 'Nothing') {
-        //         $game->adjustResource('fkp', 2);
-        //         $game->activeCharacterEventLog('received 2 fkp');
-        //     }
-        // },
         'onGetActionSelectable' => function (Game $game, $char, &$data) {
             if ($char['isActive'] && $data['action'] == 'actEat') {
                 $data['selectable'] = array_filter(
@@ -539,7 +533,7 @@ $charactersData = [
         'name' => 'Nirv',
         'slots' => ['weapon', 'tool'],
         'onNight' => function (Game $game, $char, &$data) {
-            if ($data['killed']) {
+            if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
                 $game->character->adjustAllHealth($char['character_name'], 1);
                 $this->notify->all('activeCharacter', clienttranslate('All tribe members gained 1 hp after the rival tribe event'), [
                     'gameData' => $this->getAllDatas(),
@@ -647,6 +641,16 @@ $charactersData = [
         'stamina' => '5',
         'name' => 'Nanuk',
         'slots' => ['weapon', 'tool'],
+        'onEat' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                $data['health'] *= 2;
+            }
+        },
+        'onGetEatData' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                $data['health'] *= 2;
+            }
+        },
         'onGetActionSelectable' => function (Game $game, $char, &$data) {
             if ($char['isActive'] && $data['action'] == 'actEat') {
                 $data['selectable'] = array_filter(
@@ -666,6 +670,37 @@ $charactersData = [
         'name' => 'Nibna',
         'startsWith' => 'bag',
         'slots' => ['weapon', 'tool'],
+        'onEat' => function (Game $game, $char, &$data) {
+            if ($char['isActive'] && getUsePerDay($char['id'], $game) < 1) {
+                usePerDay($char['id'], $game);
+                $data['health'] *= 2;
+            }
+        },
+        'onGetEatData' => function (Game $game, $char, &$data) {
+            if ($char['isActive'] && getUsePerDay($char['id'], $game) < 1) {
+                $data['health'] *= 2;
+            }
+        },
+        'skills' => [
+            'skill1' => [
+                'name' => clienttranslate('Heal everyone else for 1 hp'),
+                'health' => 2,
+                'onUse' => function (Game $game, $skill, $data) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($char['isActive']) {
+                        foreach ($game->character->getAllCharacterData() as $k => $character) {
+                            if ($character['character_name'] != $char['character_name']) {
+                                $game->character->adjustHealth($character['character_name'], 1);
+                            }
+                        }
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+        ],
     ],
     'Zeebo' => [
         // Done
@@ -739,6 +774,33 @@ $charactersData = [
         'stamina' => '5',
         'name' => 'Tiku',
         'slots' => ['weapon', 'tool'],
+        'onDraw' => function (Game $game, $char, $deck, $card) {
+            if ($char['isActive'] && $deck == 'explore' && $card['deckType'] != 'encounter') {
+                if ($game->adjustResource('dino-egg', 1) == 0) {
+                    $game->activeCharacterEventLog('gained 1 dino egg');
+                }
+            }
+        },
+        'skills' => [
+            'skill1' => [
+                'name' => clienttranslate('Make Stew'),
+                'stamina' => 1,
+                'onUse' => function (Game $game, $skill, $data) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($char['isActive']) {
+                        $game->adjustResource('berry', -1);
+                        $game->adjustResource('meat', -1);
+                        $game->adjustResource('herb', -1);
+                        $game->adjustResource('stew', 1);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && sizeof(array_filter($game->gameData->getResources('berry', 'meat', 'herb'))) == 3;
+                },
+            ],
+        ],
+        // TODO not affected by mental hindrance, can hold 4 physical
     ],
     'Vog' => [
         'type' => 'character',

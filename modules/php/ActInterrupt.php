@@ -119,7 +119,7 @@ class ActInterrupt
     {
         array_push($this->activatableSkills, $skill);
     }
-    public function getLatestInterruptState(): array
+    public function getLatestInterruptState(): ?array
     {
         $state = $this->getEntireState();
         $maxStateNumber = 0;
@@ -132,6 +132,9 @@ class ActInterrupt
                 return $v['stateNumber'] == $maxStateNumber;
             })
         );
+        if (sizeof($data) == 0) {
+            return null;
+        }
         $functionName = $data[0];
         $data = $state[$functionName];
         return ['functionName' => $functionName, 'data' => $data];
@@ -154,7 +157,7 @@ class ActInterrupt
     }
     public function actInterrupt(string $skillId): void
     {
-        $state = $this->getDataForState();
+        $state = $this->getLatestInterruptState();
         if (!$state) {
             return;
         }
@@ -183,7 +186,7 @@ class ActInterrupt
     }
     public function onInterruptCancel()
     {
-        $state = $this->getDataForState();
+        $state = $this->getLatestInterruptState();
         if (!$state) {
             return;
         }

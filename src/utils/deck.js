@@ -37,7 +37,12 @@ class Deck {
       renderImage(cardId, this.div.querySelector(`.flipped-card`), { scale: this.scale, pos: 'replace' });
       this.cleanup = addClickListener(this.div.querySelector(`.flipped-card`), cardId, () => {
         this.game.tooltip.show();
-        renderImage(cardId, this.game.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+        const {
+          frame: { w, h },
+          rotate,
+        } = allSprites[cardId];
+
+        renderImage(cardId, this.game.tooltip.renderByElement(), { scale: (rotate ? h : w) < 300 ? 0.5 : 1, pos: 'replace' });
       });
     }
     this.div
