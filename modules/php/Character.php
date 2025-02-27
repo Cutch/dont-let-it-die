@@ -278,7 +278,9 @@ class Character
     public function adjustStamina(string $characterName, int $stamina): int
     {
         $prev = 0;
-        $this->updateCharacterData($characterName, function (&$data) use ($stamina, &$prev) {
+        $_this = $this;
+        $this->updateCharacterData($characterName, function (&$data) use ($_this, $stamina, &$prev) {
+            $_this->game->hooks->onAdjustStamina($stamina);
             $prev = $data['stamina'];
             $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
             $prev = $data['stamina'] - $prev;
@@ -288,6 +290,7 @@ class Character
     public function adjustActiveStamina(int $stamina): int
     {
         $characterName = $this->getSubmittingCharacter()['character_name'];
+        $this->game->hooks->onAdjustStamina($stamina);
         return $this->adjustStamina($characterName, $stamina);
     }
     public function getActiveHealth(): int

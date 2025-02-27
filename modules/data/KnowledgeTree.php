@@ -61,6 +61,7 @@ $knowledgeTreeData = [
     'fire-starter' => [
         'name' => clienttranslate('Fire Starter'),
         'onUse' => function (Game $game, $obj) {
+            $this->notify->all('tree', clienttranslate('The tribe has discovered how to make fire!'));
             $game->win();
         },
     ],

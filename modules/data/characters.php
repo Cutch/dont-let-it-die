@@ -38,6 +38,7 @@ $charactersData = [
                     $game->activeCharacterEventLog('gained 2 stamina, lost 2 health');
                     return ['notify' => false];
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
@@ -119,6 +120,7 @@ $charactersData = [
                         usePerDay($char['id'] . 'investigateFire', $game);
                     }
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return !$char['isActive'] && getUsePerDay($char['id'] . 'investigateFire', $game) < 1;
@@ -146,9 +148,12 @@ $charactersData = [
                         ]);
                     }
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return !$char['isActive'] && getUsePerDay($char['id'] . 'stamina', $game) < 1;
+                    return !$char['isActive'] &&
+                        getUsePerDay($char['id'] . 'stamina', $game) < 1 &&
+                        !in_array('night-event-8_11', $game->getActiveNightCardIds());
                 },
             ],
             'skill3' => [
@@ -193,6 +198,7 @@ $charactersData = [
                 //     $game->activeCharacterEventLog('doubled the resources they found');
                 //     }
                 // },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return !$char['isActive'] && getUsePerDay($char['id'] . 'stamina', $game) < 1;
@@ -264,6 +270,7 @@ $charactersData = [
                     $game->adjustResource('bone', -1);
                     // TODO: Interrupt and Discard current night event
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return getUsePerDay($char['id'], $game) < 1 && $game->gameData->getResource('bone') > 0;
@@ -314,6 +321,7 @@ $charactersData = [
                     $game->activeCharacterEventLog('gained 2 health, lost 2 stamina');
                     return ['notify' => false];
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
@@ -348,6 +356,7 @@ $charactersData = [
                     $game->adjustResource('wood', 1);
                     $game->activeCharacterEventLog('gained 1 wood');
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
@@ -385,6 +394,7 @@ $charactersData = [
                     $game->adjustResource('fiber', 1);
                     $game->activeCharacterEventLog('converted 1 raw berry to 1 fiber');
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'] && $game->gameData->getResource('berry') > 0;
@@ -402,6 +412,7 @@ $charactersData = [
                     $game->character->adjustActiveHealth(2);
                     $game->activeCharacterEventLog('healed by 2');
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive'] && $char['health'] < $char['maxHealth']) {
@@ -477,6 +488,7 @@ $charactersData = [
                     $skill['sendNotification']();
                     $game->activeCharacterEventLog('received ${count} fish', ['count' => $game->rollFireDie()]);
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     $hasItem =
@@ -519,6 +531,7 @@ $charactersData = [
                 'onUse' => function (Game $game, $skill) {
                     $game->activeCharacterEventLog('healed for 1 hp');
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'];
@@ -534,9 +547,9 @@ $charactersData = [
         'slots' => ['weapon', 'tool'],
         'onNight' => function (Game $game, $char, &$data) {
             if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
-                $game->character->adjustAllHealth($char['character_name'], 1);
-                $this->notify->all('activeCharacter', clienttranslate('All tribe members gained 1 hp after the rival tribe event'), [
-                    'gameData' => $this->getAllDatas(),
+                $game->character->adjustHealth($char['character_name'], 1);
+                $game->notify->all('activeCharacter', clienttranslate('All tribe members gained 1 hp after the rival tribe event'), [
+                    'gameData' => $game->getAllDatas(),
                 ]);
             }
         },
@@ -601,6 +614,7 @@ $charactersData = [
                         return ['spendActionCost' => false, 'notify' => false];
                     }
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'] && sizeof(array_filter($game->gameData->getResources())) > 0;
@@ -628,6 +642,7 @@ $charactersData = [
                         $game->activeCharacterEventLog('gained 1 fire knowledge point');
                     }
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'] && $char['health'] < 3 && getUsePerDay($skill['id'], $game) < 1;
@@ -695,6 +710,7 @@ $charactersData = [
                         }
                     }
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'];
@@ -738,6 +754,7 @@ $charactersData = [
                         $game->activeCharacterEventLog('doubled the resources they found');
                     }
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'];
@@ -794,6 +811,7 @@ $charactersData = [
                         $game->adjustResource('stew', 1);
                     }
                 },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'] && sizeof(array_filter($game->gameData->getResources('berry', 'meat', 'herb'))) == 3;
@@ -858,9 +876,9 @@ $charactersData = [
                             ...$char,
                             'active_character_name' => $game->character->getTurnCharacter()['character_name'],
                         ]);
-                        // $this->notify->all('activeCharacter', clienttranslate('${character_name} ' ), [
+                        // $game->notify->all('activeCharacter', clienttranslate('${character_name} ' ), [
                         //     ...$arg,
-                        //     'gameData' => $this->getAllDatas(),
+                        //     'gameData' => $game->getAllDatas(),
                         // ]);
                     }
                 },
@@ -873,6 +891,7 @@ $charactersData = [
                 //         $game->activeCharacterEventLog('doubled the resources they found');
                 //     }
                 // },
+                'type' => 'skill',
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return !$char['isActive'];

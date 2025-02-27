@@ -248,7 +248,7 @@ $itemsData = [
         ],
         'onDraw' => function (Game $game, $item, $deck, $card) {
             if ($card['resourceType'] == 'meat') {
-                $game->gameData->setResource('meat', $game->gameData->getResource('meat') + 1);
+                $game->adjustResource('meat', 1);
                 $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
                     'item_name' => $item['name'],
                     'resource_type' => $card['resourceType'],

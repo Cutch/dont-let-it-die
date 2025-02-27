@@ -821,6 +821,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     notification_shuffle: function (notification) {
       this.notificationWrapper(notification);
       console.log('notification_shuffle', notification);
+      console.log(this.decks);
       this.decks[notification.args.deck].shuffle();
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
     },

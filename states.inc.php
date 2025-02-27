@@ -173,6 +173,7 @@ $machinestates = [
             'nightPhase' => 30,
             'morningPhase' => 50,
             'drawCard' => 11,
+            'endTurn' => 15,
         ],
     ],
     15 => [

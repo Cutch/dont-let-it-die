@@ -414,10 +414,10 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $this->adjustResource('fiber', -$roll);
-            $game->nightEventLog('A rival tribe stole ${number} ${resource_type}', [
+            $game->adjustResource('fiber', -$roll);
+            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
                 'number' => $roll,
                 'resource_type' => 'fiber',
             ]);
@@ -427,11 +427,11 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $left = $this->adjustResource('berry-cooked', -$roll);
-            $this->adjustResource('berry', $left);
-            $game->nightEventLog('A rival tribe stole ${number} ${resource_type}', [
+            $left = $game->adjustResource('berry-cooked', -$roll);
+            $game->adjustResource('berry', $left);
+            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
                 'number' => $roll,
                 'resource_type' => 'berry',
             ]);
@@ -440,15 +440,15 @@ $decksData = [
     'night-event-7_10' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onMorning' => function (Game $game, &$data) {
-            $data['health'] = min($data['health'] + 1, 0);
+        'onMorning' => function (Game $game, $nightCard, &$data) {
+            $data['health'] = 0;
             $game->nightEventLog('No damage taken in the morning');
         },
     ],
     'night-event-7_11' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onDraw' => function (Game $game, $object, $deck, $card) {
+        'onDraw' => function (Game $game, $nightCard, $deck, $card) {
             $roll = $game->rollFireDie();
             if ($roll == 0) {
                 $game->character->adjustActiveHealth(-1);
@@ -459,19 +459,23 @@ $decksData = [
     'night-event-7_12' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             // TODO discard item on item trade screen
         },
     ],
     'night-event-7_13' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
+            $game->nightEventLog('Mammoths storm the camp');
             $game->character->updateAllCharacterData(function ($character) use ($game) {
-                $roll = $game->rollFireDie($character['character_name'], $character)['value'];
+                $roll = $game->rollFireDie($character['character_name']);
+                // On blank roll take a damage
                 if ($roll == 0) {
                     $game->character->adjustHealth($character['character_name'], -1);
-                    $game->nightEventLog('${character_name} took 1 damage');
+                    $game->nightEventLog('${character_name} took 1 damage', [
+                        'character_name' => $game->getCharacterHTML($character['character_name']),
+                    ]);
                     return false;
                 }
                 return true;
@@ -481,15 +485,15 @@ $decksData = [
     'night-event-7_14' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onMorning' => function (Game $game, &$data) {
+        'onMorning' => function (Game $game, $nightCard, &$data) {
             $data['health'] = min($data['health'] - 1, 0);
-            $game->nightEventLog('Volcano causes an additional health damage');
+            $game->nightEventLog('A volcano causes an additional health damage');
         },
     ],
     'night-event-7_15' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, &$data) {
+        'onUse' => function (Game $game, $nightCard) {
             $charactersWithStamina = array_filter($game->character->getAllCharacterData(), function ($data) {
                 return $data['stamina'] > 0;
             });
@@ -504,7 +508,7 @@ $decksData = [
     'night-event-7_2' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onGetValidActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
             $charactersWithStamina = array_filter($game->character->getAllCharacterData(), function ($data) {
                 return $data['stamina'] > 0;
             });
@@ -519,15 +523,31 @@ $decksData = [
     'night-event-7_3' => [
         'deck' => 'night-event',
         'type' => 'deck',
+        // Can't gain stamina next day (not including morning)
+        'onUse' => function (Game $game, $nightCard) {
+            $game->nightEventLog('Can\'t gain stamina tomorrow');
+        },
+        'onCheckSkillRequirements' => function (Game $game, $nightCard, $data, &$requires) {
+            // Stamina skills can't be used
+            if (array_key_exists('type', $data)) {
+                $requires['requires'] = $requires['requires'] && $data['type'] == 'skill' && array_key_exists('stamina', $data);
+            }
+        },
+        'onAdjustStamina' => function (Game $game, $nightCard, &$data) {
+            if ($data > 0) {
+                $data = 0;
+            }
+            return $data;
+        },
     ],
     'night-event-7_4' => [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $this->adjustResource('wood', -$roll);
-            $game->nightEventLog('A rival tribe stole ${number} ${resource_type}', [
+            $game->adjustResource('wood', -$roll);
+            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
                 'number' => $roll,
                 'resource_type' => 'wood',
             ]);
@@ -537,10 +557,10 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $this->adjustResource('rock', -$roll);
-            $game->nightEventLog('A rival tribe stole ${number} ${resource_type}', [
+            $game->adjustResource('rock', -$roll);
+            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
                 'number' => $roll,
                 'resource_type' => 'rock',
             ]);
@@ -550,11 +570,11 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $left = $this->adjustResource('meat-cooked', -$roll);
-            $this->adjustResource('meat', $left);
-            $game->nightEventLog('A rival tribe stole ${number} ${resource_type}', [
+            $left = $game->adjustResource('meat-cooked', -$roll);
+            $game->adjustResource('meat', $left);
+            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
                 'number' => $roll,
                 'resource_type' => 'meat',
             ]);
@@ -563,31 +583,31 @@ $decksData = [
     'night-event-7_7' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->character->adjustAllHealth(2);
-            $game->nightEventLog('Everyone heals 2');
+            $game->nightEventLog('Everyone heals 2 hp');
         },
     ],
     'night-event-7_8' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
-            $game->nightEventLog('Everyone heals 1 extra when eating tomorrow');
+        'onUse' => function (Game $game, $nightCard) {
+            $game->nightEventLog('Everyone heals 1 extra hp when eating tomorrow');
         },
-        'onEat' => function (Game $game, &$data) {
+        'onEat' => function (Game $game, $nightCard, &$data) {
             $data['health'] += 1;
         },
-        'onGetEatData' => function (Game $game, &$data) {
+        'onGetEatData' => function (Game $game, $nightCard, &$data) {
             $data['health'] += 1;
         },
     ],
     'night-event-7_9' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Lack of sleep lessens everyone\'s stamina');
         },
-        'onMorning' => function (Game $game, &$data) {
+        'onMorning' => function (Game $game, $nightCard, &$data) {
             $data['stamina'] -= 3;
         },
     ],
@@ -599,7 +619,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             // Everyone take physical hindrance
         },
     ],
@@ -607,7 +627,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             // Add 3 raw eggs to supply
             // If 3 raw eggs are not there by night, everyone takes 1 damage
         },
@@ -615,11 +635,14 @@ $decksData = [
     'night-event-8_10' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Only 2 investigate fire action can be taken tomorrow');
         },
-        'onGetValidActions' => function (Game $game, $object, &$data) {
-            if ($game->actions->getTurnActions()['actInvestigateFire'] > 0) {
+        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
+            if (
+                array_key_exists('actInvestigateFire', $game->actions->getTurnActions()) &&
+                $game->actions->getTurnActions()['actInvestigateFire'] > 0
+            ) {
                 unset($data['actInvestigateFire']);
             }
         },
@@ -627,15 +650,18 @@ $decksData = [
     'night-event-8_11' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onGetValidActions' => function (Game $game, $object, &$data) {
-            // Stamina skills can't be used
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Bad mushrooms make some skills not work tomorrow');
+        },
+        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
+            // Stamina skills can't be used
+            return !array_key_exists('stamina', $data);
         },
     ],
     'night-event-8_12' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->adjustResource('meat', 2);
             $game->nightEventLog('The tribe receives 2 meat');
         },
@@ -643,18 +669,18 @@ $decksData = [
     'night-event-8_13' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Freezing winds deal 1 damage and lessens everyone\'s stamina');
             $game->character->adjustAllHealth(-1);
         },
-        'onMorning' => function (Game $game, &$data) {
+        'onMorning' => function (Game $game, $nightCard, &$data) {
             $data['stamina'] -= 2;
         },
     ],
     'night-event-8_14' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $berries = $game->gameData->getResource('berry');
             if ($berries > 0) {
                 $lostBerries = floor($berries / 2);
@@ -684,7 +710,7 @@ $decksData = [
     'night-event-8_15' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('The night was peaceful');
         },
     ],
@@ -692,7 +718,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $charactersWithStamina = array_filter($game->character->getAllCharacterData(), function ($data) {
                 return $data['stamina'] >= 2;
             });
@@ -710,30 +736,30 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('All items have disappeared');
             foreach ($game->character->getAllCharacterData() as $i => $char) {
                 $game->character->unequipEquipment($char['character_name'], $char['equipment']);
             }
         },
-        'onGetValidActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
             unset($data['actItems']);
         },
     ],
     'night-event-8_4' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Can\'t investigate the fire tomorrow, it\'s too hot');
         },
-        'onGetValidActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
             unset($data['actInvestigateFire']);
         },
     ],
     'night-event-8_5' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $meat = $game->gameData->getResource('meat');
             if ($meat > 0) {
                 $game->adjustResource('meat', -1);
@@ -747,7 +773,7 @@ $decksData = [
     'night-event-8_6' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             // Item selection, destroy 2 unequipped
         },
     ],
@@ -755,14 +781,14 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             // Pick a deck used this turn and show the top 3 cards
         },
     ],
     'night-event-8_8' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Sharing knowledge increases fire knowledge by 4');
             $game->adjustResource('fkp', 4);
         },
@@ -770,23 +796,28 @@ $decksData = [
     'night-event-9_9' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('All fire die rolls will be reduced tomorrow');
         },
-        'onRollDie' => function (Game $game, &$data) {
-            $data -= 1;
+        'onRollDie' => function (Game $game, $nightCard, &$data) {
+            if ($data > 1) {
+                $game->nightEventLog('Roll reduced by 1');
+            }
+            $data = max($data, $data - 1);
         },
     ],
     'night-event-9_10' => [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             // Remove physical hindrance from each character
             // Skip morning phase damage
         },
-        'onMorning' => function (Game $game, &$data) {
-            $data['health'] = min($data['health'] + 1, 0);
+        'onMorning' => function (Game $game, $nightCard, &$data) {
+            $turnOrder = $this->game->gameData->getGlobals('turnOrder');
+            $turnOrder = array_values(array_filter($turnOrder));
+            array_push($data['skipMorningDamage'], ...$turnOrder);
             $game->nightEventLog('No damage taken in the morning');
         },
     ],
@@ -794,10 +825,10 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('No exploring tomorrow');
         },
-        'onGetValidActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
             unset($data['actDrawExplore']);
         },
     ],
@@ -805,7 +836,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Berries can\'t be found until the forage deck runs out of cards');
             // Need to add a globally active card
             $game->decks->discardCards('forage', function ($data) {
@@ -817,10 +848,10 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Actions outside of camp are harder tomorrow');
         },
-        'onGetValidActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
             $data['actDrawForage'] += 1;
             $data['actDrawExplore'] += 1;
             $data['actDrawHunt'] += 1;
@@ -832,10 +863,10 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Unable to craft tomorrow');
         },
-        'onGetValidActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
             unset($data['actCraft']);
         },
     ],
@@ -844,10 +875,10 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'eventType' => 'rival-tribe',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $this->adjustResource('dino-egg', -$roll);
-            $game->nightEventLog('A rival tribe stole ${number} ${resource_type}', [
+            $game->adjustResource('dino-egg', -$roll);
+            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
                 'number' => $roll,
                 'resource_type' => 'dino-egg',
             ]);
@@ -857,7 +888,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             foreach ($game->decks->getAllDeckNames() as $i => $deck) {
                 $game->decks->shuffleInDiscard($deck, false);
             }
@@ -868,10 +899,10 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $card1 = $game->decks->pickCard('hunt');
             $card2 = $game->decks->pickCard('hunt');
-            $this->notify->all('cardDrawn', clienttranslate('Drew 2 from the ${deck} deck'), [
+            $game->notify->all('cardDrawn', clienttranslate('Drew 2 from the ${deck} deck'), [
                 'deck' => 'hunt',
             ]);
             $maxDamage = max(
@@ -890,10 +921,10 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Unable to trade with tribes tomorrow');
         },
-        'onGetValidActions' => function (Game $game, $object, &$data) {
+        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
             unset($data['actTrade']);
         },
     ],
@@ -902,10 +933,10 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'eventType' => 'rival-tribe',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $this->adjustResource('gem', -$roll);
-            $game->nightEventLog('A rival tribe stole ${number} ${resource_type}', [
+            $game->adjustResource('gem', -$roll);
+            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
                 'number' => $roll,
                 'resource_type' => 'gem',
             ]);
@@ -916,10 +947,10 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'eventType' => 'rival-tribe',
-        'onUse' => function (Game $game, $object) {
+        'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $this->adjustResource('herb', -$roll);
-            $game->nightEventLog('A rival tribe stole ${number} ${resource_type}', [
+            $game->adjustResource('herb', -$roll);
+            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
                 'number' => $roll,
                 'resource_type' => 'herb',
             ]);

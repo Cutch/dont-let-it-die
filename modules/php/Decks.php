@@ -108,20 +108,15 @@ class Decks
         $this->decks[$deck]->moveAllCardsInLocation('discard', 'deck');
         $this->decks[$deck]->shuffle('deck');
         unset($this->cachedData[$deck]);
-        $results = [];
+        $results = [
+            'deck' => $deck,
+            'deckName' => str_replace('-', ' ', $deck),
+        ];
         $this->game->getDecks($results);
         if ($notify) {
-            $this->game->notify->all('shuffle', clienttranslate('The ${deck_name} deck is out of cards, shuffling'), [
-                'gameData' => $results,
-                'deck' => str_replace('-', ' ', $deck),
-                'deckName' => $deck,
-            ]);
+            $this->game->notify->all('shuffle', clienttranslate('The ${deckName} deck is out of cards, shuffling'), $results);
         } else {
-            $this->game->notify->all('shuffle', '', [
-                'gameData' => $results,
-                'deck' => $deck,
-                'deck_name' => str_replace('-', ' ', $deck),
-            ]);
+            $this->game->notify->all('shuffle', '', $results);
         }
     }
     public function pickCard(string $deck): array

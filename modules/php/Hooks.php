@@ -9,12 +9,15 @@ class Hooks
 {
     private Game $game;
     private bool $checkInterrupt = false;
-    private array $hooks = [];
     public function __construct(Game $game)
     {
         $this->game = $game;
+    }
+    private function getHook(): array
+    {
         $unlocks = $this->game->getUnlockedKnowledge();
         $activeNightCards = $this->game->getActiveNightCards();
+        // var_dump(json_encode($activeNightCards));
         $buildings = $this->game->getBuildings();
         $characters = $this->game->character->getAllCharacterData(true);
         $equipment = array_merge(
@@ -30,16 +33,18 @@ class Hooks
                 return [];
             }, $characters)
         );
-        $this->hooks = [...$unlocks, ...$activeNightCards, ...$buildings, ...$characters, ...$skills, ...$equipment];
+        return [...$unlocks, ...$buildings, ...$characters, ...$skills, ...$equipment, ...$activeNightCards];
     }
     private function callHooks($functionName, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
     {
-        $hooks = $this->hooks;
+        $hooks = $this->getHook();
         if ($this->checkInterrupt) {
             // var_dump($functionName);
             $hooks = array_filter($hooks, function ($object) use ($data1, $data2, $data3, $data4) {
+                $interruptData = array_filter([$data1, $data2, $data3, $data4]);
+                $interruptData = $interruptData[sizeof($interruptData) - 1];
                 return (!array_key_exists('state', $object) || in_array('interrupt', $object['state'])) &&
-                    (!array_key_exists('interruptState', $object) || in_array($data1['currentState'], $object['interruptState'])) &&
+                    (!array_key_exists('interruptState', $object) || in_array($interruptData['currentState'], $object['interruptState'])) &&
                     (!array_key_exists('requires', $object) || $object['requires']($this->game, $object, $data1, $data2, $data3, $data4));
             });
         }
@@ -180,5 +185,24 @@ class Hooks
                 $jsonData[$k] = $v;
             }
         });
+    }
+    function onAdjustStamina(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onAdjustHealth(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onCheckSkillRequirements(&$data, $checkInterrupt = false)
+    {
+        $requires = ['requires' => true];
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data, $requires);
+        return $requires['requires'];
     }
 }

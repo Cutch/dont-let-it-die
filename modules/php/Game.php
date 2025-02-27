@@ -139,9 +139,9 @@ class Game extends \Table
         $this->hooks->onGetTradeRatio($data);
         return $data['ratio'];
     }
-    public function adjustResource($resourceType, $change): int
+    public function adjustResource($resourceType, int $change): int
     {
-        $currentCount = $this->gameData->getResource($resourceType);
+        $currentCount = (int) $this->gameData->getResource($resourceType);
         $maxCount = isset($this->data->tokens[$resourceType]['count']) ? $this->data->tokens[$resourceType]['count'] : 999;
         $newValue = max(min($currentCount + $change, $maxCount), 0);
         $this->gameData->setResource($resourceType, $newValue);
@@ -163,7 +163,7 @@ class Game extends \Table
         if ($character) {
             $this->notify->all('rollFireDie', clienttranslate('${character_name} rolled a ${value}'), [
                 'value' => $value == 0 ? 'blank' : $value,
-                // 'character_name' => $character['character_name'],
+                'character_name' => $this->getCharacterHTML($character),
             ]);
         } else {
             $this->notify->all('rollFireDie', clienttranslate('The fire die rolled a ${value}'), [
@@ -223,6 +223,7 @@ class Game extends \Table
         }
 
         $this->actions->spendActionCost('actSpendFKP');
+        $this->unlockKnowledge($knowledgeId);
         $this->notify->all('tokenUsed', clienttranslate('${character_name} unlocked ${knowledge_name}'), [
             'gameData' => $this->getAllDatas(),
             'knowledgeId' => $knowledgeId,
@@ -725,6 +726,7 @@ class Game extends \Table
             function (Game $_this) {
                 $card = $this->decks->pickCard('night-event');
                 $this->setActiveNightCard($card['id']);
+                // var_dump(json_encode($card['id']));
                 $this->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
                 return ['card' => $card, 'deck' => 'night-event'];
             },
@@ -853,7 +855,7 @@ class Game extends \Table
         $day += 1;
         $this->gameData->set('day', $day);
         if ($day == 14) {
-            $this->lose(); // Fail
+            $this->lose();
         }
         $this->notify->all('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
             'day' => $day,
@@ -867,25 +869,29 @@ class Game extends \Table
             'woodNeeded' => $this->getFirewoodCost(),
             'difficulty' => $difficulty,
             'health' => $health,
+            'stamina' => 0,
             'skipMorningDamage' => [],
         ];
         $this->hooks->onMorning($data);
         extract($data);
-        $this->character->updateAllCharacterData(function (&$data) use ($health, $skipMorningDamage) {
+        $this->character->updateAllCharacterData(function (&$data) use ($health, $stamina, $skipMorningDamage) {
             if (!in_array($data['id'], $skipMorningDamage)) {
                 $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
             }
             $data['stamina'] = $data['maxStamina'];
+            $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
         });
-        $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} health'), [
-            'amount' => -$health,
-        ]);
+        if ($health != 0) {
+            $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} health'), [
+                'amount' => -$health,
+            ]);
+        }
 
         $this->notify->all('morningPhase', clienttranslate('The fire pit used ${amount} wood'), [
             'amount' => $woodNeeded,
         ]);
         if ($this->adjustResource('fireWood', -$woodNeeded) != 0) {
-            $this->lose(); // Fail
+            $this->lose();
         }
         $this->actions->resetTurnActions();
         $this->character->rotateTurnOrder();
@@ -1040,10 +1046,15 @@ class Game extends \Table
     }
     public function getActiveNightCards(): array
     {
-        $activeNightCards = $this->gameData->getGlobals('activeNightCards');
+        $activeNightCards = $this->getActiveNightCardIds();
         return array_map(function ($cardId) {
-            return $this->data->decks[$cardId];
+            $card = $this->data->decks[$cardId];
+            return $card;
         }, $activeNightCards);
+    }
+    public function getActiveNightCardIds(): array
+    {
+        return $this->gameData->getGlobals('activeNightCards');
     }
     public function setActiveNightCard($cardId): void
     {
@@ -1051,10 +1062,15 @@ class Game extends \Table
     }
     public function getUnlockedKnowledge(): array
     {
-        $unlocks = $this->gameData->getGlobals('unlocks');
+        $unlocks = $this->getUnlockedKnowledgeIds();
         return array_map(function ($unlock) {
             return $this->data->knowledgeTree[$unlock];
         }, $unlocks);
+    }
+    public function getUnlockedKnowledgeIds(): array
+    {
+        $unlocks = $this->gameData->getGlobals('unlocks');
+        return $unlocks;
     }
     public function unlockKnowledge($knowledgeId): void
     {
@@ -1202,25 +1218,25 @@ class Game extends \Table
     {
         $this->globals->set('resources', [
             ...$this->gameData->getResources(),
-            // 'fireWood' => 4,
-            // 'wood' => 4,
+            'fireWood' => 4,
+            'wood' => 4,
             'bone' => 6,
-            // 'meat' => 4,
-            // 'meat-cooked' => 4,
-            // 'fish' => 0,
-            // 'fish-cooked' => 0,
-            // 'dino-egg' => 0,
-            // 'dino-egg-cooked' => 0,
+            'meat' => 4,
+            'meat-cooked' => 4,
+            'fish' => 0,
+            'fish-cooked' => 0,
+            'dino-egg' => 0,
+            'dino-egg-cooked' => 0,
             'berry' => 4,
-            // 'berry-cooked' => 4,
-            // 'rock' => 6,
-            // 'stew' => 0,
-            // 'fiber' => 6,
-            // 'hide' => 8,
-            // 'trap' => 0,
-            // 'herb' => 0,
+            'berry-cooked' => 4,
+            'rock' => 6,
+            'stew' => 0,
+            'fiber' => 6,
+            'hide' => 8,
+            'trap' => 0,
+            'herb' => 0,
             'fkp' => 1,
-            // 'gem' => 0,
+            'gem' => 0,
         ]);
     }
     public function giveClub()
@@ -1239,5 +1255,39 @@ class Game extends \Table
         $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
             $data['health'] = 2;
         });
+    }
+    public function drawNightCard()
+    {
+        $this->globals->set('resources', [
+            ...$this->gameData->getResources(),
+            'fireWood' => 5,
+            'wood' => 3,
+            'bone' => 4,
+            'meat' => 4,
+            'meat-cooked' => 4,
+            'fish' => 4,
+            'fish-cooked' => 4,
+            'dino-egg' => 4,
+            'dino-egg-cooked' => 4,
+            'berry' => 4,
+            'berry-cooked' => 4,
+            'rock' => 4,
+            'fiber' => 4,
+            'hide' => 4,
+            'herb' => 4,
+            'fkp' => 1,
+            'gem' => 3,
+        ]);
+        $this->adjustResource('fireWood', 2);
+        $this->character->updateAllCharacterData(function (&$data) {
+            $data['stamina'] = $data['maxStamina'];
+            $data['health'] = $data['maxHealth'] - 2;
+        });
+        $this->gameData->set('day', 1);
+        $this->gameData->set('turnNo', 3);
+        $this->gamestate->nextState('endTurn');
+        $this->notify->all('tokenUsed', '', [
+            'gameData' => $this->getAllDatas(),
+        ]);
     }
 }
