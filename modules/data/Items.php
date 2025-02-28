@@ -5,12 +5,12 @@ use Bga\Games\DontLetItDie\Game;
 if (!function_exists('getUsePerDay')) {
     function getUsePerDay(string $itemId, $game)
     {
-        $dailyUseItems = $game->gameData->getGlobals('dailyUseItems');
+        $dailyUseItems = $game->gameData->get('dailyUseItems');
         return array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] : 0;
     }
     function usePerDay(string $itemId, $game)
     {
-        $dailyUseItems = $game->gameData->getGlobals('dailyUseItems');
+        $dailyUseItems = $game->gameData->get('dailyUseItems');
         $dailyUseItems[$itemId] = array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] + 1 : 1;
         $game->gameData->set('dailyUseItems', $dailyUseItems);
     }
@@ -149,12 +149,12 @@ $itemsData = [
                 'name' => clienttranslate('Ignore Damage'),
                 'state' => ['postEncounter'],
                 'onUse' => function (Game $game, $skill, $char) {
-                    $state = $game->gameData->getGlobals('encounterState');
+                    $state = $game->gameData->get('encounterState');
                     $game->character->adjustActiveHealth($state['willTakeDamage']);
                     usePerDay($char['id'] . $skill['id'], $game);
                 },
                 'requires' => function (Game $game, $skill, $char) {
-                    $state = $game->gameData->getGlobals('encounterState');
+                    $state = $game->gameData->get('encounterState');
                     return $state['willTakeDamage'] && getUsePerDay($char['id'] . $skill['id'], $game) < 1;
                 },
             ],

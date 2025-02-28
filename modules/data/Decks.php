@@ -815,7 +815,7 @@ $decksData = [
             // Skip morning phase damage
         },
         'onMorning' => function (Game $game, $nightCard, &$data) {
-            $turnOrder = $this->game->gameData->getGlobals('turnOrder');
+            $turnOrder = $this->game->gameData->get('turnOrder');
             $turnOrder = array_values(array_filter($turnOrder));
             array_push($data['skipMorningDamage'], ...$turnOrder);
             $game->nightEventLog('No damage taken in the morning');

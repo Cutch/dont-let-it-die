@@ -245,7 +245,7 @@ class Game extends \Table
                     throw new BgaUserException($_this->translate('Invalid Item'));
                 }
                 $itemType = $_this->data->items[$itemName]['itemType'];
-                $currentBuildings = $_this->gameData->getGlobals('buildings');
+                $currentBuildings = $_this->gameData->get('buildings');
                 if ($itemType == 'building' && sizeof($currentBuildings) > 0) {
                     throw new BgaUserException($_this->translate('A building has already been crafted'));
                 }
@@ -260,7 +260,7 @@ class Game extends \Table
                     'itemType' => $itemType,
                 ];
             },
-            function (Game $_this, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $itemName = $data['itemName'];
                 $item = $data['item'];
                 $itemType = $data['itemType'];
@@ -317,7 +317,7 @@ class Game extends \Table
         if (!$sendToCampId) {
             throw new BgaUserException($this->translate('Select an item'));
         }
-        extract($this->gameData->getGlobals('state'));
+        extract($this->gameData->get('state'));
         if (
             !in_array(
                 $sendToCampId,
@@ -352,21 +352,37 @@ class Game extends \Table
         }
         $this->character->setCharacterEquipment($character['id'], [...$unchangedItems, ...array_values($changed)]);
 
-        $campEquipment = $this->gameData->getGlobals('campEquipment');
+        $campEquipment = $this->gameData->get('campEquipment');
         $this->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gamestate->nextState('playerTurn');
     }
     public function actSelectResource(string $resourceType = null): void
     {
-        if (!$resourceType) {
-            throw new BgaUserException($this->translate('Select a resource'));
-        }
-        $this->hooks->onResourceSelection($resourceType);
-        $this->gamestate->nextState('playerTurn');
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onResourceSelection'],
+            function (Game $_this) use ($resourceType) {
+                if (!$resourceType) {
+                    throw new BgaUserException($this->translate('Select a resource'));
+                }
+                return [
+                    'resourceType' => $resourceType,
+                ];
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                // $resourceType = $data['resourceType'];
+                // var_dump('actSelectResource playerTurn');
+                $this->gamestate->nextState('playerTurn');
+            }
+        );
     }
     public function actSelectResourceCancel(): void
     {
-        $this->gamestate->nextState('playerTurn');
+        if (!$this->actInterrupt->onInterruptCancel()) {
+            // var_dump('actSelectResourceCancel playerTurn');
+            $this->gamestate->nextState('playerTurn');
+        }
     }
     public function actSelectDeck(string $deckName = null): void
     {
@@ -378,7 +394,9 @@ class Game extends \Table
     }
     public function actSelectDeckCancel(): void
     {
-        $this->gamestate->nextState('playerTurn');
+        if (!$this->actInterrupt->onInterruptCancel()) {
+            $this->gamestate->nextState('playerTurn');
+        }
     }
     public function actTrade(#[JsonParam] array $data): void
     {
@@ -480,7 +498,7 @@ class Game extends \Table
                     'turnCharacter' => $this->character->getTurnCharacter(),
                 ];
             },
-            function (Game $_this, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $skill = $data['skill'];
                 $character = $data['character'];
                 $skillId = $data['skillId'];
@@ -489,11 +507,8 @@ class Game extends \Table
                 if ($_this->gamestate->state()['name'] == 'interrupt') {
                     $_this->actInterrupt->actInterrupt($skillId);
                 }
-
-                if (
-                    !array_key_exists('interruptState', $skill) ||
-                    (in_array('interrupt', $skill['state']) && $this->gamestate->state()['name'] == 'interrupt')
-                ) {
+                // var_dump(json_encode(['onUseSkill', $skill, $this->gamestate->state()['name']]));
+                if (!array_key_exists('interruptState', $skill) || (in_array('interrupt', $skill['state']) && $finalizeInterrupt)) {
                     $notificationSent = false;
                     $skill['sendNotification'] = function () use (&$skill, $_this, &$notificationSent) {
                         $_this->notify->all('updateGameData', clienttranslate('${character_name} used the skill ${skill_name}'), [
@@ -502,6 +517,7 @@ class Game extends \Table
                         ]);
                         $notificationSent = true;
                     };
+                    // var_dump(json_encode([array_key_exists('onUse', $skill)]));
                     $result = array_key_exists('onUse', $skill) ? $skill['onUse']($this, $skill, $character) : null;
                     if (!$result || !array_key_exists('spendActionCost', $result) || $result['spendActionCost'] != false) {
                         $_this->actions->spendActionCost('actUseSkill', $skillId);
@@ -561,7 +577,7 @@ class Game extends \Table
                 $_this->actions->spendActionCost('actInvestigateFire');
                 return ['roll' => $roll];
             },
-            function (Game $_this, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 // var_dump(json_encode(['actInvestigateFire', $data]));
                 $_this->adjustResource('fkp', $data['roll']);
                 $this->notify->all('tokenUsed', '', [
@@ -588,7 +604,7 @@ class Game extends \Table
                 ]);
                 return ['deck' => $deck, 'card' => $card];
             },
-            function (Game $_this, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 extract($data);
                 $_this->actions->spendActionCost('actDraw' . ucfirst($deck));
 
@@ -624,7 +640,7 @@ class Game extends \Table
 
     public function argTooManyItems()
     {
-        return [...$this->gameData->getGlobals('state'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
+        return [...$this->gameData->get('state'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
     }
     public function argDeckSelection()
     {
@@ -644,7 +660,7 @@ class Game extends \Table
         );
         $this->hooks->onResourceSelectionOptions($resources);
         $result = [
-            ...$this->gameData->getGlobals('state'),
+            ...$this->gameData->get('state'),
             'actions' => [],
             'character_name' => $this->getCharacterHTML(),
             'tokenSelection' => $resources,
@@ -655,7 +671,7 @@ class Game extends \Table
     public function argDrawCard()
     {
         $result = [
-            ...$this->gameData->getGlobals('state'),
+            ...$this->gameData->get('state'),
             'resolving' => $this->actInterrupt->isStateResolving(),
             'character_name' => $this->getCharacterHTML(),
         ];
@@ -665,7 +681,7 @@ class Game extends \Table
     public function argNightDrawCard()
     {
         $result = [
-            ...$this->gameData->getGlobals('state'),
+            ...$this->gameData->get('state'),
             'resolving' => $this->actInterrupt->isStateResolving(),
             'character_name' => $this->getCharacterHTML(),
         ];
@@ -701,7 +717,7 @@ class Game extends \Table
             function (Game $_this) {
                 // $character = $this->character->getSubmittingCharacter();
                 // deck,card
-                $state = $this->gameData->getGlobals('state');
+                $state = $this->gameData->get('state');
                 $deck = $state['deck'];
                 $card = $state['card'];
                 if ($card['deckType'] == 'resource') {
@@ -728,7 +744,7 @@ class Game extends \Table
                 }
                 return $state;
             },
-            function (Game $_this, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
                 $card = $data['card'];
                 if ($card['deckType'] == 'resource') {
@@ -758,7 +774,7 @@ class Game extends \Table
                 $this->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
                 return ['card' => $card, 'deck' => 'night-event'];
             },
-            function (Game $_this, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
                 $this->gamestate->nextState('nightDrawCard');
             }
@@ -772,7 +788,7 @@ class Game extends \Table
             [$this->hooks, 'onNightDrawCard'],
             function (Game $_this) {
                 // deck,card
-                $state = $this->gameData->getGlobals('state');
+                $state = $this->gameData->get('state');
                 $deck = $state['deck'];
                 $card = $state['card'];
                 $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
@@ -782,7 +798,7 @@ class Game extends \Table
 
                 return ['state' => $state, 'useResult' => $result];
             },
-            function (Game $_this, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $this->gamestate->nextState('morningPhase');
             }
         );
@@ -822,7 +838,7 @@ class Game extends \Table
     public function getGameProgression()
     {
         // TODO: compute and return the game progression
-        extract($this->gameData->getGlobalsAll('day', 'turnNo'));
+        extract($this->gameData->getAll('day', 'turnNo'));
         return (($day - 1) * 4 + $turnNo) / (12 * 4);
     }
 
@@ -860,7 +876,7 @@ class Game extends \Table
     }
     public function getFirewoodCost()
     {
-        $day = $this->gameData->getGlobals('day');
+        $day = $this->gameData->get('day');
         if ($this->getTrackDifficulty() == 'normal') {
             return (int) (($day - 1) / 3) + 1 + ($day == 12 ? 1 : 0);
         } else {
@@ -879,7 +895,7 @@ class Game extends \Table
     }
     public function stMorningPhase()
     {
-        $day = $this->gameData->getGlobals('day');
+        $day = $this->gameData->get('day');
         $day += 1;
         $this->gameData->set('day', $day);
         if ($day == 14) {
@@ -927,7 +943,7 @@ class Game extends \Table
     }
     public function stTradePhase()
     {
-        $this->gamestate->setPlayersMultiactive([], 'playerTurn');
+        $this->gameData->setAllMultiActiveCharacter();
         // $this->gamestate->nextState('playerTurn');
     }
 
@@ -985,7 +1001,12 @@ class Game extends \Table
     }
     public function getCraftedItems(): array
     {
-        $campEquipment = array_count_values($this->gameData->getGlobals('campEquipment'));
+        $items = $this->gameData->getItems();
+        $campEquipment = array_count_values(
+            array_map(function ($d) use ($items) {
+                return $items[$d];
+            }, $this->gameData->get('campEquipment'))
+        );
 
         $equippedEquipment = array_merge(
             [],
@@ -1007,7 +1028,12 @@ class Game extends \Table
     public function getItemData(&$result): void
     {
         $result['builtEquipment'] = $this->getCraftedItems();
-        $result['campEquipment'] = array_count_values($this->gameData->getGlobals('campEquipment'));
+        $items = $this->gameData->getItems();
+        $result['campEquipment'] = array_count_values(
+            array_map(function ($d) use ($items) {
+                return $items[$d];
+            }, $this->gameData->get('campEquipment'))
+        );
         $result['eatableFoods'] = array_map(function ($eatable) {
             $data = [...$eatable['actEat'], 'id' => $eatable['id']];
             $this->hooks->onGetEatData($data);
@@ -1025,7 +1051,7 @@ class Game extends \Table
     }
     protected function getGameData(&$result): void
     {
-        $result['game'] = $this->gameData->getGlobalsAll();
+        $result['game'] = $this->gameData->getAll();
         $result['game']['prevResources'] = $this->gameData->getPreviousResources();
 
         $resourcesAvailable = [];
@@ -1061,14 +1087,14 @@ class Game extends \Table
     }
     public function getBuildings(): array
     {
-        $buildings = $this->gameData->getGlobals('buildings');
+        $buildings = $this->gameData->get('buildings');
         return array_map(function ($building) {
             return $this->data->items[$building];
         }, $buildings);
     }
     public function addBuilding($buildingId): void
     {
-        $array = $this->gameData->getGlobals('buildings');
+        $array = $this->gameData->get('buildings');
         array_push($array, $buildingId);
         $this->gameData->set('buildings', $array);
     }
@@ -1082,7 +1108,7 @@ class Game extends \Table
     }
     public function getActiveNightCardIds(): array
     {
-        return $this->gameData->getGlobals('activeNightCards');
+        return $this->gameData->get('activeNightCards');
     }
     public function setActiveNightCard($cardId): void
     {
@@ -1097,12 +1123,12 @@ class Game extends \Table
     }
     public function getUnlockedKnowledgeIds(): array
     {
-        $unlocks = $this->gameData->getGlobals('unlocks');
+        $unlocks = $this->gameData->get('unlocks');
         return $unlocks;
     }
     public function unlockKnowledge($knowledgeId): void
     {
-        $array = $this->gameData->getGlobals('unlocks');
+        $array = $this->gameData->get('unlocks');
         array_push($array, $knowledgeId);
         $this->gameData->set('unlocks', $array);
     }

@@ -97,7 +97,7 @@ class CharacterSelection
     private function setTurnOrder($playerId, $selectedCharacters)
     {
         // Set the character turn order
-        $turnOrder = $this->game->gameData->getGlobals('turnOrder');
+        $turnOrder = $this->game->gameData->get('turnOrder');
         $players = $this->game->loadPlayersBasicInfos();
         $playerNo = ((int) $players[$playerId]['player_no']) - 1;
         $playerCount = sizeof($players);

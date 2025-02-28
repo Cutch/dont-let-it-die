@@ -61,7 +61,7 @@ class Encounter
             func_get_args(),
             [$this->game->hooks, 'onEncounter'],
             function ($_this) {
-                $card = $_this->gameData->getGlobals('state')['card'];
+                $card = $_this->gameData->get('state')['card'];
                 $tools = array_filter($_this->character->getActiveEquipment(), function ($item) {
                     return array_key_exists('onEncounter', $item) && !(!array_key_exists('requires', $item) || $item['requires']($item));
                 });
@@ -69,7 +69,7 @@ class Encounter
                     return $item['itemType'] == 'weapon';
                 });
                 if (sizeof($tools) >= 2) {
-                    $weapon = $_this->gameData->getGlobals('useTools');
+                    $weapon = $_this->gameData->get('useTools');
                     if ($weapon) {
                         $_this->gameData->set('chooseWeapon', null);
                     } else {
@@ -81,7 +81,7 @@ class Encounter
                 }
                 $weapon = null;
                 if (sizeof($weapons) >= 2) {
-                    $weapon = $_this->gameData->getGlobals('chooseWeapon');
+                    $weapon = $_this->gameData->get('chooseWeapon');
                     if ($weapon) {
                         $_this->gameData->set('chooseWeapon', null);
                     } else {

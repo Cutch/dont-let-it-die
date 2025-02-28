@@ -49,7 +49,7 @@ class Character
     }
     public function updateAllCharacterData($callback)
     {
-        $turnOrder = $this->game->gameData->getGlobals('turnOrder');
+        $turnOrder = $this->game->gameData->get('turnOrder');
         $turnOrder = array_values(array_filter($turnOrder));
         $hasUpdate = false;
         foreach ($turnOrder as $i => $name) {
@@ -78,7 +78,7 @@ class Character
     }
     public function getAllCharacterData($_skipHooks = false): array
     {
-        $turnOrder = $this->game->gameData->getGlobals('turnOrder');
+        $turnOrder = $this->game->gameData->get('turnOrder');
         $turnOrder = array_values(array_filter($turnOrder));
         $_this = $this;
         return array_map(function ($char) use ($_this, $_skipHooks) {
@@ -87,7 +87,7 @@ class Character
     }
     public function getCalculatedData($characterData, $_skipHooks = false): array
     {
-        extract($this->game->gameData->getGlobalsAll('turnNo', 'turnOrder'));
+        extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
         $turnOrder = array_values(array_filter($turnOrder));
         $characterName = $characterData['character_name'];
         $isActive = $turnOrder[$turnNo] == $characterName;
@@ -216,7 +216,7 @@ class Character
     }
     public function getTurnCharacter(): array
     {
-        extract($this->game->gameData->getGlobalsAll('turnNo', 'turnOrder'));
+        extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
         $character = $turnOrder[$turnNo];
         return $this->getCharacterData($character);
     }
@@ -241,7 +241,7 @@ class Character
     public function activateNextCharacter()
     {
         // Making the assumption that the functions are checking isLastCharacter()
-        extract($this->game->gameData->getGlobalsAll('turnNo', 'turnOrder'));
+        extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
         $this->game->gameData->set('turnNo', $turnNo + 1);
         $character = $turnOrder[$turnNo + 1];
         $characterData = $this->getCharacterData($character);
@@ -253,12 +253,12 @@ class Character
     }
     public function isLastCharacter()
     {
-        extract($this->game->gameData->getGlobalsAll('turnNo', 'turnOrder'));
+        extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
         return sizeof($turnOrder) == $turnNo + 1;
     }
     public function rotateTurnOrder(): void
     {
-        $turnOrder = $this->game->gameData->getGlobals('turnOrder');
+        $turnOrder = $this->game->gameData->get('turnOrder');
         $temp = array_shift($turnOrder);
         array_push($turnOrder, $temp);
         $this->game->gameData->set('turnOrder', $turnOrder);

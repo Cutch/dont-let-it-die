@@ -40,6 +40,7 @@ class GameData
         'turnNo' => 0,
         'turnActions' => [],
         'interruptState' => [],
+        'activateCharacters' => [],
         'actInterruptState' => [],
         'resources' => [
             'fireWood' => 0,
@@ -100,11 +101,11 @@ class GameData
         $this->cachedGameItems[$this->game::DbGetLastId()] = $itemName;
         return $this->game::DbGetLastId();
     }
-    public function getGlobals($name): mixed
+    public function get($name): mixed
     {
         return $this->cachedGameData[$name];
     }
-    public function getGlobalsAll(...$names): array
+    public function getAll(...$names): array
     {
         if (sizeof($names) == 0) {
             return $this->cachedGameData;
@@ -138,6 +139,44 @@ class GameData
             },
             ARRAY_FILTER_USE_KEY
         );
+    }
+    public function setAllMultiActiveCharacter()
+    {
+        $turnOrder = $this->game->gameData->get('turnOrder');
+        $turnOrder = array_values(array_filter($turnOrder));
+        foreach ($turnOrder as $k => $id) {
+            $this->addMultiActiveCharacter($id);
+        }
+    }
+    public function addMultiActiveCharacter(int $characterId)
+    {
+        $activateCharacters = $this->get('activateCharacters');
+        if (in_array($characterId, $activateCharacters)) {
+            array_push($activateCharacters, $characterId);
+        }
+        $this->set('activateCharacters', $activateCharacters);
+
+        $activePlayerIds = array_unique(
+            array_map(function ($c) {
+                return $c['player_id'];
+            }, $activateCharacters)
+        );
+        return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, '', true);
+    }
+    public function removeMultiActiveCharacter(int $characterId, string $state)
+    {
+        $activateCharacters = $this->get('activateCharacters');
+        if (in_array($characterId, $activateCharacters)) {
+            $activateCharacters = array_diff($activateCharacters, [$characterId]);
+        }
+        $this->set('activateCharacters', $activateCharacters);
+
+        $activePlayerIds = array_unique(
+            array_map(function ($c) {
+                return $c['player_id'];
+            }, $activateCharacters)
+        );
+        return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, $state, true);
     }
     public function setup()
     {

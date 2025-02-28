@@ -133,8 +133,8 @@ class Actions
                 },
                 'selectable' => function (Game $game) {
                     $craftedItems = $game->getCraftedItems();
-                    $craftingLevel = $game->gameData->getGlobals('craftingLevel');
-                    $buildings = $game->gameData->getGlobals('buildings');
+                    $craftingLevel = $game->gameData->get('craftingLevel');
+                    $buildings = $game->gameData->get('buildings');
                     return array_values(
                         array_filter(
                             $game->data->items,
@@ -203,7 +203,7 @@ class Actions
                 'state' => ['tradePhase'],
                 'type' => 'action',
                 'requires' => function (Game $game, $action) use ($_this) {
-                    return sizeof($game->gameData->getGlobals('campEquipment')) > 0;
+                    return sizeof($game->gameData->get('campEquipment')) > 0;
                 },
             ],
             'actUnEquipItem' => [
@@ -379,7 +379,7 @@ class Actions
     }
     public function getTurnActions()
     {
-        return $this->game->gameData->getGlobals('turnActions');
+        return $this->game->gameData->get('turnActions');
     }
     public function checkRequirements($actionObj, ...$args): bool
     {
@@ -422,7 +422,7 @@ class Actions
         if (!array_key_exists($action, $validActions)) {
             throw new BgaUserException($this->game->translate('This action can not be used this turn'));
         }
-        $turnActions = $this->game->gameData->getGlobals('turnActions');
+        $turnActions = $this->game->gameData->get('turnActions');
         $turnActions[$action] = ($turnActions[$action] ?? 0) + 1;
         $this->game->gameData->set('turnActions', $turnActions);
     }

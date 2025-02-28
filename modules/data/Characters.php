@@ -142,6 +142,7 @@ $charactersData = [
                         $turnChar = $game->character->getTurnCharacter();
                         $char = $game->character->getCharacterData($skill['characterId']);
                         $game->actInterrupt->addSkillInterrupt($char['skills']['Karaskill3']);
+                        // $data['args'] = ['Karaskill3'];
                         $data['skillId'] = 'Karaskill3';
                         $data['skill'] = $char['skills']['Karaskill3'];
                         $game->activeCharacterEventLog('requested Kara use their stamina skill', [
@@ -162,6 +163,12 @@ $charactersData = [
                 'state' => ['interrupt'],
                 'interruptState' => ['playerTurn'],
                 'perDay' => 1,
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    // var_dump(json_encode([$skill, &$data, $activatedSkill]));
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $data['args'] = ['Karaskill3'];
+                    }
+                },
                 'onGetActionCost' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     $interruptState = $game->actInterrupt->getState('actUseSkill');
@@ -230,7 +237,7 @@ $charactersData = [
                     }
                 },
                 'onDeckSelection' => function (Game $game, $skill, $deckName) {
-                    if ($game->gameData->getGlobals('state')['id'] == $skill['id']) {
+                    if ($game->gameData->get('state')['id'] == $skill['id']) {
                         $game->decks->shuffleInDiscard($deckName, false);
                         $game->actions->spendActionCost('actUseSkill', $skill['id']);
                         $game->activeCharacterEventLog('shuffled the ${deck} deck using their skill', [
@@ -381,17 +388,20 @@ $charactersData = [
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'] && sizeof(array_filter($game->gameData->getResources())) > 0;
                 },
-                'onResourceSelection' => function (Game $game, $skill, $resourceType) {
-                    if ($game->gameData->getGlobals('state')['id'] == $skill['id']) {
+                'onResourceSelection' => function (Game $game, $skill, &$data) {
+                    if ($game->gameData->get('state')['id'] == $skill['id']) {
                         $data = $game->actInterrupt->getState('actCraft');
-                        if (array_key_exists($resourceType, $data['data']['item']['cost'])) {
-                            $data['data']['item']['cost'][$resourceType] = max($data['data']['item']['cost'][$resourceType] - 2, 0);
+                        if (array_key_exists($data['resourceType'], $data['data']['item']['cost'])) {
+                            $data['data']['item']['cost'][$data['resourceType']] = max(
+                                $data['data']['item']['cost'][$data['resourceType']] - 2,
+                                0
+                            );
                         }
                         $game->actInterrupt->setState('actCraft', $data);
                     }
                 },
                 'onResourceSelectionOptions' => function (Game $game, $skill, &$resources) {
-                    $state = $game->gameData->getGlobals('state');
+                    $state = $game->gameData->get('state');
                     if ($state['id'] == $skill['id']) {
                         $resources = $state['item']['cost'];
                     }
@@ -449,7 +459,7 @@ $charactersData = [
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive'] && $char['health'] < $char['maxHealth']) {
-                        $state = $game->gameData->getGlobals('encounterState');
+                        $state = $game->gameData->get('encounterState');
                         if ($state['killed']) {
                             return getUsePerDay($char['id'], $game) < 1;
                         }
@@ -652,11 +662,11 @@ $charactersData = [
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'] && sizeof(array_filter($game->gameData->getResources())) > 0;
                 },
-                'onResourceSelection' => function (Game $game, $skill, $resourceType) {
-                    if ($game->gameData->getGlobals('state')['id'] == $skill['id']) {
+                'onResourceSelection' => function (Game $game, $skill, &$data) {
+                    if ($game->gameData->get('state')['id'] == $skill['id']) {
                         $game->actions->spendActionCost('actUseSkill', $skill['id']);
-                        $game->adjustResource($resourceType, 1);
-                        $game->activeCharacterEventLog('copied 1 ${resource_type}', ['resource_type' => $resourceType]);
+                        $game->adjustResource($data['resourceType'], 1);
+                        $game->activeCharacterEventLog('copied 1 ${resource_type}', ['resource_type' => $data['resourceType']]);
                     }
                 },
             ],

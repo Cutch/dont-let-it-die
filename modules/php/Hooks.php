@@ -41,10 +41,10 @@ class Hooks
         if ($this->checkInterrupt) {
             // var_dump($functionName);
             $hooks = array_filter($hooks, function ($object) use ($data1, $data2, $data3, $data4) {
-                $interruptData = array_filter([$data1, $data2, $data3, $data4]);
-                $interruptData = $interruptData[sizeof($interruptData) - 1];
+                // $interruptData = array_filter([$data1, $data2, $data3, $data4]);
+                // $interruptData = $interruptData[sizeof($interruptData) - 1];
                 return (!array_key_exists('state', $object) || in_array('interrupt', $object['state'])) &&
-                    (!array_key_exists('interruptState', $object) || in_array($interruptData['currentState'], $object['interruptState'])) &&
+                    (!array_key_exists('interruptState', $object) || in_array($data1['currentState'], $object['interruptState'])) &&
                     (!array_key_exists('requires', $object) || $object['requires']($this->game, $object, $data1, $data2, $data3, $data4));
             });
         }
