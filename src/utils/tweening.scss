@@ -1,4 +1,5 @@
 .tween {
   position: absolute;
-  transition: top 0.5s linear, left 0.5s linear;
+  user-select: none;
+  pointer-events: none;
 }

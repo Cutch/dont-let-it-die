@@ -4,16 +4,18 @@ class TooManyItemsScreen {
     this.error = false;
   }
   getSelectedId() {
-    return this.itemSelected.replace(/[0-9]$/, '');
+    return this.itemSelected;
   }
   hasError() {
     return this.error;
   }
+  hide() {
+    this.game.selector.hide('tooManyItems');
+  }
   show(gameData) {
-    console.log(gameData);
     let tmiElem = document.querySelector(`#tmi-items .items`);
     if (!tmiElem) {
-      this.game.selector.show();
+      this.game.selector.show('tooManyItems');
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="too-many-items-screen" class="dlid__container">
@@ -24,23 +26,23 @@ class TooManyItemsScreen {
       tmiElem = document.querySelector(`#tmi-items .items`);
     }
     tmiElem.innerHTML = '';
-    const renderItem = (name, i, elem, selectCallback) => {
-      elem.insertAdjacentHTML('beforeend', `<div class="token ${name + i}"></div>`);
-      renderImage(name, document.querySelector(`#too-many-items-screen .token.${name + i}`), { scale: 2, pos: 'insert' });
+    const renderItem = (name, itemId, elem, selectCallback) => {
+      elem.insertAdjacentHTML('beforeend', `<div class="token id${itemId}"></div>`);
+      renderImage(name, document.querySelector(`#too-many-items-screen .token.id${itemId}`), { scale: 1, pos: 'insert' });
       addClickListener(
-        document.querySelector(`#too-many-items-screen .token.${name + i}`),
+        document.querySelector(`#too-many-items-screen .token.id${itemId}`),
         this.game.data[name].options.name,
         selectCallback,
       );
     };
-    gameData.items.forEach((name, i) => {
-      renderItem(name, i, tmiElem, () => {
+    gameData.items.forEach(({ itemId, name }) => {
+      renderItem(name, itemId, tmiElem, () => {
         if (this.itemSelected) {
-          document.querySelector(`#too-many-items-screen .token.${this.itemSelected} .card`).style['outline'] = '';
+          document.querySelector(`#too-many-items-screen .token.id${this.itemSelected} .card`).style['outline'] = '';
         }
-        this.itemSelected = name + i;
+        this.itemSelected = itemId;
         if (this.itemSelected) {
-          document.querySelector(`#too-many-items-screen .token.${name + i} .card`).style['outline'] = `5px solid #fff`;
+          document.querySelector(`#too-many-items-screen .token.id${itemId} .card`).style['outline'] = `5px solid #fff`;
         }
       });
     });

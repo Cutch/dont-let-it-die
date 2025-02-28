@@ -9,15 +9,18 @@ class TokenScreen {
   hasError() {
     return this.error;
   }
+  hide() {
+    this.game.selector.hide('tokens');
+  }
   show(gameData) {
     let tokenElem = document.querySelector(`#resource .tokens`);
     if (!tokenElem) {
-      this.game.selector.show();
+      this.game.selector.show('tokens');
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="token-screen" class="dlid__container">
             <div class="error"></div>
-            <div id="resource" class="dlid__container"><h3>${_('Your Resources')}</h3><div class="tokens"></div></div>
+            <div id="resource" class="dlid__container"><h3>${_(gameData?.title ?? 'Your Resources')}</h3><div class="tokens"></div></div>
         </div>`,
       );
       tokenElem = document.querySelector(`#resource .tokens`);
@@ -38,7 +41,7 @@ class TokenScreen {
         renderItem(
           name,
           tokenElem,
-          () => gameData.game.resources[name],
+          () => gameData.tokenSelection[name],
           (count) => {
             tokenElem.querySelector(`.token-number-counter.${name} .counter`).innerHTML = count();
             if (this.tokenSelected) {

@@ -44,6 +44,9 @@ class TradeScreen {
       if (plusElem.classList.contains('disabled')) plusElem.classList.remove('disabled');
     }
   }
+  hide() {
+    this.game.selector.hide('trade');
+  }
   show(gameData) {
     this.updateFunctions = [];
     this.tradeRatio = gameData.tradeRatio;
@@ -52,7 +55,7 @@ class TradeScreen {
     if (!tradeElem) {
       this.resourceSelected = this.game.resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
       this.resourceRequested = this.game.resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
-      this.game.selector.show();
+      this.game.selector.show('trade');
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="trade-screen" class="dlid__container">

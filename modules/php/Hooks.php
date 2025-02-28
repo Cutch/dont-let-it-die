@@ -130,10 +130,11 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onCraft($card, $checkInterrupt = false)
+    function onCraft(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $card);
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
     }
     function onRollDie(&$data, $checkInterrupt = false)
     {

@@ -9,15 +9,18 @@ class CraftScreen {
   hasError() {
     return this.error;
   }
+  hide() {
+    this.game.selector.hide('craft');
+  }
   show(gameData) {
     let craftElem = document.querySelector(`#craft-items .items`);
     if (!craftElem) {
-      this.game.selector.show();
+      this.game.selector.show('craft');
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="craft-screen" class="dlid__container">
             <div class="error"></div>
-            <div id="craft-items" class="dlid__container"><h3>${_('Your Resources')}</h3><div class="items"></div></div>
+            <div id="craft-items" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div></div>
         </div>`,
       );
       craftElem = document.querySelector(`#craft-items .items`);
@@ -30,7 +33,7 @@ class CraftScreen {
             <div class="token ${name}"><div class="counter dot">${count()}</div></div>
             <div>`,
       );
-      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
+      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), this.game.data[name].options.name, () => selectCallback(count));
     };
     Object.keys(gameData.availableEquipment).forEach((name) => {

@@ -136,7 +136,7 @@ $machinestates = [
         'type' => 'activeplayer',
         'args' => 'argResourceSelection',
         'possibleactions' => ['actSelectResource', 'actSelectResourceCancel'],
-        'transitions' => ['playerTurn' => 10],
+        'transitions' => ['playerTurn' => 10, 'interrupt' => 22],
     ],
     20 => [
         'name' => 'resolveEncounter',
@@ -172,6 +172,7 @@ $machinestates = [
             'postEncounter' => 21,
             'nightPhase' => 30,
             'morningPhase' => 50,
+            'resourceSelection' => 14,
             'drawCard' => 11,
             'endTurn' => 15,
         ],

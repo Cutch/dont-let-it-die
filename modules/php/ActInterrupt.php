@@ -10,12 +10,12 @@ class ActInterrupt
 {
     private Game $game;
     private array $activatableSkills = [];
-    private array $calledFunction = [];
+    // private array $calledFunction = [];
 
     public function __construct(Game $game)
     {
         $this->game = $game;
-        $this->calledFunction = [];
+        // $this->calledFunction = [];
     }
     public function interruptableFunction(
         string $functionName,
@@ -30,7 +30,8 @@ class ActInterrupt
             // First time calling
             // var_dump(json_encode(['$startCallback', $this->activatableSkills]));
             $data = $startCallback($this->game, ...$args);
-            $hook($data, false);
+            $res = $hook($data, false);
+            $interrupt = $res && array_key_exists('interrupt', $res);
             $interruptData = [
                 'data' => $data,
                 'functionName' => $functionName,
@@ -39,7 +40,7 @@ class ActInterrupt
                 'skills' => $this->activatableSkills,
                 'stateNumber' => sizeof($entireState) + 1,
             ];
-            if (sizeof($this->activatableSkills) == 0) {
+            if (sizeof($this->activatableSkills) == 0 && !$interrupt) {
                 // var_dump(json_encode(['exitHook', $this->game->gamestate->state()['name'], 'noSkill']));
                 // No skills can activate
                 $endCallback($this->game, $data, ...$args);
@@ -60,7 +61,7 @@ class ActInterrupt
     }
     public function isStateResolving(): bool
     {
-        $state = $this->getDataForState();
+        $state = $this->getDataForState() ?? $this->getLatestInterruptState();
         if (!$state) {
             return false;
         }
@@ -70,7 +71,7 @@ class ActInterrupt
     }
     public function checkForInterrupt(): bool
     {
-        $state = $this->getDataForState();
+        $state = $this->getDataForState() ?? $this->getLatestInterruptState();
         if (!$state) {
             return false;
         }
@@ -87,7 +88,7 @@ class ActInterrupt
         $data = $this->game->gameData->getGlobals('actInterruptState');
         return array_key_exists($functionName, $data) ? $data[$functionName] : null;
     }
-    private function setState(string $functionName, ?array $data): void
+    public function setState(string $functionName, ?array $data): void
     {
         $currentData = $this->game->gameData->getGlobals('actInterruptState');
         if ($data) {

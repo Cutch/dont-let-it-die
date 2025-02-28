@@ -232,77 +232,100 @@ class Game extends \Table
     }
     public function actCraft(string $itemName = null): void
     {
-        if (!$itemName) {
-            throw new BgaUserException($this->translate('Select an item'));
-        }
-        $this->actions->validateCanRunAction('actCraft');
-        if (!array_key_exists($itemName, $this->data->items)) {
-            throw new BgaUserException($this->translate('Invalid Item'));
-        }
-        $itemType = $this->data->items[$itemName]['itemType'];
-        $currentBuildings = $this->gameData->getGlobals('buildings');
-        if ($itemType == 'building' && sizeof($currentBuildings) > 0) {
-            throw new BgaUserException($this->translate('A building has already been crafted'));
-        }
-        $result = [];
-        $this->getItemData($result);
-        if (!isset($result['availableEquipment'][$itemName]) || $result['availableEquipment'][$itemName] == 0) {
-            throw new BgaUserException($this->translate('All of those available items have been crafted'));
-        }
-
-        foreach ($this->data->items[$itemName]['cost'] as $key => $value) {
-            if ($this->adjustResource($key, -$value) != 0) {
-                throw new BgaUserException($this->translate('Missing resources'));
-            }
-        }
-        $this->actions->spendActionCost('actCraft');
-        $this->notify->all('tokenUsed', clienttranslate('${character_name} crafted a ${item_name}'), [
-            'gameData' => $this->getAllDatas(),
-            'item_name' => $this->data->items[$itemName]['name'],
-        ]);
-        if ($itemType == 'building') {
-            $itemId = $this->gameData->createItem($itemName);
-            array_push($currentBuildings, ['name' => $itemName, 'itemId' => $itemId]);
-            $this->gameData->set('buildings', $currentBuildings);
-        } else {
-            $itemId = $this->gameData->createItem($itemName);
-            $character = $this->character->getSubmittingCharacter();
-            $slotsAllowed = array_count_values($character['slots']);
-            $slotsUsed = array_count_values(
-                array_map(function ($d) {
-                    return $d['itemType'];
-                }, $character['equipment'])
-            );
-            if (
-                (array_key_exists($itemType, $slotsAllowed) ? $slotsAllowed[$itemType] : 0) -
-                    (array_key_exists($itemType, $slotsUsed) ? $slotsUsed[$itemType] : 0) >
-                0
-            ) {
-                $this->character->equipEquipment($character['id'], [$itemId]);
-            } else {
-                $existingItems = array_map(
-                    function ($d) {
-                        return ['name' => $d['id'], 'itemId' => $d['itemId']];
-                    },
-                    array_filter($character['equipment'], function ($d) use ($itemType) {
-                        return $d['itemType'] == $itemType;
-                    })
-                );
-                $this->gameData->set('state', [
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onCraft'],
+            function (Game $_this) use ($itemName) {
+                if (!$itemName) {
+                    throw new BgaUserException($_this->translate('Select an item'));
+                }
+                $_this->actions->validateCanRunAction('actCraft');
+                if (!array_key_exists($itemName, $_this->data->items)) {
+                    throw new BgaUserException($_this->translate('Invalid Item'));
+                }
+                $itemType = $_this->data->items[$itemName]['itemType'];
+                $currentBuildings = $_this->gameData->getGlobals('buildings');
+                if ($itemType == 'building' && sizeof($currentBuildings) > 0) {
+                    throw new BgaUserException($_this->translate('A building has already been crafted'));
+                }
+                $result = [];
+                $_this->getItemData($result);
+                if (!isset($result['availableEquipment'][$itemName]) || $result['availableEquipment'][$itemName] == 0) {
+                    throw new BgaUserException($_this->translate('All of those available items have been crafted'));
+                }
+                return [
+                    'itemName' => $itemName,
+                    'item' => $_this->data->items[$itemName],
                     'itemType' => $itemType,
-                    'items' => [...$existingItems, ['name' => $itemName, 'itemId' => $itemId]],
+                ];
+            },
+            function (Game $_this, $data) {
+                $itemName = $data['itemName'];
+                $item = $data['item'];
+                $itemType = $data['itemType'];
+                foreach ($item['cost'] as $key => $value) {
+                    if ($_this->adjustResource($key, -$value) != 0) {
+                        throw new BgaUserException($_this->translate('Missing resources'));
+                    }
+                }
+                $_this->actions->spendActionCost('actCraft');
+                $_this->notify->all('tokenUsed', clienttranslate('${character_name} crafted a ${item_name}'), [
+                    'gameData' => $_this->getAllDatas(),
+                    'item_name' => $item['name'],
                 ]);
-                $this->gamestate->nextState('tooManyItems');
+                if ($itemType == 'building') {
+                    $itemId = $_this->gameData->createItem($itemName);
+                    array_push($currentBuildings, ['name' => $itemName, 'itemId' => $itemId]);
+                    $_this->gameData->set('buildings', $currentBuildings);
+                } else {
+                    $itemId = $_this->gameData->createItem($itemName);
+                    $character = $_this->character->getSubmittingCharacter();
+                    $slotsAllowed = array_count_values($character['slots']);
+                    $slotsUsed = array_count_values(
+                        array_map(function ($d) {
+                            return $d['itemType'];
+                        }, $character['equipment'])
+                    );
+                    if (
+                        (array_key_exists($itemType, $slotsAllowed) ? $slotsAllowed[$itemType] : 0) -
+                            (array_key_exists($itemType, $slotsUsed) ? $slotsUsed[$itemType] : 0) >
+                        0
+                    ) {
+                        $_this->character->equipEquipment($character['id'], [$itemId]);
+                    } else {
+                        $existingItems = array_map(
+                            function ($d) {
+                                return ['name' => $d['id'], 'itemId' => $d['itemId']];
+                            },
+                            array_filter($character['equipment'], function ($d) use ($itemType) {
+                                return $d['itemType'] == $itemType;
+                            })
+                        );
+                        $_this->gameData->set('state', [
+                            'itemType' => $itemType,
+                            'items' => [...$existingItems, ['name' => $itemName, 'itemId' => $itemId]],
+                        ]);
+                        $_this->gamestate->nextState('tooManyItems');
+                    }
+                }
             }
-        }
+        );
     }
-    public function actSendToCamp(string $sendToCampId = null): void
+    public function actSendToCamp(int $sendToCampId = null): void
     {
         if (!$sendToCampId) {
             throw new BgaUserException($this->translate('Select an item'));
         }
         extract($this->gameData->getGlobals('state'));
-        if (!in_array($sendToCampId, $items)) {
+        if (
+            !in_array(
+                $sendToCampId,
+                array_map(function ($d) {
+                    return $d['itemId'];
+                }, $items)
+            )
+        ) {
             throw new BgaUserException($this->translate('Invalid Item'));
         }
         $character = $this->character->getSubmittingCharacter();
@@ -620,7 +643,12 @@ class Game extends \Table
             ARRAY_FILTER_USE_BOTH
         );
         $this->hooks->onResourceSelectionOptions($resources);
-        $result = ['actions' => [], 'character_name' => $this->getCharacterHTML(), 'tokenSelection' => $resources];
+        $result = [
+            ...$this->gameData->getGlobals('state'),
+            'actions' => [],
+            'character_name' => $this->getCharacterHTML(),
+            'tokenSelection' => $resources,
+        ];
         $this->getGameData($result);
         return $result;
     }

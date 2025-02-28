@@ -120,7 +120,7 @@ class Character
                 'isActive' => $isActive,
                 ...$_this->game->data->items[$itemName],
                 'skills' => $skills,
-                // 'character_name' => $characterName,
+                'character_name' => $characterName,
             ];
         }, array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']]));
         if (!$_skipHooks) {

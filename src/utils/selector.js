@@ -2,14 +2,22 @@ class Selector {
   constructor(gamePlayAreaElem) {
     gamePlayAreaElem.insertAdjacentHTML('beforeend', `<div id="selector-overlay"></div>`);
     this.selectorElem = document.getElementById('selector-overlay');
-    this.hide();
+    this.screenName = null;
+    this.hide(null);
   }
-  show() {
+  show(name) {
+    if (this.screenName) {
+      this.selectorElem.innerHTML = '';
+    }
+    this.screenName = name;
     this.selectorElem.style.display = '';
   }
-  hide() {
-    this.selectorElem.style.display = 'none';
-    this.selectorElem.innerHTML = '';
+  hide(name) {
+    if (this.screenName === name) {
+      this.selectorElem.style.display = 'none';
+      this.selectorElem.innerHTML = '';
+      this.screenName = null;
+    }
   }
   renderByHTML(html) {
     this.selectorElem.innerHTML = html;

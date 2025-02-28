@@ -3,11 +3,14 @@ class Tweening {
     this.container = container;
     this.tweenId = 0;
   }
-  addTween(elem1, elem2, image, count = 1) {
+  addTween(elem1, elem2, image, count = 1, time = 500) {
     const containerRect = this.container.getBoundingClientRect();
 
     const id = `tween_${++this.tweenId}`;
-    this.container.insertAdjacentHTML('beforeend', `<div id="${id}" class="tween"></div>`);
+    this.container.insertAdjacentHTML(
+      'beforeend',
+      `<div id="${id}" class="tween" style="transition: top ${time}ms linear, left ${time}ms linear;"></div>`,
+    );
     const tweenElem = document.getElementById(id);
     renderImage(image, tweenElem, { scale: 2 });
     const elementRect1 = elem1.getBoundingClientRect();
@@ -25,7 +28,7 @@ class Tweening {
       tweenElem.style.top = `${relativeY2}px`;
       setTimeout(() => {
         tweenElem.remove();
-      }, 2000);
+      }, time);
     }, 100);
     if (count > 1) {
       setTimeout(() => {

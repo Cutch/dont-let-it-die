@@ -9,6 +9,9 @@ class DeckSelectionScreen {
   hasError() {
     return this.error;
   }
+  hide() {
+    this.game.selector.hide('deckSelection');
+  }
   show(gameData) {
     const deckScaling = {
       'day-event': 2,
@@ -17,7 +20,7 @@ class DeckSelectionScreen {
     };
     let deckSelectionElem = document.querySelector(`#deck-selection-screen .decks`);
     if (!deckSelectionElem) {
-      this.game.selector.show();
+      this.game.selector.show('deckSelection');
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="deck-selection-screen" class="dlid__container">

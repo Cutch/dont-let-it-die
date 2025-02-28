@@ -9,6 +9,9 @@ class EatScreen {
   hasError() {
     return this.error;
   }
+  hide() {
+    this.game.selector.hide('eat');
+  }
   show(gameData) {
     if (gameData.characters && !gameData.characters.some((d) => d.name === 'Sig')) {
       gameData.eatableFoods = gameData.eatableFoods.filter((d) => !d['id'].includes('fish'));
@@ -17,7 +20,7 @@ class EatScreen {
     if (!eatElem) {
       this.resourceSelected = this.game.resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
       this.resourceRequested = this.game.resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
-      this.game.selector.show();
+      this.game.selector.show('eat');
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="eat-screen" class="dlid__container">
