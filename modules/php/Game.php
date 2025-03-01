@@ -374,7 +374,8 @@ class Game extends \Table
                 // $resourceType = $data['resourceType'];
                 // var_dump('actSelectResource playerTurn');
                 $this->gamestate->nextState('playerTurn');
-            }
+            },
+            'playerTurn'
         );
     }
     public function actSelectResourceCancel(): void

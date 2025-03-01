@@ -148,22 +148,23 @@ class GameData
             $this->addMultiActiveCharacter($id);
         }
     }
-    public function addMultiActiveCharacter(int $characterId)
+    public function addMultiActiveCharacter(string $characterId)
     {
         $activateCharacters = $this->get('activateCharacters');
-        if (in_array($characterId, $activateCharacters)) {
+        if (!in_array($characterId, $activateCharacters)) {
             array_push($activateCharacters, $characterId);
         }
         $this->set('activateCharacters', $activateCharacters);
 
         $activePlayerIds = array_unique(
             array_map(function ($c) {
-                return $c['player_id'];
+                return $this->game->character->getCharacterData($c)['player_id'];
             }, $activateCharacters)
         );
-        return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, '', true);
+        var_dump('state 1', $activePlayerIds, 'playerTurn');
+        return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, 'playerTurn', true);
     }
-    public function removeMultiActiveCharacter(int $characterId, string $state)
+    public function removeMultiActiveCharacter(string $characterId, string $state)
     {
         $activateCharacters = $this->get('activateCharacters');
         if (in_array($characterId, $activateCharacters)) {
@@ -173,9 +174,10 @@ class GameData
 
         $activePlayerIds = array_unique(
             array_map(function ($c) {
-                return $c['player_id'];
+                return $this->game->character->getCharacterData($c)['player_id'];
             }, $activateCharacters)
         );
+        var_dump('state 2', $activePlayerIds, $state);
         return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, $state, true);
     }
     public function setup()

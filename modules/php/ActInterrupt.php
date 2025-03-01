@@ -185,7 +185,7 @@ class ActInterrupt
         $array = array_unique(array_diff($characterIds, $newCharacterIds));
         // if (sizeof($array) > 0) {
         //     // var_dump(json_encode([$array, $playerIds, $newPlayerIds, $skills]));
-        //     $this->game->gamestate->setPlayerNonMultiactive($array[0], $data['cancelState']);
+        //     $this->game->gamestate->setPlayerNonMultiactive($array[0], $data['currentState']);
         // }
         foreach ($array as $k => $v) {
             $this->game->gameData->removeMultiActiveCharacter($v, $data['cancelState']);
@@ -202,15 +202,26 @@ class ActInterrupt
 
         $playerId = $this->game->getCurrentPlayer();
 
-        // var_dump(json_encode([$this->game->gamestate->state()['name'], $data['currentState']]));
+        $characterIds = array_map(
+            function ($char) {
+                return $char['id'];
+            },
+            array_filter($this->game->character->getAllCharacterData(), function ($char) use ($playerId) {
+                return $char['player_id'] == $playerId;
+            })
+        );
+
+        // var_dump(json_encode([$this->game->gamestate->state()['name'], $data['currentState'], $data['cancelState']]));
         // var_dump($this->game->gamestate->getActivePlayerList(), $this->game->gamestate->state()['name']);
-        $bool = $this->game->gameData->removeMultiActiveCharacter((int) $playerId, $data['cancelState']);
-        // $bool = $this->game->gamestate->setPlayerNonMultiactive($playerId, $data['cancelState']);
-        // $bool = $this->game->gamestate->setPlayerNonMultiactive($playerId, $data['cancelState']);
+        foreach ($characterIds as $k => $v) {
+            $this->game->gameData->removeMultiActiveCharacter($v, $data['cancelState']);
+        }
+        // $bool = $this->game->gamestate->setPlayerNonMultiactive($playerId, $data['currentState']);
+        // $bool = $this->game->gamestate->setPlayerNonMultiactive($playerId, $data['currentState']);
         // $bool2 = $this->game->gamestate->setAllPlayersNonMultiactive('playerTurn');
         // $this->game->gamestate->nextState('playerTurn');
         // var_dump(
-        //     'onInterruptCancel ' . $playerId . ' ' . $data['cancelState'],
+        //     'onInterruptCancel ' . $playerId . ' ' . $data['currentState'],
         //     $this->game->gamestate->getActivePlayerList(),
         //     $bool,
         //     $this->game->gamestate->state()['name']
