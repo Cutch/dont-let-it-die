@@ -272,20 +272,34 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
-                'name' => clienttranslate('Discard Night Event'),
+                'name' => clienttranslate('Redraw Night Event'),
                 'state' => ['interrupt'],
-                'interruptState' => ['nightPhase'],
-                'stamina' => 2,
+                'interruptState' => ['nightPhase', 'nightDrawCard'],
                 'perDay' => 1,
-                'onUse' => function (Game $game, $skill) {
-                    $char = $game->character->getCharacterData($skill['characterId']);
-                    usePerDay($char['id'], $game);
-                    $game->adjustResource('bone', -1);
-                    // TODO: Interrupt and Discard current night event
-                },
+                // 'onUse' => function (Game $game, $skill) {
+                // },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return getUsePerDay($char['id'], $game) < 1 && $game->gameData->getResource('bone') > 0;
+                },
+                'onNightDrawCard' => function (Game $game, $skill, $data) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($char['isActive']) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $char = $game->character->getCharacterData($skill['characterId']);
+                        usePerDay($char['id'], $game);
+                        $game->adjustResource('bone', -1);
+                        $game->activeCharacterEventLog('re-drew the night event');
+                        // TODO: Interrupt and Discard current night event
+                        $card = $game->decks->pickCard('night-event');
+                        $game->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
+
+                        $data['card'] = $card;
+                    }
                 },
             ],
         ],

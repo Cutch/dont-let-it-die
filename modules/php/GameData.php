@@ -161,7 +161,7 @@ class GameData
                 return $this->game->character->getCharacterData($c)['player_id'];
             }, $activateCharacters)
         );
-        var_dump('state 1', $activePlayerIds, 'playerTurn');
+        $this->game->log('state 1', $activePlayerIds, 'playerTurn');
         return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, 'playerTurn', true);
     }
     public function removeMultiActiveCharacter(string $characterId, string $state)
@@ -177,7 +177,7 @@ class GameData
                 return $this->game->character->getCharacterData($c)['player_id'];
             }, $activateCharacters)
         );
-        var_dump('state 2', $activePlayerIds, $state);
+        $this->game->log('state 2', $activePlayerIds, $state);
         return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, $state, true);
     }
     public function setup()

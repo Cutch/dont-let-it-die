@@ -173,10 +173,10 @@ class Game extends \Table
         return $value;
     }
     public function actCharacterClicked(
-        string $character1 = null,
-        string $character2 = null,
-        string $character3 = null,
-        string $character4 = null
+        ?string $character1 = null,
+        ?string $character2 = null,
+        ?string $character3 = null,
+        ?string $character4 = null
     ): void {
         $this->characterSelection->actCharacterClicked($character1, $character2, $character3, $character4);
     }
@@ -230,7 +230,7 @@ class Game extends \Table
             'knowledge_name' => $this->data->knowledgeTree[$knowledgeId]['name'],
         ]);
     }
-    public function actCraft(string $itemName = null): void
+    public function actCraft(?string $itemName = null): void
     {
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
@@ -312,7 +312,7 @@ class Game extends \Table
             }
         );
     }
-    public function actSendToCamp(int $sendToCampId = null): void
+    public function actSendToCamp(?int $sendToCampId = null): void
     {
         if (!$sendToCampId) {
             throw new BgaUserException($this->translate('Select an item'));
@@ -356,7 +356,7 @@ class Game extends \Table
         $this->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gamestate->nextState('playerTurn');
     }
-    public function actSelectResource(string $resourceType = null): void
+    public function actSelectResource(?string $resourceType = null): void
     {
         if (!$resourceType) {
             throw new BgaUserException($this->translate('Select a resource'));
@@ -393,7 +393,7 @@ class Game extends \Table
             $this->gamestate->nextState('playerTurn');
         }
     }
-    public function actSelectDeck(string $deckName = null): void
+    public function actSelectDeck(?string $deckName = null): void
     {
         if (!$deckName) {
             throw new BgaUserException($this->translate('Select a deck'));
@@ -778,13 +778,14 @@ class Game extends \Table
             [$this->hooks, 'onNight'],
             function (Game $_this) {
                 $card = $this->decks->pickCard('night-event');
-                $this->setActiveNightCard($card['id']);
-                // var_dump(json_encode($card['id']));
                 $this->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
                 return ['card' => $card, 'deck' => 'night-event'];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
+                $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
+                    'deck' => str_replace('-', ' ', $deck),
+                ]);
                 $this->gamestate->nextState('nightDrawCard');
             }
         );
@@ -799,15 +800,15 @@ class Game extends \Table
                 // deck,card
                 $state = $this->gameData->get('state');
                 $deck = $state['deck'];
-                $card = $state['card'];
-                $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
-                    'deck' => str_replace('-', ' ', $deck),
-                ]);
-                $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
-
-                return ['state' => $state, 'useResult' => $result];
+                return ['state' => $state];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
+                $card = $data['state']['card'];
+                $_this->hooks->reconnectHooks($card, $_this->decks->getCard($card['id']));
+
+                $this->setActiveNightCard($card['id']);
+                $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
+
                 $this->gamestate->nextState('morningPhase');
             }
         );

@@ -168,13 +168,15 @@ $machinestates = [
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => [
             'playerTurn' => 10,
+            'drawCard' => 11,
+            'resourceSelection' => 14,
+            'endTurn' => 15,
             'resolveEncounter' => 20,
             'postEncounter' => 21,
             'nightPhase' => 30,
+            'nightDrawCard' => 31,
             'morningPhase' => 50,
-            'resourceSelection' => 14,
-            'drawCard' => 11,
-            'endTurn' => 15,
+            'tradePhase' => 60,
         ],
     ],
     15 => [
@@ -191,6 +193,7 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stNightPhase',
         // 'args' => 'argNightPhase',
+        'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => ['endGame' => 99, 'morningPhase' => 50, 'interrupt' => 22, 'nightDrawCard' => 31],
     ],
     31 => [
@@ -200,6 +203,7 @@ $machinestates = [
         'type' => 'game',
         'args' => 'argNightDrawCard',
         'action' => 'stNightDrawCard',
+        'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => ['endGame' => 99, 'morningPhase' => 50, 'interrupt' => 22],
     ],
     50 => [
@@ -208,6 +212,7 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stMorningPhase',
         'updateGameProgression' => true,
+        'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => ['endGame' => 99, 'tradePhase' => 60, 'interrupt' => 22],
     ],
     60 => [

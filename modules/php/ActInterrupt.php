@@ -23,7 +23,7 @@ class ActInterrupt
         callable $hook,
         callable $startCallback,
         callable $endCallback,
-        string $cancelState = null
+        ?string $cancelState = null
     ) {
         $entireState = $this->getEntireState();
         $existingData = $this->getState($functionName);
@@ -43,7 +43,7 @@ class ActInterrupt
                 'stateNumber' => sizeof($entireState) + 1,
             ];
             if (sizeof($this->activatableSkills) == 0 && !$interrupt) {
-                // var_dump(json_encode(['exitHook', $this->game->gamestate->state()['name'], 'noSkill']));
+                $this->game->log('exitHook', 'not interrupted', $this->game->gamestate->state()['name'], 'noSkill');
                 // No skills can activate
                 $endCallback($this->game, false, $data, ...$args);
             } else {
@@ -52,9 +52,9 @@ class ActInterrupt
                 // Goto the skill screen
                 $this->game->gamestate->nextState('interrupt');
             }
-        } else {
-            // var_dump(json_encode(['exitHook', $functionName, $this->game->gamestate->state()['name'], $existingData]));
-
+        } elseif (!array_key_exists('activated', $existingData)) {
+            $this->setState($functionName, ['activated' => true, ...$existingData]);
+            $this->game->log('exitHook', 'finalize', $functionName, $this->game->gamestate->state()['name'], $existingData);
             // Don't need to re-check for interrupts
             $hook($existingData['data'], false);
             // Calling after skill screen
