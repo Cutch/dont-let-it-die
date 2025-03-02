@@ -296,9 +296,10 @@ $charactersData = [
                         $game->activeCharacterEventLog('re-drew the night event');
                         // TODO: Interrupt and Discard current night event
                         $card = $game->decks->pickCard('night-event');
+                        $data['state']['card'] = $card;
                         $game->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
 
-                        $data['card'] = $card;
+                        $game->log($data);
                     }
                 },
             ],

@@ -190,6 +190,7 @@ $machinestates = [
     30 => [
         'name' => 'nightPhase',
         'description' => clienttranslate('It\'s night time'),
+        'descriptionmyturn' => clienttranslate('It\'s night time'),
         'type' => 'game',
         'action' => 'stNightPhase',
         // 'args' => 'argNightPhase',
@@ -204,11 +205,12 @@ $machinestates = [
         'args' => 'argNightDrawCard',
         'action' => 'stNightDrawCard',
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
-        'transitions' => ['endGame' => 99, 'morningPhase' => 50, 'interrupt' => 22],
+        'transitions' => ['endGame' => 99, 'morningPhase' => 50, 'interrupt' => 22, 'nightPhase' => 30, 'nightDrawCard' => 31],
     ],
     50 => [
         'name' => 'morningPhase',
         'description' => clienttranslate('Morning has arrived'),
+        'descriptionmyturn' => clienttranslate('Morning has arrived'),
         'type' => 'game',
         'action' => 'stMorningPhase',
         'updateGameProgression' => true,
@@ -218,8 +220,10 @@ $machinestates = [
     60 => [
         'name' => 'tradePhase',
         'description' => clienttranslate('Trade Items'),
+        'descriptionmyturn' => clienttranslate('Trade Items'),
         'type' => 'multipleactiveplayer',
         'action' => 'stTradePhase',
+        'args' => 'argTradePhase',
         'possibleactions' => ['actEquipItem', 'actUnEquipItem', 'actTradeItem', 'actConfirmTradeItem', 'actDone'],
         'transitions' => ['playerTurn' => 10],
     ],
@@ -229,6 +233,7 @@ $machinestates = [
     98 => [
         'name' => 'gameEnd',
         'description' => clienttranslate('End of game'),
+        'descriptionmyturn' => clienttranslate('End of game'),
         'type' => 'manager',
         'action' => 'stGameEnd',
         'args' => 'argGameEnd',

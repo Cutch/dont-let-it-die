@@ -697,6 +697,12 @@ class Game extends \Table
         $this->getDecks($result);
         return $result;
     }
+    public function argTradePhase()
+    {
+        $result = [...$this->getAllDatas()];
+        return $result;
+    }
+
     public function argPostEncounter()
     {
         return $this->encounter->argPostEncounter();
@@ -823,7 +829,7 @@ class Game extends \Table
     }
     public function log(...$args)
     {
-        $this->trace('TRACE ' . json_encode($args));
+        $this->trace('TRACE [' . $this->gamestate->state()['name'] . '] ' . json_encode($args));
     }
     public function argPlayerState(): array
     {

@@ -22,8 +22,7 @@ class ActInterrupt
         array $args = [],
         callable $hook,
         callable $startCallback,
-        callable $endCallback,
-        ?string $cancelState = null
+        callable $endCallback
     ) {
         $entireState = $this->getEntireState();
         $existingData = $this->getState($functionName);
@@ -38,7 +37,6 @@ class ActInterrupt
                 'functionName' => $functionName,
                 'args' => $args,
                 'currentState' => $this->game->gamestate->state()['name'],
-                'cancelState' => $cancelState ?? $this->game->gamestate->state()['name'],
                 'skills' => $this->activatableSkills,
                 'stateNumber' => sizeof($entireState) + 1,
             ];
@@ -188,7 +186,7 @@ class ActInterrupt
         //     $this->game->gamestate->setPlayerNonMultiactive($array[0], $data['currentState']);
         // }
         foreach ($array as $k => $v) {
-            $this->game->gameData->removeMultiActiveCharacter($v, $data['cancelState']);
+            $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
         }
     }
     public function onInterruptCancel()
@@ -211,10 +209,10 @@ class ActInterrupt
             })
         );
 
-        // var_dump(json_encode([$this->game->gamestate->state()['name'], $data['currentState'], $data['cancelState']]));
+        // var_dump(json_encode([$this->game->gamestate->state()['name'], $data['currentState'], $data['currentState']]));
         // var_dump($this->game->gamestate->getActivePlayerList(), $this->game->gamestate->state()['name']);
         foreach ($characterIds as $k => $v) {
-            $this->game->gameData->removeMultiActiveCharacter($v, $data['cancelState']);
+            $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
         }
         // $bool = $this->game->gamestate->setPlayerNonMultiactive($playerId, $data['currentState']);
         // $bool = $this->game->gamestate->setPlayerNonMultiactive($playerId, $data['currentState']);
