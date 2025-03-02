@@ -218,6 +218,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (!elem.classList.contains('disabled')) elem.classList.add('disabled');
     },
     updateResources: function (gameData) {
+      if (!gameData.resourcesAvailable || !gameData.game) return;
+
       const firewoodElem = document.querySelector(`#board-container .fire-wood`);
       firewoodElem.innerHTML = '';
       this.updateResource('wood', firewoodElem, gameData.game['resources']['fireWood'] ?? 0, {

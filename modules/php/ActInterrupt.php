@@ -161,7 +161,7 @@ class ActInterrupt
     public function actInterrupt(string $skillId): void
     {
         $state = $this->getLatestInterruptState();
-        // var_dump(json_encode(['actInterrupt', $state]));
+        $this->game->log(['action' => 'actInterrupt', 'state' => $state]);
         if (!$state) {
             return;
         }
@@ -250,12 +250,19 @@ class ActInterrupt
         $state = $this->getLatestInterruptState();
         $data = $state['data'];
         $characterIds = $this->getSkillsCharacterIds($data['skills']);
-        if (sizeof($characterIds) == 0) {
-            array_push($characterIds, $this->game->character->getTurnCharacter()['id']);
-        }
+        // if (sizeof($characterIds) == 0) {
+        //     array_push($characterIds, $this->game->character->getTurnCharacter()['id']);
+        // }
         // var_dump(json_encode([$characterIds, 'stInterrupt', $data['skills']]));
         foreach ($characterIds as $k => $v) {
             $this->game->gameData->addMultiActiveCharacter($v);
         }
+        $changeState = false;
+        if (sizeof($characterIds) == 0) {
+            $this->game->gamestate->nextState($data['currentState']);
+            $changeState = true;
+        }
+
+        $this->game->log(['action' => 'actInterrupt', 'state' => $state, 'changeState' => $changeState, 'state' => $data['currentState']]);
     }
 }

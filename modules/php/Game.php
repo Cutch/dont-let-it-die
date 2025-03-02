@@ -358,25 +358,33 @@ class Game extends \Table
     }
     public function actSelectResource(string $resourceType = null): void
     {
-        $this->actInterrupt->interruptableFunction(
-            __FUNCTION__,
-            func_get_args(),
-            [$this->hooks, 'onResourceSelection'],
-            function (Game $_this) use ($resourceType) {
-                if (!$resourceType) {
-                    throw new BgaUserException($this->translate('Select a resource'));
-                }
-                return [
-                    'resourceType' => $resourceType,
-                ];
-            },
-            function (Game $_this, bool $finalizeInterrupt, $data) {
-                // $resourceType = $data['resourceType'];
-                // var_dump('actSelectResource playerTurn');
-                $this->gamestate->nextState('playerTurn');
-            },
-            'playerTurn'
-        );
+        if (!$resourceType) {
+            throw new BgaUserException($this->translate('Select a resource'));
+        }
+        $data = [
+            'resourceType' => $resourceType,
+        ];
+        $this->hooks->onResourceSelection($data);
+        $this->gamestate->nextState('playerTurn');
+        // $this->actInterrupt->interruptableFunction(
+        //     __FUNCTION__,
+        //     func_get_args(),
+        //     [$this->hooks, 'onResourceSelection'],
+        //     function (Game $_this) use ($resourceType) {
+        //         if (!$resourceType) {
+        //             throw new BgaUserException($this->translate('Select a resource'));
+        //         }
+        //         return [
+        //             'resourceType' => $resourceType,
+        //         ];
+        //     },
+        //     function (Game $_this, bool $finalizeInterrupt, $data) {
+        //         // $resourceType = $data['resourceType'];
+        //         // var_dump('actSelectResource playerTurn');
+        //         $this->gamestate->nextState('playerTurn');
+        //     },
+        //     'playerTurn'
+        // );
     }
     public function actSelectResourceCancel(): void
     {
@@ -811,6 +819,10 @@ class Game extends \Table
         $this->getAllCharacters($result);
         $this->getAllPlayers($result);
         return $result;
+    }
+    public function log(...$args)
+    {
+        $this->trace('TRACE ' . json_encode($args));
     }
     public function argPlayerState(): array
     {

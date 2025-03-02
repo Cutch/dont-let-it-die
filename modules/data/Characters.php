@@ -245,6 +245,10 @@ $charactersData = [
                         ]);
                     }
                 },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
             ],
         ],
         'onEncounter' => function (Game $game, $char, $data) {
@@ -390,14 +394,15 @@ $charactersData = [
                 },
                 'onResourceSelection' => function (Game $game, $skill, &$data) {
                     if ($game->gameData->get('state')['id'] == $skill['id']) {
-                        $data = $game->actInterrupt->getState('actCraft');
-                        if (array_key_exists($data['resourceType'], $data['data']['item']['cost'])) {
-                            $data['data']['item']['cost'][$data['resourceType']] = max(
-                                $data['data']['item']['cost'][$data['resourceType']] - 2,
+                        $state = $game->actInterrupt->getState('actCraft');
+                        $game->log($state, $data);
+                        if (array_key_exists($data['resourceType'], $state['data']['item']['cost'])) {
+                            $state['data']['item']['cost'][$data['resourceType']] = max(
+                                $state['data']['item']['cost'][$data['resourceType']] - 2,
                                 0
                             );
                         }
-                        $game->actInterrupt->setState('actCraft', $data);
+                        $game->actInterrupt->setState('actCraft', $state);
                     }
                 },
                 'onResourceSelectionOptions' => function (Game $game, $skill, &$resources) {
