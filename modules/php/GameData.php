@@ -140,6 +140,13 @@ class GameData
             ARRAY_FILTER_USE_KEY
         );
     }
+    public function getAllMultiActiveCharacter(): array
+    {
+        $activateCharacters = $this->get('activateCharacters');
+        return array_map(function ($c) {
+            return $this->game->character->getCharacterData($c);
+        }, $activateCharacters);
+    }
     public function setAllMultiActiveCharacter()
     {
         $turnOrder = $this->game->gameData->get('turnOrder');
@@ -148,7 +155,7 @@ class GameData
             $this->addMultiActiveCharacter($id);
         }
     }
-    public function addMultiActiveCharacter(string $characterId)
+    public function addMultiActiveCharacter(string $characterId): bool
     {
         $activateCharacters = $this->get('activateCharacters');
         if (!in_array($characterId, $activateCharacters)) {
@@ -164,7 +171,7 @@ class GameData
         $this->game->log('state 1', $activePlayerIds, 'playerTurn');
         return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, 'playerTurn', true);
     }
-    public function removeMultiActiveCharacter(string $characterId, string $state)
+    public function removeMultiActiveCharacter(string $characterId, string $state): bool
     {
         $activateCharacters = $this->get('activateCharacters');
         if (in_array($characterId, $activateCharacters)) {

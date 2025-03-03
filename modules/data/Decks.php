@@ -902,7 +902,7 @@ $decksData = [
         'onUse' => function (Game $game, $nightCard) {
             $card1 = $game->decks->pickCard('hunt');
             $card2 = $game->decks->pickCard('hunt');
-            $game->notify->all('cardDrawn', clienttranslate('Drew 2 from the ${deck} deck'), [
+            $game->nightEventLog('Drew 2 from the ${deck} deck', [
                 'deck' => 'hunt',
             ]);
             $maxDamage = max(

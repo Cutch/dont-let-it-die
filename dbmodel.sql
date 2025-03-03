@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS `character` (
     `stamina` int(1) UNSIGNED DEFAULT 0,
     `health` int(1) UNSIGNED DEFAULT 0,
     `confirmed` int(1) UNSIGNED DEFAULT 0,
+    `incapacitated` int(1) UNSIGNED DEFAULT 0,
     FOREIGN KEY (item_1) REFERENCES item(item_id),
     FOREIGN KEY (item_2) REFERENCES item(item_id),
     FOREIGN KEY (item_3) REFERENCES item(item_id),

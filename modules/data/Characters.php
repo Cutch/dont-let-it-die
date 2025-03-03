@@ -255,10 +255,8 @@ $charactersData = [
             if ($data['encounterHealth'] <= $data['characterDamage']) {
                 $data['stamina'] += 1;
 
-                $game->notify->all('activeCharacter', clienttranslate('${character_name} gave 1 stamina to ${active_character_name}'), [
-                    // 'character_name' => $game->character->getTurnCharacter()['character_name'],
-                    'active_character_name' => $char['character_name'],
-                    'gameData' => $game->getAllDatas(),
+                $game->activeCharacterEventLog('gave 1 stamina to ${active_character_name}', [
+                    'active_character_name' => $game->getCharacterHTML($char['character_name']),
                 ]);
             }
         },
@@ -298,6 +296,7 @@ $charactersData = [
                         $card = $game->decks->pickCard('night-event');
                         $data['state']['card'] = $card;
                         $game->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
+                        $game->cardDrawEvent($card, 'night-event');
 
                         $game->log($data);
                     }
@@ -611,9 +610,7 @@ $charactersData = [
         'onNight' => function (Game $game, $char, &$data) {
             if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
                 $game->character->adjustHealth($char['character_name'], 1);
-                $game->notify->all('activeCharacter', clienttranslate('All tribe members gained 1 hp after the rival tribe event'), [
-                    'gameData' => $game->getAllDatas(),
-                ]);
+                $game->activeCharacterEventLog('All tribe members gained 1 hp after the rival tribe event');
             }
         },
         'onEncounter' => function (Game $game, $char, &$data) {
@@ -940,10 +937,6 @@ $charactersData = [
                             ...$char,
                             'active_character_name' => $game->character->getTurnCharacter()['character_name'],
                         ]);
-                        // $game->notify->all('activeCharacter', clienttranslate('${character_name} ' ), [
-                        //     ...$arg,
-                        //     'gameData' => $game->getAllDatas(),
-                        // ]);
                     }
                 },
                 'onUse' => function (Game $game, $skill) {

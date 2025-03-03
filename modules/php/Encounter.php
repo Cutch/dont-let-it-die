@@ -124,11 +124,13 @@ class Encounter
                     if ($damageTaken != 0) {
                         $_this->character->adjustActiveHealth(-$damageTaken);
                     }
-                    $_this->adjustResource('meat', $data['willReceiveMeat']);
-                    $_this->activeCharacterEventLog('defeated a ${name}, took ${damageTaken} damage and gained ${willReceiveMeat} meat', [
-                        ...$data,
-                        'damageTaken' => $damageTaken,
-                    ]);
+                    if ($_this->character->getActiveHealth() != 0) {
+                        $_this->adjustResource('meat', $data['willReceiveMeat']);
+                        $_this->activeCharacterEventLog(
+                            'defeated a ${name}, took ${damageTaken} damage and gained ${willReceiveMeat} meat',
+                            [...$data, 'damageTaken' => $damageTaken]
+                        );
+                    }
                 } else {
                     $_this->character->adjustActiveHealth(-$data['willTakeDamage']);
                     $_this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);

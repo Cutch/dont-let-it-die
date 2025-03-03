@@ -307,10 +307,16 @@ class Character
     public function adjustHealth(string $characterName, int $health): int
     {
         $prev = 0;
-        $this->updateCharacterData($characterName, function (&$data) use ($health, &$prev) {
+        $this->updateCharacterData($characterName, function (&$data) use ($health, &$prev, $characterName) {
             $prev = $data['health'];
             $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
             $prev = $data['health'] - $prev;
+            if ($data['health'] == 0 && !$data['incapacitated']) {
+                $this->game->activeCharacterEventLog('has been incapacitated', [
+                    'character_name' => $this->game->getCharacterHTML($characterName),
+                ]);
+                $data['incapacitated'] = true;
+            }
         });
         return $prev;
     }

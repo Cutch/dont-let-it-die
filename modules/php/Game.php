@@ -124,6 +124,12 @@ class Game extends \Table
     }
     public function activeCharacterEventLog($message, $arg = [])
     {
+        // $result = [
+        //     'character_name' => $this->getCharacterHTML(),
+        //     ...$arg,
+        // ];
+        // $this->getAllCharacters($result);
+        // $this->getAllPlayers($result);
         $this->notify->all('activeCharacter', clienttranslate('${character_name} ' . $message), [
             ...$arg,
             'gameData' => $this->getAllDatas(),
@@ -132,6 +138,17 @@ class Game extends \Table
     public function nightEventLog($message, $arg = [])
     {
         $this->notify->all('nightEvent', clienttranslate($message), $arg);
+    }
+    public function cardDrawEvent($card, $deck, $arg = [])
+    {
+        $result = [
+            'card' => $card,
+            'deck' => $deck,
+            'resolving' => $this->actInterrupt->isStateResolving(),
+            'character_name' => $this->getCharacterHTML(),
+        ];
+        $this->getDecks($result);
+        $this->notify->all('cardDrawn', '', $result);
     }
     public function getTradeRatio()
     {
@@ -603,11 +620,8 @@ class Game extends \Table
             [$this->hooks, 'onDraw'],
             function (Game $_this, $deck) {
                 $_this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
-                // $character = $_this->character->getSubmittingCharacter();
                 $card = $_this->decks->pickCard($deck);
-                $_this->notify->all('cardDrawn', clienttranslate('${character_name} drew from the ${deck} deck'), [
-                    // 'player_id' => $character['player_id'],
-                    // 'character_name' => $character['character_name'],
+                $_this->activeCharacterEventLog('drew from the ${deck} deck', [
                     'deck' => str_replace('-', ' ', $deck),
                     'gameData' => $_this->getAllDatas(),
                 ]);
@@ -628,9 +642,7 @@ class Game extends \Table
         $playerId = (int) $this->getActivePlayerId();
 
         // Notify all players about the choice to pass.
-        $this->notify->all('pass', clienttranslate('${character_name} ends their turn'), [
-            'player_id' => $playerId,
-        ]);
+        $this->activeCharacterEventLog('${character_name} ends their turn');
 
         // at the end of the action, move to the next state
         $this->gamestate->nextState('endTurn');
@@ -735,23 +747,19 @@ class Game extends \Table
                 $state = $this->gameData->get('state');
                 $deck = $state['deck'];
                 $card = $state['card'];
+                $this->cardDrawEvent($card, $deck);
                 if ($card['deckType'] == 'resource') {
                     $this->adjustResource($card['resourceType'], $card['count']);
 
-                    $this->notify->all('tokenUsed', clienttranslate('${character_name} found ${count} ${name}'), [
-                        ...$card,
-                        'deck' => str_replace('-', ' ', $deck),
-                        'gameData' => $this->getAllDatas(),
-                    ]);
+                    $this->activeCharacterEventLog('found ${count} ${name}', [...$card, 'deck' => str_replace('-', ' ', $deck)]);
                 } elseif ($card['deckType'] == 'encounter') {
                     // Change state and check for health/damage modifications
-                    $this->notify->all(
-                        'cardDrawn',
-                        clienttranslate('${character_name} encountered a ${name} (${health} health, ${damage} damage)'),
-                        [...$card, 'deck' => str_replace('-', ' ', $deck)]
-                    );
+                    $this->activeCharacterEventLog('encountered a ${name} (${health} health, ${damage} damage)', [
+                        ...$card,
+                        'deck' => str_replace('-', ' ', $deck),
+                    ]);
                 } elseif ($card['deckType'] == 'nothing') {
-                    $this->notify->all('cardDrawn', clienttranslate('${character_name} did nothing'), [
+                    $this->activeCharacterEventLog('did nothing', [
                         'deck' => str_replace('-', ' ', $deck),
                     ]);
                 } elseif ($card['deckType'] == 'hindrance') {
@@ -789,9 +797,7 @@ class Game extends \Table
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
-                $this->notify->all('cardDrawn', clienttranslate('It\'s night, drawing from the night deck'), [
-                    'deck' => str_replace('-', ' ', $deck),
-                ]);
+                $this->nightEventLog('It\'s night, drawing from the night deck');
                 $this->gamestate->nextState('nightDrawCard');
             }
         );
@@ -806,6 +812,8 @@ class Game extends \Table
                 // deck,card
                 $state = $this->gameData->get('state');
                 $deck = $state['deck'];
+                $card = $state['card'];
+                $this->cardDrawEvent($card, $deck);
                 return ['state' => $state];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {

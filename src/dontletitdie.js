@@ -562,13 +562,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           this.updateKnowledgeTree(args.args);
           this.updateTrack(args.args);
           break;
-        case 'nightDrawCard':
-        case 'drawCard':
-          if (!args.args.resolving) {
-            this.decks[args.args.deck].drawCard(args.args.card.id);
-            this.decks[args.args.deck].updateDeckCounts(args.args.decks[args.args.deck]);
-          }
-          break;
+        // case 'nightDrawCard':
+        // case 'drawCard':
+        //   if (!args.args.resolving) {
+        //     this.decks[args.args.deck].drawCard(args.args.card.id);
+        //     this.decks[args.args.deck].updateDeckCounts(args.args.decks[args.args.deck]);
+        //   }
+        //   break;
       }
     },
 
@@ -818,6 +818,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       dojo.subscribe('activeCharacter', this, 'notification_tokenUsed');
       dojo.subscribe('tokenUsed', this, 'notification_tokenUsed');
       dojo.subscribe('shuffle', this, 'notification_shuffle');
+      dojo.subscribe('cardDrawn', this, 'notification_cardDrawn');
       //
     },
     notificationWrapper: function (notification) {
@@ -826,10 +827,15 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         notification.args.gameData.gamestate = notification.args.gamestate;
       }
     },
+    notification_cardDrawn: function (notification) {
+      this.notificationWrapper(notification);
+      console.log('notification_cardDrawn', notification);
+      this.decks[notification.args.deck].drawCard(notification.args.card.id);
+      this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
+    },
     notification_shuffle: function (notification) {
       this.notificationWrapper(notification);
       console.log('notification_shuffle', notification);
-      console.log(this.decks);
       this.decks[notification.args.deck].shuffle();
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
     },
