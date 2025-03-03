@@ -181,10 +181,12 @@ class Game extends \Table
             $this->notify->all('rollFireDie', clienttranslate('${character_name} rolled a ${value}'), [
                 'value' => $value == 0 ? 'blank' : $value,
                 'character_name' => $this->getCharacterHTML($characterName),
+                'roll' => $rand,
             ]);
         } else {
             $this->notify->all('rollFireDie', clienttranslate('The fire die rolled a ${value}'), [
                 'value' => $value == 0 ? 'blank' : $value,
+                'roll' => $rand,
             ]);
         }
         return $value;

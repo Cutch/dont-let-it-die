@@ -833,7 +833,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     notification_rollFireDie: function (notification) {
       this.notificationWrapper(notification);
       console.log('notification_rollFireDie', notification);
-      this.dice.roll(notification.args.value);
+      this.dice.roll(notification.args.roll);
     },
     notification_cardDrawn: function (notification) {
       this.notificationWrapper(notification);
