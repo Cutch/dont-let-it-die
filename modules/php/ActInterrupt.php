@@ -227,7 +227,7 @@ class ActInterrupt
         foreach ($characterIds as $k => $v) {
             $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
         }
-        if (sizeof($characterIds) > 0 && sizeof($this->game->gameData->getAllMultiActiveCharacter()) == 0) {
+        if (sizeof($characterIds) > 0 && sizeof($this->game->gameData->getAllMultiActiveCharacter()) == 0 && !$changeState) {
             $this->game->gamestate->nextState($data['currentState']);
             $changeState = true;
         }

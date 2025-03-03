@@ -176,12 +176,14 @@ class Character
             $data['item_3'] = array_key_exists(2, $equipment) ? $equipment[2] : null;
         });
     }
-    public function setSubmittingCharacter($action, $subAction = null): void
+    public function setSubmittingCharacter(?string $action, ?string $subAction = null): void
     {
         if ($action == 'actUseSkill') {
             $this->submittingCharacter = $this->game->character->getSkill($subAction)['character']['id'];
-        } elseif ($action == 'actUseSkill') {
+        } elseif ($action == 'actUseItem') {
             $this->submittingCharacter = $this->game->character->getItem($subAction)['character']['id'];
+        } elseif ($action == null) {
+            $this->submittingCharacter = null;
         }
     }
     public function getSkill($skillId): ?array

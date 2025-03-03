@@ -519,6 +519,7 @@ class Game extends \Table
                 $res = $_this->character->getSkill($skillId);
                 $skill = $res['skill'];
                 $character = $res['character'];
+                $_this->character->setSubmittingCharacter(null);
                 return [
                     'skillId' => $skillId,
                     'skill' => $skill,
@@ -554,6 +555,7 @@ class Game extends \Table
                         $skill['sendNotification']();
                     }
                 }
+                $_this->character->setSubmittingCharacter(null);
             }
         );
     }
@@ -574,6 +576,7 @@ class Game extends \Table
                 'skill_name' => $skill['name'],
             ]);
         }
+        $this->character->setSubmittingCharacter(null);
     }
     public function actDrawGather(): void
     {

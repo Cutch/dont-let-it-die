@@ -171,6 +171,9 @@ class GameData
             }, $activateCharacters)
         );
         $this->game->log('state 1', $activePlayerIds, 'playerTurn');
+        if (sizeof($activePlayerIds) == 0) {
+            $this->game->character->setSubmittingCharacter(null);
+        }
         return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, 'playerTurn', true);
     }
     public function removeMultiActiveCharacter(string $characterId, string $state): bool
@@ -178,6 +181,8 @@ class GameData
         $activateCharacters = $this->get('activateCharacters');
         if (in_array($characterId, $activateCharacters)) {
             $activateCharacters = array_diff($activateCharacters, [$characterId]);
+        } else {
+            return false;
         }
         $this->set('activateCharacters', $activateCharacters);
 
@@ -187,6 +192,9 @@ class GameData
             }, $activateCharacters)
         );
         $this->game->log('state 2', $activePlayerIds, $state);
+        if (sizeof($activePlayerIds) == 0) {
+            $this->game->character->setSubmittingCharacter(null);
+        }
         return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, $state, true);
     }
     public function setup()
