@@ -496,6 +496,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       );
       this.updatePlayers(gameData);
       this.setupBoard(gameData);
+      this.dice = new Dice(document.getElementById('board-container'));
+      // this.dice.roll(5);
       // renderImage(`board`, playArea);
       this.updateTrack(gameData);
       // Setting up player boards
@@ -819,6 +821,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       dojo.subscribe('tokenUsed', this, 'notification_tokenUsed');
       dojo.subscribe('shuffle', this, 'notification_shuffle');
       dojo.subscribe('cardDrawn', this, 'notification_cardDrawn');
+      dojo.subscribe('rollFireDie', this, 'notification_rollFireDie');
       //
     },
     notificationWrapper: function (notification) {
@@ -826,6 +829,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (notification.args.gameData) {
         notification.args.gameData.gamestate = notification.args.gamestate;
       }
+    },
+    notification_rollFireDie: function (notification) {
+      this.notificationWrapper(notification);
+      console.log('notification_rollFireDie', notification);
+      this.dice.roll(notification.args.value);
     },
     notification_cardDrawn: function (notification) {
       this.notificationWrapper(notification);

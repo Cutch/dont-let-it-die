@@ -3,6 +3,7 @@
 .dlid {
   @include meta.load-css('utils/clickable');
   @include meta.load-css('utils/deck');
+  @include meta.load-css('utils/dice');
   @include meta.load-css('utils/images');
   @include meta.load-css('utils/selector');
   @include meta.load-css('utils/tooltip');

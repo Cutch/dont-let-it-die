@@ -58,6 +58,8 @@ class ActInterrupt
             // Calling after skill screen
             $endCallback($this->game, true, $existingData['data'], ...$existingData['args']);
             $this->setState($functionName, null);
+        } else {
+            $this->setState($functionName, null);
         }
     }
     public function isStateResolving(): bool
@@ -73,7 +75,7 @@ class ActInterrupt
     public function checkForInterrupt(): bool
     {
         $state = $this->getDataForState() ?? $this->getLatestInterruptState();
-        // var_dump(json_encode('checkForInterrupt'));
+        $this->game->log('checkForInterrupt', $state);
         if (!$state) {
             return false;
         }
@@ -197,7 +199,6 @@ class ActInterrupt
         if (!$state) {
             return false;
         }
-        $this->setState($state['functionName'], null);
         $data = $state['data'];
 
         $playerId = $this->game->getCurrentPlayer();
@@ -211,13 +212,14 @@ class ActInterrupt
             })
         );
         // Remove skills so that we know there's nothing left to do
-        $skills = $data['skills'];
-        array_walk($skills, function (&$v, $k) use ($characterIds) {
-            if (in_array($v['characterId'], $characterIds)) {
-                unset($v);
-            }
-        });
-        $this->setState($state['functionName'], [...$data, 'skills' => $skills]);
+        // $skills = $data['skills'];
+        // array_walk($skills, function (&$v, $k) use ($characterIds) {
+        //     if (in_array($v['characterId'], $characterIds)) {
+        //         unset($v);
+        //     }
+        // });
+        // $this->setState($state['functionName'], [...$data, 'skills' => $skills, 'activated' => true]);
+        $this->setState($state['functionName'], null);
 
         // var_dump(json_encode([$this->game->gamestate->state()['name'], $data['currentState'], $data['currentState']]));
         // var_dump($this->game->gamestate->getActivePlayerList(), $this->game->gamestate->state()['name']);
@@ -243,6 +245,7 @@ class ActInterrupt
         }
         $data = $state['data'];
         $this->game->getAllPlayers($data);
+        $this->game->log(['action' => 'argInterrupt', 'state' => $data]);
         return [
             ...$data,
             'character_name' => $this->game->getCharacterHTML(),
@@ -268,6 +271,6 @@ class ActInterrupt
             $changeState = true;
         }
 
-        $this->game->log(['action' => 'actInterrupt', 'state' => $state, 'changeState' => $changeState, 'state' => $data['currentState']]);
+        $this->game->log(['action' => 'stInterrupt', 'state' => $state, 'changeState' => $changeState, 'state' => $data['currentState']]);
     }
 }

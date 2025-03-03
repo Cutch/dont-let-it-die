@@ -26,7 +26,7 @@ class GameData
     private Game $game;
     private ?array $resourcesBeforeTransaction = null;
     private array $cachedGameData = [];
-    private ?array $cachedGameItems = null;
+    private array $cachedGameItems = [];
     private static $defaults = [
         'dailyUseItems' => [],
         'buildings' => [],
@@ -68,6 +68,8 @@ class GameData
     {
         $this->game = $game;
         $this->reload();
+
+        $this->cachedGameItems = $this->game->getCollectionFromDb('SELECT item_id, item_name FROM `item`', true);
     }
     public function reload(): void
     {
@@ -90,9 +92,9 @@ class GameData
     }
     public function getItems(): array
     {
-        if (!$this->cachedGameItems) {
-            $this->cachedGameItems = $this->game->getCollectionFromDb('SELECT item_id, item_name FROM `item`', true);
-        }
+        // if (!$this->cachedGameItems) {
+        //     $this->cachedGameItems = $this->game->getCollectionFromDb('SELECT item_id, item_name FROM `item`', true);
+        // }
         return $this->cachedGameItems;
     }
     public function createItem(string $itemName): int

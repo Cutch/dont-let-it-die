@@ -165,7 +165,7 @@ class Game extends \Table
         $difference = $currentCount - $newValue + $change;
         return $difference;
     }
-    public function rollFireDie($character = null): int
+    public function rollFireDie(?string $characterName = null): int
     {
         $rand = rand(1, 6);
         $value = 0;
@@ -177,10 +177,10 @@ class Game extends \Table
             $value = 1;
         }
         $value = max($this->hooks->onRollDie($value), 0);
-        if ($character) {
+        if ($characterName) {
             $this->notify->all('rollFireDie', clienttranslate('${character_name} rolled a ${value}'), [
                 'value' => $value == 0 ? 'blank' : $value,
-                'character_name' => $this->getCharacterHTML($character),
+                'character_name' => $this->getCharacterHTML($characterName),
             ]);
         } else {
             $this->notify->all('rollFireDie', clienttranslate('The fire die rolled a ${value}'), [
@@ -599,7 +599,7 @@ class Game extends \Table
             function (Game $_this) {
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
-                $roll = $_this->rollFireDie($character);
+                $roll = $_this->rollFireDie($character['character_name']);
                 $_this->actions->spendActionCost('actInvestigateFire');
                 return ['roll' => $roll];
             },
@@ -642,7 +642,7 @@ class Game extends \Table
         $playerId = (int) $this->getActivePlayerId();
 
         // Notify all players about the choice to pass.
-        $this->activeCharacterEventLog('${character_name} ends their turn');
+        $this->activeCharacterEventLog('ends their turn');
 
         // at the end of the action, move to the next state
         $this->gamestate->nextState('endTurn');
@@ -899,7 +899,7 @@ class Game extends \Table
     {
         $this->gamestate->setAllPlayersMultiactive();
         foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
-            $this->giveExtraTime((int) $playerId, 500);
+            $this->giveExtraTime((int) $playerId);
         }
     }
     public function getFirewoodCost()
@@ -1008,14 +1008,15 @@ class Game extends \Table
     {
         $result['players'] = $this->getCollectionFromDb('SELECT `player_id` `id`, player_no FROM `player`');
 
-        $players = $this->gamestate->getActivePlayerList();
-        $html = [];
-        foreach ($players as $k => $v) {
-            $color = $this->getPlayerColorById($v);
-            $name = $this->getPlayerNameById($v);
-            array_push($html, "<!--PNS--><span class=\"playername\" style=\"color:#$color;\">$name</span><!--PNE-->");
-        }
-        $result['playersString'] = join(', ', $html);
+        // $characters = $this->gameData->getAllMultiActiveCharacter();
+        // $html = [];
+        // foreach ($characters as $k => $v) {
+        //     $color = $v['player_color'];
+        //     $playerName = $this->getPlayerNameById($v['player_id']);
+        //     $name = $v['character_name'];
+        //     array_push($html, "<!--PNS--><span class=\"playername\" style=\"color:#$color;\">$name ($playerName)</span><!--PNE-->");
+        // }
+        // $result['playersString'] = join(', ', $html);
     }
     public function getAllCharacters(&$result): void
     {

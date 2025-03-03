@@ -1,0 +1,136 @@
+.dice-container {
+  z-index: 101;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 7px;
+  visibility: hidden;
+}
+.dice {
+  width: 10em;
+  height: 10em;
+  transform-style: preserve-3d;
+  transition: transform 1s, left 1s, top 1s;
+  transform: translate(-50%, -50%) rotateX(0) rotateZ(0);
+
+  position: relative;
+  top: 66%;
+  left: 66%;
+
+  .dot {
+    position: absolute;
+    width: 2em;
+    height: 2em;
+    margin: -1em 0.5em 0.5em -1em;
+    border-radius: 2em;
+    background-color: #474747;
+    box-shadow: inset 2px 2px #1c1c1c;
+  }
+  // &.show-1 {
+  //   transform: rotateX(1440deg) rotateZ(-1440deg);
+  // }
+
+  // &.show-6 {
+  //   transform: rotateX(-1800deg) rotateZ(1080deg);
+  // }
+
+  // &.show-3 {
+  //   transform: rotateY(-1800deg) rotateZ(-1440deg);
+  // }
+
+  // &.show-4 {
+  //   transform: rotateY(1620deg) rotateZ(1440deg);
+  // }
+
+  // &.show-5 {
+  //   transform: rotateX(-1620deg) rotateZ(-1080deg);
+  // }
+
+  // &.show-2 {
+  //   transform: rotateX(1800deg) rotateZ(-1440deg);
+  // }
+  &.show-1 {
+    transform: translate(-50%, -50%) rotateX(720deg) rotateZ(-720deg);
+  }
+
+  &.show-6 {
+    transform: translate(-50%, -50%) rotateX(-900deg) rotateZ(1080deg);
+  }
+
+  &.show-3 {
+    transform: translate(-50%, -50%) rotateY(-900deg) rotateZ(-1440deg);
+  }
+
+  &.show-4 {
+    transform: translate(-50%, -50%) rotateX(-810deg) rotateZ(-1080deg);
+  }
+
+  &.show-5 {
+    transform: translate(-50%, -50%) rotateY(810deg) rotateZ(720deg);
+  }
+
+  &.show-2 {
+    transform: translate(-50%, -50%) rotateX(900deg) rotateZ(-720deg);
+  }
+
+  .side {
+    position: absolute;
+    background-color: #ca9163;
+    // border-radius: 3em;
+    width: 10em;
+    height: 10em;
+    box-shadow: inset 0px 0px 10px 2px black;
+    // border: 1px solid #e5e5e5;
+    // text-align: center;
+    line-height: 2em;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .image {
+    background-image: url(img/dice-spritesheet.png);
+    background-size: cover;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+  }
+  .side.one {
+    transform: translateZ(4.8em);
+    .image {
+      background-image: unset;
+    }
+  }
+  .side.two {
+    transform: rotateY(-180deg) translateZ(4.8em);
+    .image {
+      background-position: -20em 0px;
+    }
+  }
+  .side.three {
+    transform: rotateY(-90deg) translateZ(4.8em);
+    .image {
+      background-position: -20em 0px;
+    }
+  }
+  .side.four {
+    transform: rotateX(90deg) translateZ(4.8em);
+    .image {
+      background-position: -20em 0px;
+    }
+  }
+  .side.five {
+    transform: rotateX(-90deg) translateZ(4.8em);
+    .image {
+      background-position: 0px 0px;
+    }
+  }
+  .side.six {
+    transform: rotateY(90deg) translateZ(4.8em);
+    .image {
+      background-position: -10em 0px;
+    }
+  }
+}

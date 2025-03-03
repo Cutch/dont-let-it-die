@@ -117,7 +117,7 @@ $charactersData = [
                             ...$char,
                             'active_character_name' => $game->character->getTurnCharacter()['character_name'],
                         ]);
-                        $data['data']['roll'] = $game->rollFireDie($char);
+                        $data['data']['roll'] = $game->rollFireDie($char['character_name']);
                         usePerDay($char['id'] . 'investigateFire', $game);
                     }
                 },

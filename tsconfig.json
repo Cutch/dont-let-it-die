@@ -22,6 +22,7 @@
       "src/utils/clickable.js",
       "src/utils/images.js",
       "src/utils/deck.js",
+      "src/utils/dice.js",
       "src/utils/selector.js",
       "src/utils/tooltip.js",
       "src/utils/tweening.js",

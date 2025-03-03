@@ -104,8 +104,9 @@ class Character
             }
         });
         $_this = $this;
-        $characterData['equipment'] = array_map(function ($itemId) use ($_this, $isActive, $characterName) {
-            $itemName = $this->game->gameData->getItems()[$itemId];
+        $itemsLookup = $this->game->gameData->getItems();
+        $characterData['equipment'] = array_map(function ($itemId) use ($_this, $isActive, $characterName, $itemsLookup) {
+            $itemName = $itemsLookup[$itemId];
             $skills = [];
             if (array_key_exists('skills', $_this->game->data->items[$itemName])) {
                 array_walk($_this->game->data->items[$itemName]['skills'], function ($v, $k) use ($itemId, &$skills) {

@@ -160,7 +160,7 @@ $machinestates = [
     ],
     22 => [
         'name' => 'interrupt',
-        'description' => clienttranslate('${playersString} looking at their skills'),
+        'description' => clienttranslate('Other players are looking at their skills'),
         'descriptionmyturn' => clienttranslate('Looking at skills'),
         'type' => 'multipleactiveplayer',
         'action' => 'stInterrupt',
