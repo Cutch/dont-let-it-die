@@ -86,8 +86,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character, i) => {
         // Player side board
         const playerPanel = this.getPlayerPanelElement(character.playerId);
-        const equipments = character.equipment.map((d) => this.data[d.id]);
-
+        const equipments = character.equipment.map((d) => ({ ...this.data[d.id], ...d }));
         const characterSideId = `player-side-${character.playerId}-${character.name}`;
         const playerSideContainer = document.getElementById(characterSideId);
         if (!playerSideContainer) {
@@ -102,8 +101,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               character.stamina
             }</span></div>
             <div class="equipment line"><div class="fa fa-cog"></div><span class="label">Equipment: </span><span class="value">${
-              equipments.map((d) => d.options.name).join(', ') || 'None'
+              equipments.map((d) => `<span class="equipment-item equipment-${d.itemId}">${d.options.name}</span>`).join(', ') || 'None'
             }</span></div>
+            <div class="character-image"></div>
           </div>`,
           );
           renderImage('skull', document.querySelector(`#${characterSideId} .first-player-marker`), {
@@ -112,11 +112,42 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             card: false,
             css: 'side-panel-skull',
           });
+          playerSideContainer = document.getElementById(characterSideId);
+          addClickListener(playerSideContainer.querySelector(`.character-name`), character.name, () => {
+            this.tooltip.show();
+            renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+          });
+          equipments.forEach((d) => {
+            addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), d.options.name, () => {
+              this.tooltip.show();
+              renderImage(d.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+            });
+          });
+          renderImage(character.name, playerSideContainer.querySelector(`.character-image`), {
+            scale: 3,
+            overridePos: {
+              x: 0.2,
+              y: 0.16,
+              w: 0.8,
+              h: 0.45,
+            },
+          });
+          addClickListener(playerSideContainer.querySelector(`.character-image`), character.name, () => {
+            this.tooltip.show();
+            renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+          });
         } else {
           playerSideContainer.querySelector(`.health .value`).innerHTML = character.health;
           playerSideContainer.querySelector(`.stamina .value`).innerHTML = character.stamina;
-          playerSideContainer.querySelector(`.equipment .value`).innerHTML = equipments.map((d) => d.options.name).join(', ') || 'None';
+          playerSideContainer.querySelector(`.equipment .value`).innerHTML =
+            equipments.map((d) => `<span class="equipment-item equipment-${d.itemId}">${d.options.name}</span>`).join(', ') || 'None';
           playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
+          equipments.forEach((d) => {
+            addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), d.options.name, () => {
+              this.tooltip.show();
+              renderImage(d.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+            });
+          });
         }
         document.querySelector(`#${characterSideId} .first-player-marker`).style['display'] = character?.isFirst ? 'inline-block' : 'none';
         // Player main board
@@ -503,16 +534,16 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.selector = new Selector(playArea);
       this.tooltip = new Tooltip(playArea);
       this.setupCharacterSelections(gameData);
-      playArea.insertAdjacentHTML(
-        'beforeend',
-        `<div id="players-container" class="dlid__container"><div id="player-container-1" class="inner-container"></div><div id="player-container-2" class="inner-container"></div></div>`,
-      );
-      this.updatePlayers(gameData);
       this.setupBoard(gameData);
       this.dice = new Dice(document.getElementById('board-container'));
       // this.dice.roll(5);
       // renderImage(`board`, playArea);
       this.updateTrack(gameData);
+      playArea.insertAdjacentHTML(
+        'beforeend',
+        `<div id="players-container" class="dlid__container"><div id="player-container-1" class="inner-container"></div><div id="player-container-2" class="inner-container"></div></div>`,
+      );
+      this.updatePlayers(gameData);
       // Setting up player boards
       this.updateKnowledgeTree(gameData);
       this.updateItems(gameData);

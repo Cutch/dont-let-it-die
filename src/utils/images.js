@@ -6,7 +6,7 @@ const getSpriteSize = (name, scale = 2) => {
   if (rotate) return { width: h / scale, height: w / scale };
   else return { width: w / scale, height: h / scale };
 };
-const renderImage = (name, div, { scale = 2, pos = 'append', card = true, css: extraCss = '' } = {}) => {
+const renderImage = (name, div, { scale = 2, pos = 'append', card = true, css: extraCss = '', overridePos = null } = {}) => {
   // example of adding a div for each player
   if (!allSprites[name]) throw new Error(`Missing image ${name}`);
   const {
@@ -18,12 +18,18 @@ const renderImage = (name, div, { scale = 2, pos = 'append', card = true, css: e
     rotate,
   } = allSprites[name];
   let html;
-  const scaledX = Math.round(x / scale);
-  const scaledY = Math.round(y / scale);
-  const scaledWidth = Math.round(w / scale);
-  const scaledHeight = Math.round(h / scale);
+  let scaledX = Math.round(x / scale);
+  let scaledY = Math.round(y / scale);
+  let scaledWidth = Math.round(w / scale);
+  let scaledHeight = Math.round(h / scale);
   const scaledSpriteWidth = Math.ceil(spriteWidth / scale);
   const scaledSpriteHeight = Math.ceil(spriteHeight / scale);
+  if (overridePos) {
+    scaledX = scaledX + scaledWidth * overridePos.x;
+    scaledY = scaledY + scaledHeight * overridePos.y;
+    scaledWidth = scaledWidth * Math.abs(overridePos.w - overridePos.x);
+    scaledHeight = scaledHeight * Math.abs(overridePos.h - overridePos.y);
+  }
   if (rotate)
     html = `<div class="card-rotator" style="transform: rotate(${rotate}deg) translate(${scaledWidth + 3}px, ${
       -scaledHeight / 2

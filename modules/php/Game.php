@@ -345,7 +345,7 @@ class Game extends \Table
         if (!$sendToCampId) {
             throw new BgaUserException($this->translate('Select an item'));
         }
-        extract($this->gameData->get('state'));
+        $items = $this->gameData->get('state')['items'];
         if (
             !in_array(
                 $sendToCampId,
@@ -356,31 +356,27 @@ class Game extends \Table
         ) {
             throw new BgaUserException($this->translate('Invalid Item'));
         }
+        $items = array_map(function ($d) {
+            return $d['itemId'];
+        }, $items);
         $character = $this->character->getSubmittingCharacter();
-        $unchangedItems = array_map(
+        $characterItems = array_map(
             function ($d) {
                 return $d['itemId'];
             },
-            array_filter($character['equipment'], function ($d) use ($itemType) {
-                return $d['itemType'] != $itemType;
+            array_filter($character['equipment'], function ($d) use ($items) {
+                return !in_array($d['itemId'], $items);
             })
         );
+        $items = array_filter($items, function ($d) use ($sendToCampId) {
+            return $d != $sendToCampId;
+        });
 
-        $changed = array_map(
-            function ($d) {
-                return $d['itemId'];
-            },
-            array_filter($character['equipment'], function ($d) use ($itemType) {
-                return $d['itemType'] == $itemType;
-            })
-        );
-        foreach ($changed as $key) {
-            unset($changed[$key]);
-            break;
-        }
-        $this->character->setCharacterEquipment($character['id'], [...$unchangedItems, ...array_values($changed)]);
+        $this->log('setCharacterEquipment', [...$characterItems, ...$items]);
+        $this->character->setCharacterEquipment($character['id'], [...$characterItems, ...$items]);
 
         $campEquipment = $this->gameData->get('campEquipment');
+        $this->log('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gamestate->nextState('playerTurn');
     }
@@ -597,10 +593,37 @@ class Game extends \Table
     }
     public function actDrawHarvest(): void
     {
+        if (
+            sizeof(
+                array_filter($this->character->getActiveEquipment(), function ($data) {
+                    return $data['itemType'] == 'tool';
+                })
+            ) == 0
+        ) {
+            throw new BgaUserException($this->translate('You need tool to harvest'));
+        }
+        if (
+            sizeof(
+                array_filter($this->character->getActiveEquipment(), function ($data) {
+                    return $data['itemType'] == 'tool' && !in_array($data['id'], ['mortar-and-pestle', 'bandage']);
+                })
+            ) == 0
+        ) {
+            throw new BgaUserException($this->translate('The equipped tool can\'t be used for harvesting'));
+        }
         $this->actDraw('harvest');
     }
     public function actDrawHunt(): void
     {
+        if (
+            sizeof(
+                array_filter($this->character->getActiveEquipment(), function ($data) {
+                    return $data['itemType'] == 'weapon';
+                })
+            ) == 0
+        ) {
+            throw new BgaUserException($this->translate('You need weapon to hunt'));
+        }
         $this->actDraw('hunt');
     }
     public function actInvestigateFire(): void
@@ -1087,8 +1110,7 @@ class Game extends \Table
             return $data;
         }, $this->actions->getActionSelectable('actEat'));
         $selectable = $this->actions->getActionSelectable('actCraft');
-        $buildings = $this->gameData->get('buildings');
-        $this->log('$selectable', $selectable, $buildings);
+
         $result['availableEquipment'] = array_combine(
             array_map(function ($d) {
                 return $d['id'];

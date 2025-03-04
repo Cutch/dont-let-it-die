@@ -197,6 +197,18 @@ $itemsData = [
         'requires' => function (Game $game, $item) {
             return getUsePerDay($item, $game) < 1;
         },
+        'onInvestigateFire' => function (Game $game, $item, &$data) {
+            $char = $game->character->getTurnCharacter();
+            if (getUsePerDay($item['name'] . $char['id'] . 'investigateFire', $game) < 1) {
+                usePerDay($item['name'] . $char['id'] . 'investigateFire', $game);
+
+                if ($game->adjustResource('fkp', 1) == 0) {
+                    $this->notify->all('usedItem', clienttranslate('The ${item_name} grants an extra fkp'), [
+                        'item_name' => $item['name'],
+                    ]);
+                }
+            }
+        },
     ],
     'skull' => [
         'type' => 'game-piece',

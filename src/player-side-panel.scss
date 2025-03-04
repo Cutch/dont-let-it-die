@@ -3,6 +3,19 @@
   margin-bottom: 5px;
   padding: 0.25rem;
   border-radius: 10px;
+  position: relative;
+  .equipment-item {
+    text-decoration: underline;
+  }
+  .character-image {
+    position: absolute;
+    right: 0;
+    top: 0;
+    .card {
+      border: unset;
+      box-shadow: 0 0 6px 0px white inset;
+    }
+  }
 }
 .character-name {
   font-size: 16px;
