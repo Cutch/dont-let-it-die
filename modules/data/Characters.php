@@ -29,7 +29,7 @@ $charactersData = [
             'skill1' => [
                 'type' => 'skill',
                 'name' => clienttranslate('Gain 2 Stamina'),
-                'damage' => 2,
+                'health' => 2,
                 'perDay' => 1,
                 'onUse' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
@@ -71,7 +71,8 @@ $charactersData = [
                 $data['escape'] = true;
             }
         },
-        'onDraw' => function (Game $game, $char, $deck, $card) {
+        'onDraw' => function (Game $game, $char, &$data) {
+            $deck = $data['deck'];
             if ($char['isActive'] && $deck == 'gather') {
                 if ($game->adjustResource('fiber', 1) == 0) {
                     $game->activeCharacterEventLog('gained 1 fiber');
@@ -104,7 +105,7 @@ $charactersData = [
                 'perDay' => 1,
                 'onInvestigateFire' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    if (!$char['isActive'] && $data['roll'] < 3 && getUsePerDay($char['id'] . 'investigateFire', $game) < 1) {
+                    if ($data['roll'] < 3 && getUsePerDay($char['id'] . 'investigateFire', $game) < 1) {
                         // If kara is not the character, and the roll is not the max
                         $game->actInterrupt->addSkillInterrupt($skill);
                     }
@@ -123,7 +124,7 @@ $charactersData = [
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return !$char['isActive'] && getUsePerDay($char['id'] . 'investigateFire', $game) < 1;
+                    return getUsePerDay($char['id'] . 'investigateFire', $game) < 1;
                 },
             ],
             'skill2' => [
@@ -494,16 +495,18 @@ $charactersData = [
         'name' => 'River',
         'slots' => ['weapon', 'tool'],
         'onGetActionCost' => function (Game $game, $char, &$data) {
-            if ($char['isActive'] && $data['action'] == 'actInvestigateFIre' && getUsePerDay($char['id'], $game) < 1) {
+            if ($char['isActive'] && $data['action'] == 'actInvestigateFire' && getUsePerDay($char['id'], $game) < 1) {
                 $data['stamina'] = 0;
             }
         },
         'onInvestigateFire' => function (Game $game, $char, &$data) {
-            if ($char['isActive']) {
+            if ($char['isActive'] && getUsePerDay($char['id'], $game) < 1) {
                 usePerDay($char['id'], $game);
+                $data['spendActionCost'] = false;
             }
         },
-        'onDraw' => function (Game $game, $char, $deck, $card) {
+        'onDraw' => function (Game $game, $char, &$data) {
+            $card = $data['card'];
             if ($char['isActive'] && $card['name'] == 'Nothing') {
                 $game->adjustResource('fkp', 2);
                 $game->activeCharacterEventLog('received 2 fkp');
@@ -626,9 +629,11 @@ $charactersData = [
                 $data['stamina'] = 0;
             }
         },
-        'onDraw' => function (Game $game, $char, $deck, $card) {
-            if ($char['isActive'] && $deck == 'gather') {
+        'onDraw' => function (Game $game, $char, &$data) {
+            $deck = $data['deck'];
+            if ($char['isActive'] && $deck == 'gather' && getUsePerDay($char['id'] . 'onDraw', $game) < 1) {
                 usePerDay($char['id'] . 'onDraw', $game);
+                $data['spendActionCost'] = false;
             }
         },
     ],
@@ -785,7 +790,8 @@ $charactersData = [
         'stamina' => '6',
         'name' => 'Zeebo',
         'slots' => ['weapon'],
-        'onDraw' => function (Game $game, $char, $deck, $card) {
+        'onDraw' => function (Game $game, $char, &$data) {
+            $card = $data['card'];
             if ($char['isActive'] && $card['type'] == 'berry') {
                 if ($game->character->adjustActiveHealth(1) == 1) {
                     $game->activeCharacterEventLog('gained 1 health');
@@ -836,7 +842,8 @@ $charactersData = [
                 unset($data['actDrawGather']);
             }
         },
-        'onDraw' => function (Game $game, $char, $deck, $card) {
+        'onDraw' => function (Game $game, $char, &$data) {
+            $deck = $data['deck'];
             if ($char['isActive'] && $deck == 'hunt') {
                 if ($game->adjustResource('meat', 1) == 0) {
                     $game->activeCharacterEventLog('gained 1 meat');
@@ -851,7 +858,9 @@ $charactersData = [
         'stamina' => '5',
         'name' => 'Tiku',
         'slots' => ['weapon', 'tool'],
-        'onDraw' => function (Game $game, $char, $deck, $card) {
+        'onDraw' => function (Game $game, $char, &$data) {
+            $card = $data['card'];
+            $deck = $data['deck'];
             if ($char['isActive'] && $deck == 'explore' && $card['deckType'] != 'encounter') {
                 if ($game->adjustResource('dino-egg', 1) == 0) {
                     $game->activeCharacterEventLog('gained 1 dino egg');

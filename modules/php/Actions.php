@@ -186,14 +186,31 @@ class Actions
                 'stamina' => 3,
             ],
             'actUseSkill' => [
-                'state' => ['playerTurn', 'resolveEncounter', 'postEncounter', 'interrupt'],
+                'getState' => function () use ($_this) {
+                    $states = [];
+                    foreach ($_this->getAvailableCharacterSkills() as $skill) {
+                        if (array_key_exists('state', $skill)) {
+                            array_push($states, ...$skill['state']);
+                        }
+                    }
+                    $_this->game->log('$states', $states);
+                    return $states;
+                },
                 'type' => 'action',
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof($_this->getAvailableCharacterSkills()) > 0;
                 },
             ],
             'actUseItem' => [
-                'state' => ['playerTurn', 'resolveEncounter', 'postEncounter', 'interrupt'],
+                'getState' => function () use ($_this) {
+                    $states = [];
+                    foreach ($_this->getAvailableCharacterSkills() as $skill) {
+                        if (array_key_exists('state', $skill)) {
+                            array_push($states, ...$skill['state']);
+                        }
+                    }
+                    return $states;
+                },
                 'type' => 'action',
                 'requires' => function (Game $game, $action) use ($_this) {
                     return sizeof($_this->getAvailableItemSkills()) > 0;
@@ -383,7 +400,8 @@ class Actions
     }
     public function checkRequirements($actionObj, ...$args): bool
     {
-        return (!array_key_exists('state', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])) &&
+        return (!array_key_exists('getState', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['getState']())) &&
+            (!array_key_exists('state', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])) &&
             (!array_key_exists('interruptState', $actionObj) ||
                 ($this->game->actInterrupt->getLatestInterruptState() &&
                     in_array(

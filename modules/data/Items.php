@@ -14,6 +14,23 @@ if (!function_exists('getUsePerDay')) {
         $dailyUseItems[$itemId] = array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] + 1 : 1;
         $game->gameData->set('dailyUseItems', $dailyUseItems);
     }
+    function array_orderby()
+    {
+        $args = func_get_args();
+        $data = array_shift($args);
+        foreach ($args as $n => $field) {
+            if (is_string($field)) {
+                $tmp = [];
+                foreach ($data as $key => $row) {
+                    $tmp[$key] = $row[$field] ?? '0';
+                }
+                $args[$n] = $tmp;
+            }
+        }
+        $args[] = &$data;
+        call_user_func_array('array_multisort', $args);
+        return array_pop($args);
+    }
 }
 $itemsData = [
     'bow-and-arrow' => [
@@ -70,7 +87,8 @@ $itemsData = [
             'fiber' => 2,
             'bone' => 2,
         ],
-        'onDraw' => function (Game $game, $item, $deck, $card) {
+        'onDraw' => function (Game $game, $item, &$data) {
+            $card = $data['card'];
             if ($card['resourceType'] == 'fiber') {
                 $game->gameData->setResource('fiber', $game->gameData->getResource('fiber') + 1);
                 $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
@@ -90,7 +108,8 @@ $itemsData = [
             'fiber' => 2,
             'hide' => 1,
         ],
-        'onDraw' => function (Game $game, $item, $deck, $card) {
+        'onDraw' => function (Game $game, $item, &$data) {
+            $card = $data['card'];
             if ($card['resourceType'] == 'berry') {
                 $game->gameData->setResource('berry', $game->gameData->getResource('berry') + 1);
                 $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
@@ -194,7 +213,8 @@ $itemsData = [
             'wood' => 1,
             'rock' => 2,
         ],
-        'onDraw' => function (Game $game, $item, $deck, $card) {
+        'onDraw' => function (Game $game, $item, &$data) {
+            $card = $data['card'];
             if ($card['resourceType'] == 'wood') {
                 $game->gameData->setResource('wood', $game->gameData->getResource('wood') + 1);
                 $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
@@ -246,7 +266,8 @@ $itemsData = [
             'rock' => 2,
             'bone' => 1,
         ],
-        'onDraw' => function (Game $game, $item, $deck, $card) {
+        'onDraw' => function (Game $game, $item, &$data) {
+            $card = $data['card'];
             if ($card['resourceType'] == 'meat') {
                 $game->adjustResource('meat', 1);
                 $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
@@ -296,7 +317,8 @@ $itemsData = [
             'wood' => 1,
             'rock' => 1,
         ],
-        'onDraw' => function (Game $game, $item, $deck, $card) {
+        'onDraw' => function (Game $game, $item, &$data) {
+            $card = $data['card'];
             if ($card['resourceType'] == 'rock') {
                 $game->gameData->setResource('rock', $game->gameData->getResource('rock') + 1);
                 $this->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
@@ -406,6 +428,7 @@ $itemsData = [
         'type' => 'item',
         'craftingLevel' => 1,
         'count' => 2,
+        'expansion' => 'hindrance',
         'name' => clienttranslate('Bandage'),
         'itemType' => 'tool',
         'cost' => [
@@ -441,6 +464,7 @@ $itemsData = [
         'type' => 'item',
         'craftingLevel' => 2,
         'count' => 2,
+        'expansion' => 'hindrance',
         'name' => clienttranslate('Bone Claws'),
         'itemType' => 'tool',
         'cost' => [
@@ -569,3 +593,7 @@ $itemsData = [
         },
     ],
 ];
+array_walk($itemsData, function (&$item) {
+    $item['totalCost'] = array_sum(array_values(array_key_exists('cost', $item) ? $item['cost'] : []));
+});
+$itemsData = array_orderby($itemsData, 'craftingLevel', SORT_ASC, 'itemType', SORT_DESC, 'totalCost', SORT_ASC);

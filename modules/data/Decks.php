@@ -448,7 +448,8 @@ $decksData = [
     'night-event-7_11' => [
         'deck' => 'night-event',
         'type' => 'deck',
-        'onDraw' => function (Game $game, $nightCard, $deck, $card) {
+        'onDraw' => function (Game $game, $nightCard, &$data) {
+            $card = $data['card'];
             $roll = $game->rollFireDie();
             if ($roll == 0) {
                 $game->character->adjustActiveHealth(-1);

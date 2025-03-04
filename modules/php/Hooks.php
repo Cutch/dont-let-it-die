@@ -97,12 +97,12 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onDraw($data, $checkInterrupt = false)
+    function onDraw(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data['deck'], $data['card']);
+        $this->callHooks(__FUNCTION__, $data);
     }
-    function onResolveDraw($data, $checkInterrupt = false)
+    function onResolveDraw(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);

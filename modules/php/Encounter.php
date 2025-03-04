@@ -112,7 +112,7 @@ class Encounter
                     'killed' => false,
                 ];
             },
-            function ($_this, $data) {
+            function ($_this, bool $finalizeInterrupt, $data) {
                 if ($data['stamina'] != 0) {
                     $_this->character->adjustActiveStamina($data['stamina']);
                 }

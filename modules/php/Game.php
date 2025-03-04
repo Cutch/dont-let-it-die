@@ -243,6 +243,9 @@ class Game extends \Table
 
         $this->actions->spendActionCost('actSpendFKP');
         $this->unlockKnowledge($knowledgeId);
+        // $this->log($availableUnlocks[$knowledgeId]);
+        $knowledgeObj = $this->data->knowledgeTree[$knowledgeId];
+        array_key_exists('onUse', $knowledgeObj) ? $knowledgeObj['onUse']($this, $knowledgeObj) : null;
         $this->notify->all('tokenUsed', clienttranslate('${character_name} unlocked ${knowledge_name}'), [
             'gameData' => $this->getAllDatas(),
             'knowledgeId' => $knowledgeId,
@@ -288,12 +291,15 @@ class Game extends \Table
                         throw new BgaUserException($_this->translate('Missing resources'));
                     }
                 }
-                $_this->actions->spendActionCost('actCraft');
+                if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
+                    $_this->actions->spendActionCost('actCraft');
+                }
                 $_this->notify->all('tokenUsed', clienttranslate('${character_name} crafted a ${item_name}'), [
                     'gameData' => $_this->getAllDatas(),
                     'item_name' => $item['name'],
                 ]);
                 if ($itemType == 'building') {
+                    $currentBuildings = $_this->gameData->get('buildings');
                     $itemId = $_this->gameData->createItem($itemName);
                     array_push($currentBuildings, ['name' => $itemName, 'itemId' => $itemId]);
                     $_this->gameData->set('buildings', $currentBuildings);
@@ -605,11 +611,13 @@ class Game extends \Table
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
                 $roll = $_this->rollFireDie($character['character_name']);
-                $_this->actions->spendActionCost('actInvestigateFire');
                 return ['roll' => $roll];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 // var_dump(json_encode(['actInvestigateFire', $data]));
+                if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
+                    $_this->actions->spendActionCost('actInvestigateFire');
+                }
                 $_this->adjustResource('fkp', $data['roll']);
                 $this->notify->all('tokenUsed', '', [
                     'gameData' => $this->getAllDatas(),
@@ -634,7 +642,9 @@ class Game extends \Table
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 extract($data);
-                $_this->actions->spendActionCost('actDraw' . ucfirst($deck));
+                if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
+                    $_this->actions->spendActionCost('actDraw' . ucfirst($deck));
+                }
 
                 $_this->gameData->set('state', ['card' => $card, 'deck' => $deck]);
                 $_this->gamestate->nextState('drawCard');
@@ -1074,6 +1084,7 @@ class Game extends \Table
             return $data;
         }, $this->actions->getActionSelectable('actEat'));
         $selectable = $this->actions->getActionSelectable('actCraft');
+        $this->log('$selectable', $selectable);
         $result['availableEquipment'] = array_combine(
             array_map(function ($d) {
                 return $d['id'];
@@ -1123,15 +1134,15 @@ class Game extends \Table
     {
         $buildings = $this->gameData->get('buildings');
         return array_map(function ($building) {
-            return $this->data->items[$building];
+            return $this->data->items[$building['name']];
         }, $buildings);
     }
-    public function addBuilding($buildingId): void
-    {
-        $array = $this->gameData->get('buildings');
-        array_push($array, $buildingId);
-        $this->gameData->set('buildings', $array);
-    }
+    // public function addBuilding($buildingId): void
+    // {
+    //     $array = $this->gameData->get('buildings');
+    //     array_push($array, $buildingId);
+    //     $this->gameData->set('buildings', $array);
+    // }
     public function getActiveNightCards(): array
     {
         $activeNightCards = $this->getActiveNightCardIds();
@@ -1323,7 +1334,7 @@ class Game extends \Table
             'hide' => 8,
             'trap' => 0,
             'herb' => 0,
-            'fkp' => 1,
+            'fkp' => 40,
             'gem' => 0,
         ]);
     }
