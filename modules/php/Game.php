@@ -160,6 +160,9 @@ class Game extends \Table
     {
         $currentCount = (int) $this->gameData->getResource($resourceType);
         $maxCount = isset($this->data->tokens[$resourceType]['count']) ? $this->data->tokens[$resourceType]['count'] : 999;
+        if ($resourceType == 'wood') {
+            $maxCount -= $this->gameData->getResource('fireWood');
+        }
         $newValue = max(min($currentCount + $change, $maxCount), 0);
         $this->gameData->setResource($resourceType, $newValue);
         $difference = $currentCount - $newValue + $change;
@@ -294,10 +297,6 @@ class Game extends \Table
                 if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
                     $_this->actions->spendActionCost('actCraft');
                 }
-                $_this->notify->all('tokenUsed', clienttranslate('${character_name} crafted a ${item_name}'), [
-                    'gameData' => $_this->getAllDatas(),
-                    'item_name' => $item['name'],
-                ]);
                 if ($itemType == 'building') {
                     $currentBuildings = $_this->gameData->get('buildings');
                     $itemId = $_this->gameData->createItem($itemName);
@@ -334,6 +333,10 @@ class Game extends \Table
                         $_this->gamestate->nextState('tooManyItems');
                     }
                 }
+                $_this->notify->all('tokenUsed', clienttranslate('${character_name} crafted a ${item_name}'), [
+                    'gameData' => $_this->getAllDatas(),
+                    'item_name' => $item['name'],
+                ]);
             }
         );
     }
@@ -1084,7 +1087,8 @@ class Game extends \Table
             return $data;
         }, $this->actions->getActionSelectable('actEat'));
         $selectable = $this->actions->getActionSelectable('actCraft');
-        $this->log('$selectable', $selectable);
+        $buildings = $this->gameData->get('buildings');
+        $this->log('$selectable', $selectable, $buildings);
         $result['availableEquipment'] = array_combine(
             array_map(function ($d) {
                 return $d['id'];

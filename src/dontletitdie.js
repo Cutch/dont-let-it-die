@@ -304,6 +304,19 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           );
         }
       });
+      if (gameData.game.buildings.length > 0) {
+        const div = document.querySelector(`#board-container .buildings`);
+        if (div.childNodes.length == 0) {
+          gameData.game.buildings.forEach((building) => {
+            console.log(building);
+            renderImage(building.name, div, { scale: 2, pos: 'append' });
+            addClickListener(div, 'Buildings', () => {
+              this.tooltip.show();
+              renderImage(building.name, this.tooltip.renderByElement(), { scale: 0.5, pos: 'replace' });
+            });
+          });
+        }
+      }
     },
     updateResource: function (name, elem, count, { warn = false } = {}) {
       elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
@@ -362,7 +375,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         .getElementById('game_play_area')
         .insertAdjacentHTML(
           'beforeend',
-          `<div id="board-container" class="dlid__container"><div class="board"><div class="fire-wood"></div>${decks
+          `<div id="board-container" class="dlid__container"><div class="board"><div class="fire-wood"></div><div class="buildings"></div>${decks
             .map((d) => `<div class="${d.name}"></div>`)
             .join('')}</div></div>`,
         );

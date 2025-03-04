@@ -73,17 +73,17 @@ $knowledgeTreeData = [
     'fire-starter' => [
         'name' => clienttranslate('Fire Starter'),
         'onUse' => function (Game $game, $obj) {
-            $this->notify->all('tree', clienttranslate('The tribe has discovered how to make fire!'));
+            $game->notify->all('tree', clienttranslate('The tribe has discovered how to make fire!'));
             $game->win();
         },
     ],
     'resource-1' => [
         'name' => clienttranslate('Resource 1'),
-        'onDraw' => function (Game $game, $obj, &$data) {
+        'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
-            if ($card['resourceType'] == 'rock') {
+            if ($card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
                 if ($game->adjustResource('rock', 1) == 0) {
-                    $this->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'resource_type' => $card['resourceType'],
                     ]);
@@ -93,11 +93,11 @@ $knowledgeTreeData = [
     ],
     'resource-2' => [
         'name' => clienttranslate('Resource 2'),
-        'onDraw' => function (Game $game, $obj, &$data) {
+        'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
-            if ($card['resourceType'] == 'wood') {
+            if ($card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
                 if ($game->adjustResource('wood', 1) == 0) {
-                    $this->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'resource_type' => $card['resourceType'],
                     ]);
@@ -107,11 +107,11 @@ $knowledgeTreeData = [
     ],
     'hunt-1' => [
         'name' => clienttranslate('Hunt 1'),
-        'onDraw' => function (Game $game, $obj, &$data) {
+        'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
-            if ($card['resourceType'] == 'meat') {
+            if ($card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
                 if ($game->adjustResource('meat', 1) == 0) {
-                    $this->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'resource_type' => $card['resourceType'],
                     ]);
@@ -121,11 +121,11 @@ $knowledgeTreeData = [
     ],
     'forage-1' => [
         'name' => clienttranslate('Forage 1'),
-        'onDraw' => function (Game $game, $obj, &$data) {
+        'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
-            if ($card['resourceType'] == 'berry') {
+            if ($card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
                 if ($game->adjustResource('berry', 1) == 0) {
-                    $this->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'resource_type' => $card['resourceType'],
                     ]);
@@ -135,11 +135,11 @@ $knowledgeTreeData = [
     ],
     'forage-2' => [
         'name' => clienttranslate('Forage 2'),
-        'onDraw' => function (Game $game, $obj, &$data) {
+        'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
-            if ($card['resourceType'] == 'fiber') {
+            if ($card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
                 if ($game->adjustResource('fiber', 1) == 0) {
-                    $this->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'resource_type' => $card['resourceType'],
                     ]);
@@ -149,8 +149,9 @@ $knowledgeTreeData = [
     ],
     'relaxation' => [
         'name' => clienttranslate('Relaxation'),
-        'onUse' => function (Game $game, $char) {
-            $game->character->updateAllCharacterData('maxHealth', 2);
+        'onGetCharacterData' => function (Game $game, $item, &$data) {
+            $data['maxHealth'] += 2;
+            $data['health'] = min($data['maxHealth'], $data['health']);
         },
     ],
 ];

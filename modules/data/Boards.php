@@ -201,7 +201,7 @@ $boardsData = [
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
-                    return in_array('crafting-2', $unlocks) && in_array('hunt-1', $unlocks);
+                    return in_array('resource-2', $unlocks) && in_array('hunt-1', $unlocks);
                 },
             ],
         ],
