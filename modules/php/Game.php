@@ -1122,17 +1122,19 @@ class Game extends \Table
         $availableEquipment = array_keys($result['availableEquipment']);
 
         $resources = $this->gameData->getResources();
-        $result['availableEquipmentWithCost'] = array_filter($availableEquipment, function ($itemName) use ($resources) {
-            $item = $this->data->items[$itemName];
-            $hasResources = true;
-            foreach ($item['cost'] as $key => $value) {
-                $this->log($key, $value, $resources[$key]);
-                if ($resources[$key] < $value) {
-                    $hasResources = false;
+        $result['availableEquipmentWithCost'] = array_values(
+            array_filter($availableEquipment, function ($itemName) use ($resources) {
+                $item = $this->data->items[$itemName];
+                $hasResources = true;
+                foreach ($item['cost'] as $key => $value) {
+                    $this->log($key, $value, $resources[$key]);
+                    if ($resources[$key] < $value) {
+                        $hasResources = false;
+                    }
                 }
-            }
-            return $hasResources;
-        });
+                return $hasResources;
+            })
+        );
     }
     protected function getGameData(&$result): void
     {

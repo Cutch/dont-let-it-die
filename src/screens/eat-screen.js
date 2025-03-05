@@ -13,6 +13,7 @@ class EatScreen {
     this.game.selector.hide('eat');
   }
   show(gameData) {
+    this.foodSelected = null;
     if (gameData.characters && !gameData.characters.some((d) => d.name === 'Sig')) {
       gameData.eatableFoods = gameData.eatableFoods.filter((d) => !d['id'].includes('fish'));
     }

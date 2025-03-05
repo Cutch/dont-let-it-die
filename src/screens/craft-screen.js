@@ -13,6 +13,7 @@ class CraftScreen {
     this.game.selector.hide('craft');
   }
   show(gameData) {
+    this.itemSelected = null;
     let craftElem = document.querySelector(`#craft-items .items`);
     if (!craftElem) {
       this.game.selector.show('craft');
@@ -27,6 +28,7 @@ class CraftScreen {
     }
     craftElem.innerHTML = '';
     const renderItem = (name, elem, count, selectCallback) => {
+      const hasCost = gameData.availableEquipmentWithCost.includes(name);
       elem.insertAdjacentHTML(
         'beforeend',
         `<div class="token-number-counter ${name}">
@@ -35,6 +37,8 @@ class CraftScreen {
       );
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), this.game.data[name].options.name, () => selectCallback(count));
+      if (hasCost) document.querySelector(`#craft-screen .token.${name}`).classList.remove('disabled');
+      else document.querySelector(`#craft-screen .token.${name}`).classList.add('disabled');
     };
     Object.keys(gameData.availableEquipment).forEach((name) => {
       renderItem(
@@ -43,6 +47,7 @@ class CraftScreen {
         () => gameData.availableEquipment[name],
         (count) => {
           craftElem.querySelector(`.token-number-counter.${name} .counter`).innerHTML = count();
+
           if (this.itemSelected) {
             document.querySelector(`#craft-screen .token.${this.itemSelected} .card`).style['outline'] = '';
           }

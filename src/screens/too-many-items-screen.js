@@ -13,6 +13,7 @@ class TooManyItemsScreen {
     this.game.selector.hide('tooManyItems');
   }
   show(gameData) {
+    this.itemSelected = null;
     let tmiElem = document.querySelector(`#tmi-items .items`);
     if (!tmiElem) {
       this.game.selector.show('tooManyItems');

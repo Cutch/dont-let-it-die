@@ -1,3 +1,20 @@
 #craft-screen {
   margin-top: 1rem;
+  .items-card {
+    position: relative;
+  }
+  .disabled {
+    .counter {
+      background-color: rgba(0, 0, 0, 0.369);
+    }
+    .card::after {
+      content: '';
+      background-color: #7e7e7e;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  }
 }

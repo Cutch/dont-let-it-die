@@ -13,6 +13,7 @@ class TokenScreen {
     this.game.selector.hide('tokens');
   }
   show(gameData) {
+    this.tokenSelected = null;
     let tokenElem = document.querySelector(`#resource .tokens`);
     if (!tokenElem) {
       this.game.selector.show('tokens');

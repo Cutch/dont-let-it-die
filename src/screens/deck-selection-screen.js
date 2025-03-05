@@ -13,6 +13,7 @@ class DeckSelectionScreen {
     this.game.selector.hide('deckSelection');
   }
   show(gameData) {
+    this.itemSelected = null;
     const deckScaling = {
       'day-event': 2,
       'mental-hindrance': 2,

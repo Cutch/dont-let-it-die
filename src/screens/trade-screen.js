@@ -48,6 +48,8 @@ class TradeScreen {
     this.game.selector.hide('trade');
   }
   show(gameData) {
+    this.resourceRequested = null;
+    this.resourceRequested = null;
     this.updateFunctions = [];
     this.tradeRatio = gameData.tradeRatio;
     let tradeElem = document.querySelector(`#trade-resource .tokens`);
