@@ -60,6 +60,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         'fkp',
       ];
     },
+    getResourcesForDisplay: function (gameData) {
+      if (gameData.characters && !gameData.characters.some((d) => d.name === 'Sig'))
+        return this.resourcesForDisplay.filter((d) => !d.includes('fish'));
+      else return this.resourcesForDisplay;
+    },
 
     /*
           setup:
@@ -78,10 +83,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       console.log(gameData);
       if (gameData.gamestate.name === 'characterSelect')
         document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
-      else {
-        if (gameData.characters && !gameData.characters.some((d) => d.name === 'Sig'))
-          this.resourcesForDisplay = this.resourcesForDisplay.filter((d) => !d.includes('fish'));
-      }
+
       const scale = 3;
       Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character, i) => {
         // Player side board
@@ -268,7 +270,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         sharedElem = document.querySelector(`#shared-resource-container .tokens`);
       }
       sharedElem.innerHTML = '';
-      this.resourcesForDisplay.forEach((name) => this.updateResource(name, sharedElem, gameData.game['resources'][name] ?? 0));
+      const resourcesForDisplay = this.getResourcesForDisplay(gameData);
+      resourcesForDisplay.forEach((name) => this.updateResource(name, sharedElem, gameData.game['resources'][name] ?? 0));
 
       // Available Resource Pool
       let availableElem = document.querySelector(`#discoverable-container .tokens`);
@@ -284,7 +287,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         availableElem = document.querySelector(`#discoverable-container .tokens`);
       }
       availableElem.innerHTML = '';
-      this.resourcesForDisplay
+      resourcesForDisplay
         .filter((elem) => !elem.includes('-cooked'))
         .forEach((name) => this.updateResource(name, availableElem, gameData.resourcesAvailable?.[name] ?? 0));
       // this.resourcesForDisplay.forEach((name) => {
@@ -310,7 +313,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           prevResources['fireWood'] - gameData.game['resources']['fireWood'],
         );
       }
-      this.resourcesForDisplay.forEach((name) => {
+      resourcesForDisplay.forEach((name) => {
         if (prevResources[name] != null && prevResources[name] < gameData.game['resources'][name]) {
           // Discard to Shared Resources
           this.tweening.addTween(

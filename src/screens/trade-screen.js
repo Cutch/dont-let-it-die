@@ -64,8 +64,9 @@ class TradeScreen {
     let tradeElem = document.querySelector(`#trade-resource .tokens`);
     let tradeForElem = document.querySelector(`#trade-for .tokens`);
     if (!tradeElem) {
-      this.resourceSelected = this.game.resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
-      this.resourceRequested = this.game.resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
+      const resourcesForDisplay = this.game.getResourcesForDisplay(gameData);
+      this.resourceSelected = resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
+      this.resourceRequested = resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
       this.game.selector.show('trade');
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',

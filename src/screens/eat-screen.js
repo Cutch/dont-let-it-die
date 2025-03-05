@@ -28,8 +28,9 @@ class EatScreen {
     }
     let eatElem = document.querySelector(`#eat-resource .tokens`);
     if (!eatElem) {
-      this.resourceSelected = this.game.resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
-      this.resourceRequested = this.game.resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
+      const resourcesForDisplay = this.game.getResourcesForDisplay(gameData);
+      this.resourceSelected = resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
+      this.resourceRequested = resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
       this.game.selector.show('eat');
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
