@@ -1119,6 +1119,20 @@ class Game extends \Table
                 return $d['count'] - (array_key_exists($d['id'], $result['builtEquipment']) ? $result['builtEquipment'][$d['id']] : 0);
             }, $selectable)
         );
+        $availableEquipment = array_keys($result['availableEquipment']);
+
+        $resources = $this->gameData->getResources();
+        $result['availableEquipmentWithCost'] = array_filter($availableEquipment, function ($itemName) use ($resources) {
+            $item = $this->data->items[$itemName];
+            $hasResources = true;
+            foreach ($item['cost'] as $key => $value) {
+                $this->log($key, $value, $resources[$key]);
+                if ($resources[$key] < $value) {
+                    $hasResources = false;
+                }
+            }
+            return $hasResources;
+        });
     }
     protected function getGameData(&$result): void
     {
@@ -1380,6 +1394,11 @@ class Game extends \Table
         $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
             $data['health'] = 2;
         });
+    }
+    public function maxCraftLevel()
+    {
+        $craftingLevel = $this->gameData->get('craftingLevel');
+        $this->gameData->set('craftingLevel', max($craftingLevel, 3));
     }
     public function drawNightCard()
     {

@@ -224,15 +224,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               renderImage(tool.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
             });
           }
-
           const item3 = equipments.find((d) => !renderedItems.includes(d));
           if (item3) {
             renderedItems.push(item3);
-            renderImage(item3.id, document.querySelector(`#player-${character.name} > .${item3.options.itemType}`), {
+            renderImage(item3.id, document.querySelector(`#player-${character.name} > .slot3`), {
               scale: scale / 2,
               pos: 'replace',
             });
-            addClickListener(document.querySelector(`#player-${character.name} > .${item3.options.itemType}`), item3.options.name, () => {
+            addClickListener(document.querySelector(`#player-${character.name} > .slot3`), item3.options.name, () => {
               this.tooltip.show();
               renderImage(item3.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
             });
@@ -536,6 +535,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.setupCharacterSelections(gameData);
       this.setupBoard(gameData);
       this.dice = new Dice(document.getElementById('board-container'));
+      window.dice = this.dice;
       // this.dice.roll(5);
       // renderImage(`board`, playArea);
       this.updateTrack(gameData);
