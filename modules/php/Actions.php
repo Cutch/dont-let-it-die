@@ -12,14 +12,13 @@ class Actions
     private Game $game;
     public function __construct(Game $game)
     {
-        $_this = $this;
         $this->actions = addId([
             'actSpendFKP' => [
                 'state' => ['playerTurn'],
                 'stamina' => 0,
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
-                    $array = $_this->getActionSelectable($action['id']);
+                'requires' => function (Game $game, $action) {
+                    $array = $this->getActionSelectable($action['id']);
                     $variables = $game->gameData->getResources(...$array);
                     $resourceCount = array_sum(
                         array_map(function ($type) use ($variables) {
@@ -41,12 +40,12 @@ class Actions
                 'state' => ['playerTurn'],
                 'stamina' => 0,
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
+                'requires' => function (Game $game, $action) {
                     $variables = $game->gameData->getResources();
-                    $array = $_this->getActionSelectable($action['id']);
+                    $array = $this->getActionSelectable($action['id']);
                     $array = array_filter(
                         $array,
-                        function ($v) use ($variables, $_this) {
+                        function ($v) use ($variables) {
                             if (array_key_exists($v['id'], $variables)) {
                                 return $v['actEat']['count'] <= $variables[$v['id']];
                             }
@@ -71,7 +70,7 @@ class Actions
                 'state' => ['playerTurn'],
                 'stamina' => 0,
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
+                'requires' => function (Game $game, $action) {
                     $wood = $game->gameData->getResource('wood');
                     return $wood > 0;
                 },
@@ -80,8 +79,8 @@ class Actions
                 'state' => ['playerTurn'],
                 'stamina' => 1,
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
-                    $array = $_this->getActionSelectable($action['id']);
+                'requires' => function (Game $game, $action) {
+                    $array = $this->getActionSelectable($action['id']);
                     $variables = $game->gameData->getResources();
                     $count = 0;
                     foreach ($array as $key => $value) {
@@ -99,8 +98,8 @@ class Actions
                 'state' => ['playerTurn'],
                 'stamina' => 1,
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
-                    $array = $_this->getActionSelectable($action['id']);
+                'requires' => function (Game $game, $action) {
+                    $array = $this->getActionSelectable($action['id']);
                     $variables = $game->gameData->getResources();
                     $count = 0;
                     foreach ($array as $key => $value) {
@@ -134,7 +133,7 @@ class Actions
                 'state' => ['playerTurn'],
                 'stamina' => 3,
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
+                'requires' => function (Game $game, $action) {
                     return sizeof(
                         array_filter($game->character->getActiveEquipment(), function ($data) {
                             return $data['itemType'] == 'tool' && !in_array($data['id'], ['mortar-and-pestle', 'bandage']);
@@ -146,7 +145,7 @@ class Actions
                 'state' => ['playerTurn'],
                 'stamina' => 3,
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
+                'requires' => function (Game $game, $action) {
                     return sizeof(
                         array_filter($game->character->getActiveEquipment(), function ($data) {
                             return $data['itemType'] == 'weapon';
@@ -186,25 +185,25 @@ class Actions
                 'stamina' => 3,
             ],
             'actUseSkill' => [
-                'getState' => function () use ($_this) {
+                'getState' => function () {
                     $states = [];
-                    foreach ($_this->getAvailableCharacterSkills() as $skill) {
+                    foreach ($this->getAvailableCharacterSkills() as $skill) {
                         if (array_key_exists('state', $skill)) {
                             array_push($states, ...$skill['state']);
                         }
                     }
-                    $_this->game->log('$states', $states);
+                    $this->game->log('$states', $states);
                     return $states;
                 },
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
-                    return sizeof($_this->getAvailableCharacterSkills()) > 0;
+                'requires' => function (Game $game, $action) {
+                    return sizeof($this->getAvailableCharacterSkills()) > 0;
                 },
             ],
             'actUseItem' => [
-                'getState' => function () use ($_this) {
+                'getState' => function () {
                     $states = [];
-                    foreach ($_this->getAvailableCharacterSkills() as $skill) {
+                    foreach ($this->getAvailableCharacterSkills() as $skill) {
                         if (array_key_exists('state', $skill)) {
                             array_push($states, ...$skill['state']);
                         }
@@ -212,35 +211,35 @@ class Actions
                     return $states;
                 },
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
-                    return sizeof($_this->getAvailableItemSkills()) > 0;
+                'requires' => function (Game $game, $action) {
+                    return sizeof($this->getAvailableItemSkills()) > 0;
                 },
             ],
             'actEquipItem' => [
                 'state' => ['tradePhase'],
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
+                'requires' => function (Game $game, $action) {
                     return sizeof($game->gameData->get('campEquipment')) > 0;
                 },
             ],
             'actUnEquipItem' => [
                 'state' => ['tradePhase'],
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
+                'requires' => function (Game $game, $action) {
                     return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
                 },
             ],
             'actTradeItem' => [
                 'state' => ['tradePhase'],
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
+                'requires' => function (Game $game, $action) {
                     return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
                 },
             ],
             'actConfirmTradeItem' => [
                 'state' => ['tradePhase'],
                 'type' => 'action',
-                'requires' => function (Game $game, $action) use ($_this) {
+                'requires' => function (Game $game, $action) {
                     return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
                 },
             ],

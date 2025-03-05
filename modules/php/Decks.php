@@ -28,9 +28,8 @@ class Decks
     }
     public function getAllDeckNames(): array
     {
-        $_this = $this;
-        return array_filter(self::$decksNames, function ($name) use ($_this) {
-            return array_key_exists($name . '-back', $_this->game->data->decks);
+        return array_filter(self::$decksNames, function ($name) {
+            return array_key_exists($name . '-back', $this->game->data->decks);
         });
     }
     public function setup()

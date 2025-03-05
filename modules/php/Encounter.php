@@ -60,7 +60,7 @@ class Encounter
             __FUNCTION__,
             func_get_args(),
             [$this->game->hooks, 'onEncounter'],
-            function ($_this) {
+            function (Game $_this) {
                 $card = $_this->gameData->get('state')['card'];
                 $tools = array_filter($_this->character->getActiveEquipment(), function ($item) {
                     return array_key_exists('onEncounter', $item) && !(!array_key_exists('requires', $item) || $item['requires']($item));

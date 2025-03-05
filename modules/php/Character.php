@@ -80,9 +80,8 @@ class Character
     {
         $turnOrder = $this->game->gameData->get('turnOrder');
         $turnOrder = array_values(array_filter($turnOrder));
-        $_this = $this;
-        return array_map(function ($char) use ($_this, $_skipHooks) {
-            return $_this->getCharacterData($char, $_skipHooks);
+        return array_map(function ($char) use ($_skipHooks) {
+            return $this->getCharacterData($char, $_skipHooks);
         }, $turnOrder);
     }
     public function getCalculatedData($characterData, $_skipHooks = false): array
