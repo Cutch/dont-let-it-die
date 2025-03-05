@@ -9,6 +9,15 @@ class EatScreen {
   hasError() {
     return this.error;
   }
+  scroll() {
+    const { y, height } = this.eatElem.getBoundingClientRect();
+    this.arrowElem.style['top'] = `calc(${Math.max(
+      0,
+      window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2,
+    )}px / var(--bga-game-zoom, 1))`;
+    this.arrowElem.style['display'] =
+      Math.max(0, window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2) == 0 ? 'none' : '';
+  }
   hide() {
     this.game.selector.hide('eat');
   }
@@ -27,9 +36,14 @@ class EatScreen {
         `<div id="eat-screen" class="dlid__container">
               <div class="error"></div>
               <div id="eat-resource" class="dlid__container"><h3>${_('Food')}</h3><div class="tokens"></div></div>
+            <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
           </div>`,
       );
       eatElem = document.querySelector(`#eat-resource .tokens`);
+      this.eatElem = eatElem;
+      this.arrowElem = document.querySelector(`#eat-screen .arrow`);
+      this.arrowElem.style['display'] = 'none';
+      this.cleanup = addPassiveListener('scroll', () => this.scroll());
     }
     eatElem.innerHTML = '';
     const renderResource = (food, elem, selectCallback) => {

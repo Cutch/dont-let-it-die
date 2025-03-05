@@ -9,6 +9,15 @@ class TokenScreen {
   hasError() {
     return this.error;
   }
+  scroll() {
+    const { y, height } = this.tokenElem.getBoundingClientRect();
+    this.arrowElem.style['top'] = `calc(${Math.max(
+      0,
+      window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2,
+    )}px / var(--bga-game-zoom, 1))`;
+    this.arrowElem.style['display'] =
+      Math.max(0, window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2) == 0 ? 'none' : '';
+  }
   hide() {
     this.game.selector.hide('tokens');
   }
@@ -22,9 +31,14 @@ class TokenScreen {
         `<div id="token-screen" class="dlid__container">
             <div class="error"></div>
             <div id="resource" class="dlid__container"><h3>${_(gameData?.title ?? 'Your Resources')}</h3><div class="tokens"></div></div>
+            <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
       );
       tokenElem = document.querySelector(`#resource .tokens`);
+      this.tokenElem = tokenElem;
+      this.arrowElem = document.querySelector(`#token-screen .arrow`);
+      this.arrowElem.style['display'] = 'none';
+      this.cleanup = addPassiveListener('scroll', () => this.scroll());
     }
     tokenElem.innerHTML = '';
     const renderItem = (name, elem, count, selectCallback) => {

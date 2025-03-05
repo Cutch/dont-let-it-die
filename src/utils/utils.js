@@ -11,3 +11,24 @@ function uuidv4() {
     return v.toString(16);
   });
 }
+// try to handle passive events
+let passiveEventSupported = false;
+try {
+  const opts = Object.defineProperty({}, 'passive', {
+    get() {
+      passiveEventSupported = true;
+    },
+  });
+  window.addEventListener('test', null, opts);
+} catch (e) {}
+// if they are supported, setup the optional params
+// FALSE doubles as the default CAPTURE value
+
+const passiveEvent = passiveEventSupported ? { capture: false, passive: true } : false;
+
+const addPassiveListener = (type, callback) => {
+  window.addEventListener(type, callback, passiveEvent);
+  return () => {
+    window.removeEventListener(type, callback, passiveEvent);
+  };
+};

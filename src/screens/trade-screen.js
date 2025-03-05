@@ -44,6 +44,15 @@ class TradeScreen {
       if (plusElem.classList.contains('disabled')) plusElem.classList.remove('disabled');
     }
   }
+  scroll() {
+    const { y, height } = this.tradeContent.getBoundingClientRect();
+    this.arrowElem.style['top'] = `calc(${Math.max(
+      0,
+      window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2,
+    )}px / var(--bga-game-zoom, 1))`;
+    this.arrowElem.style['display'] =
+      Math.max(0, window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2) == 0 ? 'none' : '';
+  }
   hide() {
     this.game.selector.hide('trade');
   }
@@ -62,12 +71,19 @@ class TradeScreen {
         'beforeend',
         `<div id="trade-screen" class="dlid__container">
             <div class="error"></div>
-            <div id="trade-resource" class="dlid__container"><h3>${_('Your Resources')}</h3><div class="tokens"></div></div>
-            <div id="trade-for" class="dlid__container"><h3>${_('Trade For')}</h3><div class="tokens"></div></div>
+            <div id="trade-body">
+              <div id="trade-resource" class="dlid__container"><h3>${_('Your Resources')}</h3><div class="tokens"></div></div>
+              <div id="trade-for" class="dlid__container"><h3>${_('Trade For')}</h3><div class="tokens"></div></div>
+            </div>
+            <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
       );
       tradeElem = document.querySelector(`#trade-resource .tokens`);
       tradeForElem = document.querySelector(`#trade-for .tokens`);
+      this.tradeContent = document.querySelector(`#trade-body`);
+      this.arrowElem = document.querySelector(`#trade-screen .arrow`);
+      this.arrowElem.style['display'] = 'none';
+      this.cleanup = addPassiveListener('scroll', () => this.scroll());
     }
     tradeElem.innerHTML = '';
     tradeForElem.innerHTML = '';

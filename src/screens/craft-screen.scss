@@ -1,15 +1,16 @@
 #craft-screen {
   margin-top: 1rem;
+  overflow: hidden;
   .items-card {
     position: relative;
   }
   .disabled {
     .counter {
-      background-color: rgba(0, 0, 0, 0.369);
+      background-color: #7e7e7e;
     }
     .card::after {
       content: '';
-      background-color: #7e7e7e;
+      background-color: rgba(0, 0, 0, 0.369);
       position: absolute;
       top: 0;
       bottom: 0;

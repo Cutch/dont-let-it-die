@@ -1,12 +1,13 @@
 #eat-screen {
   margin-top: 1rem;
+  overflow: hidden;
   .tokens {
     gap: 1em;
     margin: 2em;
   }
   .token-block {
     font-size: 18px;
-    background-color: #fff;
+    background-color: #eee;
     border-radius: 10px;
     display: flex;
     flex-flow: column wrap;

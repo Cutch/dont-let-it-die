@@ -11,6 +11,16 @@ class CraftScreen {
   }
   hide() {
     this.game.selector.hide('craft');
+    if (this.cleanup) this.cleanup();
+  }
+  scroll() {
+    const { y, height } = document.querySelector(`#craft-items .items`).getBoundingClientRect();
+    this.arrowElem.style['top'] = `calc(${Math.max(
+      0,
+      window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2,
+    )}px / var(--bga-game-zoom, 1))`;
+    this.arrowElem.style['display'] =
+      Math.max(0, window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2) == 0 ? 'none' : '';
   }
   show(gameData) {
     this.itemSelected = null;
@@ -22,9 +32,14 @@ class CraftScreen {
         `<div id="craft-screen" class="dlid__container">
             <div class="error"></div>
             <div id="craft-items" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div></div>
+            <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
       );
       craftElem = document.querySelector(`#craft-items .items`);
+      this.craftElem = craftElem;
+      this.arrowElem = document.querySelector(`#craft-screen .arrow`);
+      this.arrowElem.style['display'] = 'none';
+      this.cleanup = addPassiveListener('scroll', () => this.scroll());
     }
     craftElem.innerHTML = '';
     const renderItem = (name, elem, count, selectCallback) => {
