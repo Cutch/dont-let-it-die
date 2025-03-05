@@ -44,61 +44,79 @@
     transform: translate(-50%, -50%) rotateX(900deg) rotateZ(-900deg);
   }
 
-  .side {
+  .side-wrapper {
     position: absolute;
-    background-color: #ca9163;
-    // border-radius: 3em;
+    background-color: #9d674b;
     width: 10em;
     height: 10em;
-    box-shadow: inset 0px 0px 10px 2px black;
-    // border: 1px solid #e5e5e5;
-    // text-align: center;
     line-height: 2em;
     transform-style: preserve-3d;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    box-shadow: inset 0px 0px 10px 0px #ffffff61;
   }
-  .image {
-    background-image: url(img/dice-spritesheet.png);
-    background-size: cover;
+
+  .side {
+    padding: 1em;
+    background-color: #ca9163;
+    box-shadow: inset 0px 0px 10px 2px #512d11;
     border-radius: 50%;
     width: 100%;
     height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .side.one {
+  .image {
+    background-image: url(img/dice-spritesheet.png);
+    width: 50px;
+    height: 50px;
+  }
+  .side-wrapper.one {
     transform: translateZ(4.8em);
     .image {
       background-image: unset;
     }
   }
-  .side.two {
+  .side-wrapper.two {
     transform: rotateY(-180deg) translateZ(4.8em);
     .image {
-      background-position: -20em 0px;
+      background-position: -100px 0px;
+      background-size: 150px 50px;
+      // background-position: -20em 0px;
     }
   }
-  .side.three {
+  .side-wrapper.three {
     transform: rotateY(-90deg) translateZ(4.8em);
     .image {
-      background-position: -20em 0px;
+      background-position: -100px 0px;
+      background-size: 150px 50px;
     }
   }
-  .side.four {
+  .side-wrapper.four {
     transform: rotateX(90deg) translateZ(4.8em);
     .image {
-      background-position: -20em 0px;
+      background-position: -100px 0px;
+      background-size: 150px 50px;
     }
   }
-  .side.five {
+  .side-wrapper.five {
     transform: rotateX(-90deg) translateZ(4.8em);
     .image {
       background-position: 0px 0px;
+      background-size: 150px 50px;
     }
   }
-  .side.six {
+  .side-wrapper.six {
     transform: rotateY(90deg) translateZ(4.8em);
     .image {
-      background-position: -10em 0px;
+      background-position: -200px 0px;
+      background-size: 150px 50px;
     }
   }
+  // .corner {
+  //   transform: rotateX(45deg) rotateY(45deg);
+  //   background-color: #fff;
+  // }
 }

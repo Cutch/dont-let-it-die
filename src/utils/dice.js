@@ -6,9 +6,9 @@ class Dice {
     this.rolling = false;
     let html = `<div id="dice-container" class="dice-container"><div id='dice' class="dice">`;
     for (let i = 1; i <= 6; i++) {
-      html += `<div class="side ${sideNames[i - 1]}">`;
+      html += `<div class="side-wrapper ${sideNames[i - 1]}"><div class="side">`;
       html += `<div class="image"></div>`;
-      html += `</div>`;
+      html += `</div></div>`;
     }
     html += `</div></div>`;
     this.div.insertAdjacentHTML('beforeend', html);

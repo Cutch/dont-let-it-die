@@ -1127,7 +1127,6 @@ class Game extends \Table
                 $item = $this->data->items[$itemName];
                 $hasResources = true;
                 foreach ($item['cost'] as $key => $value) {
-                    $this->log($key, $value, $resources[$key]);
                     if ($resources[$key] < $value) {
                         $hasResources = false;
                     }
