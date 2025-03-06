@@ -1,0 +1,41 @@
+#item-trade-screen {
+  padding: 2rem 1rem;
+  overflow: hidden;
+}
+
+#item-trade-screen-content {
+  display: flex;
+  gap: 2rem;
+  flex-flow: column;
+  .dlid__container {
+    background-color: #7e7e7e8f;
+    padding: 1rem 2rem;
+    margin: 0;
+  }
+  .items-card {
+    position: relative;
+  }
+  .disabled {
+    .counter {
+      background-color: #7e7e7e;
+    }
+    .card::after {
+      content: '';
+      background-color: rgba(0, 0, 0, 0.369);
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  }
+  .player-item-container {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 2rem;
+  }
+  .discard {
+    width: 5rem;
+    height: 5rem;
+  }
+}

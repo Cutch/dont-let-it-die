@@ -1,13 +1,12 @@
 class TokenScreen {
   constructor(game) {
     this.game = game;
-    this.error = false;
   }
   getSelectedId() {
     return this.tokenSelected;
   }
   hasError() {
-    return this.error;
+    return false;
   }
   scroll() {
     const { y, height } = this.tokenElem.getBoundingClientRect();
@@ -29,7 +28,6 @@ class TokenScreen {
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="token-screen" class="dlid__container">
-            <div class="error"></div>
             <div id="resource" class="dlid__container"><h3>${_(gameData?.title ?? 'Your Resources')}</h3><div class="tokens"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,

@@ -215,33 +215,16 @@ class Actions
                     return sizeof($this->getAvailableItemSkills()) > 0;
                 },
             ],
-            'actEquipItem' => [
-                'state' => ['tradePhase'],
-                'type' => 'action',
-                'requires' => function (Game $game, $action) {
-                    return sizeof($game->gameData->get('campEquipment')) > 0;
-                },
-            ],
-            'actUnEquipItem' => [
-                'state' => ['tradePhase'],
-                'type' => 'action',
-                'requires' => function (Game $game, $action) {
-                    return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
-                },
-            ],
             'actTradeItem' => [
                 'state' => ['tradePhase'],
                 'type' => 'action',
-                'requires' => function (Game $game, $action) {
-                    return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
-                },
+                // 'requires' => function (Game $game, $action) {
+                //     return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
+                // },
             ],
             'actConfirmTradeItem' => [
                 'state' => ['tradePhase'],
                 'type' => 'action',
-                'requires' => function (Game $game, $action) {
-                    return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
-                },
             ],
         ]);
         $this->game = $game;

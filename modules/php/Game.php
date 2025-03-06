@@ -200,14 +200,17 @@ class Game extends \Table
         ?string $character3 = null,
         ?string $character4 = null
     ): void {
+        $this->character->addExtraTime(30);
         $this->characterSelection->actCharacterClicked($character1, $character2, $character3, $character4);
     }
     public function actChooseCharacters(): void
     {
+        $this->character->addExtraTime();
         $this->characterSelection->actChooseCharacters();
     }
     public function actCook(array $type): void
     {
+        $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actCook', null, $type);
         $this->adjustResource($type, -1);
         $this->adjustResource($type . '-cooked', 1);
@@ -221,6 +224,7 @@ class Game extends \Table
     }
     public function actSpendFKP(string $knowledgeId): void
     {
+        $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actSpendFKP', null);
 
         $resources = $this->actions->getActionSelectable('actSpendFKP');
@@ -257,6 +261,7 @@ class Game extends \Table
     }
     public function actCraft(?string $itemName = null): void
     {
+        $this->character->addExtraTime();
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),
@@ -311,19 +316,29 @@ class Game extends \Table
                             return $d['itemType'];
                         }, $character['equipment'])
                     );
-                    if (
+                    $hasOpenSlots =
                         (array_key_exists($itemType, $slotsAllowed) ? $slotsAllowed[$itemType] : 0) -
                             (array_key_exists($itemType, $slotsUsed) ? $slotsUsed[$itemType] : 0) >
-                        0
-                    ) {
+                        0;
+                    $hasDuplicateTool =
+                        sizeof(
+                            array_filter($character['equipment'], function ($d) use ($itemName) {
+                                return $d['id'] == $itemName;
+                            })
+                        ) > 0;
+                    if ($hasOpenSlots && !$hasDuplicateTool) {
                         $_this->character->equipEquipment($character['id'], [$itemId]);
                     } else {
                         $existingItems = array_map(
                             function ($d) {
                                 return ['name' => $d['id'], 'itemId' => $d['itemId']];
                             },
-                            array_filter($character['equipment'], function ($d) use ($itemType) {
-                                return $d['itemType'] == $itemType;
+                            array_filter($character['equipment'], function ($d) use ($itemType, $hasDuplicateTool, $itemName) {
+                                if ($hasDuplicateTool) {
+                                    return $d['id'] == $itemName;
+                                } else {
+                                    return $d['itemType'] == $itemType;
+                                }
                             })
                         );
                         $_this->gameData->set('state', [
@@ -342,6 +357,7 @@ class Game extends \Table
     }
     public function actSendToCamp(?int $sendToCampId = null): void
     {
+        $this->character->addExtraTime();
         if (!$sendToCampId) {
             throw new BgaUserException($this->translate('Select an item'));
         }
@@ -382,6 +398,7 @@ class Game extends \Table
     }
     public function actSelectResource(?string $resourceType = null): void
     {
+        $this->character->addExtraTime();
         if (!$resourceType) {
             throw new BgaUserException($this->translate('Select a resource'));
         }
@@ -412,6 +429,7 @@ class Game extends \Table
     }
     public function actSelectResourceCancel(): void
     {
+        $this->character->addExtraTime();
         if (!$this->actInterrupt->onInterruptCancel()) {
             // var_dump('actSelectResourceCancel playerTurn');
             $this->gamestate->nextState('playerTurn');
@@ -419,6 +437,7 @@ class Game extends \Table
     }
     public function actSelectDeck(?string $deckName = null): void
     {
+        $this->character->addExtraTime();
         if (!$deckName) {
             throw new BgaUserException($this->translate('Select a deck'));
         }
@@ -427,12 +446,14 @@ class Game extends \Table
     }
     public function actSelectDeckCancel(): void
     {
+        $this->character->addExtraTime();
         if (!$this->actInterrupt->onInterruptCancel()) {
             $this->gamestate->nextState('playerTurn');
         }
     }
     public function actTrade(#[JsonParam] array $data): void
     {
+        $this->character->addExtraTime();
         extract($data);
         $this->actions->validateCanRunAction('actTrade');
         $offeredSum = 0;
@@ -479,6 +500,7 @@ class Game extends \Table
 
     public function actEat(string $resourceType): void
     {
+        $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actEat', null, $resourceType);
         $tokenData = $this->data->tokens[$resourceType];
         $data = ['type' => $resourceType, ...$tokenData['actEat']];
@@ -503,6 +525,7 @@ class Game extends \Table
     }
     public function actAddWood(): void
     {
+        $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actAddWood');
         extract($this->gameData->getResources('fireWood', 'wood'));
         $this->gameData->setResource('fireWood', min($fireWood + 1, $this->data->tokens['wood']['count']));
@@ -520,6 +543,7 @@ class Game extends \Table
             [$this->hooks, 'onUseSkill'],
             function (Game $_this) use ($skillId) {
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
+                $this->character->addExtraTime();
                 $_this->actions->validateCanRunAction('actUseSkill', $skillId);
                 $res = $_this->character->getSkill($skillId);
                 $skill = $res['skill'];
@@ -567,6 +591,7 @@ class Game extends \Table
     public function actUseItem(string $skillId): void
     {
         $this->character->setSubmittingCharacter('actUseItem', $skillId);
+        $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actUseItem', $skillId);
         $character = $this->character->getSubmittingCharacter();
         $skills = $this->character->getActiveEquipmentSkills();
@@ -626,33 +651,9 @@ class Game extends \Table
         }
         $this->actDraw('hunt');
     }
-    public function actInvestigateFire(): void
-    {
-        // var_dump(json_encode(['actInvestigateFire']));
-        $this->actInterrupt->interruptableFunction(
-            __FUNCTION__,
-            func_get_args(),
-            [$this->hooks, 'onInvestigateFire'],
-            function (Game $_this) {
-                $_this->actions->validateCanRunAction('actInvestigateFire');
-                $character = $_this->character->getSubmittingCharacter();
-                $roll = $_this->rollFireDie($character['character_name']);
-                return ['roll' => $roll];
-            },
-            function (Game $_this, bool $finalizeInterrupt, $data) {
-                // var_dump(json_encode(['actInvestigateFire', $data]));
-                if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
-                    $_this->actions->spendActionCost('actInvestigateFire');
-                }
-                $_this->adjustResource('fkp', $data['roll']);
-                $this->notify->all('tokenUsed', '', [
-                    'gameData' => $this->getAllDatas(),
-                ]);
-            }
-        );
-    }
     public function actDraw(string $deck): void
     {
+        $this->character->addExtraTime();
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),
@@ -677,11 +678,34 @@ class Game extends \Table
             }
         );
     }
+    public function actInvestigateFire(): void
+    {
+        $this->character->addExtraTime();
+        // var_dump(json_encode(['actInvestigateFire']));
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onInvestigateFire'],
+            function (Game $_this) {
+                $_this->actions->validateCanRunAction('actInvestigateFire');
+                $character = $_this->character->getSubmittingCharacter();
+                $roll = $_this->rollFireDie($character['character_name']);
+                return ['roll' => $roll];
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                // var_dump(json_encode(['actInvestigateFire', $data]));
+                if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
+                    $_this->actions->spendActionCost('actInvestigateFire');
+                }
+                $_this->adjustResource('fkp', $data['roll']);
+                $this->notify->all('tokenUsed', '', [
+                    'gameData' => $this->getAllDatas(),
+                ]);
+            }
+        );
+    }
     public function actEndTurn(): void
     {
-        // Retrieve the active player ID.
-        $playerId = (int) $this->getActivePlayerId();
-
         // Notify all players about the choice to pass.
         $this->activeCharacterEventLog('ends their turn');
 
@@ -690,6 +714,7 @@ class Game extends \Table
     }
     public function actDone(): void
     {
+        $this->character->addExtraTime();
         $stateName = $this->gamestate->state()['name'];
         if ($stateName == 'postEncounter') {
             $this->gamestate->nextState('playerTurn');
@@ -923,7 +948,7 @@ class Game extends \Table
                 $this->gamestate->nextState('nightPhase');
                 break;
             } else {
-                $this->character->activateNextCharacter();
+                $playerId = $this->character->activateNextCharacter();
                 if ($this->character->getActiveHealth() == 0) {
                     $this->notify->all('playerTurn', clienttranslate('${character_name} is incapacitated'), []);
                 } else {
@@ -1012,8 +1037,11 @@ class Game extends \Table
     }
     public function stTradePhase()
     {
-        $this->gameData->setAllMultiActiveCharacter();
-        // $this->gamestate->nextState('playerTurn');
+        if (sizeof($this->getCraftedItems()) == 0) {
+            $this->gamestate->nextState('playerTurn');
+        } else {
+            $this->gameData->setAllMultiActiveCharacter();
+        }
     }
 
     /**
@@ -1099,11 +1127,15 @@ class Game extends \Table
     {
         $result['builtEquipment'] = $this->getCraftedItems();
         $items = $this->gameData->getItems();
-        $result['campEquipment'] = array_count_values(
+        $result['campEquipmentCounts'] = array_count_values(
             array_map(function ($d) use ($items) {
                 return $items[$d];
             }, $this->gameData->get('campEquipment'))
         );
+        $result['campEquipment'] = array_map(function ($d) use ($items) {
+            return ['name' => $items[$d], 'itemId' => $d];
+        }, $this->gameData->get('campEquipment'));
+
         $result['eatableFoods'] = array_map(function ($eatable) {
             $data = [...$eatable['actEat'], 'id' => $eatable['id']];
             $this->hooks->onGetEatData($data);

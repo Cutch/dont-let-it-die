@@ -26,8 +26,10 @@ const actionMappings = {
   actAddWood: 'Add Wood',
   actEat: 'Eat',
   actCook: 'Cook',
-  actTrade: 'Trade',
+  actTrade: 'Trade Resources',
   actUseSkill: 'Use Skill',
+  actTradeItem: 'Request Trade',
+  actConfirmTradeItem: 'Confirm Trade',
 };
 define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], function (dojo, declare) {
   return declare('bgagame.dontletitdie', ebg.core.gamegui, {
@@ -41,6 +43,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.decks = {};
       this.deckSelectionScreen = new DeckSelectionScreen(this);
       this.tradeScreen = new TradeScreen(this);
+      this.itemTradeScreen = new ItemTradeScreen(this);
       this.craftScreen = new CraftScreen(this);
       this.eatScreen = new EatScreen(this);
       this.tokenScreen = new TokenScreen(this);
@@ -367,10 +370,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           );
         campElem = document.querySelector(`#camp-items-container .items`);
       }
-      document.getElementById('camp-items-container').style.display = Object.keys(gameData.campEquipment).length > 0 ? '' : 'none';
+      document.getElementById('camp-items-container').style.display = Object.keys(gameData.campEquipmentCounts).length > 0 ? '' : 'none';
       campElem.innerHTML = '';
-      Object.keys(gameData.campEquipment).forEach((name) => {
-        this.updateItem(name, campElem, gameData.campEquipment?.[name] ?? 0);
+      Object.keys(gameData.campEquipmentCounts).forEach((name) => {
+        this.updateItem(name, campElem, gameData.campEquipmentCounts?.[name] ?? 0);
       });
       // Shared Resource Pool
       // Available Resource Pool
@@ -610,6 +613,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           this.updateItems(args.args);
           this.updateKnowledgeTree(args.args);
           this.updateTrack(args.args);
+          break;
+        case 'tradePhase':
+          this.itemTradeScreen.show(args.args);
           break;
         // case 'nightDrawCard':
         // case 'drawCard':

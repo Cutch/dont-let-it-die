@@ -1,13 +1,12 @@
 class EatScreen {
   constructor(game) {
     this.game = game;
-    this.error = false;
   }
   getSelectedId() {
     return this.foodSelected;
   }
   hasError() {
-    return this.error;
+    return false;
   }
   scroll() {
     const { y, height } = this.eatElem.getBoundingClientRect();
@@ -35,7 +34,6 @@ class EatScreen {
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="eat-screen" class="dlid__container">
-              <div class="error"></div>
               <div id="eat-resource" class="dlid__container"><h3>${_('Food')}</h3><div class="tokens"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
           </div>`,

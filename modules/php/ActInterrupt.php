@@ -161,6 +161,7 @@ class ActInterrupt
     public function actInterrupt(string $skillId): void
     {
         $state = $this->getLatestInterruptState();
+        $this->game->character->addExtraTime();
         $this->game->log(['action' => 'actInterrupt', 'state' => $state]);
         if (!$state) {
             return;

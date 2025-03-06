@@ -1,13 +1,12 @@
 class DeckSelectionScreen {
   constructor(game) {
     this.game = game;
-    this.error = false;
   }
   getSelectedId() {
     return this.itemSelected;
   }
   hasError() {
-    return this.error;
+    return false;
   }
   scroll() {
     const { y, height } = this.deckSelectionElem.getBoundingClientRect();
@@ -34,7 +33,6 @@ class DeckSelectionScreen {
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="deck-selection-screen" class="dlid__container">
-            <div class="error"></div>
             <div id="deck-selection-screen" class="dlid__container"><h3>${_('Select a Deck')}</h3><div class="decks"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,

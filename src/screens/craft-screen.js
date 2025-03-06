@@ -1,13 +1,12 @@
 class CraftScreen {
   constructor(game) {
     this.game = game;
-    this.error = false;
   }
   getSelectedId() {
     return this.itemSelected;
   }
   hasError() {
-    return this.error;
+    return false;
   }
   hide() {
     this.game.selector.hide('craft');
@@ -30,7 +29,6 @@ class CraftScreen {
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="craft-screen" class="dlid__container">
-            <div class="error"></div>
             <div id="craft-items" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,

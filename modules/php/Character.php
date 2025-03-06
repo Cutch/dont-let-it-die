@@ -26,6 +26,10 @@ class Character
     {
         $this->game = $game;
     }
+    public function addExtraTime(?int $extraTime = null)
+    {
+        $this->game->giveExtraTime($this->getTurnCharacter()['player_id'], $extraTime);
+    }
     public function updateCharacterData($name, $callback)
     {
         // Pull from db if needed
@@ -251,7 +255,10 @@ class Character
         $playerId = (int) $this->game->getActivePlayerId();
         if ($playerId != $characterData['player_id']) {
             $this->game->gamestate->changeActivePlayer($characterData['player_id']);
+            $this->game->character->addExtraTime();
+            return $characterData['player_id'];
         }
+        return $playerId;
     }
     public function isLastCharacter()
     {
