@@ -169,7 +169,7 @@ class ItemTradeScreen {
       const itemsElem = document.querySelector(`#item-trade-screen__camp .items`);
       itemsElem.innerHTML = '';
       gameData.campEquipment.forEach((equipment) => {
-        renderImage(equipment.id, itemsElem, { scale: 1, pos: 'insert', css: `character-null item-${equipment.itemId}` });
+        renderImage(equipment.name, itemsElem, { scale: 1, pos: 'insert', css: `character-null item-${equipment.itemId}` });
         addClickListener(itemsElem.querySelector(`.item-${equipment.itemId}`), equipment.name, () => {
           this.updateSelection(null, equipment);
         });

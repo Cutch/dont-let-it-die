@@ -488,23 +488,57 @@ class Game extends \Table
                     throw new BgaUserException($this->translate('Select one item to trade'));
                 }
                 if ($sendToCamp) {
-                    $sendToCampId = $trade1['itemId'];
+                    $this->log($trade1, $trade2);
+                    $itemId1 = array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null;
+                    $itemId2 = array_key_exists('itemId', $trade2) ? $trade2['itemId'] : null;
 
-                    $character = $this->character->getCharacterData($trade1['character']);
+                    $character = $this->character->getCharacterData($trade1['character']['character_name']);
                     $characterItems = array_map(
                         function ($d) {
                             return $d['itemId'];
                         },
-                        array_filter($character['equipment'], function ($d) use ($sendToCampId) {
-                            return $d['itemId'] != $sendToCampId;
+                        array_filter($character['equipment'], function ($d) use ($itemId1) {
+                            return $d['itemId'] != $itemId1;
                         })
                     );
+                    if ($itemId2) {
+                        $result = $this->character->getItemValidations($itemId2, $trade1['character'], $itemId1);
+                        $hasOpenSlots = $result['hasOpenSlots'];
+                        $hasDuplicateTool = $result['hasDuplicateTool'];
+
+                        if (!$hasOpenSlots) {
+                            throw new BgaUserException($this->translate('There is no open slot for that item type'));
+                        }
+                        if ($hasDuplicateTool) {
+                            throw new BgaUserException($this->translate('Cannot of a duplicate tool'));
+                        }
+                        array_push($characterItems, $itemId2);
+                    }
+                    $campEquipment = array_filter($this->gameData->get('campEquipment'), function ($d) use ($itemId2) {
+                        return $d != $itemId2;
+                    });
+
+                    if ($itemId1) {
+                        array_push($campEquipment, $itemId1);
+                    }
+
                     $this->log('setCharacterEquipment', $characterItems);
                     $this->character->setCharacterEquipment($character['id'], $characterItems);
 
-                    $campEquipment = $this->gameData->get('campEquipment');
-                    $this->log('campEquipment', [...$campEquipment, $sendToCampId]);
-                    $this->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
+                    $this->log('campEquipment', $campEquipment);
+                    $this->gameData->set('campEquipment', $campEquipment);
+
+                    $items = $this->gameData->getItems();
+                    $_this->notify->all('updateGameData', clienttranslate('${character_name_1} traded an item with the camp'), [
+                        'character_name_1' => $this->getCharacterHTML($trade1['character']['id']),
+                        'gameData' => $_this->getAllDatas(),
+                        'itemId1' => array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null,
+                        'itemId2' => array_key_exists('itemId', $trade2) ? $trade2['itemId'] : null,
+                        'itemName1' => array_key_exists('itemId', $trade1) ? $items[$trade1['itemId']] : null,
+                        'itemName2' => array_key_exists('itemId', $trade2) ? $items[$trade2['itemId']] : null,
+                        'character1' => $trade1['character']['id'],
+                        'character2' => null,
+                    ]);
                     return null;
                 } else {
                     $this->log($trade1, $trade2);
