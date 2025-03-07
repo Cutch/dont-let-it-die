@@ -13,13 +13,7 @@ class CraftScreen {
     if (this.cleanup) this.cleanup();
   }
   scroll() {
-    const { y, height } = document.querySelector(`#craft-items .items`).getBoundingClientRect();
-    this.arrowElem.style['top'] = `calc(${Math.max(
-      0,
-      window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2,
-    )}px / var(--bga-game-zoom, 1))`;
-    this.arrowElem.style['display'] =
-      Math.max(0, window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2) == 0 ? 'none' : '';
+    scrollArrow(document.querySelector(`#craft-items .items`), this.arrowElem);
   }
   show(gameData) {
     this.itemSelected = null;
@@ -36,7 +30,7 @@ class CraftScreen {
       craftElem = document.querySelector(`#craft-items .items`);
       this.craftElem = craftElem;
       this.arrowElem = document.querySelector(`#craft-screen .arrow`);
-      this.arrowElem.style['display'] = 'none';
+      // this.arrowElem.style['display'] = 'none';
       this.cleanup = addPassiveListener('scroll', () => this.scroll());
     }
     craftElem.innerHTML = '';
@@ -71,5 +65,6 @@ class CraftScreen {
         },
       );
     });
+    this.scroll();
   }
 }

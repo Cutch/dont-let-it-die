@@ -1,5 +1,6 @@
 .clickable {
   cursor: pointer;
+  user-select: none;
 }
 .clickable.disabled {
   cursor: unset;

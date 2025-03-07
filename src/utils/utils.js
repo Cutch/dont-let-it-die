@@ -32,3 +32,12 @@ const addPassiveListener = (type, callback) => {
     window.removeEventListener(type, callback, passiveEvent);
   };
 };
+
+const scrollArrow = (itemTradeContent, arrowElem) => {
+  const { y, height } = itemTradeContent.getBoundingClientRect();
+  arrowElem.style['top'] = `calc(${Math.max(
+    0,
+    window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2,
+  )}px / var(--bga-game-zoom, 1))`;
+  arrowElem.style['display'] = Math.max(0, window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2) == 0 ? 'none' : '';
+};

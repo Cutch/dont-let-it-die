@@ -45,13 +45,7 @@ class TradeScreen {
     }
   }
   scroll() {
-    const { y, height } = this.tradeContent.getBoundingClientRect();
-    this.arrowElem.style['top'] = `calc(${Math.max(
-      0,
-      window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2,
-    )}px / var(--bga-game-zoom, 1))`;
-    this.arrowElem.style['display'] =
-      Math.max(0, window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2) == 0 ? 'none' : '';
+    scrollArrow(this.tradeContent, this.arrowElem);
   }
   hide() {
     this.game.selector.hide('trade');
@@ -144,5 +138,6 @@ class TradeScreen {
         );
       });
     this.updateFunctions.forEach((d) => d());
+    this.scroll();
   }
 }

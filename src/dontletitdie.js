@@ -28,7 +28,7 @@ const actionMappings = {
   actCook: 'Cook',
   actTrade: 'Trade Resources',
   actUseSkill: 'Use Skill',
-  actTradeItem: 'Request Trade',
+  actTradeItem: 'Trade',
   actConfirmTradeItem: 'Confirm Trade',
 };
 define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], function (dojo, declare) {
@@ -642,6 +642,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'tooManyItems':
           this.tooManyItemsScreen.hide();
           break;
+        case 'tradePhase':
+          this.itemTradeScreen.hide();
+          break;
         case 'characterSelect':
           dojo.style('character-selector', 'display', 'none');
           dojo.style('game_play_area', 'display', '');
@@ -730,6 +733,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   },
                   { color: 'secondary' },
                 );
+              } else if (action === 'actTradeItem') {
+                // if (!this.itemTradeScreen.hasError()) {
+                this.bgaPerformAction('actTradeItem', {
+                  data: JSON.stringify(this.itemTradeScreen.getTrade()),
+                }).catch(console.error);
+                // .then(() => this.itemTradeScreen.hide())
+                // .catch(console.error);
+                // }
               } else if (action === 'actCraft') {
                 this.removeActionButtons();
                 this.craftScreen.show(args);

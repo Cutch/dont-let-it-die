@@ -11,6 +11,7 @@
     "clienttranslate",
     "dlid",
     "gamestate",
+    "gameui",
     "interruptable",
     "spritesheet",
     "tweening"

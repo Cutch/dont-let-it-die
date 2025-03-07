@@ -9,13 +9,7 @@ class TooManyItemsScreen {
     return false;
   }
   scroll() {
-    const { y, height } = this.tmiElem.getBoundingClientRect();
-    this.arrowElem.style['top'] = `calc(${Math.max(
-      0,
-      window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2,
-    )}px / var(--bga-game-zoom, 1))`;
-    this.arrowElem.style['display'] =
-      Math.max(0, window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2) == 0 ? 'none' : '';
+    scrollArrow(this.tmiElem, this.arrowElem);
   }
   hide() {
     this.game.selector.hide('tooManyItems');
@@ -59,5 +53,6 @@ class TooManyItemsScreen {
         }
       });
     });
+    this.scroll();
   }
 }

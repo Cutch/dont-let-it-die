@@ -224,7 +224,7 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'action' => 'stTradePhase',
         'args' => 'argTradePhase',
-        'possibleactions' => ['actEquipItem', 'actUnEquipItem', 'actTradeItem', 'actConfirmTradeItem', 'actDone'],
+        'possibleactions' => ['actTradeItem', 'actConfirmTradeItem', 'actDone'],
         'transitions' => ['playerTurn' => 10],
     ],
 

@@ -162,6 +162,7 @@ class GameData
         $activateCharacters = $this->get('activateCharacters');
         if (!in_array($characterId, $activateCharacters)) {
             array_push($activateCharacters, $characterId);
+            $this->game->giveExtraTime($this->game->character->getCharacterData($characterId)['player_id']);
         }
         $this->set('activateCharacters', $activateCharacters);
 
