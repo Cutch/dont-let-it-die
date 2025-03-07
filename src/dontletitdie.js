@@ -305,6 +305,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           firewoodElem.querySelector(`.token.wood`),
           'wood',
           gameData.game['resources']['fireWood'] - prevResources['fireWood'],
+          2,
         );
         skipWood = true;
       } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['resources']['fireWood']) {
@@ -314,6 +315,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           availableElem.querySelector(`.token.wood`),
           'wood',
           prevResources['fireWood'] - gameData.game['resources']['fireWood'],
+          2,
         );
       }
       resourcesForDisplay.forEach((name) => {
@@ -324,6 +326,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             sharedElem.querySelector(`.token.${name}`),
             name,
             gameData.game['resources'][name] - prevResources[name],
+            2,
           );
         } else if (
           prevResources[name] != null &&
@@ -337,6 +340,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             availableElem.querySelector(`.token.${name.replace('-cooked', '')}`),
             name,
             prevResources[name] - gameData.game['resources'][name],
+            2,
           );
         }
       });
@@ -919,6 +923,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updateItems(notification.args.gameData);
       this.updateKnowledgeTree(notification.args.gameData);
       if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
+      if (notification.args?.gamestate?.name == 'tradePhase') this.itemTradeScreen.update(notification.args);
     },
 
     notification_characterClicked: function (notification) {

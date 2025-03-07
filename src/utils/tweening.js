@@ -3,8 +3,14 @@ class Tweening {
     this.container = container;
     this.tweenId = 0;
   }
-  addTween(elem1, elem2, image, count = 1, time = 500) {
-    const containerRect = this.container.getBoundingClientRect();
+  getBoundingClientRect(elem) {
+    const { x, y, left, top, right, bottom, width, height } = elem.getBoundingClientRect();
+    return { x, y, left, top, right, bottom, width, height };
+  }
+  addTween(elem1, elem2, image, scale, count = 1, time = 500) {
+    const elementRect1 = elem1 instanceof Element ? this.getBoundingClientRect(elem1) : elem1;
+    const elementRect2 = elem2 instanceof Element ? this.getBoundingClientRect(elem2) : elem2;
+    const containerRect = this.getBoundingClientRect(this.container);
 
     const id = `tween_${++this.tweenId}`;
     this.container.insertAdjacentHTML(
@@ -12,9 +18,7 @@ class Tweening {
       `<div id="${id}" class="tween" style="transition: top ${time}ms linear, left ${time}ms linear;"></div>`,
     );
     const tweenElem = document.getElementById(id);
-    renderImage(image, tweenElem, { scale: 2 });
-    const elementRect1 = elem1.getBoundingClientRect();
-    const elementRect2 = elem2.getBoundingClientRect();
+    renderImage(image, tweenElem, { scale });
 
     const relativeX1 = elementRect1.left - containerRect.left;
     const relativeY1 = elementRect1.top - containerRect.top;
@@ -32,8 +36,16 @@ class Tweening {
     }, 100);
     if (count > 1) {
       setTimeout(() => {
-        this.addTween(elem1, elem2, image, count - 1);
+        this.addTween(elementRect1, elementRect2, image, scale, count - 1);
       }, 300);
     }
+  }
+  addStartTween(elemQueryString1, elemQueryString2, image, scale, count, time) {
+    const start = this.getBoundingClientRect(document.querySelector(elemQueryString1));
+    // End tween
+    return () => {
+      const end = this.getBoundingClientRect(document.querySelector(elemQueryString2));
+      this.addTween(start, end, image, scale, count, time);
+    };
   }
 }

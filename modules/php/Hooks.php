@@ -148,6 +148,12 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
+    function onItemTrade(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
     function onGetTradeRatio(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;

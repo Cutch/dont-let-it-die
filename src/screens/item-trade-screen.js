@@ -46,6 +46,32 @@ class ItemTradeScreen {
       this.toggleSelection(query, false);
     }
   }
+  update({ itemId1, itemId2, itemName1, itemName2, character1, character2, gameData }) {
+    const tween = new Tweening(document.querySelector(`#item-trade-screen`));
+
+    const end1 =
+      itemName1 &&
+      tween.addStartTween(
+        `.character-${character1 ?? null}.item-${itemId1 ?? null}`,
+        `.character-${character2 ?? null}.item-${itemId1 ?? null}`,
+        itemName1,
+        1,
+      );
+    const end2 =
+      itemName2 &&
+      tween.addStartTween(
+        `.character-${character2 ?? null}.item-${itemId2 ?? null}`,
+        `.character-${character1 ?? null}.item-${itemId2 ?? null}`,
+        itemName2,
+        1,
+      );
+    setTimeout(() => {
+      this.show(gameData);
+      if (end1) end1();
+      if (end2) end2();
+    }, 0);
+    this.selection = [];
+  }
   show(gameData) {
     this.itemSelected = null;
     const scale = 1;
@@ -127,9 +153,11 @@ class ItemTradeScreen {
       //   const itemsElem = document.querySelector(`#item-trade-screen__${character.name} .items`);
       itemsElem.insertAdjacentHTML(
         'beforeend',
-        `<div class="empty card character-${character.name} item-null" style="width: ${scaledWidth}px;height: ${scaledHeight}px;">${_(
-          'Give',
-        )}</div>`,
+        `<div class="empty card character-${character.name} item-null" style="width: ${scaledWidth}px;height: ${scaledHeight}px;">
+        <div style="margin-bottom: 0.5rem">${_('Give')}</div>
+        <div>${_('Weapon Slots')}: ${(character.slotsAllowed.weapon ?? 0) - (character.slotsUsed.weapon ?? 0)}</div>
+        <div>${_('Tool Slots')}: ${(character.slotsAllowed.tool ?? 0) - (character.slotsUsed.tool ?? 0)}</div>
+        </div>`,
       );
       addClickListener(document.querySelector(`#item-trade-screen__${character.name} .items .empty`), _('Give'), () => {
         this.updateSelection(character, null);
