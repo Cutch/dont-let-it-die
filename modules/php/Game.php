@@ -960,7 +960,7 @@ class Game extends \Table
     {
         // TODO: compute and return the game progression
         extract($this->gameData->getAll('day', 'turnNo'));
-        return (($day - 1) * 4 + $turnNo) / (12 * 4);
+        return (($day - 1) * 4 + ($turnNo ?? 0)) / (12 * 4);
     }
 
     /**
@@ -969,18 +969,16 @@ class Game extends \Table
     public function stNextCharacter(): void
     {
         // Retrieve the active player ID.
-        $playerId = (int) $this->getActivePlayerId();
         while (true) {
             if ($this->character->isLastCharacter()) {
                 $this->gamestate->nextState('nightPhase');
                 break;
             } else {
-                $playerId = $this->character->activateNextCharacter();
+                $this->character->activateNextCharacter();
                 if ($this->character->getActiveHealth() == 0) {
                     $this->notify->all('playerTurn', clienttranslate('${character_name} is incapacitated'), []);
                 } else {
-                    $this->giveExtraTime($playerId);
-                    $this->gamestate->nextState('nextCharacter');
+                    $this->gamestate->nextState('playerTurn');
                     $this->notify->all('playerTurn', clienttranslate('${character_name} begins their turn'), []);
                     break;
                 }

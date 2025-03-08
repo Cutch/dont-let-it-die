@@ -93,7 +93,7 @@ class Character
         extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
         $turnOrder = array_values(array_filter($turnOrder));
         $characterName = $characterData['character_name'];
-        $isActive = $turnOrder[$turnNo] == $characterName;
+        $isActive = $turnOrder[$turnNo ?? 0] == $characterName;
         $characterData['isActive'] = $isActive;
         $characterData['isFirst'] = array_key_exists(0, $turnOrder) && $turnOrder[0] == $characterName;
         $characterData['id'] = $characterName;
@@ -254,7 +254,7 @@ class Character
     public function getTurnCharacter(): array
     {
         extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
-        $character = $turnOrder[$turnNo];
+        $character = $turnOrder[$turnNo ?? 0];
         return $this->getCharacterData($character);
     }
     public function getActiveEquipment(): array
@@ -275,26 +275,31 @@ class Character
         );
         return $skills;
     }
-    public function activateNextCharacter()
+    public function activateNextCharacter(): void
     {
         // Making the assumption that the functions are checking isLastCharacter()
         extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
-        $this->game->gameData->set('turnNo', $turnNo + 1);
-        $character = $turnOrder[$turnNo + 1];
+        if ($turnNo !== null) {
+            $this->game->gameData->set('turnNo', $turnNo + 1);
+            $character = $turnOrder[$turnNo + 1];
+            $turnNo = $turnNo + 1;
+        } else {
+            $this->game->gameData->set('turnNo', 0);
+            $character = $turnOrder[0];
+            $turnNo = 0;
+        }
         $characterData = $this->getCharacterData($character);
 
         $playerId = (int) $this->game->getActivePlayerId();
         if ($playerId != $characterData['player_id']) {
             $this->game->gamestate->changeActivePlayer($characterData['player_id']);
             $this->game->character->addExtraTime();
-            return $characterData['player_id'];
         }
-        return $playerId;
     }
     public function isLastCharacter()
     {
         extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
-        return sizeof($turnOrder) == $turnNo + 1;
+        return sizeof($turnOrder) == ($turnNo ?? 0) + 1;
     }
     public function rotateTurnOrder(): void
     {
@@ -302,7 +307,8 @@ class Character
         $temp = array_shift($turnOrder);
         array_push($turnOrder, $temp);
         $this->game->gameData->set('turnOrder', $turnOrder);
-        $this->game->gameData->set('turnNo', 0);
+        $this->game->gameData->set('turnNo', null);
+        $this->game->log('turn order', $turnOrder);
     }
 
     public function getActiveStamina(): int

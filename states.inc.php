@@ -185,7 +185,7 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stNextCharacter',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'nextCharacter' => 10, 'nightPhase' => 30],
+        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'nightPhase' => 30],
     ],
     30 => [
         'name' => 'nightPhase',
@@ -226,7 +226,7 @@ $machinestates = [
         'args' => 'argTradePhase',
         'initialprivate' => 61,
         'possibleactions' => [],
-        'transitions' => ['playerTurn' => 10],
+        'transitions' => ['nextCharacter' => 15],
     ],
     61 => [
         'name' => 'tradePhaseActions',

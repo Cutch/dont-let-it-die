@@ -40,7 +40,7 @@ class ItemTrade
     {
         $selfId = $this->game->getCurrentPlayer();
 
-        $this->game->gamestate->setPlayerNonMultiactive($selfId, 'playerTurn');
+        $this->game->gamestate->setPlayerNonMultiactive($selfId, 'nextCharacter');
         // $this->game->gamestate->unsetPrivateState($selfId);
     }
     public function actTradeItem(#[JsonParam] array $data): void
@@ -329,7 +329,7 @@ class ItemTrade
     public function stTradePhase()
     {
         if (sizeof($this->game->getCraftedItems()) == 0) {
-            $this->game->gamestate->nextState('playerTurn');
+            $this->game->gamestate->nextState('nextCharacter');
         } else {
             $this->game->gamestate->setAllPlayersMultiactive();
             foreach ($this->game->gamestate->getActivePlayerList() as $key => $playerId) {

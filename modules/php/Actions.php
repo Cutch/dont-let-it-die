@@ -192,7 +192,6 @@ class Actions
                             array_push($states, ...$skill['state']);
                         }
                     }
-                    $this->game->log('$states', $states);
                     return $states;
                 },
                 'type' => 'action',
