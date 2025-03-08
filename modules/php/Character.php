@@ -108,27 +108,25 @@ class Character
         });
         $_this = $this;
         $itemsLookup = $this->game->gameData->getItems();
-        $characterData['equipment'] = array_values(
-            array_map(function ($itemId) use ($_this, $isActive, $characterName, $itemsLookup) {
-                $itemName = $itemsLookup[$itemId];
-                $skills = [];
-                if (array_key_exists('skills', $_this->game->data->items[$itemName])) {
-                    array_walk($_this->game->data->items[$itemName]['skills'], function ($v, $k) use ($itemId, &$skills) {
-                        $skillId = $k . '_' . $itemId;
-                        $v['id'] = $skillId;
-                        $skills[$skillId] = $v;
-                    });
-                }
+        $characterData['equipment'] = array_map(function ($itemId) use ($_this, $isActive, $characterName, $itemsLookup) {
+            $itemName = $itemsLookup[$itemId];
+            $skills = [];
+            if (array_key_exists('skills', $_this->game->data->items[$itemName])) {
+                array_walk($_this->game->data->items[$itemName]['skills'], function ($v, $k) use ($itemId, &$skills) {
+                    $skillId = $k . '_' . $itemId;
+                    $v['id'] = $skillId;
+                    $skills[$skillId] = $v;
+                });
+            }
 
-                return [
-                    'itemId' => $itemId,
-                    'isActive' => $isActive,
-                    ...$_this->game->data->items[$itemName],
-                    'skills' => $skills,
-                    'character_name' => $characterName,
-                ];
-            }, array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']]))
-        );
+            return [
+                'itemId' => $itemId,
+                'isActive' => $isActive,
+                ...$_this->game->data->items[$itemName],
+                'skills' => $skills,
+                'character_name' => $characterName,
+            ];
+        }, array_values(array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']])));
         if (!$_skipHooks) {
             $this->game->hooks->onGetCharacterData($characterData);
         }
@@ -153,12 +151,14 @@ class Character
     {
         $items = $this->game->gameData->getItems();
         $item = $items[$itemId];
-        $itemName = $this->game->data->items[$item]['name'];
+        $itemName = $this->game->data->items[$item]['id'];
         $itemType = $this->game->data->items[$item]['itemType'];
         $slotsAllowed = array_count_values($character['slots']);
-        $equipment = array_filter($character['equipment'], function ($d) use ($removingItemId) {
-            return $d['itemId'] != $removingItemId;
-        });
+        $equipment = array_values(
+            array_filter($character['equipment'], function ($d) use ($removingItemId) {
+                return $d['itemId'] != $removingItemId;
+            })
+        );
         $slotsUsed = array_count_values(
             array_map(function ($d) {
                 return $d['itemType'];
@@ -234,9 +234,11 @@ class Character
     {
         $characters = $this->game->character->getAllCharacterData(true);
         foreach ($characters as $k => $v) {
-            $array = array_filter($v['equipment'], function ($item) use ($itemId) {
-                return $item['itemId'] == $itemId;
-            });
+            $array = array_values(
+                array_filter($v['equipment'], function ($item) use ($itemId) {
+                    return $item['itemId'] == $itemId;
+                })
+            );
             if (sizeof($array) > 0) {
                 return ['character' => $v, 'item' => $$array[0]];
             }

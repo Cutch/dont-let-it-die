@@ -99,7 +99,8 @@ class TradeScreen {
 
       this.updateFunctions.push(() => this.updateMinMax(plusElem, minusElem, count(), max()));
     };
-    this.game.resourcesForDisplay.forEach((name) => {
+
+    this.game.getResourcesForDisplay(gameData).forEach((name) => {
       renderResource(
         name,
         tradeElem,
@@ -117,7 +118,8 @@ class TradeScreen {
         },
       );
     });
-    this.game.resourcesForDisplay
+    this.game
+      .getResourcesForDisplay(gameData)
       .filter((d) => !d.includes('-cooked'))
       .forEach((name) => {
         renderResource(

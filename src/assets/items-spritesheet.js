@@ -155,7 +155,7 @@ const itemsSprites = {
     hatchet: {
       options: {
         type: 'item',
-        itemType: 'weapon',
+        itemType: 'tool',
         name: 'Hatchet',
       },
       frame: {
