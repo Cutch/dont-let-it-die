@@ -738,6 +738,8 @@ class Game extends \Table
             $this->gamestate->nextState('playerTurn');
         } elseif ($stateName == 'interrupt') {
             $this->actInterrupt->onInterruptCancel();
+        } elseif ($stateName == 'dinnerPhase') {
+            $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'nightPhase');
         }
     }
 
@@ -971,7 +973,7 @@ class Game extends \Table
         // Retrieve the active player ID.
         while (true) {
             if ($this->character->isLastCharacter()) {
-                $this->gamestate->nextState('nightPhase');
+                $this->gamestate->nextState('dinnerPhase');
                 break;
             } else {
                 $this->character->activateNextCharacter();
@@ -985,7 +987,20 @@ class Game extends \Table
             }
         }
     }
-
+    public function argDinnerPhase()
+    {
+        $result = [
+            'actions' => $this->actions->getValidActions(),
+        ];
+        return $result;
+    }
+    public function stDinnerPhase()
+    {
+        $this->gamestate->setAllPlayersMultiactive();
+        foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
+            $this->giveExtraTime((int) $playerId, 60);
+        }
+    }
     public function stSelectCharacter()
     {
         $this->gamestate->setAllPlayersMultiactive();
@@ -1021,19 +1036,32 @@ class Game extends \Table
         $day = $this->gameData->get('day');
         $day += 1;
         $this->gameData->set('day', $day);
-        if ($day == 14) {
-            $this->lose();
+        $woodNeeded = $this->getFirewoodCost();
+        $this->log($this->gameData->get('morningState'), $woodNeeded);
+        $fireWood = $this->gameData->get('fireWood');
+        if (array_key_exists('allowFireWoodAddition', $this->gameData->get('morningState') ?? []) && $fireWood < $woodNeeded) {
+            $missingWood = $woodNeeded - $fireWood;
+            $wood = $this->gameData->get('wood');
+            $this->gameData->setResource('fireWood', min($fireWood + $missingWood, $this->data->tokens['wood']['count']));
+            $this->gameData->setResource('wood', max($wood - $missingWood, 0));
+            $this->notify->all('tokenUsed', clienttranslate('During the night the tribe quickly added ${woodNeeded} wood to the fire'), [
+                'gameData' => $this->getAllDatas(),
+                'woodNeeded' => $woodNeeded,
+            ]);
         }
+
         $this->notify->all('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
             'day' => $day,
         ]);
+        if ($day == 14) {
+            $this->lose();
+        }
         $difficulty = $this->getTrackDifficulty();
         $health = -1;
         if ($difficulty == 'hard') {
             $health = -2;
         }
         $data = [
-            'woodNeeded' => $this->getFirewoodCost(),
             'difficulty' => $difficulty,
             'health' => $health,
             'stamina' => 0,
@@ -1462,6 +1490,27 @@ class Game extends \Table
         $this->character->equipEquipment($turnOrder[2], [$itemId]);
         $itemId = $this->gameData->createItem('hatchet');
         $this->character->equipEquipment($turnOrder[3], [$itemId]);
+    }
+
+    public function setNightCard()
+    {
+        $cards = array_values($this->decks->getDeck('night-event')->getCardsInLocation('deck'));
+        $firstCard = null;
+        $max = 0;
+        foreach ($cards as $k => $v) {
+            if ($max < $v['location_arg']) {
+                $max = max($max, $v['location_arg']);
+                $firstCard = $v;
+            }
+        }
+        $this->log($max, $firstCard);
+        foreach ($cards as $k => $v) {
+            if ($v['type_arg'] == 'night-event-7_15' && $firstCard['type_arg'] != 'night-event-7_15') {
+                $this->decks->getDeck('night-event')->moveCard($firstCard['id'], 'deck', $v['location_arg']);
+                $this->decks->getDeck('night-event')->moveCard($v['id'], 'deck', $max);
+            }
+        }
+        $this->globals->set('resources', [...$this->gameData->getResources(), 'fireWood' => 1, 'wood' => 1]);
     }
     public function resetStamina()
     {

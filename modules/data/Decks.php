@@ -499,10 +499,13 @@ $decksData = [
                 return $data['stamina'] > 0;
             });
             if (sizeof($charactersWithStamina) > 0) {
-                $game->nightEventLog('${character_name} saved the wood', ['character_name' => $charactersWithStamina[0]['character_name']]);
+                $game->nightEventLog('${character_name} had some extra stamina and saved the wood', [
+                    'character_name' => $charactersWithStamina[0]['character_name'],
+                ]);
             } else {
                 $game->adjustResource('fireWood', -1);
                 $game->nightEventLog('1 firewood was lost');
+                $game->gameData->set('morningState', [...$game->gameData->get('morningState') ?? [], 'allowFireWoodAddition' => true]);
             }
         },
     ],
@@ -518,6 +521,7 @@ $decksData = [
             } else {
                 $game->adjustResource('fireWood', -1);
                 $game->nightEventLog('1 firewood was lost');
+                $game->gameData->set('morningState', [...$game->gameData->get('morningState') ?? [], 'allowFireWoodAddition' => true]);
             }
         },
     ],
@@ -729,7 +733,9 @@ $decksData = [
                     'character_name' => $charactersWithStamina[0]['character_name'],
                 ]);
             } else {
+                $game->adjustResource('fireWood', -1);
                 $game->nightEventLog('1 firewood was lost');
+                $game->gameData->set('morningState', [...$game->gameData->get('morningState') ?? [], 'allowFireWoodAddition' => true]);
             }
         },
     ],
@@ -878,7 +884,8 @@ $decksData = [
         'eventType' => 'rival-tribe',
         'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $game->adjustResource('dino-egg', -$roll);
+            $left = $game->adjustResource('dino-egg-cooked', -$roll);
+            $game->adjustResource('dino-egg', -$left);
             $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
                 'number' => $roll,
                 'resource_type' => 'dino-egg',

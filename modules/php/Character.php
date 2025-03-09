@@ -389,6 +389,7 @@ class Character
                 'playerId' => $char['player_id'],
                 'stamina' => $char['stamina'],
                 'maxStamina' => $char['maxStamina'],
+                'maxHealth' => $char['maxHealth'],
                 'health' => $char['health'],
                 'slotsUsed' => $slotsUsed,
                 'slotsAllowed' => $slotsAllowed,

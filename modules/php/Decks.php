@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
+use Deck;
+
 class Decks
 {
     private Game $game;
@@ -25,6 +27,10 @@ class Decks
         foreach ($this->getAllDeckNames() as $i => $deck) {
             $this->decks[$deck] = $this->game->initDeck(str_replace('-', '', $deck));
         }
+    }
+    public function getDeck(string $name): Deck
+    {
+        return $this->decks[$name];
     }
     public function getAllDeckNames(): array
     {
@@ -59,8 +65,8 @@ class Decks
             array_keys($filtered_cards),
             $filtered_cards
         );
-        $this->decks[$type]->createCards($cards, 'deck');
-        $this->decks[$type]->shuffle('deck');
+        $this->getDeck($type)->createCards($cards, 'deck');
+        $this->getDeck($type)->shuffle('deck');
     }
     public function getCard($id): array
     {
@@ -104,8 +110,8 @@ class Decks
     }
     public function shuffleInDiscard($deck, $notify = true): void
     {
-        $this->decks[$deck]->moveAllCardsInLocation('discard', 'deck');
-        $this->decks[$deck]->shuffle('deck');
+        $this->getDeck($deck)->moveAllCardsInLocation('discard', 'deck');
+        $this->getDeck($deck)->shuffle('deck');
         unset($this->cachedData[$deck]);
         $results = [
             'deck' => $deck,
@@ -120,26 +126,26 @@ class Decks
     }
     public function pickCard(string $deck): array
     {
-        $topCard = $this->decks[$deck]->getCardOnTop('deck');
+        $topCard = $this->getDeck($deck)->getCardOnTop('deck');
         if (!$topCard) {
             $this->shuffleInDiscard($deck);
-            $topCard = $this->decks[$deck]->getCardOnTop('deck');
+            $topCard = $this->getDeck($deck)->getCardOnTop('deck');
         }
-        $this->decks[$deck]->insertCardOnExtremePosition($topCard['id'], 'discard', true);
+        $this->getDeck($deck)->insertCardOnExtremePosition($topCard['id'], 'discard', true);
         $card = $this->getCard($topCard['type_arg']);
         unset($this->cachedData[$deck]);
         return $card;
     }
     public function discardCards($deck, $callback): void
     {
-        $deckCount = $this->decks[$deck]->countCardsInLocation('deck');
-        $cards = $this->decks[$deck]->getCardOnTop($deckCount, 'deck');
+        $deckCount = $this->getDeck($deck)->countCardsInLocation('deck');
+        $cards = $this->getDeck($deck)->getCardOnTop($deckCount, 'deck');
 
         $cards = array_filter($cards, function ($card) use ($callback) {
             $callback($this->getCard($card['id']));
         });
         array_walk(function ($card) use ($deck) {
-            $this->decks[$deck]->insertCardOnExtremePosition($card['id'], 'discard', true);
+            $this->getDeck($deck)->insertCardOnExtremePosition($card['id'], 'discard', true);
         }, $cards);
         unset($this->cachedData[$deck]);
         if ($deckCount - sizeof($cards) == 0) {

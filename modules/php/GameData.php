@@ -105,7 +105,7 @@ class GameData
     }
     public function get($name): mixed
     {
-        return $this->cachedGameData[$name];
+        return array_key_exists($name, $this->cachedGameData) ? $this->cachedGameData[$name] : null;
     }
     public function getAll(...$names): array
     {

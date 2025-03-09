@@ -348,7 +348,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         const div = document.querySelector(`#board-container .buildings`);
         if (div.childNodes.length == 0) {
           gameData.game.buildings.forEach((building) => {
-            console.log(building);
             renderImage(building.name, div, { scale: 2, pos: 'append' });
             addClickListener(div, 'Buildings', () => {
               this.tooltip.show();
@@ -841,6 +840,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           case 'interrupt':
             this.statusBar.addActionButton(_('Skip'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
             break;
+          case 'dinnerPhase':
           case 'tradePhase':
           case 'postEncounter':
             this.statusBar.addActionButton(_('Done'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
