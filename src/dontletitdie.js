@@ -100,10 +100,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             `<div id="${characterSideId}" class="character-side-container">
             <div class="character-name">${character.name}<span class="first-player-marker"></span></div>
             <div class="health line"><div class="fa fa-heart"></div><span class="label">Health: </span><span class="value">${
-              character.health
+              character.health ?? 0
             }</span></div>
             <div class="stamina line"><div class="fa fa-bolt"></div><span class="label">Stamina: </span><span class="value">${
-              character.stamina
+              character.stamina ?? 0
             }</span></div>
             <div class="equipment line"><div class="fa fa-cog"></div><span class="label">Equipment: </span><span class="value">${
               equipments.map((d) => `<span class="equipment-item equipment-${d.itemId}">${d.options.name}</span>`).join(', ') || 'None'
@@ -142,8 +142,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
           });
         } else {
-          playerSideContainer.querySelector(`.health .value`).innerHTML = character.health;
-          playerSideContainer.querySelector(`.stamina .value`).innerHTML = character.stamina;
+          playerSideContainer.querySelector(`.health .value`).innerHTML = character.health ?? 0;
+          playerSideContainer.querySelector(`.stamina .value`).innerHTML = character.stamina ?? 0;
           playerSideContainer.querySelector(`.equipment .value`).innerHTML =
             equipments.map((d) => `<span class="equipment-item equipment-${d.itemId}">${d.options.name}</span>`).join(', ') || 'None';
           playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
@@ -304,8 +304,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           sharedElem.querySelector(`.token.wood`),
           firewoodElem.querySelector(`.token.wood`),
           'wood',
-          gameData.game['resources']['fireWood'] - prevResources['fireWood'],
           2,
+          gameData.game['resources']['fireWood'] - prevResources['fireWood'],
         );
         skipWood = true;
       } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['resources']['fireWood']) {
@@ -314,8 +314,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           firewoodElem.querySelector(`.token.wood`),
           availableElem.querySelector(`.token.wood`),
           'wood',
-          prevResources['fireWood'] - gameData.game['resources']['fireWood'],
           2,
+          prevResources['fireWood'] - gameData.game['resources']['fireWood'],
         );
       }
       resourcesForDisplay.forEach((name) => {
@@ -325,8 +325,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             availableElem.querySelector(`.token.${name.replace('-cooked', '')}`),
             sharedElem.querySelector(`.token.${name}`),
             name,
-            gameData.game['resources'][name] - prevResources[name],
             2,
+            gameData.game['resources'][name] - prevResources[name],
           );
         } else if (
           prevResources[name] != null &&
@@ -339,8 +339,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             sharedElem.querySelector(`.token.${name}`),
             availableElem.querySelector(`.token.${name.replace('-cooked', '')}`),
             name,
-            prevResources[name] - gameData.game['resources'][name],
             2,
+            prevResources[name] - gameData.game['resources'][name],
           );
         }
       });
@@ -658,13 +658,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
     //
-    getActionCostHTML: function (action) {
-      let cost = '';
-      if (action['stamina'] != null) cost += ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
-      if (action['health'] != null) cost += ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
-      if (action['cost'] != null) cost += ` <i class="fa fa-graduation-cap dlid__fkp"></i> ${action['cost']}`;
-      if (action['perDay'] != null) cost += ` <i class="fa fa-sun-o dlid__sun"></i> ${action['perDay']} left`;
-      return cost;
+    getActionSuffixHTML: function (action) {
+      let suffix = '';
+      if (action['character'] != null) suffix += ` (${action['character']})`;
+      if (action['stamina'] != null) suffix += ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
+      if (action['health'] != null) suffix += ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
+      if (action['cost'] != null) suffix += ` <i class="fa fa-graduation-cap dlid__fkp"></i> ${action['cost']}`;
+      if (action['perDay'] != null) suffix += ` <i class="fa fa-sun-o dlid__sun"></i> ${action['perDay']} left`;
+      return suffix;
     },
     onUpdateActionButtons: function (stateName, args) {
       const actions = args?.actions;
@@ -676,47 +677,48 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
         // Add test action buttons in the action status bar, simulating a card click:
         if (actions)
-          Object.keys(actions).forEach((action) => {
-            if (action === 'actUseSkill' && ['interrupt', 'postEncounter'].includes(stateName)) {
+          actions.forEach((action) => {
+            const actionId = action.action;
+            if (actionId === 'actUseSkill' && ['interrupt', 'postEncounter'].includes(stateName)) {
               return Object.values(args.availableSkills).forEach((skill) => {
-                const cost = this.getActionCostHTML(skill);
-                this.statusBar.addActionButton(`${skill.name} (${skill.characterId})${cost}`, () => {
-                  return this.bgaPerformAction(action, { skillId: skill.id });
+                const suffix = this.getActionSuffixHTML(skill);
+                this.statusBar.addActionButton(`${skill.name} (${skill.characterId})${suffix}`, () => {
+                  return this.bgaPerformAction(actionId, { skillId: skill.id });
                 });
               });
             }
-            if (action === 'actUseItem' && ['interrupt', 'postEncounter'].includes(stateName)) {
+            if (actionId === 'actUseItem' && ['interrupt', 'postEncounter'].includes(stateName)) {
               return Object.values(args.availableItemSkills).forEach((skill) => {
-                const cost = this.getActionCostHTML(skill);
-                this.statusBar.addActionButton(`${skill.name} (${skill.characterId})${cost}`, () => {
-                  return this.bgaPerformAction(action, { skillId: skill.id });
+                const suffix = this.getActionSuffixHTML(skill);
+                this.statusBar.addActionButton(`${skill.name} (${skill.characterId})${suffix}`, () => {
+                  return this.bgaPerformAction(actionId, { skillId: skill.id });
                 });
               });
             }
-            const cost = this.getActionCostHTML(actions[action]);
-            return this.statusBar.addActionButton(`${actionMappings[action]}${cost}`, () => {
-              if (action === 'actSpendFKP') {
+            const suffix = this.getActionSuffixHTML(action);
+            return this.statusBar.addActionButton(`${actionMappings[actionId]}${suffix}`, () => {
+              if (actionId === 'actSpendFKP') {
                 this.removeActionButtons();
                 Object.values(args.availableUnlocks).forEach((unlock) => {
-                  const cost = this.getActionCostHTML(unlock);
-                  this.statusBar.addActionButton(`${unlock.name}${cost}`, () => {
-                    return this.bgaPerformAction(action, { knowledgeId: unlock.id });
+                  const suffix = this.getActionSuffixHTML(unlock);
+                  this.statusBar.addActionButton(`${unlock.name}${suffix}`, () => {
+                    return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
                   });
                 });
                 this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
-              } else if (action === 'actUseSkill') {
+              } else if (actionId === 'actUseSkill') {
                 this.removeActionButtons();
                 Object.values(args.availableSkills).forEach((skill) => {
-                  const cost = this.getActionCostHTML(skill);
-                  this.statusBar.addActionButton(`${skill.name}${cost}`, () => {
-                    return this.bgaPerformAction(action, { skillId: skill.id });
+                  const suffix = this.getActionSuffixHTML(skill);
+                  this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
+                    return this.bgaPerformAction(actionId, { skillId: skill.id });
                   });
                 });
                 this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
-              } else if (action === 'actTrade') {
+              } else if (actionId === 'actTrade') {
                 this.removeActionButtons();
                 this.tradeScreen.show(args);
-                this.statusBar.addActionButton(_('Trade') + `${cost}`, () => {
+                this.statusBar.addActionButton(_('Trade') + `${suffix}`, () => {
                   if (!this.tradeScreen.hasError()) {
                     this.bgaPerformAction('actTrade', {
                       data: JSON.stringify({
@@ -736,7 +738,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   },
                   { color: 'secondary' },
                 );
-              } else if (action === 'actTradeItem') {
+              } else if (actionId === 'actTradeItem') {
                 // if (!this.itemTradeScreen.hasError()) {
                 this.bgaPerformAction('actTradeItem', {
                   data: JSON.stringify(this.itemTradeScreen.getTrade()),
@@ -744,10 +746,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 // .then(() => this.itemTradeScreen.hide())
                 // .catch(console.error);
                 // }
-              } else if (action === 'actCraft') {
+              } else if (actionId === 'actCraft') {
                 this.removeActionButtons();
                 this.craftScreen.show(args);
-                this.statusBar.addActionButton(_('Craft') + `${cost}`, () => {
+                this.statusBar.addActionButton(_('Craft') + `${suffix}`, () => {
                   if (!this.craftScreen.hasError()) {
                     this.bgaPerformAction('actCraft', {
                       itemName: this.craftScreen.getSelectedId(),
@@ -766,10 +768,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   },
                   { color: 'secondary' },
                 );
-              } else if (action === 'actEat') {
+              } else if (actionId === 'actEat') {
                 this.removeActionButtons();
                 this.eatScreen.show(args);
-                this.statusBar.addActionButton(_('Eat') + `${cost}`, () => {
+                this.statusBar.addActionButton(_('Eat') + `${suffix}`, () => {
                   if (!this.eatScreen.hasError()) {
                     this.bgaPerformAction('actEat', {
                       resourceType: this.eatScreen.getSelectedId(),
@@ -790,7 +792,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   { color: 'secondary' },
                 );
               } else {
-                return this.bgaPerformAction(action);
+                return this.bgaPerformAction(actionId);
               }
             });
           });

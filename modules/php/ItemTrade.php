@@ -284,7 +284,8 @@ class ItemTrade
     {
         $result = [
             'actions' => [
-                'actTradeItem' => [
+                [
+                    'action' => 'actTradeItem',
                     'type' => 'action',
                 ],
             ],
@@ -301,7 +302,8 @@ class ItemTrade
     {
         $result = [
             'actions' => [
-                'actConfirmTradeItem' => [
+                [
+                    'action' => 'actConfirmTradeItem',
                     'type' => 'action',
                 ],
             ],

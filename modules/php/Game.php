@@ -547,8 +547,10 @@ class Game extends \Table
         $this->gameData->setResource('fireWood', min($fireWood + 1, $this->data->tokens['wood']['count']));
         $this->gameData->setResource('wood', max($wood - 1, 0));
 
-        $this->notify->all('tokenUsed', clienttranslate('${character_name} added 1 wood to the fire'), [
+        $this->notify->all('tokenUsed', clienttranslate('${character_name} added ${count} ${token_name} to the fire'), [
             'gameData' => $this->getAllDatas(),
+            'token_name' => 'wood',
+            'count' => 1,
         ]);
     }
     public function actUseSkill(string $skillId): void
@@ -828,7 +830,13 @@ class Game extends \Table
     }
     public function stPlayerTurn()
     {
-        $this->actInterrupt->checkForInterrupt();
+        if (!$this->actInterrupt->checkForInterrupt()) {
+            $char = $this->character->getTurnCharacter();
+            if ($char['isActive'] && $char['incapacitated']) {
+                $this->activeCharacterEventLog('is still incapacitated');
+                $this->gamestate->nextState('endTurn');
+            }
+        }
     }
     public function stDrawCard()
     {
@@ -989,16 +997,33 @@ class Game extends \Table
     }
     public function argDinnerPhase()
     {
+        $playerId = $this->getCurrentPlayer();
+        $actions = array_map(function ($char) {
+            return [
+                'action' => 'actEat',
+                'character' => $char['character_name'],
+                'type' => 'action',
+            ];
+        }, $this->character->getAllCharacterDataForPlayer($playerId));
         $result = [
-            'actions' => $this->actions->getValidActions(),
+            'actions' => $actions,
         ];
+        $this->getItemData($result);
+        $this->getGameData($result);
         return $result;
     }
     public function stDinnerPhase()
     {
-        $this->gamestate->setAllPlayersMultiactive();
-        foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
-            $this->giveExtraTime((int) $playerId, 60);
+        $action = $this->actions->getAction('actEat');
+        $hasFood = $action['requires']($this, $action);
+        if ($hasFood) {
+            $this->gamestate->setAllPlayersMultiactive();
+            foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
+                $this->giveExtraTime((int) $playerId);
+            }
+        } else {
+            $this->notify->all('playerTurn', clienttranslate('The tribe skipped dinner as there is nothing to eat'));
+            $this->gamestate->nextState('nightPhase');
         }
     }
     public function stSelectCharacter()
@@ -1044,10 +1069,15 @@ class Game extends \Table
             $wood = $this->gameData->get('wood');
             $this->gameData->setResource('fireWood', min($fireWood + $missingWood, $this->data->tokens['wood']['count']));
             $this->gameData->setResource('wood', max($wood - $missingWood, 0));
-            $this->notify->all('tokenUsed', clienttranslate('During the night the tribe quickly added ${woodNeeded} wood to the fire'), [
-                'gameData' => $this->getAllDatas(),
-                'woodNeeded' => $woodNeeded,
-            ]);
+            $this->notify->all(
+                'tokenUsed',
+                clienttranslate('During the night the tribe quickly added ${woodNeeded} ${token_name} to the fire'),
+                [
+                    'gameData' => $this->getAllDatas(),
+                    'woodNeeded' => $woodNeeded,
+                    'token_name' => 'wood',
+                ]
+            );
         }
 
         $this->notify->all('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
@@ -1528,6 +1558,10 @@ class Game extends \Table
     {
         $craftingLevel = $this->gameData->get('craftingLevel');
         $this->gameData->set('craftingLevel', max($craftingLevel, 3));
+    }
+    public function kill()
+    {
+        $this->character->adjustActiveHealth(-10);
     }
     public function drawNightCard()
     {

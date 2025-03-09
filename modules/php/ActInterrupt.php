@@ -204,14 +204,9 @@ class ActInterrupt
 
         $playerId = $this->game->getCurrentPlayer();
 
-        $characterIds = array_map(
-            function ($char) {
-                return $char['id'];
-            },
-            array_filter($this->game->character->getAllCharacterData(), function ($char) use ($playerId) {
-                return $char['player_id'] == $playerId;
-            })
-        );
+        $characterIds = array_map(function ($char) {
+            return $char['id'];
+        }, $this->game->character->getAllCharacterDataForPlayer($playerId));
         // Remove skills so that we know there's nothing left to do
         // $skills = $data['skills'];
         // array_walk($skills, function (&$v, $k) use ($characterIds) {

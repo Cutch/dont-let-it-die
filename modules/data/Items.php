@@ -167,6 +167,7 @@ $itemsData = [
             'skill1' => [
                 'name' => clienttranslate('Ignore Damage'),
                 'state' => ['postEncounter'],
+                'perDay' => 1,
                 'onUse' => function (Game $game, $skill, $char) {
                     $state = $game->gameData->get('encounterState');
                     $game->character->adjustActiveHealth($state['willTakeDamage']);

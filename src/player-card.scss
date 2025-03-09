@@ -50,7 +50,8 @@
   width: 20px;
   height: 20px;
   transition: top 1s linear, left 1s linear, transform 1s linear;
-  border: 3px solid rgb(205, 205, 205);
+  border: 3px solid #cdcdcd;
+  background-color: #9c9c9c;
   border-radius: 50%;
 }
 .player-card .marker {

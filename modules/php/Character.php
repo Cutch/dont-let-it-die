@@ -88,6 +88,14 @@ class Character
             return $this->getCharacterData($char, $_skipHooks);
         }, $turnOrder);
     }
+    public function getAllCharacterDataForPlayer($playerId): array
+    {
+        return array_values(
+            array_filter($this->game->character->getAllCharacterData(), function ($char) use ($playerId) {
+                return $char['player_id'] == $playerId;
+            })
+        );
+    }
     public function getCalculatedData($characterData, $_skipHooks = false): array
     {
         extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
@@ -354,6 +362,9 @@ class Character
     {
         $prev = 0;
         $this->updateCharacterData($characterName, function (&$data) use ($health, &$prev, $characterName) {
+            if ($data['incapacitated'] && $health > 0) {
+                return;
+            }
             $prev = $data['health'];
             $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
             $prev = $data['health'] - $prev;
@@ -362,6 +373,9 @@ class Character
                     'character_name' => $this->game->getCharacterHTML($characterName),
                 ]);
                 $data['incapacitated'] = true;
+                if ($data['isActive'] && $this->game->gamestate->state()['name'] == 'playerTurn') {
+                    $this->game->gamestate->nextState('endTurn');
+                }
             }
         });
         return $prev;

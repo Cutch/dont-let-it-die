@@ -13,6 +13,23 @@ class Actions
     public function __construct(Game $game)
     {
         $this->actions = addId([
+            'actRevive' => [
+                'state' => ['playerTurn'],
+                'type' => 'action',
+                'requires' => function (Game $game, $action) {
+                    $variables = $game->gameData->getResources('cooked-fish', 'cooked-meat');
+                    $total = array_sum($variables);
+                    return $total >= 3 &&
+                        sizeof(
+                            array_filter($game->character->getAllCharacterData(), function ($char) {
+                                return $char['incapacitated'];
+                            })
+                        ) > 0;
+                },
+                'selectable' => function (Game $game) {
+                    return ['cooked-fish', 'cooked-meat'];
+                },
+            ],
             'actSpendFKP' => [
                 'state' => ['playerTurn'],
                 'stamina' => 0,
@@ -37,7 +54,7 @@ class Actions
                 },
             ],
             'actEat' => [
-                'state' => ['playerTurn'],
+                'state' => ['playerTurn', 'dinnerPhase'],
                 'stamina' => 0,
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {
@@ -341,7 +358,6 @@ class Actions
                 : null,
         ];
         $this->game->hooks->onGetActionCost($data);
-        unset($data['action']);
         return $data;
     }
     public function wrapSkills($skills): array
@@ -449,6 +465,6 @@ class Actions
             1,
             0
         );
-        return $this->game->hooks->onGetValidActions($data);
+        return array_values($this->game->hooks->onGetValidActions($data));
     }
 }
