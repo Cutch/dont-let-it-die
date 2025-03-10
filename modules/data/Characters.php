@@ -298,8 +298,6 @@ $charactersData = [
                         $data['state']['card'] = $card;
                         $game->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
                         $game->cardDrawEvent($card, 'night-event');
-
-                        $game->log($data);
                     }
                 },
             ],
@@ -410,7 +408,6 @@ $charactersData = [
                 'onResourceSelection' => function (Game $game, $skill, &$data) {
                     if ($game->gameData->get('state')['id'] == $skill['id']) {
                         $state = $game->actInterrupt->getState('actCraft');
-                        $game->log($state, $data);
                         if (array_key_exists($data['resourceType'], $state['data']['item']['cost'])) {
                             $state['data']['item']['cost'][$data['resourceType']] = max(
                                 $state['data']['item']['cost'][$data['resourceType']] - 2,

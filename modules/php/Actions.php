@@ -219,7 +219,7 @@ class Actions
             'actUseItem' => [
                 'getState' => function () {
                     $states = [];
-                    foreach ($this->getAvailableCharacterSkills() as $skill) {
+                    foreach ($this->getAvailableItemSkills() as $skill) {
                         if (array_key_exists('state', $skill)) {
                             array_push($states, ...$skill['state']);
                         }
@@ -314,6 +314,26 @@ class Actions
     {
         $character = $this->game->character->getSubmittingCharacter();
         $skills = $this->game->character->getActiveEquipmentSkills();
+        $this->game->log(
+            'getAvailableItemSkills',
+            $skills,
+            array_values(
+                array_filter($skills, function ($skill) use ($character) {
+                    $stamina = $character['stamina'];
+                    $health = $character['health'];
+                    $actionCost = [
+                        'action' => 'actUseItem',
+                        'subAction' => $skill['id'],
+                        'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
+                        'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
+                    ];
+                    $this->game->hooks->onGetActionCost($actionCost);
+                    return $this->checkRequirements($skill, $character) &&
+                        (!array_key_exists('stamina', $actionCost) || $stamina >= $actionCost['stamina']) &&
+                        (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
+                })
+            )
+        );
         return array_values(
             array_filter($skills, function ($skill) use ($character) {
                 $stamina = $character['stamina'];

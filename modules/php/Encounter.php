@@ -113,6 +113,7 @@ class Encounter
                 ];
             },
             function ($_this, bool $finalizeInterrupt, $data) {
+                $this->game->log('stResolveEncounter', $data);
                 if ($data['stamina'] != 0) {
                     $_this->character->adjustActiveStamina($data['stamina']);
                 }
@@ -126,21 +127,23 @@ class Encounter
                     }
                     if ($_this->character->getActiveHealth() != 0) {
                         $_this->adjustResource('meat', $data['willReceiveMeat']);
-                        if ($data['willTakeDamage'] > 0) {
+                        if ($damageTaken > 0) {
                             $_this->activeCharacterEventLog(
-                                'defeated a ${name}, took ${damageTaken} damage, gained ${willReceiveMeat} meat and lost ${willTakeDamage} health',
+                                'defeated a ${name}, gained ${willReceiveMeat} meat and lost ${damageTaken} health',
                                 [...$data, 'damageTaken' => $damageTaken]
                             );
                         } else {
-                            $_this->activeCharacterEventLog(
-                                'defeated a ${name}, took ${damageTaken} damage and gained ${willReceiveMeat} meat',
-                                [...$data, 'damageTaken' => $damageTaken]
-                            );
+                            $_this->activeCharacterEventLog('defeated a ${name} and gained ${willReceiveMeat} meat', [...$data]);
                         }
                     }
                 } else {
-                    $_this->character->adjustActiveHealth(-$data['willTakeDamage']);
-                    $_this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);
+                    $damageTaken = $this->countDamageTaken($data);
+                    if ($damageTaken > 0) {
+                        $_this->character->adjustActiveHealth(-$data['willTakeDamage']);
+                        $_this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);
+                    } else {
+                        $_this->activeCharacterEventLog('was attacked by a ${name} but lost no health', $data);
+                    }
                 }
                 $_this->gameData->set('encounterState', $data);
                 $_this->gamestate->nextState('postEncounter');

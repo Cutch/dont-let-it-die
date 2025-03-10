@@ -215,7 +215,7 @@ class ActInterrupt
         //     }
         // });
         // $this->setState($state['functionName'], [...$data, 'skills' => $skills, 'activated' => true]);
-        $this->setState($state['functionName'], null);
+        $this->setState($state['functionName'], null); // TODO: for items this doesnt work, but does work for player turn?
 
         // var_dump(json_encode([$this->game->gamestate->state()['name'], $data['currentState'], $data['currentState']]));
         // var_dump($this->game->gamestate->getActivePlayerList(), $this->game->gamestate->state()['name']);
@@ -245,8 +245,26 @@ class ActInterrupt
         return [
             ...$data,
             'character_name' => $this->game->getCharacterHTML(),
-            'actions' => ['actUseSkill' => []],
-            'availableSkills' => $this->game->actions->wrapSkills($data['skills']),
+            'actions' => [
+                [
+                    'action' => 'actUseSkill',
+                    'type' => 'action',
+                ],
+                [
+                    'action' => 'actUseItem',
+                    'type' => 'action',
+                ],
+            ],
+            'availableSkills' => $this->game->actions->wrapSkills(
+                array_filter($data['skills'], function ($skill) {
+                    return $skill['type'] == 'skill';
+                })
+            ),
+            'availableItemSkills' => $this->game->actions->wrapSkills(
+                array_filter($data['skills'], function ($skill) {
+                    return $skill['type'] == 'item-skill';
+                })
+            ),
         ];
     }
     public function stInterrupt(): void

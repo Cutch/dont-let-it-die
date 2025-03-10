@@ -25,7 +25,17 @@ class Hooks
                 return $c['equipment'];
             }, $characters)
         );
+
         $skills = array_merge(
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return $c['skills'];
+                    // array_map(function ($data) use ($c) {
+                    //     return [...$data, 'characterId' => $c['character_name']];
+                    // }, $c['skills']);
+                }
+                return [];
+            }, $equipment),
             ...array_map(function ($c) {
                 if (array_key_exists('skills', $c)) {
                     return $c['skills'];

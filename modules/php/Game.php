@@ -630,23 +630,57 @@ class Game extends \Table
     }
     public function actUseItem(string $skillId): void
     {
-        $this->character->setSubmittingCharacter('actUseItem', $skillId);
-        // $this->character->addExtraTime();
-        $this->actions->validateCanRunAction('actUseItem', $skillId);
-        $character = $this->character->getSubmittingCharacter();
-        $skills = $this->character->getActiveEquipmentSkills();
-        $skill = $skills[$skillId];
-        $result = $skill['onUse']($this, $skill, $character);
-        if (!$result || (array_key_exists('spendActionCost', $result) && $result['spendActionCost'] != false)) {
-            $this->actions->spendActionCost('actUseItem', $skillId);
-        }
-        if (!$result || (array_key_exists('notify', $result) && $result['notify'] != false)) {
-            $this->notify->all('updateGameData', clienttranslate('${character_name} used the item\'s skill ${skill_name}'), [
-                'gameData' => $this->getAllDatas(),
-                'skill_name' => $skill['name'],
-            ]);
-        }
-        $this->character->setSubmittingCharacter(null);
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onUseSkill'],
+            function (Game $_this) use ($skillId) {
+                $_this->character->setSubmittingCharacter('actUseItem', $skillId);
+                // $this->character->addExtraTime();
+                $_this->actions->validateCanRunAction('actUseItem', $skillId);
+                $character = $this->character->getSubmittingCharacter();
+
+                $skills = $this->character->getActiveEquipmentSkills();
+                $skill = $skills[$skillId];
+                return [
+                    'skillId' => $skillId,
+                    'skill' => $skill,
+                    'character' => $character,
+                    'turnCharacter' => $this->character->getTurnCharacter(),
+                ];
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                $skill = $data['skill'];
+                $character = $data['character'];
+                $skillId = $data['skillId'];
+
+                $skills = $this->character->getActiveEquipmentSkills();
+                $_this->hooks->reconnectHooks($skill, $skills[$skillId]);
+                $_this->character->setSubmittingCharacter('actUseItem', $skillId);
+                if ($_this->gamestate->state()['name'] == 'interrupt') {
+                    $_this->actInterrupt->actInterrupt($skillId);
+                }
+                if (!array_key_exists('interruptState', $skill) || (in_array('interrupt', $skill['state']) && $finalizeInterrupt)) {
+                    $notificationSent = false;
+                    $skill['sendNotification'] = function () use (&$skill, $_this, &$notificationSent) {
+                        $_this->notify->all('updateGameData', clienttranslate('${character_name} used the item\'s skill ${skill_name}'), [
+                            'gameData' => $_this->getAllDatas(),
+                            'skill_name' => $skill['name'],
+                        ]);
+                        $notificationSent = true;
+                    };
+                    // var_dump(json_encode([array_key_exists('onUse', $skill)]));
+                    $result = array_key_exists('onUse', $skill) ? $skill['onUse']($this, $skill, $character) : null;
+                    if (!$result || !array_key_exists('spendActionCost', $result) || $result['spendActionCost'] != false) {
+                        $_this->actions->spendActionCost('actUseItem', $skillId);
+                    }
+                    if (!$notificationSent && (!$result || !array_key_exists('notify', $result) || $result['notify'] != false)) {
+                        $skill['sendNotification']();
+                    }
+                }
+                $_this->character->setSubmittingCharacter(null);
+            }
+        );
     }
     public function actDrawGather(): void
     {
@@ -1531,6 +1565,11 @@ class Game extends \Table
     public function giveClub()
     {
         $itemId = $this->gameData->createItem('club');
+        $this->character->equipEquipment($this->character->getSubmittingCharacter()['id'], [$itemId]);
+    }
+    public function give($item)
+    {
+        $itemId = $this->gameData->createItem($item);
         $this->character->equipEquipment($this->character->getSubmittingCharacter()['id'], [$itemId]);
     }
     public function giveItems()

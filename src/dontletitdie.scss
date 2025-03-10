@@ -20,6 +20,11 @@
   @include meta.load-css('boards');
   @include meta.load-css('player-card');
   @include meta.load-css('player-side-panel');
+  .selected {
+    border: 5px solid var(--player-color, #fff);
+    margin: 0;
+    border-radius: 10px;
+  }
 }
 
 .action-button .dlid__stamina {
@@ -44,9 +49,4 @@
 .dlid__container {
   margin: 0 auto 1rem;
   place-items: anchor-center;
-}
-.selected {
-  border: 5px solid var(--player-color, #fff);
-  margin: 0;
-  border-radius: 10px;
 }

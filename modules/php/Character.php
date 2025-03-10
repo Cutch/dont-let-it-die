@@ -121,9 +121,17 @@ class Character
             $itemName = $itemsLookup[$itemId];
             $skills = [];
             if (array_key_exists('skills', $_this->game->data->items[$itemName])) {
-                array_walk($_this->game->data->items[$itemName]['skills'], function ($v, $k) use ($itemId, &$skills) {
+                array_walk($_this->game->data->items[$itemName]['skills'], function ($v, $k) use (
+                    $itemId,
+                    $itemName,
+                    $characterName,
+                    &$skills
+                ) {
                     $skillId = $k . '_' . $itemId;
                     $v['id'] = $skillId;
+                    $v['itemId'] = $itemId;
+                    $v['itemName'] = $itemName;
+                    $v['characterId'] = $characterName;
                     $skills[$skillId] = $v;
                 });
             }
@@ -222,7 +230,8 @@ class Character
         if ($action == 'actUseSkill') {
             $this->submittingCharacter = $this->game->character->getSkill($subAction)['character']['id'];
         } elseif ($action == 'actUseItem') {
-            $this->submittingCharacter = $this->game->character->getItem($subAction)['character']['id'];
+            $this->submittingCharacter = $this->game->character->getSkill($subAction)['character']['id'];
+            // $this->submittingCharacter = $this->game->character->getItem($subAction)['character']['id'];
         } elseif ($action == null) {
             $this->submittingCharacter = null;
         }
@@ -234,6 +243,13 @@ class Character
             if (array_key_exists('skills', $v)) {
                 if (array_key_exists($skillId, $v['skills'])) {
                     return ['character' => $v, 'skill' => $v['skills'][$skillId]];
+                }
+            }
+            foreach ($v['equipment'] as $k => $equipment) {
+                if (array_key_exists('skills', $equipment)) {
+                    if (array_key_exists($skillId, $equipment['skills'])) {
+                        return ['character' => $v, 'skill' => $equipment['skills'][$skillId]];
+                    }
                 }
             }
         }

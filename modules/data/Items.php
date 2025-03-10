@@ -130,12 +130,53 @@ $itemsData = [
             'bone' => 3,
             'rock' => 1,
         ],
-        'onUse' => function (Game $game, $item) {
-            usePerDay($item, $game);
-        },
-        'requires' => function (Game $game, $item) {
-            return getUsePerDay($item, $game) < 2;
-        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Ignore Damage'),
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
+                'perDay' => 2,
+                'onGetActionCost' => function (Game $game, $skill, &$data) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    $interruptState = $game->actInterrupt->getState('actUseItem');
+                    if (
+                        !$char['isActive'] &&
+                        $data['action'] == 'actUseItem' &&
+                        $data['subAction'] == $skill['id'] &&
+                        $interruptState &&
+                        array_key_exists('data', $interruptState) &&
+                        $interruptState['data']['skillId'] == $skill['id']
+                    ) {
+                        $data['perDay'] = getUsePerDay($char['id'] . $skill['id'], $game);
+                    }
+                },
+                'onEncounter' => function (Game $game, $skill, &$data) {
+                    $damageTaken = $game->encounter->countDamageTaken($data);
+                    $char = $game->character->getCharacterData($skill['characterId']);
+
+                    if ($char['isActive'] && $damageTaken > 0) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $char = $game->character->getCharacterData($skill['characterId']);
+                        usePerDay($char['id'] . $skill['id'], $game);
+                        $game->log('onInterrupt', $data);
+                        $data['data']['willTakeDamage'] = 0;
+
+                        $game->activeCharacterEventLog('used ${item_name} to block the damage', [
+                            'item_name' => clienttranslate('Bone Armor'),
+                        ]);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && getUsePerDay($char['id'] . $skill['id'], $game) < 2;
+                },
+            ],
+        ],
     ],
     'camp-walls' => [
         'type' => 'item',
@@ -165,17 +206,34 @@ $itemsData = [
         ],
         'skills' => [
             'skill1' => [
+                'type' => 'item-skill',
                 'name' => clienttranslate('Ignore Damage'),
-                'state' => ['postEncounter'],
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
                 'perDay' => 1,
-                'onUse' => function (Game $game, $skill, $char) {
-                    $state = $game->gameData->get('encounterState');
-                    $game->character->adjustActiveHealth($state['willTakeDamage']);
-                    usePerDay($char['id'] . $skill['id'], $game);
+                'onEncounter' => function (Game $game, $skill, &$data) {
+                    $damageTaken = $game->encounter->countDamageTaken($data);
+                    $char = $game->character->getCharacterData($skill['characterId']);
+
+                    if ($char['isActive'] && $damageTaken > 0) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
                 },
-                'requires' => function (Game $game, $skill, $char) {
-                    $state = $game->gameData->get('encounterState');
-                    return $state['willTakeDamage'] && getUsePerDay($char['id'] . $skill['id'], $game) < 1;
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $char = $game->character->getCharacterData($skill['characterId']);
+                        usePerDay($char['id'] . $skill['id'], $game);
+                        $game->log('onInterrupt', $data);
+                        $data['data']['willTakeDamage'] = 0;
+
+                        $game->activeCharacterEventLog('used ${item_name} to block the damage', [
+                            'item_name' => clienttranslate('Hide Armor'),
+                        ]);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && getUsePerDay($char['id'] . $skill['id'], $game) < 1;
                 },
             ],
         ],

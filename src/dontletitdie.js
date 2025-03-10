@@ -702,7 +702,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           actions.forEach((action) => {
             const actionId = action.action;
             if (actionId === 'actUseSkill' && ['interrupt', 'postEncounter'].includes(stateName)) {
-              return Object.values(args.availableSkills).forEach((skill) => {
+              return args.availableSkills?.forEach((skill) => {
                 const suffix = this.getActionSuffixHTML(skill);
                 this.statusBar.addActionButton(`${skill.name} (${skill.characterId})${suffix}`, () => {
                   return this.bgaPerformAction(actionId, { skillId: skill.id });
@@ -710,7 +710,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               });
             }
             if (actionId === 'actUseItem' && ['interrupt', 'postEncounter'].includes(stateName)) {
-              return Object.values(args.availableItemSkills).forEach((skill) => {
+              return args.availableItemSkills?.forEach((skill) => {
                 const suffix = this.getActionSuffixHTML(skill);
                 this.statusBar.addActionButton(`${skill.name} (${skill.characterId})${suffix}`, () => {
                   return this.bgaPerformAction(actionId, { skillId: skill.id });
