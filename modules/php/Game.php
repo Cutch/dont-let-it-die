@@ -234,6 +234,28 @@ class Game extends \Table
             'type' => $type,
         ]);
     }
+    public function actRevive(string $character): void
+    {
+        if (!$this->character->getCharacterData($character)['incapacitated']) {
+            throw new BgaUserException($this->translate('That character is not incapacitated'));
+        }
+        $this->actions->validateCanRunAction('actRevive');
+        $left = $this->adjustResource('fish-cooked', -3);
+        $this->adjustResource('meat-cooked', $left);
+
+        $this->character->updateCharacterData($character, function (&$data) {
+            $data['health'] = max(min(3, $data['maxHealth']), 0);
+            $this->log($data['health'], $data['incapacitated'], $data['maxHealth']);
+        });
+        $this->notify->all(
+            'tokenUsed',
+            clienttranslate('${character_name} revived ${character_name_2} they should be recovered by the morning'),
+            [
+                'gameData' => $this->getAllDatas(),
+                'character_name_2' => $this->getCharacterHTML($character),
+            ]
+        );
+    }
     public function actSpendFKP(string $knowledgeId): void
     {
         // $this->character->addExtraTime();
@@ -1062,7 +1084,6 @@ class Game extends \Table
         $day += 1;
         $this->gameData->set('day', $day);
         $woodNeeded = $this->getFirewoodCost();
-        $this->log($this->gameData->get('morningState'), $woodNeeded);
         $fireWood = $this->gameData->get('fireWood');
         if (array_key_exists('allowFireWoodAddition', $this->gameData->get('morningState') ?? []) && $fireWood < $woodNeeded) {
             $missingWood = $woodNeeded - $fireWood;
@@ -1103,8 +1124,14 @@ class Game extends \Table
             if (!in_array($data['id'], $skipMorningDamage)) {
                 $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
             }
-            $data['stamina'] = $data['maxStamina'];
-            $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
+            if ($data['incapacitated'] && $data['health'] > 0) {
+                $data['incapacitated'] = false;
+            }
+
+            if (!$data['incapacitated']) {
+                $data['stamina'] = $data['maxStamina'];
+                $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
+            }
         });
         if ($health != 0) {
             $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} health'), [
@@ -1372,7 +1399,7 @@ class Game extends \Table
         ];
         if ($this->gamestate->state()['name'] != 'characterSelect') {
             $result['character_name'] = $this->getCharacterHTML();
-            $result['actions'] = $this->actions->getValidActions();
+            $result['actions'] = array_values($this->actions->getValidActions());
             $result['availableSkills'] = $this->actions->getAvailableCharacterSkills();
             $result['availableItemSkills'] = $this->actions->getAvailableItemSkills();
         }
@@ -1497,6 +1524,9 @@ class Game extends \Table
             'fkp' => 40,
             'gem' => 0,
         ]);
+        $this->notify->all('tokenUsed', '', [
+            'gameData' => $this->getAllDatas(),
+        ]);
     }
     public function giveClub()
     {
@@ -1533,7 +1563,6 @@ class Game extends \Table
                 $firstCard = $v;
             }
         }
-        $this->log($max, $firstCard);
         foreach ($cards as $k => $v) {
             if ($v['type_arg'] == 'night-event-7_15' && $firstCard['type_arg'] != 'night-event-7_15') {
                 $this->decks->getDeck('night-event')->moveCard($firstCard['id'], 'deck', $v['location_arg']);

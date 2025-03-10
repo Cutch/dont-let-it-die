@@ -24,11 +24,6 @@
     border: 1px solid #000;
     margin: 4px;
     user-select: none;
-
-    &.selected {
-      border: 5px solid var(--player-color);
-      margin: 0;
-    }
   }
   .items-card {
     position: relative;

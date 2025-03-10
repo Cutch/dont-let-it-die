@@ -92,6 +92,7 @@ $machinestates = [
             'actEndTurn',
             'actUseSkill',
             'actUseItem',
+            'actRevive',
         ],
         'transitions' => [
             'drawCard' => 11,

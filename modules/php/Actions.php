@@ -17,17 +17,17 @@ class Actions
                 'state' => ['playerTurn'],
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {
-                    $variables = $game->gameData->getResources('cooked-fish', 'cooked-meat');
+                    $variables = $game->gameData->getResources('fish-cooked', 'meat-cooked');
                     $total = array_sum($variables);
                     return $total >= 3 &&
                         sizeof(
                             array_filter($game->character->getAllCharacterData(), function ($char) {
-                                return $char['incapacitated'];
+                                return $char['incapacitated'] && ($char['health'] ?? 0) == 0;
                             })
                         ) > 0;
                 },
                 'selectable' => function (Game $game) {
-                    return ['cooked-fish', 'cooked-meat'];
+                    return ['fish-cooked', 'meat-cooked'];
                 },
             ],
             'actSpendFKP' => [
@@ -465,6 +465,6 @@ class Actions
             1,
             0
         );
-        return array_values($this->game->hooks->onGetValidActions($data));
+        return $this->game->hooks->onGetValidActions($data);
     }
 }

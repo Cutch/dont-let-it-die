@@ -15,25 +15,26 @@
  *
  */
 
-const actionMappings = {
-  actInvestigateFire: 'Investigate Fire',
-  actCraft: 'Craft',
-  actDrawGather: 'Gather',
-  actDrawForage: 'Forage',
-  actDrawHarvest: 'Harvest',
-  actDrawHunt: 'Hunt',
-  actSpendFKP: 'Spend FKP',
-  actAddWood: 'Add Wood',
-  actEat: 'Eat',
-  actCook: 'Cook',
-  actTrade: 'Trade Resources',
-  actUseSkill: 'Use Skill',
-  actTradeItem: 'Trade',
-  actConfirmTradeItem: 'Confirm Trade',
-};
 define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], function (dojo, declare) {
   return declare('bgagame.dontletitdie', ebg.core.gamegui, {
     constructor: function () {
+      this.actionMappings = {
+        actInvestigateFire: _('Investigate Fire'),
+        actCraft: _('Craft'),
+        actDrawGather: _('Gather'),
+        actDrawForage: _('Forage'),
+        actDrawHarvest: _('Harvest'),
+        actDrawHunt: _('Hunt'),
+        actSpendFKP: _('Spend FKP'),
+        actAddWood: _('Add Wood'),
+        actRevive: _('Revive'),
+        actEat: _('Eat'),
+        actCook: _('Cook'),
+        actTrade: _('Trade Resources'),
+        actUseSkill: _('Use Skill'),
+        actTradeItem: _('Trade'),
+        actConfirmTradeItem: _('Confirm Trade'),
+      };
       // Used For character selection
       this.selectedCharacters = [];
       this.mySelectedCharacters = [];
@@ -46,6 +47,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.itemTradeScreen = new ItemTradeScreen(this);
       this.craftScreen = new CraftScreen(this);
       this.eatScreen = new EatScreen(this);
+      this.reviveScreen = new ReviveScreen(this);
       this.tokenScreen = new TokenScreen(this);
       this.tooManyItemsScreen = new TooManyItemsScreen(this);
       this.resourcesForDisplay = [
@@ -99,13 +101,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             'beforeend',
             `<div id="${characterSideId}" class="character-side-container">
             <div class="character-name">${character.name}<span class="first-player-marker"></span></div>
-            <div class="health line"><div class="fa fa-heart"></div><span class="label">Health: </span><span class="value">${
+            <div class="health line"><div class="fa fa-heart"></div><span class="label">${_('Health')}: </span><span class="value">${
               character.health ?? 0
             }</span></div>
-            <div class="stamina line"><div class="fa fa-bolt"></div><span class="label">Stamina: </span><span class="value">${
+            <div class="stamina line"><div class="fa fa-bolt"></div><span class="label">${_('Stamina')}: </span><span class="value">${
               character.stamina ?? 0
             }</span></div>
-            <div class="equipment line"><div class="fa fa-cog"></div><span class="label">Equipment: </span><span class="value">${
+            <div class="equipment line"><div class="fa fa-cog"></div><span class="label">${_('Equipment')}: </span><span class="value">${
               equipments.map((d) => `<span class="equipment-item equipment-${d.itemId}">${d.options.name}</span>`).join(', ') || 'None'
             }</span></div>
             <div class="character-image"></div>
@@ -164,7 +166,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               `<div id="player-${character.name}" class="player-card">
               <div class="card"></div>
               <div class="color-marker" style="background-color: #${character.playerColor}"></div>
-              <div class="character"></div>
+              <div class="character"><div class="cover"></div></div>
               <div class="max-health max-marker"></div>
               <div class="health marker fa fa-heart"></div>
               <div class="max-stamina max-marker"></div>
@@ -197,12 +199,32 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           document.querySelector(`#player-${character.name} .stamina.marker`).style = `background-color: #${character.playerColor};left: ${
             Math.round(((character.stamina ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale) + 2
           }px;top: ${Math.round((34.5 * 4) / scale) + 2 - (character.stamina == 0 ? (3 * 4) / scale : 0)}px`;
-
-          renderImage(character.name, document.querySelector(`#player-${character.name} > .character`), { scale, pos: 'replace' });
-          addClickListener(document.querySelector(`#player-${character.name} > .character`), character.name, () => {
+          const characterElem = document.querySelector(`#player-${character.name} > .character`);
+          renderImage(character.name, characterElem, { scale, pos: 'replace' });
+          addClickListener(characterElem, character.name, () => {
             this.tooltip.show();
             renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
           });
+          const coverElem = document.createElement('div');
+          characterElem.appendChild(coverElem);
+          // const coverElem = characterElem.querySelector(`.cover`);
+          coverElem.classList.add('cover');
+          if (character.incapacitated) {
+            if ((character.health ?? 0) > 0) {
+              coverElem.innerHTML = _('Recovering');
+              if (!coverElem.classList.contains('healing')) coverElem.classList.add('healing');
+            } else if (!coverElem.classList.contains('incapacitated')) {
+              coverElem.innerHTML = _('Incapacitated');
+              coverElem.classList.add('incapacitated');
+            }
+          } else {
+            if ((character.health ?? 0) > 0) {
+              if (coverElem.classList.contains('healing')) coverElem.classList.remove('healing');
+            } else if (coverElem.classList.contains('incapacitated')) {
+              coverElem.classList.remove('incapacitated');
+            }
+          }
+
           const renderedItems = [];
           const weapon = equipments.find((d) => d.options.itemType === 'weapon');
           if (weapon) {
@@ -696,7 +718,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               });
             }
             const suffix = this.getActionSuffixHTML(action);
-            return this.statusBar.addActionButton(`${actionMappings[actionId]}${suffix}`, () => {
+            return this.statusBar.addActionButton(`${this.actionMappings[actionId]}${suffix}`, () => {
               if (actionId === 'actSpendFKP') {
                 this.removeActionButtons();
                 Object.values(args.availableUnlocks).forEach((unlock) => {
@@ -765,6 +787,29 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   () => {
                     this.onUpdateActionButtons(stateName, args);
                     this.craftScreen.hide();
+                  },
+                  { color: 'secondary' },
+                );
+              } else if (actionId === 'actRevive') {
+                this.removeActionButtons();
+                this.reviveScreen.show(args);
+                this.statusBar.addActionButton(_('Revive') + `${suffix}`, () => {
+                  if (!this.reviveScreen.hasError()) {
+                    this.bgaPerformAction('actRevive', {
+                      character: this.reviveScreen.getSelectedId(),
+                    })
+                      .then(() => {
+                        this.onUpdateActionButtons(stateName, args);
+                        this.reviveScreen.hide();
+                      })
+                      .catch(console.error);
+                  }
+                });
+                this.statusBar.addActionButton(
+                  _('Cancel'),
+                  () => {
+                    this.onUpdateActionButtons(stateName, args);
+                    this.reviveScreen.hide();
                   },
                   { color: 'secondary' },
                 );

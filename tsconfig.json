@@ -30,6 +30,7 @@
       "src/screens/deck-selection-screen.js",
       "src/screens/eat-screen.js",
       "src/screens/item-trade-screen.js",
+      "src/screens/revive-screen.js",
       "src/screens/token-screen.js",
       "src/screens/trade-screen.js",
       "src/screens/too-many-items-screen.js",

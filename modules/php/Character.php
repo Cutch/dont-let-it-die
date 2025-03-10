@@ -20,6 +20,7 @@ class Character
         'stamina',
         'health',
         'confirmed',
+        'incapacitated',
     ];
 
     public function __construct($game)
@@ -373,6 +374,7 @@ class Character
                     'character_name' => $this->game->getCharacterHTML($characterName),
                 ]);
                 $data['incapacitated'] = true;
+                $data['stamina'] = 0;
                 if ($data['isActive'] && $this->game->gamestate->state()['name'] == 'playerTurn') {
                     $this->game->gamestate->nextState('endTurn');
                 }
@@ -405,6 +407,7 @@ class Character
                 'maxStamina' => $char['maxStamina'],
                 'maxHealth' => $char['maxHealth'],
                 'health' => $char['health'],
+                'incapacitated' => !!$char['incapacitated'],
                 'slotsUsed' => $slotsUsed,
                 'slotsAllowed' => $slotsAllowed,
             ];

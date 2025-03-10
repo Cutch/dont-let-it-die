@@ -35,6 +35,26 @@
   position: absolute;
   top: 14px;
   left: 13px;
+  .cover {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #fff;
+    text-shadow: 0 0 10px black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 500;
+  }
+  .cover.incapacitated {
+    background-color: #8006;
+  }
+  .cover.healing {
+    background-color: #0006;
+  }
 }
 .player-card .weapon {
   position: absolute;

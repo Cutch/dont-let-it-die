@@ -12,6 +12,7 @@
   @include meta.load-css('screens/deck-selection-screen');
   @include meta.load-css('screens/eat-screen');
   @include meta.load-css('screens/item-trade-screen');
+  @include meta.load-css('screens/revive-screen');
   @include meta.load-css('screens/token-screen');
   @include meta.load-css('screens/trade-screen');
   @include meta.load-css('screens/too-many-items-screen');
@@ -43,4 +44,9 @@
 .dlid__container {
   margin: 0 auto 1rem;
   place-items: anchor-center;
+}
+.selected {
+  border: 5px solid var(--player-color, #fff);
+  margin: 0;
+  border-radius: 10px;
 }

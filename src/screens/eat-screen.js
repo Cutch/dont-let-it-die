@@ -46,12 +46,12 @@ class EatScreen {
         'beforeend',
         `<div class="token-block ${food['id']}">
             <div class="name">${allSprites[food['id']].options.name}</div>
-            <div class="available line"><span class="label">Available: </span><span class="value">${available}</span></div>
-            <div class="requires line"><span class="label">Requires: </span><span class="value">${requires}</span></div>
-            <div class="health line ${food['health'] ? '' : 'hidden'}"><span class="label">Health: </span><span class="value">${
+            <div class="available line"><span class="label">${_('Available')}: </span><span class="value">${available}</span></div>
+            <div class="requires line"><span class="label">${_('Requires')}: </span><span class="value">${requires}</span></div>
+            <div class="health line ${food['health'] ? '' : 'hidden'}"><span class="label">${_('Health')}: </span><span class="value">${
           food['health']
         } <i class="fa fa-heart"></i></span></div>
-            <div class="stamina line ${food['stamina'] ? '' : 'hidden'}"><span class="label">Stamina: </span><span class="value">${
+            <div class="stamina line ${food['stamina'] ? '' : 'hidden'}"><span class="label">${_('Stamina')}: </span><span class="value">${
           food['stamina']
         } <i class="fa fa-bolt"></i></span></div>
             <div class="margin"></div>
