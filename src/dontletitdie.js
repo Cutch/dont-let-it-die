@@ -103,10 +103,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             <div class="character-name">${character.name}<span class="first-player-marker"></span></div>
             <div class="health line"><div class="fa fa-heart"></div><span class="label">${_('Health')}: </span><span class="value">${
               character.health ?? 0
-            }</span></div>
+            }/${character.maxHealth ?? 0}</span></div>
             <div class="stamina line"><div class="fa fa-bolt"></div><span class="label">${_('Stamina')}: </span><span class="value">${
               character.stamina ?? 0
-            }</span></div>
+            }/${character.maxStamina ?? 0}</span></div>
             <div class="equipment line"><div class="fa fa-cog"></div><span class="label">${_('Equipment')}: </span><span class="value">${
               equipments.map((d) => `<span class="equipment-item equipment-${d.itemId}">${d.options.name}</span>`).join(', ') || 'None'
             }</span></div>
@@ -144,8 +144,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
           });
         } else {
-          playerSideContainer.querySelector(`.health .value`).innerHTML = character.health ?? 0;
-          playerSideContainer.querySelector(`.stamina .value`).innerHTML = character.stamina ?? 0;
+          playerSideContainer.querySelector(`.health .value`).innerHTML = `${character.health ?? 0}/${character.maxHealth ?? 0}`;
+          playerSideContainer.querySelector(`.stamina .value`).innerHTML = `${character.stamina ?? 0}/${character.maxStamina ?? 0}`;
           playerSideContainer.querySelector(`.equipment .value`).innerHTML =
             equipments.map((d) => `<span class="equipment-item equipment-${d.itemId}">${d.options.name}</span>`).join(', ') || 'None';
           playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';

@@ -62,6 +62,7 @@ class ActInterrupt
                     })
                 )
         ) {
+            $this->setState($functionName, null);
         } elseif (!array_key_exists('activated', $existingData)) {
             $this->setState($functionName, ['activated' => true, ...$existingData]);
             $this->game->log('exitHook', 'finalize', $functionName, $this->game->gamestate->state()['name'], $existingData);
@@ -94,6 +95,7 @@ class ActInterrupt
         $data = $state['data'];
 
         if ($data && array_key_exists('functionName', $data)) {
+            $this->game->log('checkForInterrupt ' . $state['functionName'], $data['args']);
             call_user_func([$this->game, $data['functionName']], ...$data['args']);
             return true;
         }
@@ -206,7 +208,9 @@ class ActInterrupt
             $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
         }
         if ($changeState) {
-            if ($data && array_key_exists('functionName', $data)) {
+            // Check that the state change has not already handled the function call
+            if ($data && array_key_exists('functionName', $data) && $this->getState($data['functionName'])) {
+                $this->game->log('actInterrupt ' . $state['functionName'], $data['args']);
                 call_user_func([$this->game, $data['functionName']], ...$data['args']);
                 $this->game->log('actInterrupt changeState ', $data['functionName']);
             }
@@ -247,8 +251,9 @@ class ActInterrupt
             $changeState = true;
         }
         if ($changeState) {
-            if ($data && array_key_exists('functionName', $data)) {
+            if ($data && array_key_exists('functionName', $data) && $this->getState($state['functionName'])) {
                 $this->setState($state['functionName'], [...$this->getState($state['functionName']), 'cancelled' => true]);
+                $this->game->log('actInterruptCancel ' . $state['functionName'], $data['args']);
                 call_user_func([$this->game, $data['functionName']], ...$data['args']);
                 $this->game->log('onInterruptCancel 3 call ', $data['functionName']);
             }
