@@ -83,7 +83,7 @@ class ItemTrade
             throw new BgaUserException($this->game->translate('Select one item to trade'));
         }
         if ($sendToCamp) {
-            $this->game->log($trade1, $trade2);
+            $this->game->log('$sendToCamp', $trade1, $trade2);
             $itemId1 = array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null;
             $itemId2 = array_key_exists('itemId', $trade2) ? $trade2['itemId'] : null;
 

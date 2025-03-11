@@ -30,6 +30,9 @@ class ActInterrupt
             // First time calling
             // var_dump(json_encode(['$startCallback', $this->activatableSkills]));
             $data = $startCallback($this->game, ...$args);
+            if (!$data) {
+                return;
+            }
             $res = $hook($data, false);
             $interrupt = $res && array_key_exists('interrupt', $res);
             $interruptData = [
@@ -50,6 +53,15 @@ class ActInterrupt
                 // Goto the skill screen
                 $this->game->gamestate->nextState('interrupt');
             }
+        } elseif (
+            array_key_exists('cancelled', $existingData) &&
+            sizeof($existingData['skills']) ==
+                sizeof(
+                    array_filter($existingData['skills'], function ($s) {
+                        return array_key_exists('cancellable', $s);
+                    })
+                )
+        ) {
         } elseif (!array_key_exists('activated', $existingData)) {
             $this->setState($functionName, ['activated' => true, ...$existingData]);
             $this->game->log('exitHook', 'finalize', $functionName, $this->game->gamestate->state()['name'], $existingData);
@@ -89,12 +101,12 @@ class ActInterrupt
     }
     public function getState(string $functionName): ?array
     {
-        $data = $this->game->gameData->get('actInterruptState');
+        $data = $this->getEntireState();
         return array_key_exists($functionName, $data) ? $data[$functionName] : null;
     }
     public function setState(string $functionName, ?array $data): void
     {
-        $currentData = $this->game->gameData->get('actInterruptState');
+        $currentData = $this->getEntireState();
         if ($data) {
             $currentData[$functionName] = $data;
         } else {
@@ -162,7 +174,7 @@ class ActInterrupt
     {
         $state = $this->getLatestInterruptState();
         $this->game->character->addExtraTime();
-        $this->game->log(['action' => 'actInterrupt', 'state' => $state]);
+        $this->game->log('actInterrupt', ['action' => 'actInterrupt', 'state' => $state]);
         if (!$state) {
             return;
         }
@@ -189,14 +201,21 @@ class ActInterrupt
         //     // var_dump(json_encode([$array, $playerIds, $newPlayerIds, $skills]));
         //     $this->game->gamestate->setPlayerNonMultiactive($array[0], $data['currentState']);
         // }
+        $changeState = false;
         foreach ($array as $k => $v) {
-            $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
+            $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
+        }
+        if ($changeState) {
+            if ($data && array_key_exists('functionName', $data)) {
+                call_user_func([$this->game, $data['functionName']], ...$data['args']);
+                $this->game->log('actInterrupt changeState ', $data['functionName']);
+            }
         }
     }
     public function onInterruptCancel()
     {
         $state = $this->getLatestInterruptState();
-        $this->game->log(['action' => 'onInterruptCancel', 'state' => $state]);
+        $this->game->log('onInterruptCancel', ['action' => 'onInterruptCancel', 'state' => $state]);
         if (!$state) {
             return false;
         }
@@ -215,7 +234,7 @@ class ActInterrupt
         //     }
         // });
         // $this->setState($state['functionName'], [...$data, 'skills' => $skills, 'activated' => true]);
-        $this->setState($state['functionName'], null); // TODO: for items this doesnt work, but does work for player turn?
+        // $this->setState($state['functionName'], null); // TODO: for items this doesnt work, but does work for player turn?
 
         // var_dump(json_encode([$this->game->gamestate->state()['name'], $data['currentState'], $data['currentState']]));
         // var_dump($this->game->gamestate->getActivePlayerList(), $this->game->gamestate->state()['name']);
@@ -227,7 +246,18 @@ class ActInterrupt
             $this->game->gamestate->nextState($data['currentState']);
             $changeState = true;
         }
-        $this->game->log(['action' => 'onInterruptCancel', 'characterIds' => $characterIds, 'changeState' => $changeState]);
+        if ($changeState) {
+            if ($data && array_key_exists('functionName', $data)) {
+                $this->setState($state['functionName'], [...$this->getState($state['functionName']), 'cancelled' => true]);
+                call_user_func([$this->game, $data['functionName']], ...$data['args']);
+                $this->game->log('onInterruptCancel 3 call ', $data['functionName']);
+            }
+        }
+        $this->game->log('onInterruptCancel 2', [
+            'action' => 'onInterruptCancel',
+            'characterIds' => $characterIds,
+            'changeState' => $changeState,
+        ]);
 
         return true;
     }
@@ -241,7 +271,7 @@ class ActInterrupt
         }
         $data = $state['data'];
         $this->game->getAllPlayers($data);
-        $this->game->log(['action' => 'argInterrupt', 'state' => $data]);
+        $this->game->log('argInterrupt', ['action' => 'argInterrupt', 'state' => $data]);
         return [
             ...$data,
             'character_name' => $this->game->getCharacterHTML(),
@@ -285,6 +315,11 @@ class ActInterrupt
             $changeState = true;
         }
 
-        $this->game->log(['action' => 'stInterrupt', 'state' => $state, 'changeState' => $changeState, 'state' => $data['currentState']]);
+        $this->game->log('stInterrupt', [
+            'action' => 'stInterrupt',
+            'state' => $state,
+            'changeState' => $changeState,
+            'state' => $data['currentState'],
+        ]);
     }
 }

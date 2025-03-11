@@ -131,6 +131,7 @@ $charactersData = [
                 'type' => 'skill',
                 'name' => clienttranslate('Request 2 Stamina from Kara'),
                 'state' => ['playerTurn'],
+                'cancellable' => true,
                 'perDay' => 1,
                 'onGetActionCost' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($skill['characterId']);
@@ -163,6 +164,7 @@ $charactersData = [
                 'name' => clienttranslate('Give 2 Stamina'),
                 'state' => ['interrupt'],
                 'interruptState' => ['playerTurn'],
+                'cancellable' => true,
                 'perDay' => 1,
                 'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                     // var_dump(json_encode([$skill, &$data, $activatedSkill]));

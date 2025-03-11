@@ -245,7 +245,7 @@ class Game extends \Table
 
         $this->character->updateCharacterData($character, function (&$data) {
             $data['health'] = max(min(3, $data['maxHealth']), 0);
-            $this->log($data['health'], $data['incapacitated'], $data['maxHealth']);
+            $this->log('actRevive', $data['health'], $data['incapacitated'], $data['maxHealth']);
         });
         $this->notify->all(
             'tokenUsed',
@@ -284,7 +284,6 @@ class Game extends \Table
 
         $this->actions->spendActionCost('actSpendFKP');
         $this->unlockKnowledge($knowledgeId);
-        // $this->log($availableUnlocks[$knowledgeId]);
         $knowledgeObj = $this->data->knowledgeTree[$knowledgeId];
         array_key_exists('onUse', $knowledgeObj) ? $knowledgeObj['onUse']($this, $knowledgeObj) : null;
         $this->notify->all('tokenUsed', clienttranslate('${character_name} unlocked ${knowledge_name}'), [
@@ -755,7 +754,6 @@ class Game extends \Table
     public function actInvestigateFire(): void
     {
         // $this->character->addExtraTime();
-        // var_dump(json_encode(['actInvestigateFire']));
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),
@@ -764,10 +762,11 @@ class Game extends \Table
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
                 $roll = $_this->rollFireDie($character['character_name']);
+                $this->log('roll', $roll);
                 return ['roll' => $roll];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
-                // var_dump(json_encode(['actInvestigateFire', $data]));
+                $this->log('actInvestigateFire', !array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false, $data);
                 if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
                     $_this->actions->spendActionCost('actInvestigateFire');
                 }
@@ -868,6 +867,14 @@ class Game extends \Table
         return $this->itemTrade->argTradePhase();
     }
 
+    public function actChooseWeapon(string $weaponId)
+    {
+        return $this->encounter->actChooseWeapon($weaponId);
+    }
+    public function argWhichWeapon()
+    {
+        return $this->encounter->argWhichWeapon();
+    }
     public function argPostEncounter()
     {
         return $this->encounter->argPostEncounter();
@@ -886,13 +893,13 @@ class Game extends \Table
     }
     public function stPlayerTurn()
     {
-        if (!$this->actInterrupt->checkForInterrupt()) {
-            $char = $this->character->getTurnCharacter();
-            if ($char['isActive'] && $char['incapacitated']) {
-                $this->activeCharacterEventLog('is still incapacitated');
-                $this->gamestate->nextState('endTurn');
-            }
+        // if (!$this->actInterrupt->checkForInterrupt()) {
+        $char = $this->character->getTurnCharacter();
+        if ($char['isActive'] && $char['incapacitated']) {
+            $this->activeCharacterEventLog('is still incapacitated');
+            $this->gamestate->nextState('endTurn');
         }
+        // }
     }
     public function stDrawCard()
     {

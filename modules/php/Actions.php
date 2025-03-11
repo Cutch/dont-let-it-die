@@ -310,30 +310,11 @@ class Actions
             })
         );
     }
+
     public function getAvailableItemSkills(): array
     {
         $character = $this->game->character->getSubmittingCharacter();
         $skills = $this->game->character->getActiveEquipmentSkills();
-        $this->game->log(
-            'getAvailableItemSkills',
-            $skills,
-            array_values(
-                array_filter($skills, function ($skill) use ($character) {
-                    $stamina = $character['stamina'];
-                    $health = $character['health'];
-                    $actionCost = [
-                        'action' => 'actUseItem',
-                        'subAction' => $skill['id'],
-                        'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
-                        'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
-                    ];
-                    $this->game->hooks->onGetActionCost($actionCost);
-                    return $this->checkRequirements($skill, $character) &&
-                        (!array_key_exists('stamina', $actionCost) || $stamina >= $actionCost['stamina']) &&
-                        (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
-                })
-            )
-        );
         return array_values(
             array_filter($skills, function ($skill) use ($character) {
                 $stamina = $character['stamina'];
@@ -430,6 +411,7 @@ class Actions
     public function spendActionCost($action, $subAction = null)
     {
         $cost = $this->getActionCost($action, $subAction);
+        $this->game->log('$cost', $cost);
         if (array_key_exists('health', $cost)) {
             $this->game->character->adjustActiveHealth(-$cost['health']);
         }

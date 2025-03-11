@@ -34,6 +34,7 @@
       "src/screens/token-screen.js",
       "src/screens/trade-screen.js",
       "src/screens/too-many-items-screen.js",
+      "src/screens/weapon-screen.js",
       "src/dontletitdie.js"
     ]
 }

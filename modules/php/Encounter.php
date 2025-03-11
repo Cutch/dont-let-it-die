@@ -18,6 +18,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
+use BgaUserException;
+
 class Encounter
 {
     private Game $game;
@@ -47,12 +49,36 @@ class Encounter
             if ($data['characterRange'] > 1) {
                 $damageTaken = 0;
             } else {
-                $damageTaken = max($data['willTakeDamage'], 1);
+                $damageTaken = min($data['willTakeDamage'], 1);
             }
             return $damageTaken;
         } else {
             return $data['willTakeDamage'];
         }
+    }
+    public function actChooseWeapon($weaponId)
+    {
+        $chooseWeapons = $this->game->gameData->get('chooseWeapons');
+        $selectedWeapon = array_values(
+            array_filter($chooseWeapons, function ($item) use ($weaponId) {
+                return $item['id'] == $weaponId;
+            })
+        );
+        if (sizeof($selectedWeapon) == 0) {
+            throw new BgaUserException($this->game->translate('That weapon choice is not available'));
+        }
+        $this->game->gameData->set('chooseWeapons', [$selectedWeapon[0]]);
+
+        $this->game->gamestate->nextState('resolveEncounter');
+    }
+    public function argWhichWeapon()
+    {
+        $chooseWeapons = $this->game->gameData->get('chooseWeapons');
+        $result = [
+            'chooseWeapons' => $chooseWeapons,
+            ...$this->game->getAllDatas(),
+        ];
+        return $result;
     }
     public function stResolveEncounter()
     {
@@ -62,32 +88,41 @@ class Encounter
             [$this->game->hooks, 'onEncounter'],
             function (Game $_this) {
                 $card = $_this->gameData->get('state')['card'];
-                $tools = array_filter($_this->character->getActiveEquipment(), function ($item) {
-                    return array_key_exists('onEncounter', $item) && !(!array_key_exists('requires', $item) || $item['requires']($item));
-                });
+                // $tools = array_filter($_this->character->getActiveEquipment(), function ($item) {
+                //     return array_key_exists('onEncounter', $item) && !(!array_key_exists('requires', $item) || $item['requires']($item));
+                // });
                 $weapons = array_filter($this->game->character->getActiveEquipment(), function ($item) {
                     return $item['itemType'] == 'weapon';
                 });
-                if (sizeof($tools) >= 2) {
-                    $weapon = $_this->gameData->get('useTools');
-                    if ($weapon) {
-                        $_this->gameData->set('chooseWeapon', null);
-                    } else {
-                        // TODO: Ask if want to use tools
-                        $_this->gameData->set('useTools', $weapons);
-                        $_this->gamestate->nextState('whichTool');
-                        return;
-                    }
-                }
+                // if (sizeof($tools) >= 2) {
+                //     $weapon = $_this->gameData->get('useTools');
+                //     if ($weapon) {
+                //         $_this->gameData->set('chooseWeapon', null);
+                //     } else {
+                //         // TODO: Ask if want to use tools
+                //         $_this->gameData->set('useTools', $weapons);
+                //         $_this->gamestate->nextState('whichTool');
+                //         return;
+                //     }
+                // }
                 $weapon = null;
                 if (sizeof($weapons) >= 2) {
-                    $weapon = $_this->gameData->get('chooseWeapon');
-                    if ($weapon) {
-                        $_this->gameData->set('chooseWeapon', null);
+                    $chooseWeapons = $_this->gameData->get('chooseWeapons');
+                    if ($chooseWeapons && sizeof($chooseWeapons) == 1) {
+                        $_this->gameData->set('chooseWeapons', null);
+                        $weapon = $chooseWeapons[0];
                     } else {
                         // TODO: Ask gronk if you want to combine two weapons or pick one
                         // Highest range, lowest damage for combine
-                        $_this->gameData->set('chooseWeapon', $weapons);
+                        $_this->gameData->set('chooseWeapons', [
+                            ...$weapons,
+                            [
+                                'id' => 'both',
+                                'name' => clienttranslate('Both'),
+                                'damage' => $weapons[0]['damage'] + $weapons[1]['damage'],
+                                'range' => min($weapons[0]['damage'], $weapons[1]['damage']),
+                            ],
+                        ]);
                         $_this->gamestate->nextState('whichWeapon');
                         return;
                     }

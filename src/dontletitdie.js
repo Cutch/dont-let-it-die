@@ -50,6 +50,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.reviveScreen = new ReviveScreen(this);
       this.tokenScreen = new TokenScreen(this);
       this.tooManyItemsScreen = new TooManyItemsScreen(this);
+      this.weaponScreen = new WeaponScreen(this);
       this.resourcesForDisplay = [
         'wood',
         'rock',
@@ -85,7 +86,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       */
     updatePlayers: function (gameData) {
       // If character selection, keep removing characters
-      console.log(gameData);
       if (gameData.gamestate.name === 'characterSelect')
         document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
 
@@ -628,6 +628,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'resourceSelection':
           if (isActive) this.tokenScreen.show(args.args);
           break;
+        case 'whichWeapon':
+          if (isActive) this.weaponScreen.show(args.args);
+          break;
         case 'characterSelect':
           this.selectedCharacters = args.args.characters;
           this.updateCharacterSelections(args.args);
@@ -660,6 +663,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       switch (stateName) {
         case 'deckSelection':
           this.deckSelectionScreen.hide();
+          break;
+        case 'whichWeapon':
+          this.weaponScreen.hide();
           break;
         case 'resourceSelection':
           this.tokenScreen.hide();
@@ -877,7 +883,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               );
             });
             break;
-
+          case 'whichWeapon':
+            this.statusBar.addActionButton(_('Confirm'), () =>
+              this.bgaPerformAction('actChooseWeapon', { weaponId: this.weaponScreen.getSelectedId() }).then(() =>
+                this.weaponScreen.hide(),
+              ),
+            );
+            break;
           case 'tradePhaseActions':
             this.statusBar.addActionButton(_('Pass'), () => this.bgaPerformAction('actTradeDone'), { color: 'secondary' });
             break;

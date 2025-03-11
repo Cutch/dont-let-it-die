@@ -147,7 +147,7 @@ $machinestates = [
         'action' => 'stResolveEncounter',
         'args' => 'argResolveEncounter',
         'possibleactions' => ['actChooseResource', 'actUseItem'],
-        'transitions' => ['postEncounter' => 21, 'interrupt' => 22],
+        'transitions' => ['postEncounter' => 21, 'interrupt' => 22, 'whichWeapon' => 23],
     ],
     21 => [
         'name' => 'postEncounter',
@@ -178,6 +178,15 @@ $machinestates = [
             'morningPhase' => 50,
             'tradePhase' => 60,
         ],
+    ],
+    23 => [
+        'name' => 'whichWeapon',
+        'description' => clienttranslate('${character_name} is selecting a weapon'),
+        'descriptionmyturn' => clienttranslate('Choose your weapon'),
+        'type' => 'activeplayer',
+        'args' => 'argWhichWeapon',
+        'possibleactions' => ['actChooseWeapon'],
+        'transitions' => ['resolveEncounter' => 20],
     ],
     15 => [
         'name' => 'nextCharacter',

@@ -355,12 +355,15 @@ class Character
             $prev = $data['stamina'];
             $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
             $prev = $data['stamina'] - $prev;
+            $this->game->log('stamina', $data['stamina']);
+            return $prev == 0;
         });
         return $prev;
     }
     public function adjustActiveStamina(int $stamina): int
     {
         $characterName = $this->getSubmittingCharacter()['character_name'];
+        $this->game->log('$cost', $characterName, $stamina);
         $this->game->hooks->onAdjustStamina($stamina);
         return $this->adjustStamina($characterName, $stamina);
     }
@@ -394,6 +397,8 @@ class Character
                 if ($data['isActive'] && $this->game->gamestate->state()['name'] == 'playerTurn') {
                     $this->game->gamestate->nextState('endTurn');
                 }
+            } else {
+                return $prev == 0;
             }
         });
         return $prev;
