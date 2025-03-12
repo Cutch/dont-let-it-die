@@ -82,6 +82,7 @@ $machinestates = [
             'actDrawForage',
             'actDrawHarvest',
             'actDrawHunt',
+            'actDrawExplore',
             'actSpendFKP',
             'actInvestigateFire',
             'actAddWood',

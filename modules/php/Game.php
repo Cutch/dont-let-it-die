@@ -224,6 +224,10 @@ class Game extends \Table
     {
         // $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actCook', null, $type);
+        $data = [
+            'resourceType' => $type,
+        ];
+        $this->hooks->onCook($data);
         $this->adjustResource($type, -1);
         $this->adjustResource($type . '-cooked', 1);
         $this->actions->spendActionCost('actCook');
@@ -333,7 +337,7 @@ class Game extends \Table
                     }
                 }
                 if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
-                    $_this->actions->spendActionCost('actCraft');
+                    $_this->actions->spendActionCost('actCraft', $itemName);
                 }
                 if ($itemType == 'building') {
                     $currentBuildings = $_this->gameData->get('buildings');
@@ -416,6 +420,37 @@ class Game extends \Table
         $this->log('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gamestate->nextState('playerTurn');
+    }
+
+    public function destroyItem(int $itemId): void
+    {
+        $destroyedEquipment = $this->gameData->get('destroyedEquipment');
+        array_push($destroyedEquipment, $itemId);
+        $this->gameData->set('destroyedEquipment', $destroyedEquipment);
+
+        $campEquipment = $this->gameData->get('campEquipment');
+        if (in_array($itemId, $campEquipment)) {
+            $this->gameData->set(
+                'campEquipment',
+                array_filter($campEquipment, function ($id) use ($itemId) {
+                    return $id != $itemId;
+                })
+            );
+        } else {
+            foreach ($this->character->getAllCharacterData() as $k => $v) {
+                $equippedIds = array_map(function ($d) {
+                    return $d['itemId'];
+                }, $v['equipment']);
+                if (in_array($itemId, $equippedIds)) {
+                    $this->character->unequipEquipment($v['character_name'], [$itemId]);
+                    break;
+                }
+            }
+        }
+    }
+    public function actDestroyItem(int $itemId): void
+    {
+        $this->destroyItem($itemId);
     }
     public function actSelectResource(?string $resourceType = null): void
     {
@@ -724,6 +759,10 @@ class Game extends \Table
         }
         $this->actDraw('hunt');
     }
+    public function actDrawExplore(): void
+    {
+        $this->actDraw('explore');
+    }
     public function actDraw(string $deck): void
     {
         // $this->character->addExtraTime();
@@ -761,6 +800,7 @@ class Game extends \Table
             function (Game $_this) {
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
+                $_this->activeCharacterEventLog('investigated the fire');
                 $roll = $_this->rollFireDie($character['character_name']);
                 $this->log('roll', $roll);
                 return ['roll' => $roll];
@@ -1260,6 +1300,11 @@ class Game extends \Table
                 return $items[$d];
             }, $this->gameData->get('campEquipment'))
         );
+        $destroyedEquipment = array_count_values(
+            array_map(function ($d) use ($items) {
+                return $items[$d];
+            }, $this->gameData->get('destroyedEquipment'))
+        );
 
         $equippedEquipment = array_merge(
             [],
@@ -1271,9 +1316,10 @@ class Game extends \Table
         );
         $equippedCounts = array_count_values(array_values($equippedEquipment));
         $sums = [];
-        foreach (array_keys($campEquipment + $equippedCounts) as $key) {
+        foreach (array_keys($campEquipment + $destroyedEquipment + $equippedCounts) as $key) {
             $sums[$key] =
                 (array_key_exists($key, $campEquipment) ? $campEquipment[$key] : 0) +
+                (array_key_exists($key, $destroyedEquipment) ? $destroyedEquipment[$key] : 0) +
                 (array_key_exists($key, $equippedCounts) ? $equippedCounts[$key] : 0);
         }
         return $sums;
@@ -1576,8 +1622,16 @@ class Game extends \Table
     }
     public function give($item)
     {
-        $itemId = $this->gameData->createItem($item);
-        $this->character->equipEquipment($this->character->getSubmittingCharacter()['id'], [$itemId]);
+        $itemType = $this->data->items[$item]['itemType'];
+        if ($itemType == 'building') {
+            $currentBuildings = $this->gameData->get('buildings');
+            $itemId = $this->gameData->createItem($item);
+            array_push($currentBuildings, ['name' => $item, 'itemId' => $itemId]);
+            $this->gameData->set('buildings', $currentBuildings);
+        } else {
+            $itemId = $this->gameData->createItem($item);
+            $this->character->equipEquipment($this->character->getSubmittingCharacter()['id'], [$itemId]);
+        }
     }
     public function giveItems()
     {

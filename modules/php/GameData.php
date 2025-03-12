@@ -33,6 +33,7 @@ class GameData
         'state' => [],
         'unlocks' => [],
         'campEquipment' => [],
+        'destroyedEquipment' => [],
         'activeNightCards' => [],
         'day' => 1,
         'craftingLevel' => 0,

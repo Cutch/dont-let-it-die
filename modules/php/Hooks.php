@@ -222,4 +222,16 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data, $requires);
         return $requires['requires'];
     }
+    function onCook(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onIncapacitation(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
 }

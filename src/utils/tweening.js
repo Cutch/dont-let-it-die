@@ -11,7 +11,6 @@ class Tweening {
     const elementRect1 = elem1 instanceof Element ? this.getBoundingClientRect(elem1) : elem1;
     const elementRect2 = elem2 instanceof Element ? this.getBoundingClientRect(elem2) : elem2;
     const containerRect = this.getBoundingClientRect(this.container);
-
     const id = `tween_${++this.tweenId}`;
     this.container.insertAdjacentHTML(
       'beforeend',
@@ -20,10 +19,10 @@ class Tweening {
     const tweenElem = document.getElementById(id);
     renderImage(image, tweenElem, { scale });
 
-    const relativeX1 = elementRect1.left - containerRect.left;
-    const relativeY1 = elementRect1.top - containerRect.top;
-    const relativeX2 = elementRect2.left - containerRect.left;
-    const relativeY2 = elementRect2.top - containerRect.top;
+    const relativeX1 = elementRect1.left - containerRect.left - window.scrollX;
+    const relativeY1 = elementRect1.top - containerRect.top - window.scrollY;
+    const relativeX2 = elementRect2.left - containerRect.left - window.scrollX;
+    const relativeY2 = elementRect2.top - containerRect.top - window.scrollY;
 
     tweenElem.style.left = `${relativeX1}px`;
     tweenElem.style.top = `${relativeY1}px`;

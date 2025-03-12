@@ -532,7 +532,7 @@ $charactersData = [
         'expansion' => 'mini-expansion',
         // Skip trading ITEMS with others
         'onGetActionCost' => function (Game $game, $char, &$data) {
-            if ($char['isActive'] && $data['action'] == 'onInvestigateFire') {
+            if ($char['isActive'] && $data['action'] == 'actInvestigateFire') {
                 $data['stamina'] = 5;
             }
         },

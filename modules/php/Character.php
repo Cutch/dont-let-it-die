@@ -397,6 +397,10 @@ class Character
                 if ($data['isActive'] && $this->game->gamestate->state()['name'] == 'playerTurn') {
                     $this->game->gamestate->nextState('endTurn');
                 }
+                $hookData = [
+                    'characterId' => $characterName,
+                ];
+                $this->game->hooks->onIncapacitation($hookData);
             } else {
                 return $prev == 0;
             }

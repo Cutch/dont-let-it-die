@@ -189,6 +189,12 @@ $itemsData = [
             'rock' => 3,
             'bone' => 2,
         ],
+        'onNight' => function (Game $game, $item, &$data) {
+            if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
+                $game->character->adjustHealth($item['characterId'], 1);
+                $game->activeCharacterEventLog('Camp walls protect against the rival tribe');
+            }
+        },
     ],
     'fire' => [
         'type' => 'game-piece',
@@ -325,6 +331,9 @@ $itemsData = [
             'hide' => 2,
             'bone' => 2,
         ],
+        'onEat' => function (Game $game, $item, &$data) {
+            $data['health'] += 2;
+        },
     ],
     'carving-knife' => [
         'type' => 'item',
@@ -457,6 +466,10 @@ $itemsData = [
             'hide' => 2,
             'bone' => 2,
         ],
+        'onMorning' => function (Game $game, $nightCard, &$data) {
+            $data['health'] = 0;
+            $game->nightEventLog('No damage taken in the morning');
+        },
     ],
     'rock-knife' => [
         'type' => 'item',
@@ -483,6 +496,12 @@ $itemsData = [
             'rock' => 2,
             'wood' => 1,
         ],
+        'onGetActionCost' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive'] && $data['action'] == 'actCraft') {
+                $data['action'] -= 2;
+            }
+        },
     ],
     'mortar-and-pestle' => [
         'type' => 'item',
@@ -507,6 +526,20 @@ $itemsData = [
             'hide' => 1,
             'herb' => 1,
         ],
+        'onGetCharacterData' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive']) {
+                $data['maxHealth'] += 1;
+                $data['health'] = min($data['maxHealth'], $data['health']);
+            }
+        },
+        'onIncapacitation' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive']) {
+                $game->activeCharacterEventLog('used their bandage to revive');
+                $game->destroyItem($item['itemId']);
+            }
+        },
     ],
     'skull-shield' => [
         'type' => 'item',
@@ -517,6 +550,20 @@ $itemsData = [
         'itemType' => 'tool',
         'character' => 'Faye',
         'cost' => [],
+        'onGetCharacterData' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive']) {
+                $data['maxHealth'] += 1;
+                $data['health'] = min($data['maxHealth'], $data['health']);
+            }
+        },
+        'onEncounter' => function (Game $game, $item, &$data) {
+            $damageTaken = $game->encounter->countDamageTaken($data);
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive'] && $damageTaken > 0 && $game->rollFireDie($item['characterId']) == 1) {
+                $data['willTakeDamage'] -= 1;
+            }
+        },
     ],
     'cooking-pot' => [
         'type' => 'item',
@@ -530,6 +577,20 @@ $itemsData = [
             'rock' => 2,
             'bone' => 2,
         ],
+        'onGetActionCost' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive'] && $data['action'] == 'actCook' && getUsePerDay($char['id'] . $item['itemId'], $game) % 2 == 0) {
+                $data['stamina'] = 0;
+            }
+        },
+        'onCook' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive'] && getUsePerDay($char['id'] . $item['itemId'], $game) % 2 == 0) {
+                $game->activeCharacterEventLog('another cook action can be used for free');
+                usePerDay($char['id'] . $item['itemId'], $game);
+                $data['stamina'] = 0;
+            }
+        },
     ],
     'bone-claws' => [
         'type' => 'item',
@@ -542,6 +603,12 @@ $itemsData = [
             'rock' => 2,
             'bone' => 2,
         ],
+        'onGetActionCost' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive'] && $data['action'] == 'actExplore') {
+                $data['action'] -= 2;
+            }
+        },
     ],
     'bone-flute' => [
         'type' => 'item',
@@ -554,12 +621,39 @@ $itemsData = [
             'hide' => 1,
             'bone' => 2,
         ],
-        'onUse' => function (Game $game, $item) {
-            usePerDay($item, $game);
-        },
-        'requires' => function (Game $game, $item) {
-            return getUsePerDay($item, $game) < 1;
-        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Soothe'),
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
+                'perDay' => 1,
+                'onEncounter' => function (Game $game, $skill, &$data) {
+                    $damageTaken = $game->encounter->countDamageTaken($data);
+                    $char = $game->character->getCharacterData($skill['characterId']);
+
+                    if ($char['isActive'] && $damageTaken > 0) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $char = $game->character->getCharacterData($skill['characterId']);
+                        usePerDay($char['id'] . $skill['id'], $game);
+                        $game->log('onInterrupt', $data);
+                        $data['data']['willTakeDamage'] = 0;
+
+                        $game->activeCharacterEventLog('used ${item_name} to block the damage', [
+                            'item_name' => clienttranslate('Hide Armor'),
+                        ]);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && getUsePerDay($char['id'] . $skill['id'], $game) < 1;
+                },
+            ],
+        ],
     ],
     'stock-hut' => [
         'type' => 'item',
@@ -574,6 +668,9 @@ $itemsData = [
             'hide' => 2,
             'bone' => 2,
         ],
+        'onGetTradeRatio' => function (Game $game, $item, &$data) {
+            $data['ratio'] = 2;
+        },
     ],
     'whip' => [
         'type' => 'item',
@@ -614,18 +711,16 @@ $itemsData = [
             'rock' => 1,
         ],
         'onUse' => function (Game $game, $item) {
-            $game->character->updateCharacterData($game->character->getSubmittingCharacter()['character_name'], function (&$data) use (
-                $item
-            ) {
-                if ($item['id'] == $data['item_2']) {
-                    $data['item_2'] = null;
-                } else {
-                    $data['item_2'] = null;
-                }
-            });
+            $game->character->unequipEquipment($game->character->getSubmittingCharacter()['character_name'], [$item['id']]);
             $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and lost their ${item_name}'), [
                 'item_name' => $item['name'],
             ]);
+        },
+        'onGetActionCost' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive'] && $data['action'] == 'actCraft' && $data['subAction'] == 'rock') {
+                $data['stamina'] = 1;
+            }
         },
     ],
     'bola' => [
@@ -641,6 +736,12 @@ $itemsData = [
             'fiber' => 2,
             'rock' => 2,
         ],
+        'onEncounter' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive'] && ($data['soothe'] || $data['escape']) && in_array($item['itemId'], $data['itemIds'])) {
+                $data['willTakeDamage'] -= 1;
+            }
+        },
     ],
     'boomerang' => [
         'type' => 'item',
