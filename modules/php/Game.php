@@ -114,6 +114,21 @@ class Game extends \Table
         $playerColor = $char['player_color'];
         return "<!--PNS--><span class=\"playername\" style=\"color:#$playerColor;\">$name ($playerName)</span><!--PNE-->";
     }
+    function costToString($cost): string
+    {
+        return join(
+            ', ',
+            array_values(
+                array_map(
+                    function ($k, $v) {
+                        return $v . ' ' . $this->data->tokens[$k]['name'];
+                    },
+                    array_keys($cost),
+                    $cost
+                )
+            )
+        );
+    }
     public function initDeck($type = 'card')
     {
         $deck = $this->getNew('module.common.deck');
@@ -533,7 +548,6 @@ class Game extends \Table
     }
     public function actSelectResourceCancel(): void
     {
-        // $this->character->addExtraTime();
         if (!$this->actInterrupt->onInterruptCancel()) {
             $this->gamestate->nextState('playerTurn');
         }
@@ -1383,6 +1397,18 @@ class Game extends \Table
         }
         return $sums;
     }
+    public function hasResourceCost($cost)
+    {
+        $resources = $this->gameData->getResources();
+
+        $hasResources = true;
+        foreach ($cost as $key => $value) {
+            if ($resources[$key] < $value) {
+                $hasResources = false;
+            }
+        }
+        return $hasResources;
+    }
     public function getItemData(&$result): void
     {
         $result['builtEquipment'] = $this->getCraftedItems();
@@ -1413,17 +1439,10 @@ class Game extends \Table
         );
         $availableEquipment = array_keys($result['availableEquipment']);
 
-        $resources = $this->gameData->getResources();
         $result['availableEquipmentWithCost'] = array_values(
-            array_filter($availableEquipment, function ($itemName) use ($resources) {
+            array_filter($availableEquipment, function ($itemName) {
                 $item = $this->data->items[$itemName];
-                $hasResources = true;
-                foreach ($item['cost'] as $key => $value) {
-                    if ($resources[$key] < $value) {
-                        $hasResources = false;
-                    }
-                }
-                return $hasResources;
+                return $this->hasResourceCost($item['cost']);
             })
         );
     }
@@ -1467,6 +1486,9 @@ class Game extends \Table
     {
         $buildings = $this->gameData->get('buildings');
         $characterId = $this->character->getTurnCharacterId();
+        if (!$characterId) {
+            return [];
+        }
         return array_map(function ($building) use ($characterId) {
             $data = $this->data->items[$building['name']];
             if (array_key_exists('skills', $data)) {

@@ -63,21 +63,24 @@ class Encounter
         $chooseWeapons = $this->game->gameData->get('chooseWeapons');
         $selectedWeapon = array_values(
             array_filter($chooseWeapons, function ($item) use ($weaponId) {
-                return $item['id'] == $weaponId;
+                return $item['itemId'] == $weaponId;
             })
         );
         if (sizeof($selectedWeapon) == 0) {
             throw new BgaUserException($this->game->translate('That weapon choice is not available'));
         }
+        $selectedWeapon = $selectedWeapon[0];
         $items = $this->game->gameData->getItems();
-        if ($weaponId == 'both') {
+        if ($weaponId == 'none') {
+            // pass
+        } elseif ($weaponId == 'both') {
             $bothWeapons = array_values(
                 array_filter($chooseWeapons, function ($item) {
-                    return $item['id'] != 'both';
+                    return $item['itemId'] != 'both' && $item['itemId'] != 'none';
                 })
             );
-            foreach ($bothWeapons as $k => $weaponId) {
-                $itemObj = $this->game->data->items[$items[$weaponId]];
+            foreach ($bothWeapons as $k => $weapon) {
+                $itemObj = $this->game->data->items[$items[$weapon['itemId']]];
                 if (!(!array_key_exists('requires', $itemObj) || $itemObj['requires']($this->game, $itemObj))) {
                     throw new BgaUserException($this->game->translate('A weapon is missing its requirements'));
                 }
@@ -88,7 +91,15 @@ class Encounter
                 throw new BgaUserException($this->game->translate('A weapon is missing its requirements'));
             }
         }
-        $this->game->gameData->set('chooseWeapons', [$selectedWeapon[0]]);
+
+        if (array_key_exists('useCost', $selectedWeapon)) {
+            foreach ($selectedWeapon['useCost'] as $key => $value) {
+                if ($this->game->adjustResource($key, -$value) != 0) {
+                    throw new BgaUserException($this->game->translate('Missing resources'));
+                }
+            }
+        }
+        $this->game->gameData->set('chooseWeapons', [$selectedWeapon]);
 
         $this->game->gamestate->nextState('resolveEncounter');
     }
@@ -115,29 +126,90 @@ class Encounter
                     return $item['itemType'] == 'weapon';
                 });
                 $weapon = null;
-                if (sizeof($weapons) >= 2) {
-                    $chooseWeapons = $_this->gameData->get('chooseWeapons');
+                $chooseWeapons = $_this->gameData->get('chooseWeapons');
+                $noneChoice = [
+                    'itemId' => 'none',
+                    'name' => clienttranslate('None'),
+                    'damage' => 0,
+                    'range' => 1,
+                    'itemIds' => [],
+                ];
+                $this->game->log('weaponChoice', $chooseWeapons, $weapons);
+                if ($chooseWeapons && sizeof($chooseWeapons) >= 2) {
+                    // TODO is this state reached? and how/why
+                    $_this->gameData->set('chooseWeapons', null);
+                    $weapon = $chooseWeapons[0];
+                    $this->game->log('stResolveEncounter', $chooseWeapons);
+                } elseif (sizeof($weapons) >= 2) {
+                    // This resolved the weapon choice after the change of state
                     if ($chooseWeapons && sizeof($chooseWeapons) == 1) {
                         $_this->gameData->set('chooseWeapons', null);
                         $weapon = $chooseWeapons[0];
+                        $this->game->log('stResolveEncounter', $chooseWeapons);
                     } else {
                         // Highest range, lowest damage for combine
-                        $_this->gameData->set('chooseWeapons', [
-                            ...$weapons,
+                        $bothUseCost = array_merge_count(
+                            array_key_exists('useCost', $weapons[0]) ? $weapons[0]['useCost'] : [],
+                            array_key_exists('useCost', $weapons[1]) ? $weapons[1]['useCost'] : []
+                        );
+                        $choices = [
+                            ...array_map(function ($weapon) {
+                                if (array_key_exists('useCost', $weapon)) {
+                                    $weapon['useCostString'] = $this->game->costToString($weapon['useCost']);
+                                }
+                                return $weapon;
+                            }, $weapons),
                             [
-                                'id' => 'both',
+                                'itemId' => 'both',
                                 'name' => clienttranslate('Both'),
                                 'damage' => $weapons[0]['damage'] + $weapons[1]['damage'],
-                                'range' => min($weapons[0]['damage'], $weapons[1]['damage']),
+                                'range' => min($weapons[0]['range'], $weapons[1]['range']),
+                                'useCost' => $bothUseCost,
+                                'useCostString' => $this->game->costToString($bothUseCost),
                             ],
-                        ]);
+                        ];
+                        // Add a none choice if everything is optional
+                        if (
+                            sizeof(
+                                array_filter($weapons, function ($weapon) {
+                                    return array_key_exists('useCost', $weapon);
+                                })
+                            ) == sizeof($weapons)
+                        ) {
+                            array_push($choices, $noneChoice);
+                        }
+                        $_this->gameData->set('chooseWeapons', $choices);
                         $_this->gamestate->nextState('whichWeapon');
                         return;
                     }
                 } elseif (sizeof($weapons) >= 1) {
                     $weapon = $weapons[0];
-                    $weapon['itemIds'] = [$weapon['itemId']];
+                    // If a single weapon is optional, ask if it or nothing should be used
+                    if (
+                        !$chooseWeapons &&
+                        array_key_exists('useCost', $weapon) &&
+                        (!array_key_exists('requires', $weapon) || $weapon['requires']($this->game, $weapon))
+                    ) {
+                        $_this->gameData->set('chooseWeapons', [
+                            ...array_map(function ($weapon) {
+                                if (array_key_exists('useCost', $weapon)) {
+                                    $weapon['useCostString'] = $this->game->costToString($weapon['useCost']);
+                                }
+                                return $weapon;
+                            }, $weapons),
+                            $noneChoice,
+                        ]);
+                        $_this->gamestate->nextState('whichWeapon');
+                        return;
+                    } elseif ($chooseWeapons) {
+                        $weapon = $chooseWeapons[0];
+                        $weapon['itemIds'] = [$weapon['itemId']];
+                    } else {
+                        // Select the single weapon
+                        $weapon['itemIds'] = [$weapon['itemId']];
+                    }
                 } else {
+                    // Choose nothing as the weapon
                     $weapon = [
                         'damage' => 0,
                         'range' => 1,
@@ -145,7 +217,12 @@ class Encounter
                     ];
                 }
                 return [
-                    'itemIds' => $weapon['itemIds'],
+                    'cardId' => $card['id'],
+                    'itemIds' => array_values(
+                        array_filter($weapon['itemIds'], function ($id) {
+                            return $id != 'both' && $id != 'none';
+                        })
+                    ),
                     'deck' => $deck,
                     'name' => $card['name'],
                     'encounterDamage' => $card['damage'], // Unused, maybe in logging
@@ -161,19 +238,23 @@ class Encounter
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
-                $this->game->log('stResolveEncounter', $data);
                 if ($data['stamina'] != 0) {
                     $_this->character->adjustActiveStamina($data['stamina']);
                 }
                 if ($data['soothe']) {
                     $_this->activeCharacterEventLog('soothed a ${name}', $data);
-                    $_this->decks->getDeck($data['deck']);
+                    $deck = $_this->decks->getDeck($data['deck']);
+                    $deck->moveCard($data['cardId'], 'deck');
+                    // TODO: Need to test
                 } elseif ($data['escape']) {
                     $_this->activeCharacterEventLog('escaped from a ${name}', $data);
                 } else {
                     $items = $this->game->gameData->getItems();
                     foreach ($data['itemIds'] as $k => $itemId) {
-                        array_key_exists('onUse', $items[$itemId]) ? $items[$itemId]['onUse']($this, $items[$itemId]) : null;
+                        $itemObj = $this->game->data->items[$items[$itemId]];
+                        if (array_key_exists('onUse', $itemObj)) {
+                            $itemObj['onUse']($this->game, $itemObj);
+                        }
                     }
                     if ($data['encounterHealth'] <= $data['characterDamage']) {
                         $damageTaken = $this->countDamageTaken($data);
@@ -202,6 +283,7 @@ class Encounter
                         }
                     }
                 }
+                $_this->gameData->set('chooseWeapons', null);
                 $_this->gameData->set('encounterState', $data);
                 $_this->gamestate->nextState('postEncounter');
             }

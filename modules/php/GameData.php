@@ -123,7 +123,7 @@ class GameData
     }
     public function setResource($name, $value): void
     {
-        $this->cachedGameData['resources'][$name] = $value;
+        $this->cachedGameData['resources'][$name] = min($value, 0);
         $this->game->globals->set('resources', $this->cachedGameData['resources']);
     }
     public function getResource($name): int

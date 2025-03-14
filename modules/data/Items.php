@@ -368,23 +368,16 @@ $itemsData = [
         'count' => 2,
         'name' => clienttranslate('Sling Shot'),
         'itemType' => 'weapon',
-        'range' => 3,
-        'damage' => 2,
+        'damage' => 3,
+        'range' => 2,
+        'useCost' => [
+            'rock' => 1,
+        ],
         'cost' => [
             'fiber' => 1,
             'hide' => 1,
             'wood' => 1,
         ],
-        'requires' => function (Game $game, $item) {
-            return $game->gameData->getResource('rock') > 0;
-        },
-        'onUse' => function (Game $game, $item) {
-            $game->gameData->setResource('rock', $game->gameData->getResource('rock') - 1);
-            $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and lost one ${resource_type}'), [
-                'item_name' => $item['name'],
-                'resource_type' => 'rock',
-            ]);
-        },
     ],
     'pick-axe' => [
         'type' => 'item',
@@ -756,7 +749,7 @@ $itemsData = [
         'character' => 'Rex',
         'cost' => [],
     ],
-    'rock' => [
+    'rock-weapon' => [
         'type' => 'item',
         'craftingLevel' => 0,
         'count' => 2,

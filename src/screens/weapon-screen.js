@@ -39,23 +39,26 @@ class WeaponScreen {
     const renderResource = (weapon, elem, selectCallback) => {
       elem.insertAdjacentHTML(
         'beforeend',
-        `<div class="token-block ${weapon.id}">
+        `<div class="token-block id${weapon.itemId}">
             <div class="name">${weapon.name}</div>
             <div class="line"><span class="label">${_('Damage')}: </span><span class="value">${weapon.damage}</span></div>
             <div class="line"><span class="label">${_('Range')}: </span><span class="value">${weapon.range}</span></div>
+            <div style="display: ${weapon.useCostString ? '' : 'none'}" class="line"><span class="label">${_(
+          'Cost',
+        )}: </span><span class="value">${weapon.useCostString}</span></div>
             <div class="margin"></div>
         <div>`,
       );
-      addClickListener(elem.querySelector(`.token-block.${weapon.id}`), weapon.name, () => selectCallback());
+      addClickListener(elem.querySelector(`.token-block.id${weapon.itemId}`), weapon.name, () => selectCallback());
     };
     gameData.chooseWeapons.forEach((weapon) => {
       renderResource(weapon, weaponElem, () => {
         if (this.weaponSelected) {
-          document.querySelector(`#weapon-screen .token-block.${this.weaponSelected}`).style['outline'] = '';
+          document.querySelector(`#weapon-screen .token-block.id${this.weaponSelected}`).style['outline'] = '';
         }
-        this.weaponSelected = weapon['id'];
+        this.weaponSelected = weapon['itemId'];
         if (this.weaponSelected) {
-          document.querySelector(`#weapon-screen .token-block.${weapon['id']}`).style['outline'] = `5px solid #fff`;
+          document.querySelector(`#weapon-screen .token-block.id${weapon['itemId']}`).style['outline'] = `5px solid #fff`;
         }
       });
     });

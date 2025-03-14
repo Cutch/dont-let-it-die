@@ -459,7 +459,7 @@ const itemsSprites = {
       },
       rotate: 0,
     },
-    rock: {
+    'rock-weapon': {
       options: {
         type: 'item',
         itemType: 'weapon',

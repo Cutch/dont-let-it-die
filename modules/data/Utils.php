@@ -21,4 +21,18 @@ if (!function_exists('addId')) {
 
         return $data;
     }
+    function array_merge_count(...$arrays)
+    {
+        $build = [];
+        foreach ($arrays as $array) {
+            foreach ($array as $k => $v) {
+                if (array_key_exists($k, $build)) {
+                    $build[$k] += $v;
+                } else {
+                    $build[$k] = $v;
+                }
+            }
+        }
+        return $build;
+    }
 }

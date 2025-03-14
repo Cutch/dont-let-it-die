@@ -290,10 +290,14 @@ class Character
             ? $this->getCharacterData($this->submittingCharacter, $_skipHooks)
             : $this->game->character->getTurnCharacter($_skipHooks);
     }
-    public function getTurnCharacterId(): string
+    public function getTurnCharacterId(): ?string
     {
         extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
-        return $turnOrder[$turnNo ?? 0];
+        if (sizeof($turnOrder) == 4) {
+            return $turnOrder[$turnNo ?? 0];
+        } else {
+            return null;
+        }
     }
     public function getTurnCharacter($_skipHooks = false): array
     {
