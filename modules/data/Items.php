@@ -148,7 +148,7 @@ $itemsData = [
                         array_key_exists('data', $interruptState) &&
                         $interruptState['data']['skillId'] == $skill['id']
                     ) {
-                        $data['perDay'] = getUsePerDay($char['id'] . $skill['id'], $game);
+                        $data['perDay'] = 2 - getUsePerDay($char['id'] . $skill['id'], $game);
                     }
                 },
                 'onEncounter' => function (Game $game, $skill, &$data) {
@@ -420,12 +420,70 @@ $itemsData = [
             'hide' => 2,
             'bone' => 2,
         ],
-        'onUse' => function (Game $game, $item) {
-            usePerDay($item, $game);
-        },
-        'requires' => function (Game $game, $item) {
-            return getUsePerDay($item, $game) < 2;
-        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Draw 2 Pick 1 (') . clienttranslate('Planning Hut') . ')',
+                'state' => ['interrupt'],
+                'interruptState' => ['playerTurn'],
+                'perDay' => 2,
+                'onGetActionCost' => function (Game $game, $skill, &$data) {
+                    if ($data['action'] == 'actUseItem' && $data['subAction'] == $skill['id']) {
+                        $data['perDay'] = 2 - getUsePerDay($skill['id'], $game);
+                    }
+                },
+                'onDraw' => function (Game $game, $skill, &$data) {
+                    $deck = $data['deck'];
+                    if (
+                        in_array($deck, ['forage', 'gather', 'harvest', 'hunt', 'explore']) &&
+                        getUsePerDay($skill['id'], $game) < 2 &&
+                        !$game->actInterrupt->getState('actDraw')
+                    ) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onUseSkill' => function (Game $game, $skill, &$data) {
+                    if ($data['skillId'] == $skill['id']) {
+                        $existingData = $game->actInterrupt->getState('actDraw');
+                        if (array_key_exists('data', $existingData)) {
+                            $deck = $existingData['data']['deck'];
+                            $card1 = $existingData['data']['card'];
+                            $card2 = $game->decks->pickCard($deck);
+                            $game->gameData->set('cardSelectionState', [
+                                'cards' => [$card1, $card2],
+                                'deck' => $deck,
+                                'cancellable' => false,
+                                'id' => $skill['id'],
+                            ]);
+                            $data['interrupt'] = true;
+                            $game->gamestate->nextState('cardSelection');
+                        }
+                    }
+                },
+                'onCardSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->gameData->get('cardSelectionState');
+                    if ($state && $state['id'] == $skill['id']) {
+                        usePerDay($skill['id'], $game);
+                        $discardCard = array_values(
+                            array_filter($state['cards'], function ($card) use ($data) {
+                                return $card['id'] != $data['cardId'];
+                            })
+                        )[0];
+                        $game->cardDrawEvent($discardCard, $state['deck']);
+
+                        $drawState = $game->actInterrupt->getState('actDraw');
+                        $drawState['data']['card'] = $game->decks->getCard($data['cardId']);
+                        $game->actInterrupt->setState('actDraw', $drawState);
+                        $game->actInterrupt->actInterrupt($skill['id']);
+                        $data['nextState'] = false;
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && getUsePerDay($skill['id'], $game) < 2;
+                },
+            ],
+        ],
     ],
     'spear' => [
         'type' => 'item',

@@ -315,6 +315,7 @@ class Actions
                     'subAction' => $skill['id'],
                     'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
                     'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
+                    'perDay' => array_key_exists('perDay', $skill) ? $skill['perDay'] : null,
                 ];
                 // var_dump(json_encode(['actUseSkill', $skill['id']]));
                 $this->game->hooks->onGetActionCost($actionCost);
@@ -339,6 +340,7 @@ class Actions
                     'subAction' => $skill['id'],
                     'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
                     'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
+                    'perDay' => array_key_exists('perDay', $skill) ? $skill['perDay'] : null,
                 ];
                 $this->game->hooks->onGetActionCost($actionCost);
                 return $this->checkRequirements($skill, $character) &&
@@ -376,11 +378,11 @@ class Actions
         $this->game->hooks->onGetActionCost($data);
         return $data;
     }
-    public function wrapSkills($skills): array
+    public function wrapSkills($skills, $action): array
     {
-        return array_map(function ($skill) {
+        return array_map(function ($skill) use ($action) {
             $actionCost = [
-                'action' => 'actUseSkill',
+                'action' => $action,
                 'subAction' => $skill['id'],
                 'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
                 'health' => array_key_exists('health', $skill) ? $skill['health'] : null,

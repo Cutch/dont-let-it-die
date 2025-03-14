@@ -26,6 +26,8 @@
       "src/utils/selector.js",
       "src/utils/tooltip.js",
       "src/utils/tweening.js",
+      "src/screens/card-selection-screen.js",
+      "src/screens/character-selection-screen.js",
       "src/screens/craft-screen.js",
       "src/screens/deck-selection-screen.js",
       "src/screens/eat-screen.js",

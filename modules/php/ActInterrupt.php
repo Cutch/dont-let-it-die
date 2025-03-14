@@ -26,9 +26,9 @@ class ActInterrupt
     ) {
         $entireState = $this->getEntireState();
         $existingData = $this->getState($functionName);
+
         if (!$existingData) {
             // First time calling
-            // var_dump(json_encode(['$startCallback', $this->activatableSkills]));
             $data = $startCallback($this->game, ...$args);
             if (!$data) {
                 return;
@@ -43,12 +43,13 @@ class ActInterrupt
                 'skills' => $this->activatableSkills,
                 'stateNumber' => sizeof($entireState) + 1,
             ];
-            if (sizeof($this->activatableSkills) == 0 && !$interrupt) {
+            $this->game->log($functionName, $data, $res, $interruptData);
+            $this->activatableSkills = [];
+            if (sizeof($interruptData['skills']) == 0 && !$interrupt) {
                 $this->game->log('exitHook', 'not interrupted', $this->game->gamestate->state()['name'], 'noSkill');
                 // No skills can activate
                 $endCallback($this->game, false, $data, ...$args);
             } else {
-                // var_dump(json_encode($interruptData));
                 $this->setState($functionName, $interruptData);
                 // Goto the skill screen
                 $this->game->gamestate->nextState('interrupt');
@@ -187,9 +188,7 @@ class ActInterrupt
         $characterIds = $this->getSkillsCharacterIds($skills);
         // Remove skills so that we know there's nothing left to do
         array_walk($skills, function ($v, $k) use ($skillId, &$skills, &$data) {
-            // var_dump(json_encode([$skillId, $v['id']]));
             if ($skillId == $v['id']) {
-                // var_dump(json_encode(['onInterrupt']));
                 $this->game->hooks->onInterrupt($data, $v);
                 unset($skills[$k]);
                 $skills = array_values($skills);
@@ -200,12 +199,13 @@ class ActInterrupt
 
         $array = array_unique(array_diff($characterIds, $newCharacterIds));
         // if (sizeof($array) > 0) {
-        //     // var_dump(json_encode([$array, $playerIds, $newPlayerIds, $skills]));
         //     $this->game->gamestate->setPlayerNonMultiactive($array[0], $data['currentState']);
         // }
-        $changeState = false;
-        foreach ($array as $k => $v) {
-            $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
+        $changeState = !$this->game->gamestate->isMutiactiveState();
+        if (!$changeState) {
+            foreach ($array as $k => $v) {
+                $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
+            }
         }
         if ($changeState) {
             // Check that the state change has not already handled the function call
@@ -293,12 +293,14 @@ class ActInterrupt
             'availableSkills' => $this->game->actions->wrapSkills(
                 array_filter($data['skills'], function ($skill) {
                     return $skill['type'] == 'skill';
-                })
+                }),
+                'actUseSkill'
             ),
             'availableItemSkills' => $this->game->actions->wrapSkills(
                 array_filter($data['skills'], function ($skill) {
                     return $skill['type'] == 'item-skill';
-                })
+                }),
+                'actUseItem'
             ),
         ];
     }

@@ -230,8 +230,12 @@ class Character
         if ($action == 'actUseSkill') {
             $this->submittingCharacter = $this->game->character->getSkill($subAction)['character']['id'];
         } elseif ($action == 'actUseItem') {
-            $this->submittingCharacter = $this->game->character->getSkill($subAction)['character']['id'];
-            // $this->submittingCharacter = $this->game->character->getItem($subAction)['character']['id'];
+            $skill = $this->game->character->getSkill($subAction);
+            if ($skill && array_key_exists('character', $skill)) {
+                $this->submittingCharacter = $this->game->character->getSkill($subAction)['character']['id'];
+            } else {
+                $this->submittingCharacter = null;
+            }
         } elseif ($action == null) {
             $this->submittingCharacter = null;
         }
@@ -239,6 +243,7 @@ class Character
     public function getSkill($skillId): ?array
     {
         $characters = $this->game->character->getAllCharacterData(true);
+        $currentCharacter = $this->game->character->getTurnCharacter(true);
         foreach ($characters as $k => $v) {
             if (array_key_exists('skills', $v)) {
                 if (array_key_exists($skillId, $v['skills'])) {
@@ -253,34 +258,46 @@ class Character
                 }
             }
         }
-        return null;
-    }
-    public function getItem($itemId): ?array
-    {
-        $characters = $this->game->character->getAllCharacterData(true);
-        foreach ($characters as $k => $v) {
-            $array = array_values(
-                array_filter($v['equipment'], function ($item) use ($itemId) {
-                    return $item['itemId'] == $itemId;
-                })
-            );
-            if (sizeof($array) > 0) {
-                return ['character' => $v, 'item' => $$array[0]];
+        $buildings = $this->game->gameData->get('buildings');
+        foreach ($buildings as $k => $building) {
+            $data = $this->game->data->items[$building['name']];
+            if (array_key_exists('skills', $data)) {
+                if (array_key_exists($skillId, $data['skills'])) {
+                    return ['character' => $currentCharacter, 'skill' => $data['skills'][$skillId]];
+                }
             }
         }
         return null;
     }
-    public function getSubmittingCharacter(): array
+    // public function getItem($itemId): ?array
+    // {
+    //     $characters = $this->game->character->getAllCharacterData(true);
+    //     foreach ($characters as $k => $v) {
+    //         $array = array_values(
+    //             array_filter($v['equipment'], function ($item) use ($itemId) {
+    //                 return $item['itemId'] == $itemId;
+    //             })
+    //         );
+    //         if (sizeof($array) > 0) {
+    //             return ['character' => $v, 'item' => $$array[0]];
+    //         }
+    //     }
+    //     return null;
+    // }
+    public function getSubmittingCharacter($_skipHooks = false): array
     {
         return $this->submittingCharacter
-            ? $this->getCharacterData($this->submittingCharacter)
-            : $this->game->character->getTurnCharacter();
+            ? $this->getCharacterData($this->submittingCharacter, $_skipHooks)
+            : $this->game->character->getTurnCharacter($_skipHooks);
     }
-    public function getTurnCharacter(): array
+    public function getTurnCharacterId(): string
     {
         extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
-        $character = $turnOrder[$turnNo ?? 0];
-        return $this->getCharacterData($character);
+        return $turnOrder[$turnNo ?? 0];
+    }
+    public function getTurnCharacter($_skipHooks = false): array
+    {
+        return $this->getCharacterData($this->getTurnCharacterId(), $_skipHooks);
     }
     public function getActiveEquipment(): array
     {
@@ -290,7 +307,14 @@ class Character
     public function getActiveEquipmentSkills()
     {
         $character = $this->game->character->getSubmittingCharacter();
+        $buildings = $this->game->getBuildings();
         $skills = array_merge(
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return $c['skills'];
+                }
+                return [];
+            }, $buildings),
             ...array_map(function ($item) {
                 if (!array_key_exists('skills', $item)) {
                     return [];

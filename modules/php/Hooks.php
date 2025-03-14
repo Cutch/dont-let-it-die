@@ -25,14 +25,16 @@ class Hooks
                 return $c['equipment'];
             }, $characters)
         );
-
         $skills = array_merge(
             ...array_map(function ($c) {
                 if (array_key_exists('skills', $c)) {
                     return $c['skills'];
-                    // array_map(function ($data) use ($c) {
-                    //     return [...$data, 'characterId' => $c['character_name']];
-                    // }, $c['skills']);
+                }
+                return [];
+            }, $buildings),
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return $c['skills'];
                 }
                 return [];
             }, $equipment),
@@ -171,6 +173,18 @@ class Hooks
         return $data;
     }
     function onDeckSelection(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onCharacterSelection(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onCardSelection(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);

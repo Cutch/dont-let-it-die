@@ -111,7 +111,6 @@ $charactersData = [
                     }
                 },
                 'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
-                    // var_dump(json_encode([$skill, $data, $activatedSkill]));
                     if ($skill['id'] == $activatedSkill['id']) {
                         $char = $game->character->getCharacterData($skill['characterId']);
                         $game->activeCharacterEventLog('is re-rolling ${active_character_name}\'s fire die', [
@@ -136,7 +135,7 @@ $charactersData = [
                 'onGetActionCost' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if (!$char['isActive'] && $data['action'] == 'actUseSkill' && $data['subAction'] == $skill['id']) {
-                        $data['perDay'] = getUsePerDay($char['id'] . 'stamina', $game);
+                        $data['perDay'] = 1 - getUsePerDay($char['id'] . 'stamina', $game);
                     }
                 },
                 'onUseSkill' => function (Game $game, $skill, &$data) {
@@ -167,7 +166,6 @@ $charactersData = [
                 'cancellable' => true,
                 'perDay' => 1,
                 'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
-                    // var_dump(json_encode([$skill, &$data, $activatedSkill]));
                     if ($skill['id'] == $activatedSkill['id']) {
                         $data['args'] = ['Karaskill3'];
                     }
@@ -202,13 +200,6 @@ $charactersData = [
                     ]);
                     return ['notify' => false];
                 },
-                // 'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
-                //     if ($skill['id'] == $activatedSkill['id']) {
-                // var_dump('onInterrupt');
-                //     $game->adjustResource($data['data']['card']['resourceType'], $data['data']['card']['count']);
-                //     $game->activeCharacterEventLog('doubled the resources they found');
-                //     }
-                // },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return !$char['isActive'] && getUsePerDay($char['id'] . 'stamina', $game) < 1;
@@ -928,11 +919,9 @@ $charactersData = [
                     }
                 },
                 'onEncounter' => function (Game $game, $skill, &$data) {
-                    // var_dump(json_encode($data));
                     $damageTaken = $game->encounter->countDamageTaken($data);
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if (!$char['isActive'] && $damageTaken > 0) {
-                        // var_dump(json_encode($skill));
                         $game->actInterrupt->addSkillInterrupt($skill);
                     }
                 },
@@ -950,12 +939,6 @@ $charactersData = [
                 'onUse' => function (Game $game, $skill) {
                     return ['notify' => false];
                 },
-                // 'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
-                //     if ($skill['id'] == $activatedSkill['id']) {
-                //         $game->adjustResource($data['data']['card']['resourceType'], $data['data']['card']['count']);
-                //         $game->activeCharacterEventLog('doubled the resources they found');
-                //     }
-                // },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return !$char['isActive'];

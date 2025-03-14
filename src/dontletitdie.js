@@ -34,6 +34,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         actUseSkill: _('Use Skill'),
         actTradeItem: _('Trade'),
         actConfirmTradeItem: _('Confirm Trade'),
+        actSelectCharacter: _('Select Character'),
+        actSelectCard: _('Select Card'),
       };
       // Used For character selection
       this.selectedCharacters = [];
@@ -42,6 +44,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.selector = null;
       this.tooltip = null;
       this.decks = {};
+      this.cardSelectionScreen = new CardSelectionScreen(this);
+      this.characterSelectionScreen = new CharacterSelectionScreen(this);
       this.deckSelectionScreen = new DeckSelectionScreen(this);
       this.tradeScreen = new TradeScreen(this);
       this.itemTradeScreen = new ItemTradeScreen(this);
@@ -628,6 +632,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'resourceSelection':
           if (isActive) this.tokenScreen.show(args.args);
           break;
+        case 'characterSelection':
+          if (isActive) this.characterSelectionScreen.show(args.args);
+          break;
+        case 'cardSelection':
+          if (isActive) this.cardSelectionScreen.show(args.args);
+          break;
         case 'whichWeapon':
           if (isActive) this.weaponScreen.show(args.args);
           break;
@@ -667,6 +677,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'whichWeapon':
           this.weaponScreen.hide();
           break;
+        case 'characterSelection':
+          this.characterSelectionScreen.hide();
+          break;
+        case 'cardSelection':
+          this.cardSelectionScreen.hide();
+          break;
         case 'resourceSelection':
           this.tokenScreen.hide();
           break;
@@ -692,7 +708,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (action['stamina'] != null) suffix += ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
       if (action['health'] != null) suffix += ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
       if (action['cost'] != null) suffix += ` <i class="fa fa-graduation-cap dlid__fkp"></i> ${action['cost']}`;
-      if (action['perDay'] != null) suffix += ` <i class="fa fa-sun-o dlid__sun"></i> ${action['perDay']} left`;
+      if (action['perDay'] != null)
+        suffix += ` <i class="fa fa-sun-o dlid__sun"></i> ` + _('${remaining} left').replace(/\$\{remaining\}/, action['perDay']);
       return suffix;
     },
     onUpdateActionButtons: function (stateName, args) {
@@ -710,7 +727,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             if (actionId === 'actUseSkill' && ['interrupt', 'postEncounter'].includes(stateName)) {
               return args.availableSkills?.forEach((skill) => {
                 const suffix = this.getActionSuffixHTML(skill);
-                this.statusBar.addActionButton(`${skill.name} (${skill.characterId})${suffix}`, () => {
+                const characterSuffix = skill.characterId ? ` (${skill.characterId})` : '';
+                this.statusBar.addActionButton(`${skill.name}${characterSuffix}${suffix}`, () => {
                   return this.bgaPerformAction(actionId, { skillId: skill.id });
                 });
               });
@@ -718,7 +736,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             if (actionId === 'actUseItem' && ['interrupt', 'postEncounter'].includes(stateName)) {
               return args.availableItemSkills?.forEach((skill) => {
                 const suffix = this.getActionSuffixHTML(skill);
-                this.statusBar.addActionButton(`${skill.name} (${skill.characterId})${suffix}`, () => {
+                const characterSuffix = skill.characterId ? ` (${skill.characterId})` : '';
+                this.statusBar.addActionButton(`${skill.name}${characterSuffix}${suffix}`, () => {
                   return this.bgaPerformAction(actionId, { skillId: skill.id });
                 });
               });
@@ -862,19 +881,50 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               { color: 'secondary' },
             );
             break;
+          case 'characterSelection':
+            this.statusBar.addActionButton(_('Select Character'), () => {
+              this.bgaPerformAction('actSelectCharacter', { characterId: this.characterSelectionScreen.getSelectedId() }).then(() =>
+                this.characterSelectionScreen.hide(),
+              );
+            });
+            if (args.cancellable !== false)
+              this.statusBar.addActionButton(
+                _('Cancel'),
+                () => {
+                  this.bgaPerformAction('actSelectCharacterCancel').then(() => this.selector.hide());
+                },
+                { color: 'secondary' },
+              );
+            break;
+          case 'cardSelection':
+            this.statusBar.addActionButton(_('Select Card'), () => {
+              this.bgaPerformAction('actSelectCard', { cardId: this.cardSelectionScreen.getSelectedId() }).then(() =>
+                this.cardSelectionScreen.hide(),
+              );
+            });
+            if (args.cancellable !== false)
+              this.statusBar.addActionButton(
+                _('Cancel'),
+                () => {
+                  this.bgaPerformAction('actSelectCardCancel').then(() => this.selector.hide());
+                },
+                { color: 'secondary' },
+              );
+            break;
           case 'resourceSelection':
             this.statusBar.addActionButton(_('Select Resource'), () => {
               this.bgaPerformAction('actSelectResource', { resourceType: this.tokenScreen.getSelectedId() }).then(() =>
                 this.tokenScreen.hide(),
               );
             });
-            this.statusBar.addActionButton(
-              _('Cancel'),
-              () => {
-                this.bgaPerformAction('actSelectResourceCancel').then(() => this.selector.hide());
-              },
-              { color: 'secondary' },
-            );
+            if (args.cancellable !== false)
+              this.statusBar.addActionButton(
+                _('Cancel'),
+                () => {
+                  this.bgaPerformAction('actSelectResourceCancel').then(() => this.selector.hide());
+                },
+                { color: 'secondary' },
+              );
             break;
           case 'tooManyItems':
             this.statusBar.addActionButton(_('Send To Camp'), () => {

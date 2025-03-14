@@ -33,8 +33,8 @@ const addPassiveListener = (type, callback) => {
   };
 };
 
-const scrollArrow = (itemTradeContent, arrowElem) => {
-  const { y, height } = itemTradeContent.getBoundingClientRect();
+const scrollArrow = (content, arrowElem) => {
+  const { y, height } = content.getBoundingClientRect();
   arrowElem.style['top'] = `calc(${Math.max(
     0,
     window.scrollY - (window.scrollY + y) - height + window.innerHeight / 2,

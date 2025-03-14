@@ -452,24 +452,72 @@ class Game extends \Table
     {
         $this->destroyItem($itemId);
     }
+    public function actSelectCharacter(?string $characterId = null): void
+    {
+        if (!$characterId) {
+            throw new BgaUserException($this->translate('Select a Character'));
+        }
+        $data = [
+            'characterId' => $characterId,
+            'nextState' => 'playerTurn',
+        ];
+        $this->hooks->onCharacterSelection($data);
+        if ($data['nextState'] != false) {
+            $this->gamestate->nextState($data['nextState']);
+        }
+    }
+    public function actSelectCharacterCancel(): void
+    {
+        if (!$this->actInterrupt->onInterruptCancel()) {
+            $this->gamestate->nextState('playerTurn');
+        }
+    }
+    public function actSelectCard(?string $cardId = null): void
+    {
+        if (!$cardId) {
+            throw new BgaUserException($this->translate('Select a Card'));
+        }
+        $data = [
+            'cardId' => $cardId,
+            'nextState' => 'playerTurn',
+        ];
+        $this->hooks->onCardSelection($data);
+        if ($data['nextState'] != false) {
+            $this->gamestate->nextState($data['nextState']);
+        }
+    }
+    public function actSelectCardCancel(): void
+    {
+        $state = $this->gameData->get('cardSelectionState');
+        if (array_key_exists('cancellable', $state) && !$state['cancellable']) {
+            throw new BgaUserException($this->translate('This action cannot be cancelled'));
+        }
+
+        if (!$this->actInterrupt->onInterruptCancel()) {
+            $this->gamestate->nextState('playerTurn');
+        }
+    }
     public function actSelectResource(?string $resourceType = null): void
     {
         // $this->character->addExtraTime();
         if (!$resourceType) {
-            throw new BgaUserException($this->translate('Select a resource'));
+            throw new BgaUserException($this->translate('Select a Resource'));
         }
         $data = [
             'resourceType' => $resourceType,
+            'nextState' => 'playerTurn',
         ];
         $this->hooks->onResourceSelection($data);
-        $this->gamestate->nextState('playerTurn');
+        if ($data['nextState'] != false) {
+            $this->gamestate->nextState($data['nextState']);
+        }
         // $this->actInterrupt->interruptableFunction(
         //     __FUNCTION__,
         //     func_get_args(),
         //     [$this->hooks, 'onResourceSelection'],
         //     function (Game $_this) use ($resourceType) {
         //         if (!$resourceType) {
-        //             throw new BgaUserException($this->translate('Select a resource'));
+        //             throw new BgaUserException($this->translate('Select a Resource'));
         //         }
         //         return [
         //             'resourceType' => $resourceType,
@@ -487,7 +535,6 @@ class Game extends \Table
     {
         // $this->character->addExtraTime();
         if (!$this->actInterrupt->onInterruptCancel()) {
-            // var_dump('actSelectResourceCancel playerTurn');
             $this->gamestate->nextState('playerTurn');
         }
     }
@@ -495,7 +542,7 @@ class Game extends \Table
     {
         // $this->character->addExtraTime();
         if (!$deckName) {
-            throw new BgaUserException($this->translate('Select a deck'));
+            throw new BgaUserException($this->translate('Select a Deck'));
         }
         $this->hooks->onDeckSelection($deckName);
         $this->gamestate->nextState('playerTurn');
@@ -773,7 +820,7 @@ class Game extends \Table
             function (Game $_this, $deck) {
                 $_this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
                 $card = $_this->decks->pickCard($deck);
-                $_this->activeCharacterEventLog('drew from the ${deck} deck', [
+                $_this->activeCharacterEventLog('draws from the ${deck} deck', [
                     'deck' => str_replace('-', ' ', $deck),
                     'gameData' => $_this->getAllDatas(),
                 ]);
@@ -849,6 +896,18 @@ class Game extends \Table
         $result = ['actions' => [], 'character_name' => $this->getCharacterHTML()];
         $this->getDecks($result);
 
+        return $result;
+    }
+    public function argCardSelection()
+    {
+        $result = [...$this->gameData->get('cardSelectionState'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
+        $this->getGameData($result);
+        return $result;
+    }
+    public function argCharacterSelection()
+    {
+        $result = [...$this->gameData->get('characterSelectionState'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
+        $this->getGameData($result);
         return $result;
     }
     public function argResourceSelection()
@@ -1407,8 +1466,17 @@ class Game extends \Table
     public function getBuildings(): array
     {
         $buildings = $this->gameData->get('buildings');
-        return array_map(function ($building) {
-            return $this->data->items[$building['name']];
+        $characterId = $this->character->getTurnCharacterId();
+        return array_map(function ($building) use ($characterId) {
+            $data = $this->data->items[$building['name']];
+            if (array_key_exists('skills', $data)) {
+                array_walk($data['skills'], function (&$v, $k) use ($building, $characterId) {
+                    $v['itemId'] = $building['itemId'];
+                    $v['itemName'] = $building['name'];
+                    $v['characterId'] = $characterId;
+                });
+            }
+            return $data;
         }, $buildings);
     }
     // public function addBuilding($buildingId): void
