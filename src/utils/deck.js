@@ -9,7 +9,12 @@ class Deck {
     this.div.classList.add('deck');
     this.div.classList.add(this.style === 'vertical' ? 'vertical' : 'horizontal');
     renderImage(`${this.deck}-back`, this.div, { scale: this.scale, pos: 'replace' });
-    this.div.insertAdjacentHTML('beforeend', `<div class="flipped-card"></div>`);
+    this.div.insertAdjacentHTML(
+      'beforeend',
+      `<div class="flipped-card"></div><div class="shuffle shuffle-1"></div><div class="shuffle shuffle-2"></div>`,
+    );
+    renderImage(`${this.deck}-back`, this.div.querySelector(`.shuffle-1`), { scale: this.scale, pos: 'replace' });
+    renderImage(`${this.deck}-back`, this.div.querySelector(`.shuffle-2`), { scale: this.scale, pos: 'replace' });
     this.div
       .querySelector(`.${this.deck}-back`)
       .insertAdjacentHTML('beforeend', `<div class="deck-counter dot counter">${this.countData.count}</div>`);
@@ -20,6 +25,12 @@ class Deck {
   shuffle() {
     this.topDiscard = null;
     this.setDiscard();
+    this.div.querySelector(`.shuffle-1`).classList.add('enable');
+    this.div.querySelector(`.shuffle-2`).classList.add('enable');
+    setTimeout(() => {
+      this.div.querySelector(`.shuffle-1`).classList.remove('enable');
+      this.div.querySelector(`.shuffle-2`).classList.remove('enable');
+    }, 1500);
   }
   updateDeckCounts(countData) {
     this.countData = countData;

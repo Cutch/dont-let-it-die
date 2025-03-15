@@ -58,7 +58,7 @@ class TradeScreen {
     let tradeElem = document.querySelector(`#trade-resource .tokens`);
     let tradeForElem = document.querySelector(`#trade-for .tokens`);
     if (!tradeElem) {
-      const resourcesForDisplay = this.game.getResourcesForDisplay(gameData);
+      const resourcesForDisplay = this.game.getResourcesForDisplay(gameData).filter((d) => !d.includes('fish'));
       this.resourceSelected = resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
       this.resourceRequested = resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
       this.game.selector.show('trade');
@@ -100,26 +100,30 @@ class TradeScreen {
       this.updateFunctions.push(() => this.updateMinMax(plusElem, minusElem, count(), max()));
     };
 
-    this.game.getResourcesForDisplay(gameData).forEach((name) => {
-      renderResource(
-        name,
-        tradeElem,
-        () => this.resourceSelected[name],
-        () => gameData.game['resources'][name] ?? 0,
-        (count, max) => {
-          this.resourceSelected[name] = Math.min(max(), count() + 1);
-          tradeElem.querySelector(`.token-number-counter.${name} .counter`).innerHTML = `${count()}/${max()}`;
-          this.updateFunctions.forEach((d) => d());
-        },
-        (count, max) => {
-          this.resourceSelected[name] = Math.max(0, count() - 1);
-          tradeElem.querySelector(`.token-number-counter.${name} .counter`).innerHTML = `${count()}/${max()}`;
-          this.updateFunctions.forEach((d) => d());
-        },
-      );
-    });
     this.game
       .getResourcesForDisplay(gameData)
+      .filter((d) => !d.includes('fish'))
+      .forEach((name) => {
+        renderResource(
+          name,
+          tradeElem,
+          () => this.resourceSelected[name],
+          () => gameData.game['resources'][name] ?? 0,
+          (count, max) => {
+            this.resourceSelected[name] = Math.min(max(), count() + 1);
+            tradeElem.querySelector(`.token-number-counter.${name} .counter`).innerHTML = `${count()}/${max()}`;
+            this.updateFunctions.forEach((d) => d());
+          },
+          (count, max) => {
+            this.resourceSelected[name] = Math.max(0, count() - 1);
+            tradeElem.querySelector(`.token-number-counter.${name} .counter`).innerHTML = `${count()}/${max()}`;
+            this.updateFunctions.forEach((d) => d());
+          },
+        );
+      });
+    this.game
+      .getResourcesForDisplay(gameData)
+      .filter((d) => !d.includes('fish'))
       .filter((d) => !d.includes('-cooked'))
       .forEach((name) => {
         renderResource(

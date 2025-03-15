@@ -6,6 +6,84 @@
     position: relative;
   }
 }
+.shuffle {
+  position: absolute;
+  transition: transform 0.8s;
+  top: 0;
+  left: 0;
+  display: none;
+  &.enable {
+    display: unset;
+  }
+}
+.shuffle-1 {
+  animation: 0.75s 2 alternate slide-1;
+}
+.shuffle-2 {
+  animation: 0.75s 2 alternate slide-2;
+}
+@keyframes slide-1 {
+  0% {
+    transform: translateX(0%);
+    z-index: 1;
+    display: block;
+  }
+  20% {
+    transform: translateX(-20%);
+    z-index: 2;
+  }
+  40% {
+    transform: translateX(-10%);
+  }
+  50% {
+    transform: translateX(-20%);
+    z-index: 1;
+  }
+  60% {
+    transform: translateX(-10%);
+  }
+  70% {
+    transform: translateX(-20%);
+    z-index: 2;
+  }
+
+  100% {
+    transform: translateX(0%);
+    z-index: 1;
+    display: none;
+  }
+}
+@keyframes slide-2 {
+  0% {
+    transform: translateX(0%);
+    z-index: 2;
+    display: block !important;
+  }
+  20% {
+    transform: translateX(20%);
+    z-index: 1;
+  }
+  40% {
+    transform: translateX(10%);
+  }
+  50% {
+    transform: translateX(20%);
+    z-index: 2;
+  }
+  60% {
+    transform: translateX(10%);
+  }
+  70% {
+    transform: translateX(20%);
+    z-index: 1;
+  }
+
+  100% {
+    transform: translateX(0%);
+    z-index: 2;
+    display: none;
+  }
+}
 .deck.horizontal {
   flex-direction: row;
 }
