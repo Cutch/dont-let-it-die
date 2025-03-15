@@ -5,7 +5,16 @@ class Tweening {
   }
   getBoundingClientRect(elem) {
     const { x, y, left, top, right, bottom, width, height } = elem.getBoundingClientRect();
-    return { x, y, left, top, right, bottom, width, height };
+    return {
+      x: x + window.scrollX,
+      y: y + window.scrollY,
+      left: left + window.scrollX,
+      top: top + window.scrollY,
+      right: right + window.scrollX,
+      bottom: bottom + window.scrollY,
+      width,
+      height,
+    };
   }
   addTween(elem1, elem2, image, scale, count = 1, time = 500) {
     const elementRect1 = elem1 instanceof Element ? this.getBoundingClientRect(elem1) : elem1;
@@ -19,10 +28,10 @@ class Tweening {
     const tweenElem = document.getElementById(id);
     renderImage(image, tweenElem, { scale });
 
-    const relativeX1 = elementRect1.left - containerRect.left - window.scrollX;
-    const relativeY1 = elementRect1.top - containerRect.top - window.scrollY;
-    const relativeX2 = elementRect2.left - containerRect.left - window.scrollX;
-    const relativeY2 = elementRect2.top - containerRect.top - window.scrollY;
+    const relativeX1 = elementRect1.left - containerRect.left;
+    const relativeY1 = elementRect1.top - containerRect.top;
+    const relativeX2 = elementRect2.left - containerRect.left;
+    const relativeY2 = elementRect2.top - containerRect.top;
 
     tweenElem.style.left = `${relativeX1}px`;
     tweenElem.style.top = `${relativeY1}px`;
