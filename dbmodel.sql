@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS `character` (
     `item_1` int(10) unsigned NULL,
     `item_2` int(10) unsigned NULL,
     `item_3` int(10) unsigned NULL,
+    `hindrance` text NULL,
     `stamina` int(1) UNSIGNED DEFAULT 0,
     `health` int(1) UNSIGNED DEFAULT 0,
     `confirmed` int(1) UNSIGNED DEFAULT 0,

@@ -21,6 +21,7 @@ class Character
         'health',
         'confirmed',
         'incapacitated',
+        'hindrance',
     ];
 
     public function __construct($game)
@@ -31,22 +32,36 @@ class Character
     {
         $this->game->giveExtraTime($this->getTurnCharacter()['player_id'], $extraTime);
     }
+
+    public function _updateCharacterData($name, $data)
+    {
+        // Update db
+        $data['item_1'] = array_key_exists(0, $data['equipment']) ? $data['equipment'][0] : null;
+        $data['item_2'] = array_key_exists(1, $data['equipment']) ? $data['equipment'][1] : null;
+        $data['item_3'] = array_key_exists(2, $data['equipment']) ? $data['equipment'][2] : null;
+        $data['hindrance'] = join(
+            ',',
+            array_map(function ($hindrance) {
+                return $hindrance['id'];
+            }, $data['physical-hindrance'] + $data['mental-hindrance'])
+        );
+        $values = [];
+        foreach ($data as $key => $value) {
+            if (in_array($key, self::$characterColumns)) {
+                $sqlValue = $value ? "'{$value}'" : 'NULL';
+                $values[] = "`{$key}` = {$sqlValue}";
+                $this->cachedData[$name][$key] = $value;
+            }
+        }
+        $values = implode(',', $values);
+        $this->game::DbQuery("UPDATE `character` SET {$values} WHERE character_name = '$name'");
+    }
     public function updateCharacterData($name, $callback)
     {
         // Pull from db if needed
         $data = $this->getCharacterData($name, false);
         if (!$callback($data)) {
-            // Update db
-            $values = [];
-            foreach ($data as $key => $value) {
-                if (in_array($key, self::$characterColumns)) {
-                    $sqlValue = $value ? "'{$value}'" : 'NULL';
-                    $values[] = "`{$key}` = {$sqlValue}";
-                    $this->cachedData[$name][$key] = $value;
-                }
-            }
-            $values = implode(',', $values);
-            $this->game::DbQuery("UPDATE `character` SET {$values} WHERE character_name = '$name'");
+            $this->_updateCharacterData($name, $data);
             $this->game->notify->all('updateGameData', '', [
                 'gameData' => $this->game->getAllDatas(),
             ]);
@@ -62,17 +77,7 @@ class Character
             $data = $this->getCharacterData($name, false);
             if (!$callback($data)) {
                 $hasUpdate = true;
-                // Update db
-                $values = [];
-                foreach ($data as $key => $value) {
-                    if (in_array($key, self::$characterColumns)) {
-                        $sqlValue = $value ? "'{$value}'" : 'NULL';
-                        $values[] = "`{$key}` = {$sqlValue}";
-                        $this->cachedData[$name][$key] = $value;
-                    }
-                }
-                $values = implode(',', $values);
-                $this->game::DbQuery("UPDATE `character` SET {$values} WHERE character_name = '$name'");
+                $this->_updateCharacterData($name, $data);
             }
         }
         if ($hasUpdate) {
@@ -115,13 +120,23 @@ class Character
                 $characterData[$k] = $v;
             }
         });
-        $_this = $this;
         $itemsLookup = $this->game->gameData->getItems();
-        $characterData['equipment'] = array_map(function ($itemId) use ($_this, $isActive, $characterName, $itemsLookup) {
+        $hindrances = array_map(function ($itemId) {
+            return $this->game->data->expansion[$itemId];
+        }, array_filter(explode(',', $characterData['hindrance'] ?? '')));
+        unset($characterData['hindrance']);
+        $characterData['mental-hindrance'] = array_filter($hindrances, function ($hindrance) {
+            return $hindrance['deck'] == 'mental-hindrance';
+        });
+        $characterData['physical-hindrance'] = array_filter($hindrances, function ($hindrance) {
+            return $hindrance['deck'] == 'physical-hindrance';
+        });
+
+        $characterData['equipment'] = array_map(function ($itemId) use ($isActive, $characterName, $itemsLookup) {
             $itemName = $itemsLookup[$itemId];
             $skills = [];
-            if (array_key_exists('skills', $_this->game->data->items[$itemName])) {
-                array_walk($_this->game->data->items[$itemName]['skills'], function ($v, $k) use (
+            if (array_key_exists('skills', $this->game->data->items[$itemName])) {
+                array_walk($this->game->data->items[$itemName]['skills'], function ($v, $k) use (
                     $itemId,
                     $itemName,
                     $characterName,
@@ -139,7 +154,7 @@ class Character
             return [
                 'itemId' => $itemId,
                 'isActive' => $isActive,
-                ...$_this->game->data->items[$itemName],
+                ...$this->game->data->items[$itemName],
                 'skills' => $skills,
                 'character_name' => $characterName,
             ];
@@ -200,9 +215,7 @@ class Character
                 return $d['itemId'];
             }, $data['equipment']);
             $equipment = [...$equippedIds, ...$items];
-            $data['item_1'] = array_key_exists(0, $equipment) ? $equipment[0] : null;
-            $data['item_2'] = array_key_exists(1, $equipment) ? $equipment[1] : null;
-            $data['item_3'] = array_key_exists(2, $equipment) ? $equipment[2] : null;
+            $data['equipment'] = $equipment;
         });
     }
     public function unequipEquipment(string $characterName, array $items): void
@@ -212,17 +225,13 @@ class Character
                 return $d['itemId'];
             }, $data['equipment']);
             $equipment = array_diff($equippedIds, array_intersect($equippedIds, $items));
-            $data['item_1'] = array_key_exists(0, $equipment) ? $equipment[0] : null;
-            $data['item_2'] = array_key_exists(1, $equipment) ? $equipment[1] : null;
-            $data['item_3'] = array_key_exists(2, $equipment) ? $equipment[2] : null;
+            $data['equipment'] = $equipment;
         });
     }
     public function setCharacterEquipment($characterName, $equipment): void
     {
         $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
-            $data['item_1'] = array_key_exists(0, $equipment) ? $equipment[0] : null;
-            $data['item_2'] = array_key_exists(1, $equipment) ? $equipment[1] : null;
-            $data['item_3'] = array_key_exists(2, $equipment) ? $equipment[2] : null;
+            $data['equipment'] = $equipment;
         });
     }
     public function setSubmittingCharacter(?string $action, ?string $subAction = null): void
@@ -377,9 +386,8 @@ class Character
     public function adjustStamina(string $characterName, int $stamina): int
     {
         $prev = 0;
-        $_this = $this;
-        $this->updateCharacterData($characterName, function (&$data) use ($_this, $stamina, &$prev) {
-            $_this->game->hooks->onAdjustStamina($stamina);
+        $this->updateCharacterData($characterName, function (&$data) use ($stamina, &$prev) {
+            $this->game->hooks->onAdjustStamina($stamina);
             $prev = $data['stamina'];
             $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
             $prev = $data['stamina'] - $prev;

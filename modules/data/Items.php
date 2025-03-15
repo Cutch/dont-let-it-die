@@ -31,6 +31,14 @@ if (!function_exists('getUsePerDay')) {
         call_user_func_array('array_multisort', $args);
         return array_pop($args);
     }
+    function clearItemSkills(&$skills, $itemId)
+    {
+        array_walk($skills, function ($v, $k) use (&$skills, $itemId) {
+            if ($v['itemId'] == $itemId) {
+                unset($skills[$k]);
+            }
+        });
+    }
 }
 $itemsData = [
     'bow-and-arrow' => [
@@ -39,7 +47,7 @@ $itemsData = [
         'count' => 2,
         'name' => clienttranslate('Bow And Arrow'),
         'itemType' => 'weapon',
-        'damage' => 100,
+        'damage' => 3,
         'range' => 2,
         'cost' => [
             'fiber' => 2,
@@ -61,6 +69,58 @@ $itemsData = [
             'hide' => 3,
             'bone' => 2,
         ],
+        'skills' => [
+            'skill1' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Remove 2 Physical Hindrances'),
+                'state' => ['interrupt'],
+                'interruptState' => ['morningPhase'],
+                'perDay' => 1,
+                'onMorning' => function (Game $game, $skill, &$data) {
+                    $game->actInterrupt->addSkillInterrupt($skill);
+                },
+                'onUseSkill' => function (Game $game, $skill, &$data) {
+                    if ($data['skillId'] == $skill['id']) {
+                        $characters = $game->character->getAllCharacterData(true);
+                        $charactersWithHindrances = array_values(
+                            array_map(
+                                function ($character) {
+                                    return $character['id'];
+                                },
+                                array_filter($characters, function ($character) {
+                                    sizeof($character['physical-hindrance']) > 0;
+                                })
+                            )
+                        );
+                        $game->gameData->set('characterSelectionState', [
+                            'characters' => $charactersWithHindrances,
+                            'cancellable' => false,
+                            'id' => $skill['id'],
+                        ]);
+                        $data['interrupt'] = true;
+                        $game->gamestate->nextState('cardSelection');
+                    }
+                },
+                'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->gameData->get('characterSelectionState');
+                    if ($state && $state['id'] == $skill['id']) {
+                        usePerDay($skill['id'], $game);
+                        $data['characterId'];
+                        // $game->actInterrupt->actInterrupt($skill['id']);
+                        $data['nextState'] = false;
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $characters = $game->character->getAllCharacterData(true);
+                    return getUsePerDay($skill['id'], $game) < 1 &&
+                        sizeof(
+                            array_filter($characters, function ($character) {
+                                return sizeof($character['physical-hindrance']) > 0;
+                            })
+                        ) > 0;
+                },
+            ],
+        ],
     ],
     'bone-club' => [
         'type' => 'item',
@@ -68,8 +128,8 @@ $itemsData = [
         'count' => 2,
         'name' => clienttranslate('Bone Club'),
         'itemType' => 'weapon',
-        'range' => 3,
-        'damage' => 1,
+        'range' => 1,
+        'damage' => 3,
         'cost' => [
             'fiber' => 1,
             'rock' => 1,
@@ -528,8 +588,8 @@ $itemsData = [
         'count' => 2,
         'name' => clienttranslate('Rock Knife'),
         'itemType' => 'weapon',
-        'range' => 2,
-        'damage' => 1,
+        'range' => 1,
+        'damage' => 2,
         'cost' => [
             'fiber' => 1,
             'rock' => 2,
@@ -691,12 +751,7 @@ $itemsData = [
                     if ($skill['id'] == $activatedSkill['id']) {
                         $char = $game->character->getCharacterData($skill['characterId']);
                         usePerDay($char['id'] . $skill['id'], $game);
-                        $game->log('onInterrupt', $data);
-                        $data['data']['willTakeDamage'] = 0;
-
-                        $game->activeCharacterEventLog('used ${item_name} to block the damage', [
-                            'item_name' => clienttranslate('Hide Armor'),
-                        ]);
+                        $data['data']['soothe'] = true;
                     }
                 },
                 'requires' => function (Game $game, $skill) {
@@ -730,8 +785,8 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => clienttranslate('Whip'),
         'itemType' => 'weapon',
-        'range' => 2,
-        'damage' => 1,
+        'range' => 1,
+        'damage' => 2,
         'cost' => [
             'fiber' => 3,
             'hide' => 2,
@@ -744,10 +799,30 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => clienttranslate('Fire Stick'),
         'itemType' => 'weapon',
-        'range' => 0,
+        'range' => 1,
         'damage' => 1,
         'character' => 'Rex',
         'cost' => [],
+        'onEncounter' => function (Game $game, $item, &$data) {
+            $data['characterDamage'] = $game->rollFireDie($item['characterId']);
+        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Increase Attack (3 fkp)'),
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
+                'onEncounter' => function (Game $game, $skill, &$data) {
+                    if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+        ],
     ],
     'rock-weapon' => [
         'type' => 'item',
@@ -756,13 +831,13 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => clienttranslate('Rock'),
         'itemType' => 'weapon',
-        'range' => 1,
-        'damage' => 2,
+        'range' => 2,
+        'damage' => 1,
         'cost' => [
             'rock' => 1,
         ],
         'onUse' => function (Game $game, $item) {
-            $game->character->unequipEquipment($game->character->getSubmittingCharacter()['character_name'], [$item['id']]);
+            $game->character->unequipEquipment($item['characterId'], [$item['id']]);
             $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and lost their ${item_name}'), [
                 'item_name' => $item['name'],
             ]);
@@ -787,12 +862,58 @@ $itemsData = [
             'fiber' => 2,
             'rock' => 2,
         ],
-        'onEncounter' => function (Game $game, $item, &$data) {
-            $char = $game->character->getCharacterData($item['characterId']);
-            if ($char['isActive'] && ($data['soothe'] || $data['escape']) && in_array($item['itemId'], $data['itemIds'])) {
-                $data['willTakeDamage'] -= 1;
-            }
-        },
+        'useCost' => [], //Makes this optional
+        // 'onEncounter' => function (Game $game, $item, &$data) {
+        //     $char = $game->character->getCharacterData($item['characterId']);
+        //     if ($char['isActive'] && ($data['soothe'] || $data['escape']) && in_array($item['itemId'], $data['itemIds'])) {
+        //         $data['willTakeDamage'] -= 1;
+        //     }
+        // },
+        'skills' => [
+            'skill1' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Keep Bola'),
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
+                'stamina' => 2,
+                'onEncounter' => function (Game $game, $skill, &$data) {
+                    if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        clearItemSkills($data['skills'], $skill['itemId']);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+            'skill2' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Discard Bola'),
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
+                'onEncounter' => function (Game $game, $skill, &$data) {
+                    if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $game->log('$skill', $skill);
+                        $game->character->unequipEquipment($skill['characterId'], [$skill['itemId']]);
+                        clearItemSkills($data['skills'], $skill['itemId']);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+        ],
     ],
     'boomerang' => [
         'type' => 'item',
@@ -808,12 +929,29 @@ $itemsData = [
             'hide' => 2,
             'wood' => 1,
         ],
-        'onUse' => function (Game $game, $item) {
-            usePerDay($item, $game);
-        },
-        'requires' => function (Game $game, $item) {
-            return getUsePerDay($item, $game) < 1;
-        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Reduce Life By 1'),
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
+                'perDay' => 1,
+                'onEncounter' => function (Game $game, $skill, &$data) {
+                    $game->actInterrupt->addSkillInterrupt($skill);
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $char = $game->character->getCharacterData($skill['characterId']);
+                        usePerDay($char['id'] . $skill['id'], $game);
+                        $data['data']['encounterHealth'] -= 1;
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && getUsePerDay($char['id'] . $skill['id'], $game) < 1;
+                },
+            ],
+        ],
     ],
 ];
 array_walk($itemsData, function (&$item) {

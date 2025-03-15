@@ -66,51 +66,51 @@ $expansionData = [
         'type' => 'deck',
     ],
     'hindrance_1_0' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_1' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_10' => [
-        'deck' => 'hindrance',
+        'deck' => 'mental-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_11' => [
-        'deck' => 'hindrance',
+        'deck' => 'mental-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_2' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_3' => [
-        'deck' => 'hindrance',
+        'deck' => 'mental-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_4' => [
-        'deck' => 'hindrance',
+        'deck' => 'mental-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_5' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_6' => [
-        'deck' => 'hindrance',
+        'deck' => 'mental-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_7' => [
-        'deck' => 'hindrance',
+        'deck' => 'mental-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_8' => [
-        'deck' => 'hindrance',
+        'deck' => 'mental-hindrance',
         'type' => 'deck',
     ],
     'hindrance_1_9' => [
-        'deck' => 'hindrance',
+        'deck' => 'mental-hindrance',
         'type' => 'deck',
     ],
     'physical-hindrance-back' => [
@@ -124,62 +124,62 @@ $expansionData = [
         'expansion' => 'hindrance',
     ],
     'hindrance_1_0' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_1' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_10' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_11' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_2' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_3' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_4' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_5' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_6' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_7' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_8' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],
     'hindrance_1_9' => [
-        'deck' => 'hindrance',
+        'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
     ],

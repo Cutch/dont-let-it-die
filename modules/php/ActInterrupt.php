@@ -189,7 +189,10 @@ class ActInterrupt
         // Remove skills so that we know there's nothing left to do
         array_walk($skills, function ($v, $k) use ($skillId, &$skills, &$data) {
             if ($skillId == $v['id']) {
-                $this->game->hooks->onInterrupt($data, $v);
+                if (array_key_exists($k, $skills)) {
+                    $data['skills'] = &$skills;
+                    $this->game->hooks->onInterrupt($data, $v);
+                }
                 unset($skills[$k]);
                 $skills = array_values($skills);
             }

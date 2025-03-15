@@ -37,6 +37,7 @@ class Data
             addId(array_filter($expansionData, $expansionFilter))
         );
         $this->characters = addId(array_filter($charactersData, $expansionFilter));
+        $this->expansion = addId(array_filter($expansionData, $expansionFilter));
         $this->tokens = addId(array_filter($tokensData, $expansionFilter));
         $this->boards = addId(array_filter($boardsData, $expansionFilter));
         $this->knowledgeTree = addId(array_filter($knowledgeTreeData, $expansionFilter));

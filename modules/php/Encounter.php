@@ -146,6 +146,7 @@ class Encounter
                         $_this->gameData->set('chooseWeapons', null);
                         $weapon = $chooseWeapons[0];
                         $this->game->log('stResolveEncounter', $chooseWeapons);
+                        $weapon['itemIds'] = [$weapon['itemId']];
                     } else {
                         // Highest range, lowest damage for combine
                         $bothUseCost = array_merge_count(
@@ -244,7 +245,7 @@ class Encounter
                 if ($data['soothe']) {
                     $_this->activeCharacterEventLog('soothed a ${name}', $data);
                     $deck = $_this->decks->getDeck($data['deck']);
-                    $deck->moveCard($data['cardId'], 'deck');
+                    $deck->insertCard($data['cardId'], 'deck', 0);
                     // TODO: Need to test
                 } elseif ($data['escape']) {
                     $_this->activeCharacterEventLog('escaped from a ${name}', $data);

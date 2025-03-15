@@ -365,15 +365,13 @@ class Actions
      */
     public function getActionCost($action, $subAction = null): array
     {
+        $actionObj = $this->getAction($action, $subAction);
+        $this->game->log('$actionObj', $actionObj);
         $data = [
             'action' => $action,
             'subAction' => $subAction,
-            'stamina' => array_key_exists('stamina', $this->getAction($action, $subAction))
-                ? $this->getAction($action, $subAction)['stamina']
-                : null,
-            'health' => array_key_exists('health', $this->getAction($action, $subAction))
-                ? $this->getAction($action, $subAction)['health']
-                : null,
+            'stamina' => array_key_exists('stamina', $actionObj) ? $actionObj['stamina'] : null,
+            'health' => array_key_exists('health', $actionObj) ? $actionObj['health'] : null,
         ];
         $this->game->hooks->onGetActionCost($data);
         return $data;

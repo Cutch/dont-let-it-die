@@ -672,6 +672,7 @@ class Game extends \Table
     }
     public function actUseSkill(string $skillId): void
     {
+        $this->log('$skillId', $skillId);
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),
@@ -679,8 +680,10 @@ class Game extends \Table
             function (Game $_this) use ($skillId) {
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 // $this->character->addExtraTime();
+                $this->log('$skillId', $skillId);
                 $_this->actions->validateCanRunAction('actUseSkill', $skillId);
                 $res = $_this->character->getSkill($skillId);
+                $this->log('$res', $res);
                 $skill = $res['skill'];
                 $character = $res['character'];
                 $_this->character->setSubmittingCharacter(null);
@@ -697,10 +700,10 @@ class Game extends \Table
                 $skillId = $data['skillId'];
                 $_this->hooks->reconnectHooks($skill, $_this->character->getSkill($skillId)['skill']);
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
+                $this->log('$endhook', $skillId);
                 if ($_this->gamestate->state()['name'] == 'interrupt') {
                     $_this->actInterrupt->actInterrupt($skillId);
                 }
-                // var_dump(json_encode(['onUseSkill', $skill, $this->gamestate->state()['name']]));
                 if (!array_key_exists('interruptState', $skill) || (in_array('interrupt', $skill['state']) && $finalizeInterrupt)) {
                     $notificationSent = false;
                     $skill['sendNotification'] = function () use (&$skill, $_this, &$notificationSent) {
@@ -713,6 +716,7 @@ class Game extends \Table
                     // var_dump(json_encode([array_key_exists('onUse', $skill)]));
                     $result = array_key_exists('onUse', $skill) ? $skill['onUse']($this, $skill, $character) : null;
                     if (!$result || !array_key_exists('spendActionCost', $result) || $result['spendActionCost'] != false) {
+                        $this->log('$spendActionCost', $skillId);
                         $_this->actions->spendActionCost('actUseSkill', $skillId);
                     }
                     if (!$notificationSent && (!$result || !array_key_exists('notify', $result) || $result['notify'] != false)) {
@@ -733,6 +737,7 @@ class Game extends \Table
                 $_this->character->setSubmittingCharacter('actUseItem', $skillId);
                 // $this->character->addExtraTime();
                 $_this->actions->validateCanRunAction('actUseItem', $skillId);
+                $this->log('validateCanRunAction', $skillId);
                 $character = $this->character->getSubmittingCharacter();
 
                 $skills = $this->character->getActiveEquipmentSkills();
@@ -748,6 +753,7 @@ class Game extends \Table
                 $skill = $data['skill'];
                 $character = $data['character'];
                 $skillId = $data['skillId'];
+                $this->log('end', $skillId);
 
                 $skills = $this->character->getActiveEquipmentSkills();
                 $_this->hooks->reconnectHooks($skill, $skills[$skillId]);
@@ -1815,5 +1821,9 @@ class Game extends \Table
         $this->notify->all('tokenUsed', '', [
             'gameData' => $this->getAllDatas(),
         ]);
+    }
+    public function shuffle()
+    {
+        $this->decks->shuffleInDiscard('gather', true);
     }
 }
