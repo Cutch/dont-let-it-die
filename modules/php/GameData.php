@@ -35,6 +35,7 @@ class GameData
         'campEquipment' => [],
         'destroyedEquipment' => [],
         'activeNightCards' => [],
+        'activeDayCards' => [],
         'day' => 1,
         'craftingLevel' => 0,
         'turnOrder' => [],

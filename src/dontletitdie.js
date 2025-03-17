@@ -707,7 +707,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (action['character'] != null) suffix += ` (${action['character']})`;
       if (action['stamina'] != null) suffix += ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
       if (action['health'] != null) suffix += ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
-      if (action['cost'] != null) suffix += ` <i class="fa fa-graduation-cap dlid__fkp"></i> ${action['cost']}`;
+      if (action['unlockCost'] != null) suffix += ` <i class="fa fa-graduation-cap dlid__fkp"></i> ${action['unlockCost']}`;
       if (action['perDay'] != null)
         suffix += ` <i class="fa fa-sun-o dlid__sun"></i> ` + _('${remaining} left').replace(/\$\{remaining\}/, action['perDay']);
       return suffix;
@@ -724,23 +724,24 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         if (actions)
           actions.forEach((action) => {
             const actionId = action.action;
-            if (actionId === 'actUseSkill' && ['interrupt', 'postEncounter'].includes(stateName)) {
-              return args.availableSkills?.forEach((skill) => {
-                const suffix = this.getActionSuffixHTML(skill);
-                const characterSuffix = skill.characterId ? ` (${skill.characterId})` : '';
-                this.statusBar.addActionButton(`${skill.name}${characterSuffix}${suffix}`, () => {
-                  return this.bgaPerformAction(actionId, { skillId: skill.id });
+            if (['interrupt', 'postEncounter', 'dayEvent'].includes(stateName)) {
+              if (actionId === 'actUseSkill') {
+                return args.availableSkills?.forEach((skill) => {
+                  const suffix = this.getActionSuffixHTML(skill);
+                  const characterSuffix = skill.characterId ? ` (${skill.characterId})` : '';
+                  this.statusBar.addActionButton(`${skill.name}${characterSuffix}${suffix}`, () => {
+                    return this.bgaPerformAction(actionId, { skillId: skill.id });
+                  });
                 });
-              });
-            }
-            if (actionId === 'actUseItem' && ['interrupt', 'postEncounter'].includes(stateName)) {
-              return args.availableItemSkills?.forEach((skill) => {
-                const suffix = this.getActionSuffixHTML(skill);
-                const characterSuffix = skill.characterId ? ` (${skill.characterId})` : '';
-                this.statusBar.addActionButton(`${skill.name}${characterSuffix}${suffix}`, () => {
-                  return this.bgaPerformAction(actionId, { skillId: skill.id });
+              } else if (actionId === 'actUseItem') {
+                return args.availableItemSkills?.forEach((skill) => {
+                  const suffix = this.getActionSuffixHTML(skill);
+                  const characterSuffix = skill.characterId ? ` (${skill.characterId})` : '';
+                  this.statusBar.addActionButton(`${skill.name}${characterSuffix}${suffix}`, () => {
+                    return this.bgaPerformAction(actionId, { skillId: skill.id });
+                  });
                 });
-              });
+              }
             }
             const suffix = this.getActionSuffixHTML(action);
             return this.statusBar.addActionButton(`${this.actionMappings[actionId]}${suffix}`, () => {
@@ -948,6 +949,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             break;
           case 'interrupt':
             this.statusBar.addActionButton(_('Skip'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
+            break;
+          case 'dayEvent':
+            // No Cancel Button
             break;
           case 'dinnerPhase':
           case 'tradePhase':

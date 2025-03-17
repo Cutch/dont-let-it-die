@@ -52,7 +52,7 @@ class Actions
                         $availableUnlocks = $game->data->getValidKnowledgeTree();
                         return sizeof(
                             array_filter($availableUnlocks, function ($v) use ($resourceCount) {
-                                return $v['cost'] <= $resourceCount;
+                                return $v['unlockCost'] <= $resourceCount;
                             })
                         ) > 0;
                     },
@@ -217,7 +217,7 @@ class Actions
                 'actUseSkill' => [
                     'getState' => function () {
                         $states = [];
-                        foreach ($this->getAvailableCharacterSkills() as $skill) {
+                        foreach ($this->getAvailableSkills() as $skill) {
                             if (array_key_exists('state', $skill)) {
                                 array_push($states, ...$skill['state']);
                             }
@@ -226,7 +226,7 @@ class Actions
                     },
                     'type' => 'action',
                     'requires' => function (Game $game, $action) {
-                        return sizeof($this->getAvailableCharacterSkills()) > 0;
+                        return sizeof($this->getAvailableSkills()) > 0;
                     },
                 ],
                 'actUseItem' => [
@@ -260,20 +260,62 @@ class Actions
         );
         $this->game = $game;
     }
+    public function getSkills(): array
+    {
+        $characters = $this->game->character->getAllCharacterData();
+        return array_merge(
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return $c['skills'];
+                }
+                return [];
+            }, $characters),
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return $c['skills'];
+                }
+                return [];
+            }, $this->getActiveDayEvents())
+        );
+    }
+    public function getActiveEquipmentSkills()
+    {
+        $character = $this->game->character->getSubmittingCharacter();
+        $buildings = $this->game->getBuildings();
+        $skills = array_merge(
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return $c['skills'];
+                }
+                return [];
+            }, $buildings),
+            ...array_map(function ($item) {
+                if (!array_key_exists('skills', $item)) {
+                    return [];
+                }
+                return $item['skills'];
+            }, $character['equipment']),
+            ...array_map(function ($item) {
+                if (!array_key_exists('skills', $item)) {
+                    return [];
+                }
+                return $item['skills'];
+            }, $character['dayEvent'])
+        );
+        return $skills;
+    }
     public function getAction($actionId, $subActionId = null): array
     {
         if ($actionId == 'actUseSkill') {
-            foreach ($this->game->character->getAllCharacterData() as $k => $char) {
-                if (array_key_exists('skills', $char) && isset($char['skills'][$subActionId])) {
-                    return $char['skills'][$subActionId];
-                }
+            $skills = $this->getSkills();
+            if (isset($skills[$subActionId])) {
+                return $skills[$subActionId];
             }
             return [];
         } elseif ($actionId == 'actUseItem') {
-            foreach ($this->game->character->getAllCharacterData() as $k => $char) {
-                if (array_key_exists('skills', $char) && isset($char['skills'][$subActionId])) {
-                    return $char['skills'][$subActionId];
-                }
+            $skills = $this->getActiveEquipmentSkills();
+            if (isset($skills[$subActionId])) {
+                return $skills[$subActionId];
             }
             return [];
         } else {
@@ -291,23 +333,14 @@ class Actions
     //     unset($data['action']);
     //     return $data;
     // }
-    public function getAvailableCharacterSkills(): array
+    public function getAvailableSkills(): array
     {
-        $characters = $this->game->character->getAllCharacterData();
-        $skills = array_merge(
-            ...array_map(function ($c) {
-                if (array_key_exists('skills', $c)) {
-                    return $c['skills'];
-                }
-                return [];
-            }, $characters)
-        );
-        // if (!array_key_exists('skills', $character)) {
-        //     return [];
-        // }
+        $skills = $this->getSkills();
         return array_values(
             array_filter($skills, function ($skill) {
-                $character = $this->game->character->getCharacterData($skill['characterId']);
+                $character = $this->game->character->getCharacterData(
+                    array_key_exists('characterId', $skill) ? $skill['characterId'] : $this->game->character->getTurnCharacterId()
+                );
                 $stamina = $character['stamina'];
                 $health = $character['health'];
                 $actionCost = [
@@ -330,7 +363,7 @@ class Actions
     public function getAvailableItemSkills(): array
     {
         $character = $this->game->character->getSubmittingCharacter();
-        $skills = $this->game->character->getActiveEquipmentSkills();
+        $skills = $this->getActiveEquipmentSkills();
         return array_values(
             array_filter($skills, function ($skill) use ($character) {
                 $stamina = $character['stamina'];
@@ -466,7 +499,7 @@ class Actions
             $actionCost = $this->getActionCost($v['id']);
             $stamina = $this->game->character->getActiveStamina();
             $health = $this->game->character->getActiveHealth();
-            // Rock only needs 1 stamina
+            // Rock only needs 1 stamina, this is in the hindrance expansion
             $alwaysShowCraft = $this->game->isValidExpansion('hindrance') && $v['id'] == 'actCraft';
             // var_dump(json_encode([$v['id']]));
             return $this->checkRequirements($v) &&
@@ -486,5 +519,27 @@ class Actions
             0
         );
         return $this->game->hooks->onGetValidActions($data);
+    }
+    public function getActiveDayEvents()
+    {
+        $activeDayCards = $this->game->gameData->get('activeDayCards');
+        return array_map(function ($eventId) {
+            return $this->game->data->expansion[$eventId];
+        }, $activeDayCards);
+    }
+    public function addDayEvent($eventId)
+    {
+        $activeDayCards = $this->game->gameData->get('activeDayCards');
+        array_push($activeDayCards, $eventId);
+        $this->game->gameData->set('activeDayCards', $activeDayCards);
+    }
+    public function clearDayEvent()
+    {
+        // $eventId
+        // $activeDayCards = $this->game->gameData->get('activeDayCards');
+        // $activeDayCards = array_filter($activeDayCards, function ($id) use ($eventId) {
+        //     return $eventId != $id;
+        // });
+        $this->game->gameData->set('activeDayCards', []);
     }
 }

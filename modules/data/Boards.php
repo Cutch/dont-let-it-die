@@ -11,14 +11,14 @@ $boardsData = [
     'knowledge-tree-easy' => [
         'track' => [
             'warmth-1' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     return true;
                 },
             ],
             'warmth-2' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -26,7 +26,7 @@ $boardsData = [
                 },
             ],
             'warmth-3' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -34,7 +34,7 @@ $boardsData = [
                 },
             ],
             'spices' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -42,7 +42,7 @@ $boardsData = [
                 },
             ],
             'cooking-1' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -50,7 +50,7 @@ $boardsData = [
                 },
             ],
             'cooking-2' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -58,7 +58,7 @@ $boardsData = [
                 },
             ],
             'crafting-1' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -66,7 +66,7 @@ $boardsData = [
                 },
             ],
             'crafting-2' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -74,7 +74,7 @@ $boardsData = [
                 },
             ],
             'fire-starter' => [
-                'cost' => 15,
+                'unlockCost' => 15,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -86,14 +86,14 @@ $boardsData = [
     'knowledge-tree-normal' => [
         'track' => [
             'warmth-1' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     return true;
                 },
             ],
             'warmth-2' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -101,7 +101,7 @@ $boardsData = [
                 },
             ],
             'warmth-3' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -109,7 +109,7 @@ $boardsData = [
                 },
             ],
             'cooking-1' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -117,7 +117,7 @@ $boardsData = [
                 },
             ],
             'cooking-2' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -125,7 +125,7 @@ $boardsData = [
                 },
             ],
             'relaxation' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -133,7 +133,7 @@ $boardsData = [
                 },
             ],
             'crafting-1' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -141,7 +141,7 @@ $boardsData = [
                 },
             ],
             'forage-1' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -149,7 +149,7 @@ $boardsData = [
                 },
             ],
             'forage-2' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -157,7 +157,7 @@ $boardsData = [
                 },
             ],
             'hunt-1' => [
-                'cost' => 6,
+                'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -165,7 +165,7 @@ $boardsData = [
                 },
             ],
             'crafting-2' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -173,7 +173,7 @@ $boardsData = [
                 },
             ],
             'resource-1' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -181,7 +181,7 @@ $boardsData = [
                 },
             ],
             'crafting-3' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -189,7 +189,7 @@ $boardsData = [
                 },
             ],
             'resource-2' => [
-                'cost' => 6,
+                'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -197,7 +197,7 @@ $boardsData = [
                 },
             ],
             'fire-starter' => [
-                'cost' => 15,
+                'unlockCost' => 15,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -209,14 +209,14 @@ $boardsData = [
     'knowledge-tree-normal+' => [
         'track' => [
             'crafting-1' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     return true;
                 },
             ],
             'resource-1' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -224,7 +224,7 @@ $boardsData = [
                 },
             ],
             'crafting-2' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -232,7 +232,7 @@ $boardsData = [
                 },
             ],
             'crafting-3' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -240,7 +240,7 @@ $boardsData = [
                 },
             ],
             'relaxation' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -248,7 +248,7 @@ $boardsData = [
                 },
             ],
             'cooking-1' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -256,7 +256,7 @@ $boardsData = [
                 },
             ],
             'warmth-1' => [
-                'cost' => 3,
+                'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -264,7 +264,7 @@ $boardsData = [
                 },
             ],
             'forage-1' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -272,7 +272,7 @@ $boardsData = [
                 },
             ],
             'warmth-2' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -280,7 +280,7 @@ $boardsData = [
                 },
             ],
             'forage-2' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -288,7 +288,7 @@ $boardsData = [
                 },
             ],
             'warmth-3' => [
-                'cost' => 4,
+                'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -296,7 +296,7 @@ $boardsData = [
                 },
             ],
             'cooking-2' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -304,7 +304,7 @@ $boardsData = [
                 },
             ],
             'hunt-1' => [
-                'cost' => 6,
+                'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -312,7 +312,7 @@ $boardsData = [
                 },
             ],
             'resource-2' => [
-                'cost' => 6,
+                'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -320,7 +320,7 @@ $boardsData = [
                 },
             ],
             'fire-starter' => [
-                'cost' => 15,
+                'unlockCost' => 15,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -332,14 +332,14 @@ $boardsData = [
     'knowledge-tree-hard' => [
         'track' => [
             'warmth-1' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     return true;
                 },
             ],
             'crafting-1' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -347,7 +347,7 @@ $boardsData = [
                 },
             ],
             'resource-1' => [
-                'cost' => 5,
+                'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -355,7 +355,7 @@ $boardsData = [
                 },
             ],
             'crafting-2' => [
-                'cost' => 7,
+                'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -363,7 +363,7 @@ $boardsData = [
                 },
             ],
             'relaxation' => [
-                'cost' => 7,
+                'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -371,7 +371,7 @@ $boardsData = [
                 },
             ],
             'crafting-3' => [
-                'cost' => 7,
+                'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -379,7 +379,7 @@ $boardsData = [
                 },
             ],
             'resource-2' => [
-                'cost' => 7,
+                'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -387,7 +387,7 @@ $boardsData = [
                 },
             ],
             'hunt-1' => [
-                'cost' => 9,
+                'unlockCost' => 9,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -396,7 +396,7 @@ $boardsData = [
             ],
 
             'cooking-1' => [
-                'cost' => 6,
+                'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -404,7 +404,7 @@ $boardsData = [
                 },
             ],
             'warmth-2' => [
-                'cost' => 7,
+                'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -412,7 +412,7 @@ $boardsData = [
                 },
             ],
             'cooking-2' => [
-                'cost' => 7,
+                'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -420,7 +420,7 @@ $boardsData = [
                 },
             ],
             'warmth-3' => [
-                'cost' => 7,
+                'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -428,7 +428,7 @@ $boardsData = [
                 },
             ],
             'forage-1' => [
-                'cost' => 7,
+                'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -436,7 +436,7 @@ $boardsData = [
                 },
             ],
             'forage-2' => [
-                'cost' => 9,
+                'unlockCost' => 9,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();
@@ -444,7 +444,7 @@ $boardsData = [
                 },
             ],
             'fire-starter' => [
-                'cost' => 20,
+                'unlockCost' => 20,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
                     $unlocks = $game->getUnlockedKnowledgeIds();

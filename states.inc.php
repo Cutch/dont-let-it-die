@@ -111,7 +111,7 @@ $machinestates = [
         'type' => 'game',
         'args' => 'argDrawCard',
         'action' => 'stDrawCard',
-        'transitions' => ['resolveEncounter' => 20, 'playerTurn' => 10, 'interrupt' => 22],
+        'transitions' => ['resolveEncounter' => 20, 'playerTurn' => 10, 'drawCard' => 11, 'interrupt' => 22, 'dayEvent' => 24],
     ],
     12 => [
         'name' => 'tooManyItems',
@@ -155,7 +155,7 @@ $machinestates = [
         'type' => 'activeplayer',
         'args' => 'argCharacterSelection',
         'possibleactions' => ['actSelectCharacter', 'actSelectCharacterCancel'],
-        'transitions' => ['playerTurn' => 10, 'interrupt' => 22],
+        'transitions' => ['playerTurn' => 10, 'morningPhase' => 50, 'interrupt' => 22],
     ],
     17 => [
         'name' => 'cardSelection',
@@ -164,7 +164,7 @@ $machinestates = [
         'type' => 'activeplayer',
         'args' => 'argCardSelection',
         'possibleactions' => ['actSelectCard', 'actSelectCardCancel'],
-        'transitions' => ['playerTurn' => 10, 'drawCard' => 11, 'interrupt' => 22],
+        'transitions' => ['playerTurn' => 10, 'drawCard' => 11, 'morningPhase' => 50, 'interrupt' => 22],
     ],
     20 => [
         'name' => 'resolveEncounter',
@@ -216,6 +216,24 @@ $machinestates = [
         'args' => 'argWhichWeapon',
         'possibleactions' => ['actChooseWeapon'],
         'transitions' => ['resolveEncounter' => 20],
+    ],
+    24 => [
+        'name' => 'dayEvent',
+        'description' => clienttranslate('${character_name} is resolving an event'),
+        'descriptionmyturn' => clienttranslate('What do you do'),
+        'type' => 'activeplayer',
+        'action' => 'stDayEvent',
+        'args' => 'argDayEvent',
+        'possibleactions' => ['actUseSkill', 'actUseItem'],
+        'transitions' => [
+            'playerTurn' => 10,
+            // 'drawCard' => 11,
+            'deckSelection' => 13,
+            'resourceSelection' => 14,
+            'interrupt' => 22,
+            'characterSelection' => 16,
+            'cardSelection' => 17,
+        ],
     ],
     29 => [
         'name' => 'dinnerPhase',

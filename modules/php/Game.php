@@ -92,12 +92,8 @@ class Game extends \Table
                     $args['player_name'] = $this->getPlayerNameById($playerId);
                 }
             }
-            if (
-                array_key_exists('resource', $args) &&
-                !array_key_exists('resource_name', $args) &&
-                str_contains($message, '${resource_name}')
-            ) {
-                $args['resource_name'] = $this->getPlayerNameById($args['resource']);
+            if (str_contains($message, '${resource_type}')) {
+                $args['resource_type'] = $this->data->tokens[$args['resource_type']]['name'];
             }
             return $args;
         });
@@ -293,10 +289,10 @@ class Game extends \Table
             throw new BgaUserException($this->translate('Requirements not met for this unlock'));
         } elseif (in_array($knowledgeId, $this->getUnlockedKnowledge())) {
             throw new BgaUserException($this->translate('Already unlocked'));
-        } elseif ($resourceCount < $availableUnlocks[$knowledgeId]['cost']) {
+        } elseif ($resourceCount < $availableUnlocks[$knowledgeId]['unlockCost']) {
             throw new BgaUserException($this->translate('Not enough knowledge points'));
         }
-        $cost = -$availableUnlocks[$knowledgeId]['cost'];
+        $cost = -$availableUnlocks[$knowledgeId]['unlockCost'];
         foreach ($resources as $resource) {
             $cost = $this->adjustResource($resource, $cost);
         }
@@ -724,6 +720,9 @@ class Game extends \Table
                     }
                 }
                 $_this->character->setSubmittingCharacter(null);
+                if ($this->gamestate->state()['name'] == 'dayEvent') {
+                    $this->gamestate->nextState('playerTurn');
+                }
             }
         );
     }
@@ -740,7 +739,7 @@ class Game extends \Table
                 $this->log('validateCanRunAction', $skillId);
                 $character = $this->character->getSubmittingCharacter();
 
-                $skills = $this->character->getActiveEquipmentSkills();
+                $skills = $this->actions->getActiveEquipmentSkills();
                 $skill = $skills[$skillId];
                 return [
                     'skillId' => $skillId,
@@ -755,7 +754,7 @@ class Game extends \Table
                 $skillId = $data['skillId'];
                 $this->log('end', $skillId);
 
-                $skills = $this->character->getActiveEquipmentSkills();
+                $skills = $this->actions->getActiveEquipmentSkills();
                 $_this->hooks->reconnectHooks($skill, $skills[$skillId]);
                 $_this->character->setSubmittingCharacter('actUseItem', $skillId);
                 if ($_this->gamestate->state()['name'] == 'interrupt') {
@@ -890,7 +889,7 @@ class Game extends \Table
         $this->activeCharacterEventLog('ends their turn');
 
         // at the end of the action, move to the next state
-        $this->gamestate->nextState('endTurn');
+        $this->endTurn();
     }
     public function actDone(): void
     {
@@ -1012,16 +1011,18 @@ class Game extends \Table
     }
     public function stPlayerTurn()
     {
+        $this->actions->clearDayEvent();
         // if (!$this->actInterrupt->checkForInterrupt()) {
         $char = $this->character->getTurnCharacter();
         if ($char['isActive'] && $char['incapacitated']) {
             $this->activeCharacterEventLog('is still incapacitated');
-            $this->gamestate->nextState('endTurn');
+            $this->endTurn();
         }
         // }
     }
     public function stDrawCard()
     {
+        $moveToDrawCardState = false;
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),
@@ -1044,15 +1045,17 @@ class Game extends \Table
                         'deck' => str_replace('-', ' ', $deck),
                     ]);
                 } elseif ($card['deckType'] == 'nothing') {
-                    $this->activeCharacterEventLog('did nothing', [
-                        'deck' => str_replace('-', ' ', $deck),
-                    ]);
+                    if (!$this->isValidExpansion('mini-expansion')) {
+                        $this->activeCharacterEventLog('did nothing', [
+                            'deck' => str_replace('-', ' ', $deck),
+                        ]);
+                    }
                 } elseif ($card['deckType'] == 'hindrance') {
                 } else {
                 }
                 return $state;
             },
-            function (Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) use (&$moveToDrawCardState) {
                 $deck = $data['deck'];
                 $card = $data['card'];
                 if ($card['deckType'] == 'resource') {
@@ -1060,12 +1063,43 @@ class Game extends \Table
                 } elseif ($card['deckType'] == 'encounter') {
                     $this->gamestate->nextState('resolveEncounter');
                 } elseif ($card['deckType'] == 'nothing') {
-                    $this->gamestate->nextState('playerTurn');
+                    if ($this->isValidExpansion('mini-expansion')) {
+                        $card = $this->decks->pickCard('day-event');
+                        $this->gameData->set('state', ['card' => $card, 'deck' => 'day-event']);
+                        $this->actions->addDayEvent($card['id']);
+                        $moveToDrawCardState = true;
+                    } else {
+                        $this->gamestate->nextState('playerTurn');
+                    }
                 } elseif ($card['deckType'] == 'hindrance') {
                     $this->gamestate->nextState('playerTurn');
+                } elseif ($card['deckType'] == 'day-event') {
+                    $this->gamestate->nextState('dayEvent');
                 } else {
                     $this->gamestate->nextState('playerTurn');
                 }
+            }
+        );
+        if ($moveToDrawCardState) {
+            $this->gamestate->nextState('drawCard');
+        }
+    }
+    public function stDayEvent()
+    {
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onDayEvent'],
+            function (Game $_this) {
+                $state = $this->gameData->get('state');
+                $deck = $state['deck'];
+                $card = $state['card'];
+                return ['card' => $card, 'deck' => 'day-event'];
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                $deck = $data['deck'];
+                $this->nightEventLog('Something unexpected happens, drawing a day event');
+                // $this->gamestate->nextState('playerTurn');
             }
         );
     }
@@ -1129,6 +1163,43 @@ class Game extends \Table
         $result = [...$this->getAllDatas()];
         return $result;
     }
+    public function argDayEvent(): array
+    {
+        $state = $this->gameData->get('state');
+        $card = $state['card'];
+        $result = [
+            ...$this->getAllDatas(),
+            'character_name' => $this->getCharacterHTML(),
+            //'actions' => [],//array_values($this->data->expansion[$card['id']]['skills']),
+            'actions' => [
+                [
+                    'action' => 'actUseSkill',
+                    'type' => 'action',
+                ],
+                [
+                    'action' => 'actUseItem',
+                    'type' => 'action',
+                ],
+            ],
+            'availableSkills' => array_values(
+                $this->actions->wrapSkills(
+                    array_filter($this->data->expansion[$card['id']]['skills'], function ($skill) {
+                        return $skill['type'] == 'skill';
+                    }),
+                    'actUseSkill'
+                )
+            ),
+            'availableItemSkills' => array_values(
+                $this->actions->wrapSkills(
+                    array_filter($this->data->expansion[$card['id']]['skills'], function ($skill) {
+                        return $skill['type'] == 'item-skill';
+                    }),
+                    'actUseItem'
+                )
+            ),
+        ];
+        return $result;
+    }
     public function argInterrupt(): array
     {
         return $this->actInterrupt->argInterrupt();
@@ -1154,7 +1225,14 @@ class Game extends \Table
         extract($this->gameData->getAll('day', 'turnNo'));
         return (($day - 1) * 4 + ($turnNo ?? 0)) / (12 * 4);
     }
-
+    public function endTurn()
+    {
+        $data = [
+            'characterId' => $this->character->getTurnCharacterId(),
+        ];
+        $this->hooks->onEndTurn($data);
+        $this->gamestate->nextState('endTurn');
+    }
     /**
      * The action method of state `nextCharacter` is called every time the current game state is set to `nextCharacter`.
      */
@@ -1576,14 +1654,18 @@ class Game extends \Table
             'fireWoodCost' => $this->getFirewoodCost(),
             'tradeRatio' => $this->getTradeRatio(),
             'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
-                return ['id' => $id, 'name' => $this->data->knowledgeTree[$id]['name'], 'cost' => $availableUnlocks[$id]['cost']];
+                return [
+                    'id' => $id,
+                    'name' => $this->data->knowledgeTree[$id]['name'],
+                    'unlockCost' => $availableUnlocks[$id]['unlockCost'],
+                ];
             }, array_keys($availableUnlocks)),
             'resolving' => $this->actInterrupt->isStateResolving(),
         ];
         if ($this->gamestate->state()['name'] != 'characterSelect') {
             $result['character_name'] = $this->getCharacterHTML();
             $result['actions'] = array_values($this->actions->getValidActions());
-            $result['availableSkills'] = $this->actions->getAvailableCharacterSkills();
+            $result['availableSkills'] = $this->actions->getAvailableSkills();
             $result['availableItemSkills'] = $this->actions->getAvailableItemSkills();
         }
         $this->getAllCharacters($result);
@@ -1748,6 +1830,11 @@ class Game extends \Table
         $this->character->equipEquipment($turnOrder[3], [$itemId]);
     }
 
+    public function drawDayEvent()
+    {
+        $this->gameData->set('state', ['card' => $this->data->decks['gather-7_15'], 'deck' => 'gather']);
+        $this->gamestate->nextState('drawCard');
+    }
     public function setNightCard()
     {
         $cards = array_values($this->decks->getDeck('night-event')->getCardsInLocation('deck'));
@@ -1817,7 +1904,7 @@ class Game extends \Table
         });
         $this->gameData->set('day', 1);
         $this->gameData->set('turnNo', 3);
-        $this->gamestate->nextState('endTurn');
+        $this->endTurn();
         $this->notify->all('tokenUsed', '', [
             'gameData' => $this->getAllDatas(),
         ]);

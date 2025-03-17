@@ -50,7 +50,7 @@ $charactersData = [
         'onEncounter' => function (Game $game, $char, &$data) {
             if ($char['isActive'] && $data['encounterHealth'] <= $data['characterDamage']) {
                 $data['stamina'] += 2;
-                $game->activeCharacterEventLog('gained 2 stamina');
+                $game->activeCharacterEventLog('gained ${count} ${character_resource}', ['count' => 2, 'character_resource' => 'stamina']);
             }
         },
     ],
@@ -499,7 +499,10 @@ $charactersData = [
             $card = $data['card'];
             if ($char['isActive'] && $card['name'] == 'Nothing') {
                 $game->adjustResource('fkp', 2);
-                $game->activeCharacterEventLog('received 2 fkp');
+                $game->activeCharacterEventLog('received ${count} ${resource_type}', [
+                    'count' => 2,
+                    'resource_type' => 'fkp',
+                ]);
             }
         },
         'onGetActionSelectable' => function (Game $game, $char, &$data) {
@@ -542,7 +545,10 @@ $charactersData = [
                 'stamina' => 2,
                 'onUse' => function (Game $game, $skill) {
                     $skill['sendNotification']();
-                    $game->activeCharacterEventLog('received ${count} fish', ['count' => $game->rollFireDie()]);
+                    $game->activeCharacterEventLog('received ${count} ${resource_type}', [
+                        'count' => $game->rollFireDie(),
+                        'resource_type' => 'fish',
+                    ]);
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
@@ -784,7 +790,10 @@ $charactersData = [
             $card = $data['card'];
             if ($char['isActive'] && $card['type'] == 'berry') {
                 if ($game->character->adjustActiveHealth(1) == 1) {
-                    $game->activeCharacterEventLog('gained 1 health');
+                    $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
+                        'count' => 1,
+                        'character_resource' => 'health',
+                    ]);
                 }
             }
         },

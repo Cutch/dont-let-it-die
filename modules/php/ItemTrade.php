@@ -101,6 +101,9 @@ class ItemTrade
                 $hasOpenSlots = $result['hasOpenSlots'];
                 $hasDuplicateTool = $result['hasDuplicateTool'];
 
+                if ($trade1['character']['id'] == 'Sig') {
+                    throw new BgaUserException($this->game->translate('Sig cannot obtain items from trade'));
+                }
                 if (!$hasOpenSlots) {
                     throw new BgaUserException($this->game->translate('There is no open slot for that item type'));
                 }
@@ -179,6 +182,9 @@ class ItemTrade
             $result = $this->game->character->getItemValidations($itemId1, $trade2['character'], $itemId2);
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
+            if ($trade2['character']['id'] == 'Sig') {
+                throw new BgaUserException($this->game->translate('Sig cannot obtain items from trade'));
+            }
             if (!$hasOpenSlots) {
                 throw new BgaUserException($this->game->translate('There is no open slot for that item type'));
             }
@@ -192,6 +198,9 @@ class ItemTrade
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
 
+            if ($trade1['character']['id'] == 'Sig') {
+                throw new BgaUserException($this->game->translate('Sig cannot obtain items from trade'));
+            }
             if (!$hasOpenSlots) {
                 throw new BgaUserException($this->game->translate('There is no open slot for that item type'));
             }

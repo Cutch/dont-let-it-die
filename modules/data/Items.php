@@ -88,7 +88,7 @@ $itemsData = [
                                     return $character['id'];
                                 },
                                 array_filter($characters, function ($character) {
-                                    sizeof($character['physical-hindrance']) > 0;
+                                    sizeof($character['physicalHindrance']) > 0;
                                 })
                             )
                         );
@@ -98,15 +98,13 @@ $itemsData = [
                             'id' => $skill['id'],
                         ]);
                         $data['interrupt'] = true;
-                        $game->gamestate->nextState('cardSelection');
+                        $game->gamestate->nextState('characterSelection');
                     }
                 },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
                     $state = $game->gameData->get('characterSelectionState');
                     if ($state && $state['id'] == $skill['id']) {
                         usePerDay($skill['id'], $game);
-                        $data['characterId'];
-                        // $game->actInterrupt->actInterrupt($skill['id']);
                         $data['nextState'] = false;
                     }
                 },
@@ -115,7 +113,7 @@ $itemsData = [
                     return getUsePerDay($skill['id'], $game) < 1 &&
                         sizeof(
                             array_filter($characters, function ($character) {
-                                return sizeof($character['physical-hindrance']) > 0;
+                                return sizeof($character['physicalHindrance']) > 0;
                             })
                         ) > 0;
                 },
