@@ -263,6 +263,7 @@ class Actions
     public function getSkills(): array
     {
         $characters = $this->game->character->getAllCharacterData();
+        // $character = $this->game->character->getSubmittingCharacter();
         return array_merge(
             ...array_map(function ($c) {
                 if (array_key_exists('skills', $c)) {
@@ -272,10 +273,20 @@ class Actions
             }, $characters),
             ...array_map(function ($c) {
                 if (array_key_exists('skills', $c)) {
-                    return $c['skills'];
+                    return array_filter($c['skills'], function ($item) {
+                        return $item['type'] == 'skill';
+                    });
                 }
                 return [];
             }, $this->getActiveDayEvents())
+            // ...array_map(function ($item) {
+            //     if (!array_key_exists('skills', $item)) {
+            //         return [];
+            //     }
+            //     return array_filter($item['skills'], function ($item) {
+            //         return $item['type'] == 'skill';
+            //     });
+            // }, $character['dayEvent'])
         );
     }
     public function getActiveEquipmentSkills()
@@ -299,7 +310,9 @@ class Actions
                 if (!array_key_exists('skills', $item)) {
                     return [];
                 }
-                return $item['skills'];
+                return array_filter($item['skills'], function ($skill) {
+                    return $skill['type'] == 'item-skill';
+                });
             }, $character['dayEvent'])
         );
         return $skills;
@@ -364,6 +377,7 @@ class Actions
     {
         $character = $this->game->character->getSubmittingCharacter();
         $skills = $this->getActiveEquipmentSkills();
+        $this->game->log('$getAvailableItemSkills', $skills);
         return array_values(
             array_filter($skills, function ($skill) use ($character) {
                 $stamina = $character['stamina'];
@@ -399,7 +413,7 @@ class Actions
     public function getActionCost($action, $subAction = null): array
     {
         $actionObj = $this->getAction($action, $subAction);
-        $this->game->log('$actionObj', $actionObj);
+        // $this->game->log('$actionObj', $actionObj);
         $data = [
             'action' => $action,
             'subAction' => $subAction,

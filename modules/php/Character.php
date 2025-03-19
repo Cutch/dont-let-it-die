@@ -42,18 +42,41 @@ class Character
         $data['item_1'] = array_key_exists(0, $data['equipment']) ? $data['equipment'][0] : null;
         $data['item_2'] = array_key_exists(1, $data['equipment']) ? $data['equipment'][1] : null;
         $data['item_3'] = array_key_exists(2, $data['equipment']) ? $data['equipment'][2] : null;
-        $data['hindrance'] = join(
-            ',',
-            array_map(function ($hindrance) {
-                return $hindrance['id'];
-            }, $data['physicalHindrance'] + $data['mentalHindrance'])
-        );
-        $data['day_event'] = join(
-            ',',
-            array_map(function ($dayEvent) {
-                return $dayEvent['id'];
-            }, $data['dayEvent'])
-        );
+        if ($data['item_1']) {
+            $data['item_1'] = is_int($data['item_1'])
+                ? $data['item_1']
+                : (array_key_exists('itemId', $data['item_1'])
+                    ? $data['item_1']['itemId']
+                    : null);
+        }
+        if ($data['item_2']) {
+            $data['item_2'] = is_int($data['item_2'])
+                ? $data['item_2']
+                : (array_key_exists('itemId', $data['item_2'])
+                    ? $data['item_2']['itemId']
+                    : null);
+        }
+        if ($data['item_3']) {
+            $data['item_3'] = is_int($data['item_3'])
+                ? $data['item_3']
+                : (array_key_exists('itemId', $data['item_3'])
+                    ? $data['item_3']['itemId']
+                    : null);
+        }
+        $data['hindrance'] =
+            join(
+                ',',
+                array_map(function ($hindrance) {
+                    return $hindrance['id'];
+                }, $data['physicalHindrance'] + $data['mentalHindrance'])
+            ) ?? '';
+        $data['day_event'] =
+            join(
+                ',',
+                array_map(function ($dayEvent) {
+                    return $dayEvent['id'];
+                }, $data['dayEvent'])
+            ) ?? '';
         $values = [];
         foreach ($data as $key => $value) {
             if (in_array($key, self::$characterColumns)) {
@@ -126,6 +149,8 @@ class Character
         $underlyingCharacterData = $this->game->data->characters[$characterData['id']];
         $characterData['maxStamina'] = $underlyingCharacterData['stamina'] + $characterData['modifiedMaxStamina'];
         $characterData['maxHealth'] = $underlyingCharacterData['health'] + $characterData['modifiedMaxHealth'];
+        $characterData['stamina'] = min($characterData['maxStamina'], $characterData['stamina']);
+        $characterData['health'] = min($characterData['maxHealth'], $characterData['health']);
 
         array_walk($underlyingCharacterData, function ($v, $k) use (&$characterData) {
             if (str_starts_with($k, 'on') || in_array($k, ['slots', 'skills'])) {
@@ -136,18 +161,20 @@ class Character
         $characterData['dayEvent'] = array_map(function ($itemId) {
             return $this->game->data->expansion[$itemId];
         }, array_filter(explode(',', $characterData['day_event'] ?? '')));
-        unset($characterData['day_event']);
 
         $hindrances = array_map(function ($itemId) {
             return $this->game->data->expansion[$itemId];
         }, array_filter(explode(',', $characterData['hindrance'] ?? '')));
-        unset($characterData['hindrance']);
-        $characterData['mentalHindrance'] = array_filter($hindrances, function ($hindrance) {
-            return $hindrance['deck'] == 'mental-hindrance';
-        });
-        $characterData['physicalHindrance'] = array_filter($hindrances, function ($hindrance) {
-            return $hindrance['deck'] == 'physical-hindrance';
-        });
+        $characterData['mentalHindrance'] = array_values(
+            array_filter($hindrances, function ($hindrance) {
+                return $hindrance['deck'] == 'mental-hindrance';
+            })
+        );
+        $characterData['physicalHindrance'] = array_values(
+            array_filter($hindrances, function ($hindrance) {
+                return $hindrance['deck'] == 'physical-hindrance';
+            })
+        );
 
         $characterData['equipment'] = array_map(function ($itemId) use ($isActive, $characterName, $itemsLookup) {
             $itemName = $itemsLookup[$itemId];
@@ -477,6 +504,9 @@ class Character
                 'stamina' => $char['stamina'],
                 'maxStamina' => $char['maxStamina'],
                 'maxHealth' => $char['maxHealth'],
+                'dayEvent' => $char['dayEvent'],
+                'mentalHindrance' => $char['mentalHindrance'],
+                'physicalHindrance' => $char['physicalHindrance'],
                 'health' => $char['health'],
                 'incapacitated' => !!$char['incapacitated'],
                 'slotsUsed' => $slotsUsed,

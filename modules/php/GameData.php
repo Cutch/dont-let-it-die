@@ -29,6 +29,7 @@ class GameData
     private array $cachedGameItems = [];
     private static $defaults = [
         'dailyUseItems' => [],
+        'foreverUseItems' => [],
         'buildings' => [],
         'state' => [],
         'unlocks' => [],

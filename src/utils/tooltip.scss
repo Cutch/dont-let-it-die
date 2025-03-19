@@ -13,6 +13,11 @@
   .inner {
     position: relative;
   }
+  .body {
+    display: flex;
+    gap: 1rem;
+    flex-flow: wrap;
+  }
   .close {
     position: absolute;
     top: -1.5rem;

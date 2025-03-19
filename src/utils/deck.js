@@ -22,15 +22,18 @@ class Deck {
     this.topDiscard = null;
     this.setDiscard(this.topDiscard);
   }
-  shuffle() {
-    this.topDiscard = null;
-    this.setDiscard();
-    this.div.querySelector(`.shuffle-1`).classList.add('enable');
-    this.div.querySelector(`.shuffle-2`).classList.add('enable');
-    setTimeout(() => {
-      this.div.querySelector(`.shuffle-1`).classList.remove('enable');
-      this.div.querySelector(`.shuffle-2`).classList.remove('enable');
-    }, 1500);
+  async shuffle() {
+    return new Promise((resolve) => {
+      this.topDiscard = null;
+      this.setDiscard();
+      this.div.querySelector(`.shuffle-1`).classList.add('enable');
+      this.div.querySelector(`.shuffle-2`).classList.add('enable');
+      setTimeout(() => {
+        this.div.querySelector(`.shuffle-1`).classList.remove('enable');
+        this.div.querySelector(`.shuffle-2`).classList.remove('enable');
+        resolve();
+      }, 1500);
+    });
   }
   updateDeckCounts(countData) {
     this.countData = countData;
@@ -61,11 +64,13 @@ class Deck {
       .insertAdjacentHTML('beforeend', `<div class="discard-counter dot counter">${this.countData.discardCount}</div>`);
     this.topDiscard = cardId;
   }
-  drawCard(cardId) {
-    this.drawing.push(cardId);
-    if (this.drawing.length === 1) this._drawCard(this.drawing[0]);
+  async drawCard(cardId) {
+    return new Promise((resolve) => {
+      this.drawing.push(cardId);
+      if (this.drawing.length === 1) this._drawCard(this.drawing[0], (id) => id === cardId && resolve());
+    });
   }
-  _drawCard(cardId) {
+  _drawCard(cardId, callback) {
     this.div.insertAdjacentHTML(
       'beforeend',
       `<div class="flip-card">
@@ -85,6 +90,7 @@ class Deck {
           this.setDiscard(cardId);
           this.div.querySelector('.flip-card').remove();
           this.drawing.splice(this.drawing.indexOf(cardId), 1);
+          callback(cardId);
           if (this.drawing.length > 0) this._drawCard(this.drawing[0]);
         }, 1000);
       }, 1000);

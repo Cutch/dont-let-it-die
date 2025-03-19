@@ -145,7 +145,7 @@ const itemsSprites = {
         name: 'Skull',
       },
       frame: {
-        x: 876,
+        x: 878,
         y: 220,
         w: 217,
         h: 219,

@@ -18,7 +18,7 @@ class Dice {
       this.dice.style.animationPlayState = 'paused';
     });
   }
-  _roll(roll) {
+  _roll({ roll, callback }) {
     this.rolling = true;
     this.container.style['visibility'] = 'unset';
     this.dice.style['transition'] = 'transform 1s, left 1s, top 1s';
@@ -35,6 +35,7 @@ class Dice {
       for (let i = 1; i <= 6; i++) {
         this.dice.classList.remove('show-' + i);
       }
+      callback();
       if (this.queue.length > 0) {
         setTimeout(() => {
           this._roll(this.queue.shift());
@@ -45,10 +46,12 @@ class Dice {
     }, 3000);
   }
   roll(roll) {
-    if (this.queue.length == 0 && !this.rolling) {
-      this._roll(roll);
-    } else {
-      this.queue.push(roll);
-    }
+    new Promise((resolve) => {
+      if (this.queue.length == 0 && !this.rolling) {
+        this._roll({ roll, callback: resolve });
+      } else {
+        this.queue.push({ roll, callback: resolve });
+      }
+    });
   }
 }

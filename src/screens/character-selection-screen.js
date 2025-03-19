@@ -3,7 +3,7 @@ class CharacterSelectionScreen {
     this.game = game;
   }
   getSelectedId() {
-    return this.itemSelected;
+    return this.characterSelected;
   }
   hasError() {
     return false;
@@ -15,7 +15,7 @@ class CharacterSelectionScreen {
     this.game.selector.hide('characterSelection');
   }
   show(gameData) {
-    this.itemSelected = null;
+    this.characterSelected = null;
     let characterSelectionElem = document.querySelector(`#character-selection-screen .cards`);
     if (!characterSelectionElem) {
       this.game.selector.show('characterSelection');
@@ -43,13 +43,13 @@ class CharacterSelectionScreen {
       renderImage(cardName, elem.querySelector(`.token.${cardName}`), { scale: 1.5, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${cardName}`), cardName, () => selectCallback());
     };
-    gameData.characterSelection.forEach(({ character }) => {
+    gameData.selectableCharacters.forEach((character) => {
       renderItem(character, characterSelectionElem, () => {
-        if (this.itemSelected) {
-          document.querySelector(`#character-selection-screen .token.${this.itemSelected} .card`).style['outline'] = '';
+        if (this.characterSelected) {
+          document.querySelector(`#character-selection-screen .token.${this.characterSelected} .card`).style['outline'] = '';
         }
-        this.itemSelected = character;
-        if (this.itemSelected) {
+        this.characterSelected = character;
+        if (this.characterSelected) {
           document.querySelector(`#character-selection-screen .token.${character} .card`).style['outline'] = `5px solid #fff`;
         }
       });

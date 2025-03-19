@@ -28,6 +28,7 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
+                'state' => ['playerTurn'],
                 'name' => clienttranslate('Gain 2 Stamina'),
                 'health' => 2,
                 'perDay' => 1,
@@ -301,7 +302,8 @@ $charactersData = [
             }
         },
         'onRollDie' => function (Game $game, $char, &$data) {
-            if ($char['isActive'] && $data == 1) {
+            $data['sendNotification']();
+            if ($char['isActive'] && $data['value'] == 1) {
                 if ($game->adjustResource('berry', 1) == 0) {
                     $game->activeCharacterEventLog('gained 1 berry');
                 }
@@ -329,6 +331,7 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
+                'state' => ['playerTurn'],
                 'name' => clienttranslate('Gain 2 Health'),
                 'stamina' => 2,
                 'perDay' => 1,
@@ -365,6 +368,7 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
+                'state' => ['playerTurn'],
                 'name' => clienttranslate('Gain 1 Wood'),
                 'stamina' => 2,
                 'perDay' => 1,
@@ -384,6 +388,7 @@ $charactersData = [
             ],
             'skill2' => [
                 'type' => 'skill',
+                'state' => ['playerTurn'],
                 'name' => clienttranslate('Reduce Crafting Resources'),
                 'onCraft' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($skill['characterId']);
@@ -440,6 +445,7 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
+                'state' => ['playerTurn'],
                 // Tested
                 'name' => clienttranslate('Convert 1 Berry to Fiber'),
                 'stamina' => 1,
@@ -666,6 +672,7 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
+                'state' => ['playerTurn'],
                 'name' => clienttranslate('Copy Resource'),
                 'stamina' => 3,
                 'onUse' => function (Game $game, $skill, $data) {
@@ -690,6 +697,7 @@ $charactersData = [
             ],
             'skill2' => [
                 'type' => 'skill',
+                'state' => ['playerTurn'],
                 'name' => clienttranslate('Roll Low Health Die'),
                 'perDay' => 1,
                 'onUse' => function (Game $game, $skill) {
@@ -760,6 +768,7 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
+                'state' => ['playerTurn'],
                 'name' => clienttranslate('Heal everyone else for 1 hp'),
                 'health' => 2,
                 'onUse' => function (Game $game, $skill, $data) {
@@ -869,6 +878,7 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
+                'state' => ['playerTurn'],
                 'name' => clienttranslate('Make Stew'),
                 'stamina' => 1,
                 'onUse' => function (Game $game, $skill, $data) {

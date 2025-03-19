@@ -14,6 +14,17 @@ if (!function_exists('getUsePerDay')) {
         $dailyUseItems[$itemId] = array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] + 1 : 1;
         $game->gameData->set('dailyUseItems', $dailyUseItems);
     }
+    function getUsePerForever(string $itemId, $game)
+    {
+        $foreverUseItems = $game->gameData->get('foreverUseItems');
+        return array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] : 0;
+    }
+    function usePerForever(string $itemId, $game)
+    {
+        $foreverUseItems = $game->gameData->get('foreverUseItems');
+        $foreverUseItems[$itemId] = array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] + 1 : 1;
+        $game->gameData->set('foreverUseItems', $foreverUseItems);
+    }
     function array_orderby()
     {
         $args = func_get_args();
@@ -93,7 +104,7 @@ $itemsData = [
                             )
                         );
                         $game->gameData->set('characterSelectionState', [
-                            'characters' => $charactersWithHindrances,
+                            'selectableCharacters' => $charactersWithHindrances,
                             'cancellable' => false,
                             'id' => $skill['id'],
                         ]);

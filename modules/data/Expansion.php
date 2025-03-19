@@ -18,27 +18,33 @@ $expansionData = [
         'deckType' => 'day-event',
         'expansion' => 'mini-expansion',
         'type' => 'deck',
+        'name' => clienttranslate('Wolf Pup'),
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
                 'name' => clienttranslate('Tame the beast'),
                 'state' => ['dayEvent'],
                 'onUse' => function (Game $game, $skill) {
-                    $game->activeCharacterEventLog('obtained a wolf pup');
+                    $game->activeCharacterEventLog('obtained a ${item_name}', ['item_name' => clienttranslate('Wolf Pup')]);
                     // TODO: Add to character, maybe a little icon
+                    $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) use ($skill, $game) {
+                        array_push($data['dayEvent'], $game->data->expansion[$skill['cardId']]);
+                    });
                     return ['notify' => false];
                 },
             ],
             'skill2' => [
-                'type' => 'skill',
-                'name' => clienttranslate('Ask Wolfy to Fetch'),
+                'type' => 'item-skill',
+                'name' => clienttranslate('Ask Wolf Pup to Fetch'),
                 'state' => ['playerTurn'],
                 'stamina' => 2,
                 'onUse' => function (Game $game, $skill) {
-                    if ($game->rollFireDie($skill['characterId']) == 0) {
+                    if ($game->rollFireDie($game->character->getTurnCharacterId()) == 0) {
                         $game->activeCharacterEventLog('received ${count} ${resource_type}', ['count' => 1, 'resource_type' => 'wood']);
+                        $game->adjustResource('wood', 1);
                     } else {
                         $game->activeCharacterEventLog('received ${count} ${resource_type}', ['count' => 1, 'resource_type' => 'rock']);
+                        $game->adjustResource('rock', 1);
                     }
                     return ['notify' => false];
                 },
@@ -50,20 +56,32 @@ $expansionData = [
         'deckType' => 'day-event',
         'expansion' => 'mini-expansion',
         'type' => 'deck',
-        'health' => 1,
+        'damage' => 1,
         'health' => 3,
         'name' => clienttranslate('Snapping Turtle'),
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
                 'name' => clienttranslate('Make a snappy comeback'),
-                'state' => ['dayEvent'],
+                'state' => ['dayEvent', 'resolveEncounter'],
                 'health' => 1,
                 'onUse' => function (Game $game, $skill) {
                     // TODO: Add 1 / 3 fight
-                    $game->gameData->set('state', ['card' => $skill['card'], 'deck' => 'day-event']);
-                    $game->gamestate->nextState('resolveEncounter');
-                    return ['notify' => false];
+                    $game->gameData->set('state', ['card' => $game->data->expansion[$skill['cardId']], 'deck' => 'day-event']);
+                    return ['notify' => false, 'nextState' => 'resolveEncounter'];
+                },
+                'onEncounter' => function (Game $game, $skill, &$data) {
+                    $game->log('encounter', $data);
+                    if ($data['killed']) {
+                        $game->activeCharacterEventLog('obtained a ${item_name}', ['item_name' => clienttranslate('Snapping Turtle')]);
+                        // TODO: Add to character, maybe a little icon
+                        $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) use (
+                            $skill,
+                            $game
+                        ) {
+                            array_push($data['dayEvent'], $game->data->expansion[$skill['cardId']]);
+                        });
+                    }
                 },
             ],
             'skill2' => [
@@ -71,9 +89,9 @@ $expansionData = [
                 'name' => clienttranslate('Ignore Damage'),
                 'state' => ['interrupt'],
                 'interruptState' => ['resolveEncounter'],
-                'perDay' => 2,
+                'perForever' => 2,
                 'onGetActionCost' => function (Game $game, $skill, &$data) {
-                    $char = $game->character->getCharacterData($skill['characterId']);
+                    $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
                     $interruptState = $game->actInterrupt->getState('actUseItem');
                     if (
                         !$char['isActive'] &&
@@ -83,12 +101,12 @@ $expansionData = [
                         array_key_exists('data', $interruptState) &&
                         $interruptState['data']['skillId'] == $skill['id']
                     ) {
-                        $data['perDay'] = 2 - getUsePerDay($char['id'] . $skill['id'], $game);
+                        $data['perForever'] = 2 - getUsePerForever($char['id'] . $skill['id'], $game);
                     }
                 },
                 'onEncounter' => function (Game $game, $skill, &$data) {
                     $damageTaken = $game->encounter->countDamageTaken($data);
-                    $char = $game->character->getCharacterData($skill['characterId']);
+                    $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
 
                     if ($char['isActive'] && $damageTaken > 0) {
                         $game->actInterrupt->addSkillInterrupt($skill);
@@ -96,8 +114,8 @@ $expansionData = [
                 },
                 'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                     if ($skill['id'] == $activatedSkill['id']) {
-                        $char = $game->character->getCharacterData($skill['characterId']);
-                        usePerDay($char['id'] . $skill['id'], $game);
+                        $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
+                        usePerForever($char['id'] . $skill['id'], $game);
                         $game->log('onInterrupt', $data);
                         $data['data']['willTakeDamage'] = 0;
 
@@ -107,8 +125,8 @@ $expansionData = [
                     }
                 },
                 'requires' => function (Game $game, $skill) {
-                    $char = $game->character->getCharacterData($skill['characterId']);
-                    return $char['isActive'] && getUsePerDay($char['id'] . $skill['id'], $game) < 2;
+                    $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
+                    return $char['isActive'] && getUsePerForever($char['id'] . $skill['id'], $game) < 2;
                 },
             ],
         ],
@@ -168,6 +186,7 @@ $expansionData = [
                 'onUse' => function (Game $game, $skill) {
                     $game->adjustResource('wood', 1);
                     $game->activeCharacterEventLog('received ${count} ${resource_type}', ['count' => 1, 'resource_type' => 'wood']);
+                    $game->activeCharacterEventLog('lost ${count} ${character_resource}', ['count' => 1, 'character_resource' => 'health']);
                     return ['notify' => false];
                 },
             ],
@@ -185,9 +204,11 @@ $expansionData = [
                 'state' => ['dayEvent'],
                 'health' => 2,
                 'onUse' => function (Game $game, $skill) {
-                    $game->character->adjustActiveHealth(-2);
-                    $game->activeCharacterEventLog('received ${count} ${resource_type}', ['count' => 3, 'resource_type' => 'wood']);
+                    $game->activeCharacterEventLog('lost ${count} ${character_resource}', ['count' => 2, 'character_resource' => 'health']);
                     return ['notify' => false];
+                },
+                'requires' => function (Game $game, $skill) {
+                    return getUsePerDay($skill['cardId'], $game) == 0;
                 },
             ],
             'skill2' => [
@@ -197,32 +218,37 @@ $expansionData = [
                 'cost' => ['rock' => 1],
                 'onUse' => function (Game $game, $skill) {
                     $game->adjustResource('rock', -1);
-                    if ($game->rollFireDie($skill['characterId']) == 0) {
-                        usePerDay($skill['id'], $game);
-                        if (getUsePerDay($skill['id'], $game) == 2) {
+                    if (getUsePerDay($skill['cardId'], $game) == 0) {
+                        usePerDay($skill['cardId'], $game);
+                    }
+                    if ($game->rollFireDie($game->character->getTurnCharacterId()) == 0) {
+                        usePerDay($skill['cardId'], $game);
+                        if (getUsePerDay($skill['cardId'], $game) == 3) {
                             $game->activeCharacterEventLog('received ${count} ${resource_type}', ['count' => 3, 'resource_type' => 'meat']);
+                            return ['notify' => false, 'nextState' => 'playerTurn'];
                         } else {
                             $game->activeCharacterEventLog('hit the beast');
                         }
                     } else {
                         $game->activeCharacterEventLog('missed the beast');
                     }
-                    return ['notify' => false];
+                    return ['notify' => false, 'nextState' => false];
                 },
                 'requires' => function (Game $game, $skill) {
-                    return $game->gameData->getResource('rock') >= 1 && getUsePerDay($skill['id'], $game) < 2;
+                    return $game->gameData->getResource('rock') >= 1 && getUsePerDay($skill['cardId'], $game) < 3;
                 },
             ],
             'skill3' => [
                 'type' => 'skill',
                 'name' => clienttranslate('Give Up'),
                 'state' => ['dayEvent'],
+                'health' => 2,
                 'onUse' => function (Game $game, $skill) {
                     $game->character->adjustActiveHealth(-2);
                     return ['notify' => false];
                 },
                 'requires' => function (Game $game, $skill) {
-                    return getUsePerDay($skill['id'], $game) < 2;
+                    return getUsePerDay($skill['cardId'], $game) > 0 && getUsePerDay($skill['cardId'], $game) < 3;
                 },
             ],
         ],
@@ -264,7 +290,7 @@ $expansionData = [
                 'name' => clienttranslate('Maybe if I just move my foot'),
                 'state' => ['dayEvent'],
                 'onUse' => function (Game $game, $skill) {
-                    $game->character->updateCharacterData($game->getActivePlayerId(), function (&$data) {
+                    $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) {
                         $data['modifiedMaxStamina'] -= 1;
                     });
                     return ['notify' => false];
@@ -289,24 +315,25 @@ $expansionData = [
                     });
 
                     $game->gameData->set('characterSelectionState', [
-                        'characters' => $characters,
+                        'selectableCharacters' => array_values($characters),
                         'cancellable' => false,
                         'id' => $skill['id'],
                     ]);
                     $data['interrupt'] = true;
                     $game->gamestate->nextState('characterSelection');
-                    return ['notify' => false];
+                    return ['notify' => false, 'nextState' => false];
                 },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
                     $state = $game->gameData->get('characterSelectionState');
+                    $game->log('onCharacterSelection', $skill, $data, $state);
                     if ($state && $state['id'] == $skill['id']) {
-                        $data['nextState'] = 'morningPhase';
                         $game->character->adjustHealth($data['characterId'], -1);
                         $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
                             'count' => 1,
                             'character_resource' => 'health',
                             'character_name' => $data['characterId'],
                         ]);
+                        $data['nextState'] = 'playerTurn';
                     }
                 },
             ],
@@ -322,13 +349,13 @@ $expansionData = [
                     });
 
                     $game->gameData->set('characterSelectionState', [
-                        'characters' => $characters,
+                        'selectableCharacters' => array_values($characters),
                         'cancellable' => false,
                         'id' => $skill['id'],
                     ]);
                     $data['interrupt'] = true;
                     $game->gamestate->nextState('characterSelection');
-                    return ['notify' => false];
+                    return ['notify' => false, 'nextState' => false];
                 },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
                     $state = $game->gameData->get('characterSelectionState');
@@ -344,7 +371,7 @@ $expansionData = [
                             'character_resource' => 'health',
                             'character_name' => $data['characterId'],
                         ]);
-                        $data['nextState'] = 'morningPhase';
+                        $data['nextState'] = 'playerTurn';
                     }
                 },
             ],
@@ -423,8 +450,8 @@ $expansionData = [
                 'type' => 'skill',
                 'name' => clienttranslate('Backtrack'),
                 'state' => ['dayEvent'],
+                'health' => 1,
                 'onUse' => function (Game $game, $skill) {
-                    $game->character->adjustActiveHealth(-1);
                     $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
                         'count' => 1,
                         'character_resource' => 'health',
@@ -459,7 +486,6 @@ $expansionData = [
                 'type' => 'skill',
                 'name' => clienttranslate('Head back to camp'),
                 'state' => ['dayEvent'],
-                'stamina' => 1,
                 'onUse' => function (Game $game, $skill) {
                     $game->character->adjustActiveStamina(-1);
                     $game->adjustResource('berry', 2);
@@ -472,50 +498,62 @@ $expansionData = [
     'hindrance_1_0' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Blind'),
     ],
     'hindrance_1_1' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Broken Arm'),
     ],
     'hindrance_1_10' => [
         'deck' => 'mental-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Berserk'),
     ],
     'hindrance_1_11' => [
         'deck' => 'mental-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Cowardly'),
     ],
     'hindrance_1_2' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Broken Leg'),
     ],
     'hindrance_1_3' => [
         'deck' => 'mental-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Obsessive'),
     ],
     'hindrance_1_4' => [
         'deck' => 'mental-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Paranoid'),
     ],
     'hindrance_1_5' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Bad Back'),
     ],
     'hindrance_1_6' => [
         'deck' => 'mental-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Depressed'),
     ],
     'hindrance_1_7' => [
         'deck' => 'mental-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Dumb'),
     ],
     'hindrance_1_8' => [
         'deck' => 'mental-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Forgetful'),
     ],
     'hindrance_1_9' => [
         'deck' => 'mental-hindrance',
         'type' => 'deck',
+        'name' => clienttranslate('Anti-Social'),
     ],
     'physical-hindrance-back' => [
         'deck' => 'physical-hindrance',
@@ -531,60 +569,72 @@ $expansionData = [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Sun Burnt'),
     ],
     'hindrance_1_1' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Swollen Eyes'),
     ],
     'hindrance_1_10' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Deep Wound'),
     ],
     'hindrance_1_11' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Dehydrated'),
     ],
     'hindrance_1_2' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Twisted Ankle'),
     ],
     'hindrance_1_3' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Nauseous'),
     ],
     'hindrance_1_4' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Parasites'),
     ],
     'hindrance_1_5' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Sick'),
     ],
     'hindrance_1_6' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Diseased'),
     ],
     'hindrance_1_7' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Exhausted'),
     ],
     'hindrance_1_8' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Malnourished'),
     ],
     'hindrance_1_9' => [
         'deck' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'name' => clienttranslate('Concussion'),
     ],
 ];

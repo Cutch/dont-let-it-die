@@ -807,10 +807,10 @@ $decksData = [
             $game->nightEventLog('All fire die rolls will be reduced tomorrow');
         },
         'onRollDie' => function (Game $game, $nightCard, &$data) {
-            if ($data > 1) {
+            if ($data['value'] > 1) {
                 $game->nightEventLog('Roll reduced by 1');
             }
-            $data = max($data, $data - 1);
+            $data['value'] = max($data['value'], $data['value'] - 1);
         },
     ],
     'night-event-9_10' => [

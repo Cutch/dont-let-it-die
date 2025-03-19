@@ -178,6 +178,9 @@ class Game extends \Table
     {
         $currentCount = (int) $this->gameData->getResource($resourceType);
         $maxCount = isset($this->data->tokens[$resourceType]['count']) ? $this->data->tokens[$resourceType]['count'] : 999;
+        if (array_key_exists($resourceType . '-cooked', $this->data->tokens)) {
+            $maxCount -= (int) $this->gameData->getResource($resourceType . '-cooked');
+        }
         if ($resourceType == 'wood') {
             $maxCount -= $this->gameData->getResource('fireWood');
         }
@@ -197,18 +200,30 @@ class Game extends \Table
         } elseif ($rand > 1) {
             $value = 1;
         }
-        $value = max($this->hooks->onRollDie($value), 0);
-        if ($characterName) {
-            $this->notify->all('rollFireDie', clienttranslate('${character_name} rolled a ${value}'), [
-                'value' => $value == 0 ? 'blank' : $value,
-                'character_name' => $this->getCharacterHTML($characterName),
-                'roll' => $rand,
-            ]);
-        } else {
-            $this->notify->all('rollFireDie', clienttranslate('The fire die rolled a ${value}'), [
-                'value' => $value == 0 ? 'blank' : $value,
-                'roll' => $rand,
-            ]);
+        $notificationSent = false;
+        $data = [
+            'value' => $value,
+        ];
+        $data['sendNotification'] = function () use ($data, $characterName, &$notificationSent) {
+            $sideNum = $data['value'] == 0 ? 1 : ($data['value'] == 3 ? 6 : ($data['value'] == 2 ? 5 : 2));
+            if ($characterName) {
+                $this->notify->all('rollFireDie', clienttranslate('${character_name} rolled a ${value}'), [
+                    'value' => $data['value'] == 0 ? clienttranslate('blank') : $data['value'],
+                    'character_name' => $this->getCharacterHTML($characterName),
+                    'roll' => $sideNum,
+                ]);
+            } else {
+                $this->notify->all('rollFireDie', clienttranslate('The fire die rolled a ${value}'), [
+                    'value' => $data['value'] == 0 ? clienttranslate('blank') : $data['value'],
+                    'roll' => $sideNum,
+                ]);
+            }
+            $notificationSent = true;
+        };
+        $this->hooks->onRollDie($data);
+        $data['value'] = max($data['value'], 0);
+        if (!$notificationSent) {
+            $data['sendNotification']();
         }
         return $value;
     }
@@ -249,8 +264,11 @@ class Game extends \Table
             'type' => $type,
         ]);
     }
-    public function actRevive(string $character): void
+    public function actRevive(?string $character): void
     {
+        if (!$character) {
+            throw new BgaUserException($this->translate('Select a character'));
+        }
         if (!$this->character->getCharacterData($character)['incapacitated']) {
             throw new BgaUserException($this->translate('That character is not incapacitated'));
         }
@@ -473,6 +491,7 @@ class Game extends \Table
             'nextState' => 'playerTurn',
         ];
         $this->hooks->onCharacterSelection($data);
+        $this->gameData->set('characterSelectionState', null);
         if ($data['nextState'] != false) {
             $this->gamestate->nextState($data['nextState']);
         }
@@ -688,6 +707,7 @@ class Game extends \Table
                     'skill' => $skill,
                     'character' => $character,
                     'turnCharacter' => $this->character->getTurnCharacter(),
+                    'nextState' => $this->gamestate->state()['name'] == 'dayEvent' ? 'playerTurn' : false,
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
@@ -696,7 +716,7 @@ class Game extends \Table
                 $skillId = $data['skillId'];
                 $_this->hooks->reconnectHooks($skill, $_this->character->getSkill($skillId)['skill']);
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
-                $this->log('$endhook', $skillId);
+                $this->log('$endhook', $data);
                 if ($_this->gamestate->state()['name'] == 'interrupt') {
                     $_this->actInterrupt->actInterrupt($skillId);
                 }
@@ -718,10 +738,13 @@ class Game extends \Table
                     if (!$notificationSent && (!$result || !array_key_exists('notify', $result) || $result['notify'] != false)) {
                         $skill['sendNotification']();
                     }
+                    if ($result && array_key_exists('nextState', $result)) {
+                        $data['nextState'] = $result['nextState'];
+                    }
                 }
                 $_this->character->setSubmittingCharacter(null);
-                if ($this->gamestate->state()['name'] == 'dayEvent') {
-                    $this->gamestate->nextState('playerTurn');
+                if ($data['nextState']) {
+                    $this->gamestate->nextState($data['nextState']);
                 }
             }
         );
@@ -1181,23 +1204,25 @@ class Game extends \Table
                     'type' => 'action',
                 ],
             ],
-            'availableSkills' => array_values(
-                $this->actions->wrapSkills(
-                    array_filter($this->data->expansion[$card['id']]['skills'], function ($skill) {
-                        return $skill['type'] == 'skill';
-                    }),
-                    'actUseSkill'
-                )
-            ),
-            'availableItemSkills' => array_values(
-                $this->actions->wrapSkills(
-                    array_filter($this->data->expansion[$card['id']]['skills'], function ($skill) {
-                        return $skill['type'] == 'item-skill';
-                    }),
-                    'actUseItem'
-                )
-            ),
+            // 'availableSkills' => array_values(
+            //     $this->actions->wrapSkills(
+            //         array_filter($this->data->expansion[$card['id']]['skills'], function ($skill) {
+            //             return $skill['type'] == 'skill';
+            //         }),
+            //         'actUseSkill'
+            //     )
+            // ),
+            // 'availableItemSkills' => array_values(
+            //     $this->actions->wrapSkills(
+            //         array_filter($this->data->expansion[$card['id']]['skills'], function ($skill) {
+            //             return $skill['type'] == 'item-skill';
+            //         }),
+            //         'actUseItem'
+            //     )
+            // ),
         ];
+        $result['availableSkills'] = $this->actions->getAvailableSkills();
+        $result['availableItemSkills'] = $this->actions->getAvailableItemSkills();
         return $result;
     }
     public function argInterrupt(): array

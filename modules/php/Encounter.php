@@ -217,6 +217,8 @@ class Encounter
                         'itemIds' => [],
                     ];
                 }
+
+                $this->game->log('onEncounter', 'here');
                 return [
                     'cardId' => $card['id'],
                     'itemIds' => array_values(

@@ -227,12 +227,13 @@ $machinestates = [
         'possibleactions' => ['actUseSkill', 'actUseItem'],
         'transitions' => [
             'playerTurn' => 10,
-            // 'drawCard' => 11,
+            'drawCard' => 11,
             'deckSelection' => 13,
             'resourceSelection' => 14,
             'interrupt' => 22,
             'characterSelection' => 16,
             'cardSelection' => 17,
+            'resolveEncounter' => 20,
         ],
     ],
     29 => [

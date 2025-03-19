@@ -39,11 +39,32 @@ class Hooks
                 return [];
             }, $equipment),
             ...array_map(function ($c) {
+                $skills = [];
                 if (array_key_exists('skills', $c)) {
                     return $c['skills'];
                 }
+                array_walk($c['dayEvent'], function ($item) use ($skills) {
+                    if (array_key_exists('skills', $item)) {
+                        array_push(
+                            $skills,
+                            ...array_values(
+                                array_filter($item['skills'], function ($item) {
+                                    return $item['type'] == 'item-skill';
+                                })
+                            )
+                        );
+                    }
+                });
+                return $skills;
+            }, $characters),
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    array_filter($c['skills'], function ($item) {
+                        return $item['type'] == 'skill';
+                    });
+                }
                 return [];
-            }, $characters)
+            }, $this->game->actions->getActiveDayEvents())
         );
         return [...$unlocks, ...$buildings, ...$characters, ...$skills, ...$equipment, ...$activeNightCards];
     }

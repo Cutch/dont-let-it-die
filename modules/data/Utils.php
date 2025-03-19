@@ -11,6 +11,8 @@ if (!function_exists('addId')) {
                     $keyName = $k . $ik;
                     if ($v['type'] == 'character') {
                         $array[$keyName] = ['id' => $keyName, 'characterId' => $v['name'], ...$iv];
+                    } elseif ($v['type'] == 'deck') {
+                        $array[$keyName] = ['id' => $keyName, 'cardId' => $v['id'], ...$iv];
                     } else {
                         $array[$keyName] = ['id' => $keyName, ...$iv];
                     }
