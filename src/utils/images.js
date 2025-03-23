@@ -6,7 +6,11 @@ const getSpriteSize = (name, scale = 2) => {
   if (rotate) return { width: h / scale, height: w / scale };
   else return { width: w / scale, height: h / scale };
 };
-const renderImage = (name, div, { scale = 2, pos = 'append', card = true, css: extraCss = '', overridePos = null } = {}) => {
+const renderImage = (
+  name,
+  div,
+  { scale = 2, pos = 'append', card = true, css: extraCss = '', overridePos = null, rotate: rotateAPI = 0, centered = false } = {},
+) => {
   // example of adding a div for each player
   if (!allSprites[name]) throw new Error(`Missing image ${name}`);
   const {
@@ -30,11 +34,11 @@ const renderImage = (name, div, { scale = 2, pos = 'append', card = true, css: e
     scaledWidth = scaledWidth * Math.abs(overridePos.w - overridePos.x);
     scaledHeight = scaledHeight * Math.abs(overridePos.h - overridePos.y);
   }
-  if (rotate)
-    html = `<div class="card-rotator" style="transform: rotate(${rotate}deg) translate(${scaledWidth + 3}px, ${
-      -scaledHeight / 2
-    }px);height: ${scaledWidth}px;transform-origin:top;width: ${scaledHeight}px;">
-    <div name="${name}-${rotate}" class="image card ${css} ${extraCss} ${
+  if (rotate || rotateAPI)
+    html = `<div class="card-rotator" style="transform: rotate(${rotate || rotateAPI}deg) ${
+      centered ? ';transform-origin: center;' : `translate(${scaledWidth + 3}px, ${-scaledHeight / 2}px);transform-origin:top;`
+    }height: ${scaledWidth}px;width: ${scaledHeight}px;">
+    <div name="${name}-${rotate || rotateAPI}" class="image card ${css} ${extraCss} ${
       card ? 'card' : ''
     } ${name}" style="background-size: ${scaledSpriteWidth}px ${scaledSpriteHeight}px;background-position: -${scaledX}px -${scaledY}px;width: ${scaledWidth}px;height: ${
       scaledHeight - 1

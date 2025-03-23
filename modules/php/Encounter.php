@@ -46,7 +46,7 @@ class Encounter
             return 0;
         } elseif ($data['escape']) {
             return 0;
-        } elseif ($data['encounterHealth'] <= $data['characterDamage'] || $data['killed']) {
+        } elseif ($data['encounterHealth'] <= $data['characterDamage']) {
             $damageTaken = 0;
             if ($data['characterRange'] > 1) {
                 $damageTaken = 0;
@@ -134,7 +134,6 @@ class Encounter
                     'range' => 1,
                     'itemIds' => [],
                 ];
-                $this->game->log('weaponChoice', $chooseWeapons, $weapons);
                 if ($chooseWeapons && sizeof($chooseWeapons) >= 2) {
                     // TODO is this state reached? and how/why
                     $_this->gameData->set('chooseWeapons', null);
@@ -237,7 +236,6 @@ class Encounter
                     'willTakeDamage' => $card['damage'],
                     'willReceiveMeat' => $card['health'],
                     'stamina' => 0,
-                    'killed' => false,
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
@@ -261,7 +259,6 @@ class Encounter
                     }
                     if ($data['encounterHealth'] <= $data['characterDamage']) {
                         $damageTaken = $this->countDamageTaken($data);
-                        $data['killed'] = true;
                         if ($damageTaken != 0) {
                             $_this->character->adjustActiveHealth(-$damageTaken);
                         }

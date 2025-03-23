@@ -351,13 +351,13 @@ $charactersData = [
                 },
             ],
         ],
-        'onEncounter' => function (Game $game, $char, &$data) {
-            if ($char['isActive'] && $data['name'] == 'Beast') {
-                $data['encounterHealth'] = 0;
-                $data['willTakeDamage'] = 0;
-                $data['willReceiveMeat'] = 1;
-            }
-        },
+        // 'onEncounter' => function (Game $game, $char, &$data) {
+        //     if ($char['isActive'] && $data['name'] == 'Beast') {
+        //         $data['encounterHealth'] = 0;
+        //         $data['willTakeDamage'] = 0;
+        //         $data['willReceiveMeat'] = 1;
+        //     }
+        // },
     ],
     'Atouk' => [
         'type' => 'character',
@@ -476,7 +476,7 @@ $charactersData = [
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive'] && $char['health'] < $char['maxHealth']) {
                         $state = $game->gameData->get('encounterState');
-                        if ($state['killed']) {
+                        if ($state['encounterHealth'] <= $state['characterDamage']) {
                             return getUsePerDay($char['id'], $game) < 1;
                         }
                     }
@@ -619,7 +619,7 @@ $charactersData = [
             }
         },
         'onEncounter' => function (Game $game, $char, &$data) {
-            if ($data['killed']) {
+            if ($data['encounterHealth'] <= $data['characterDamage']) {
                 $game->character->adjustHealth($char['character_name'], 1);
                 $game->activeCharacterEventLog('gained 1 hp after the danger cards death', [
                     'character_name' => $game->getCharacterHTML($char['character_name']),

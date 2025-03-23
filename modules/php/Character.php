@@ -39,29 +39,15 @@ class Character
     public function _updateCharacterData($name, $data)
     {
         // Update db
-        $data['item_1'] = array_key_exists(0, $data['equipment']) ? $data['equipment'][0] : null;
-        $data['item_2'] = array_key_exists(1, $data['equipment']) ? $data['equipment'][1] : null;
-        $data['item_3'] = array_key_exists(2, $data['equipment']) ? $data['equipment'][2] : null;
-        if ($data['item_1']) {
-            $data['item_1'] = is_int($data['item_1'])
-                ? $data['item_1']
-                : (array_key_exists('itemId', $data['item_1'])
-                    ? $data['item_1']['itemId']
-                    : null);
-        }
-        if ($data['item_2']) {
-            $data['item_2'] = is_int($data['item_2'])
-                ? $data['item_2']
-                : (array_key_exists('itemId', $data['item_2'])
-                    ? $data['item_2']['itemId']
-                    : null);
-        }
-        if ($data['item_3']) {
-            $data['item_3'] = is_int($data['item_3'])
-                ? $data['item_3']
-                : (array_key_exists('itemId', $data['item_3'])
-                    ? $data['item_3']['itemId']
-                    : null);
+        for ($i = 0; $i < 3; $i++) {
+            $data['item_' . ($i + 1)] = array_key_exists($i, $data['equipment']) ? $data['equipment'][$i] : null;
+            if ($data['item_' . ($i + 1)]) {
+                $data['item_' . ($i + 1)] = is_int($data['item_' . ($i + 1)])
+                    ? $data['item_' . ($i + 1)]
+                    : (array_key_exists('itemId', $data['item_' . ($i + 1)])
+                        ? $data['item_' . ($i + 1)]['itemId']
+                        : null);
+            }
         }
         $data['hindrance'] =
             join(

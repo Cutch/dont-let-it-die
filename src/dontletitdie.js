@@ -159,13 +159,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         [...equipments, ...character.dayEvent].forEach((d) => {
           addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), _(d.name), () => {
             this.tooltip.show();
-            renderImage(d.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+            renderImage(d.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace', rotate: d.rotate, centered: true });
           });
         });
         hindrance.forEach((d) => {
           addClickListener(playerSideContainer.querySelector(`.hindrance-${d.itemId}`), _(d.name), () => {
             this.tooltip.show();
-            renderImage(d.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+            renderImage(d.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace', rotate: d.rotate, centered: true });
           });
         });
 
@@ -267,7 +267,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           extraContainerButtons.innerHTML = '';
           extraContainerButtons.insertAdjacentHTML(
             'beforeend',
-            `<div class="card-extra-equipment">${_('Extra  Equipment')} (<span>0</span>)</div>
+            `<div class="card-extra-equipment">${_('Extra Equipment')} (<span>0</span>)</div>
               <div class="card-hindrance">${_('Hindrance')} (<span>0</span>)</div>`,
           );
           // if (item3) {
@@ -284,11 +284,17 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           const extraEquipmentElem = extraContainerButtons.querySelector(`.card-extra-equipment`);
           extraEquipmentElem.style['display'] = !!item3 || character.dayEvent.length > 0 ? `` : 'none';
           extraEquipmentElem.querySelector('span').innerHTML = (!!item3 ? 1 : 0) + character.dayEvent.length;
-          addClickListener(extraEquipmentElem, _('Extra  Equipment'), () => {
+          addClickListener(extraEquipmentElem, _('Extra Equipment'), () => {
             this.tooltip.show();
-            if (item3) renderImage(item3.id, this.tooltip.renderByElement(), { scale: 1, pos: 'append' });
+            if (item3)
+              renderImage(item3.id, this.tooltip.renderByElement(), { scale: 1, pos: 'append', rotate: item3.rotate, centered: true });
             character.dayEvent.forEach((dayEvent) => {
-              renderImage(dayEvent.id, this.tooltip.renderByElement(), { scale: 1, pos: 'append' });
+              renderImage(dayEvent.id, this.tooltip.renderByElement(), {
+                scale: 1,
+                pos: 'append',
+                rotate: dayEvent.rotate,
+                centered: true,
+              });
             });
           });
 
@@ -756,7 +762,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (action['perDay'] != null)
         suffix += ` <i class="fa fa-sun-o dlid__sun"></i> ` + _('${remaining} left').replace(/\$\{remaining\}/, action['perDay']);
       if (action['perForever'] != null)
-        suffix += ` <i class="fa fa-cog dlid__cog"></i> ` + _('${remaining} left').replace(/\$\{remaining\}/, action['perForever']);
+        suffix +=
+          ` <i class="fa fa-circle-o-notch dlid__forever"></i> ` + _('${remaining} left').replace(/\$\{remaining\}/, action['perForever']);
       return suffix;
     },
     onUpdateActionButtons: function (stateName, args) {

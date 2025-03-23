@@ -21,7 +21,7 @@ class Decks
         'physical-hindrance',
         'mental-hindrance',
     ];
-    public function __construct($game)
+    public function __construct(Game $game)
     {
         $this->game = $game;
         foreach ($this->getAllDeckNames() as $i => $deck) {
@@ -34,9 +34,11 @@ class Decks
     }
     public function getAllDeckNames(): array
     {
-        return array_filter(self::$decksNames, function ($name) {
-            return array_key_exists($name . '-back', $this->game->data->decks);
-        });
+        return array_values(
+            array_filter(self::$decksNames, function ($name) {
+                return array_key_exists($name . '-back', $this->game->data->decks);
+            })
+        );
     }
     public function setup()
     {
@@ -44,7 +46,7 @@ class Decks
             $this->createDeck($deck);
         }
     }
-    protected function createDeck($type)
+    protected function createDeck(string $type)
     {
         $filtered_cards = array_filter(
             $this->game->data->decks,
@@ -68,7 +70,7 @@ class Decks
         $this->getDeck($type)->createCards($cards, 'deck');
         $this->getDeck($type)->shuffle('deck');
     }
-    public function getCard($id): array
+    public function getCard(string $id): array
     {
         $card = $this->game->data->decks[$id];
         $name = '';
@@ -108,7 +110,25 @@ class Decks
         }
         return $result;
     }
-    public function shuffleInDiscard($deck, $notify = true): void
+    public function addBackToDeck(string $deck, string $cardName): void
+    {
+        $cards = array_filter($this->getDeck($deck)->getCardsInLocation('discard'), function ($card) use ($cardName) {
+            return $card['type_arg'] == $cardName;
+        });
+        if (sizeof($cards) > 0) {
+            $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'discard');
+        }
+    }
+    public function removeFromDeck(string $deck, string $cardName): void
+    {
+        $cards = array_filter($this->getDeck($deck)->getCardsInLocation('hand'), function ($card) use ($cardName) {
+            return $card['type_arg'] == $cardName;
+        });
+        if (sizeof($cards) > 0) {
+            $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'hand');
+        }
+    }
+    public function shuffleInDiscard(string $deck, bool $notify = true): void
     {
         $this->getDeck($deck)->moveAllCardsInLocation('discard', 'deck');
         $this->getDeck($deck)->shuffle('deck');
@@ -136,7 +156,7 @@ class Decks
         unset($this->cachedData[$deck]);
         return $card;
     }
-    public function discardCards($deck, $callback): void
+    public function discardCards(string $deck, $callback): void
     {
         $deckCount = $this->getDeck($deck)->countCardsInLocation('deck');
         $cards = $this->getDeck($deck)->getCardOnTop($deckCount, 'deck');

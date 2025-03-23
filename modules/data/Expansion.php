@@ -30,6 +30,7 @@ $expansionData = [
                     $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) use ($skill, $game) {
                         array_push($data['dayEvent'], $game->data->expansion[$skill['cardId']]);
                     });
+                    $game->decks->removeFromDeck('day-event', $skill['cardId']);
                     return ['notify' => false];
                 },
             ],
@@ -58,7 +59,8 @@ $expansionData = [
         'type' => 'deck',
         'damage' => 1,
         'health' => 3,
-        'name' => clienttranslate('Snapping Turtle'),
+        'name' => clienttranslate('Shell Shield'),
+        'rotate' => 180,
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
@@ -72,9 +74,10 @@ $expansionData = [
                 },
                 'onEncounter' => function (Game $game, $skill, &$data) {
                     $game->log('encounter', $data);
-                    if ($data['killed']) {
-                        $game->activeCharacterEventLog('obtained a ${item_name}', ['item_name' => clienttranslate('Snapping Turtle')]);
+                    if ($data['encounterHealth'] <= $data['characterDamage']) {
+                        $game->activeCharacterEventLog('obtained a ${item_name}', ['item_name' => clienttranslate('Shell Shield')]);
                         // TODO: Add to character, maybe a little icon
+                        $game->decks->removeFromDeck('day-event', $skill['cardId']);
                         $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) use (
                             $skill,
                             $game
@@ -92,15 +95,7 @@ $expansionData = [
                 'perForever' => 2,
                 'onGetActionCost' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
-                    $interruptState = $game->actInterrupt->getState('actUseItem');
-                    if (
-                        !$char['isActive'] &&
-                        $data['action'] == 'actUseItem' &&
-                        $data['subAction'] == $skill['id'] &&
-                        $interruptState &&
-                        array_key_exists('data', $interruptState) &&
-                        $interruptState['data']['skillId'] == $skill['id']
-                    ) {
+                    if ($data['action'] == 'actUseItem' && $data['subAction'] == $skill['id']) {
                         $data['perForever'] = 2 - getUsePerForever($char['id'] . $skill['id'], $game);
                     }
                 },
@@ -122,10 +117,20 @@ $expansionData = [
                         $game->activeCharacterEventLog('used ${item_name} to block the damage', [
                             'item_name' => clienttranslate('Shell Shield'),
                         ]);
+                        if (getUsePerForever($char['id'] . $skill['id'], $game) == 2) {
+                            clearUsePerForever($char['id'] . $skill['id'], $game);
+                            $game->decks->addBackToDeck('day-event', $skill['cardId']);
+                            $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) use ($skill) {
+                                $data['dayEvent'] = array_filter($data['dayEvent'], function ($d) use ($skill) {
+                                    return $d['id'] != $skill['cardId'];
+                                });
+                            });
+                        }
                     }
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
+                    $game->log('requirement', $char['isActive'], getUsePerForever($char['id'] . $skill['id'], $game) < 2, $skill);
                     return $char['isActive'] && getUsePerForever($char['id'] . $skill['id'], $game) < 2;
                 },
             ],

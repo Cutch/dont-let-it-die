@@ -41,16 +41,22 @@ class Hooks
             ...array_map(function ($c) {
                 $skills = [];
                 if (array_key_exists('skills', $c)) {
-                    return $c['skills'];
+                    $skills = $c['skills'];
                 }
-                array_walk($c['dayEvent'], function ($item) use ($skills) {
+                array_walk($c['dayEvent'], function ($item) use (&$skills, $c) {
                     if (array_key_exists('skills', $item)) {
                         array_push(
                             $skills,
                             ...array_values(
-                                array_filter($item['skills'], function ($item) {
-                                    return $item['type'] == 'item-skill';
-                                })
+                                array_map(
+                                    function ($skill) use ($c) {
+                                        $skill['characterId'] = $c['id'];
+                                        return $skill;
+                                    },
+                                    array_filter($item['skills'], function ($item) {
+                                        return $item['type'] == 'item-skill';
+                                    })
+                                )
                             )
                         );
                     }
@@ -59,7 +65,7 @@ class Hooks
             }, $characters),
             ...array_map(function ($c) {
                 if (array_key_exists('skills', $c)) {
-                    array_filter($c['skills'], function ($item) {
+                    return array_filter($c['skills'], function ($item) {
                         return $item['type'] == 'skill';
                     });
                 }
@@ -71,8 +77,10 @@ class Hooks
     private function callHooks($functionName, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
     {
         $hooks = $this->getHook();
+        if ($functionName == 'onEncounter') {
+            $this->game->log('getHook start', $hooks);
+        }
         if ($this->checkInterrupt) {
-            // var_dump($functionName);
             $hooks = array_filter($hooks, function ($object) use ($data1, $data2, $data3, $data4) {
                 // $interruptData = array_filter([$data1, $data2, $data3, $data4]);
                 // $interruptData = $interruptData[sizeof($interruptData) - 1];

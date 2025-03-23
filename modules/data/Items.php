@@ -25,6 +25,12 @@ if (!function_exists('getUsePerDay')) {
         $foreverUseItems[$itemId] = array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] + 1 : 1;
         $game->gameData->set('foreverUseItems', $foreverUseItems);
     }
+    function clearUsePerForever(string $itemId, $game)
+    {
+        $foreverUseItems = $game->gameData->get('foreverUseItems');
+        $foreverUseItems[$itemId] = 0;
+        $game->gameData->set('foreverUseItems', $foreverUseItems);
+    }
     function array_orderby()
     {
         $args = func_get_args();
