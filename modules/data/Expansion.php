@@ -68,7 +68,6 @@ $expansionData = [
                 'state' => ['dayEvent', 'resolveEncounter'],
                 'health' => 1,
                 'onUse' => function (Game $game, $skill) {
-                    // TODO: Add 1 / 3 fight
                     $game->gameData->set('state', ['card' => $game->data->expansion[$skill['cardId']], 'deck' => 'day-event']);
                     return ['notify' => false, 'nextState' => 'resolveEncounter'];
                 },
@@ -512,11 +511,13 @@ $expansionData = [
     ],
     'hindrance_1_10' => [
         'deck' => 'mental-hindrance',
+        'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Berserk'),
     ],
     'hindrance_1_11' => [
         'deck' => 'mental-hindrance',
+        'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Cowardly'),
     ],
@@ -527,11 +528,13 @@ $expansionData = [
     ],
     'hindrance_1_3' => [
         'deck' => 'mental-hindrance',
+        'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Obsessive'),
     ],
     'hindrance_1_4' => [
         'deck' => 'mental-hindrance',
+        'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Paranoid'),
     ],
@@ -542,21 +545,25 @@ $expansionData = [
     ],
     'hindrance_1_6' => [
         'deck' => 'mental-hindrance',
+        'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Depressed'),
     ],
     'hindrance_1_7' => [
         'deck' => 'mental-hindrance',
+        'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Dumb'),
     ],
     'hindrance_1_8' => [
         'deck' => 'mental-hindrance',
+        'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Forgetful'),
     ],
     'hindrance_1_9' => [
         'deck' => 'mental-hindrance',
+        'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Anti-Social'),
     ],

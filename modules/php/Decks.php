@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Bga\Games\DontLetItDie;
 
 use Deck;
+use Exception;
 
 class Decks
 {
@@ -112,20 +113,24 @@ class Decks
     }
     public function addBackToDeck(string $deck, string $cardName): void
     {
-        $cards = array_filter($this->getDeck($deck)->getCardsInLocation('discard'), function ($card) use ($cardName) {
-            return $card['type_arg'] == $cardName;
-        });
-        if (sizeof($cards) > 0) {
-            $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'discard');
-        }
-    }
-    public function removeFromDeck(string $deck, string $cardName): void
-    {
         $cards = array_filter($this->getDeck($deck)->getCardsInLocation('hand'), function ($card) use ($cardName) {
             return $card['type_arg'] == $cardName;
         });
         if (sizeof($cards) > 0) {
+            $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'discard');
+        } else {
+            throw new Exception('Missing card id');
+        }
+    }
+    public function removeFromDeck(string $deck, string $cardName): void
+    {
+        $cards = array_filter($this->getDeck($deck)->getCardsInLocation('discard'), function ($card) use ($cardName) {
+            return $card['type_arg'] == $cardName;
+        });
+        if (sizeof($cards) > 0) {
             $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'hand');
+        } else {
+            throw new Exception('Missing card id');
         }
     }
     public function shuffleInDiscard(string $deck, bool $notify = true): void
