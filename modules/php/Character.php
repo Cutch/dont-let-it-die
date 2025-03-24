@@ -42,11 +42,11 @@ class Character
         for ($i = 0; $i < 3; $i++) {
             $data['item_' . ($i + 1)] = array_key_exists($i, $data['equipment']) ? $data['equipment'][$i] : null;
             if ($data['item_' . ($i + 1)]) {
-                $data['item_' . ($i + 1)] = is_int($data['item_' . ($i + 1)])
-                    ? $data['item_' . ($i + 1)]
-                    : (array_key_exists('itemId', $data['item_' . ($i + 1)])
+                $data['item_' . ($i + 1)] = is_array($data['item_' . ($i + 1)])
+                    ? (array_key_exists('itemId', $data['item_' . ($i + 1)])
                         ? $data['item_' . ($i + 1)]['itemId']
-                        : null);
+                        : null)
+                    : $data['item_' . ($i + 1)];
             }
         }
         $data['hindrance'] =
@@ -187,6 +187,7 @@ class Character
                 ...$this->game->data->items[$itemName],
                 'skills' => $skills,
                 'character_name' => $characterName,
+                'characterId' => $characterName,
             ];
         }, array_values(array_filter([$characterData['item_1'], $characterData['item_2'], $characterData['item_3']])));
         if (!$_skipHooks) {

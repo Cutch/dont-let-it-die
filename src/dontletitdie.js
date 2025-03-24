@@ -25,6 +25,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         actDrawForage: _('Forage'),
         actDrawHarvest: _('Harvest'),
         actDrawHunt: _('Hunt'),
+        actDrawExplore: _('Explore'),
         actSpendFKP: _('Spend FKP'),
         actAddWood: _('Add Wood'),
         actRevive: _('Revive'),
@@ -485,6 +486,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         { name: 'forage', expansion: 'base' },
         { name: 'harvest', expansion: 'base' },
         { name: 'hunt', expansion: 'base' },
+        { name: 'explore', expansion: 'hindrance' },
       ].filter((d) => this.expansions.includes(d.expansion));
       // Main board
       document
@@ -501,7 +503,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       renderImage(`board`, document.querySelector(`#board-container > .board`), { scale: 2, pos: 'insert' });
       decks.forEach(({ name: deck }) => {
-        if (!this.decks[deck]) {
+        if (!this.decks[deck] && gameData.decks[deck]) {
           const uppercaseDeck = deck[0].toUpperCase() + deck.slice(1);
           this.decks[deck] = new Deck(this, deck, gameData.decks[deck], document.querySelector(`.board > .${deck}`), 2);
           this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
@@ -593,12 +595,20 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       const eventDeckContainer = document.getElementById('event-deck-container');
       decks.forEach(({ name: deck, scale }) => {
-        if (!this.decks[deck]) {
-          this.decks[deck] = new Deck(this, deck, gameData.decks[deck], eventDeckContainer.querySelector(`.${deck}`), scale, 'horizontal');
-          if (gameData.decksDiscards[deck]?.name) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
-        } else {
-          this.decks[deck].updateDeckCounts(gameData.decks[deck]);
-        }
+        if (gameData.decks[deck])
+          if (!this.decks[deck]) {
+            this.decks[deck] = new Deck(
+              this,
+              deck,
+              gameData.decks[deck],
+              eventDeckContainer.querySelector(`.${deck}`),
+              scale,
+              'horizontal',
+            );
+            if (gameData.decksDiscards[deck]?.name) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+          } else {
+            this.decks[deck].updateDeckCounts(gameData.decks[deck]);
+          }
       });
     },
     setup: function (gameData) {

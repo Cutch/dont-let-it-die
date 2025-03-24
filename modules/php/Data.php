@@ -26,23 +26,27 @@ class Data
         include dirname(__DIR__) . '/data/Items.php';
         include dirname(__DIR__) . '/data/Tokens.php';
         include dirname(__DIR__) . '/data/Upgrades.php';
-        $expansionFilter = function ($data) use ($game) {
-            if (!array_key_exists('expansion', $data)) {
-                return true;
-            }
-            return $game->isValidExpansion($data['expansion']);
-        };
-        $this->decks = array_merge(
-            addId(array_filter($decksData, $expansionFilter)),
-            addId(array_filter($expansionData, $expansionFilter))
-        );
-        $this->characters = addId(array_filter($charactersData, $expansionFilter));
-        $this->expansion = addId(array_filter($expansionData, $expansionFilter));
-        $this->tokens = addId(array_filter($tokensData, $expansionFilter));
-        $this->boards = addId(array_filter($boardsData, $expansionFilter));
-        $this->knowledgeTree = addId(array_filter($knowledgeTreeData, $expansionFilter));
-        $this->items = addId(array_filter($itemsData, $expansionFilter));
-        $this->upgrades = addId(array_filter($upgradesData, $expansionFilter));
+        $this->decks = array_merge(addId($decksData), addId($expansionData));
+        $this->characters = addId($charactersData);
+        $this->expansion = addId($expansionData);
+        $this->tokens = addId($tokensData);
+        $this->boards = addId($boardsData);
+        $this->knowledgeTree = addId($knowledgeTreeData);
+        $this->items = addId($itemsData);
+        $this->upgrades = addId($upgradesData);
+    }
+    private function expansionFilter(array $data)
+    {
+        if (!array_key_exists('expansion', $data)) {
+            return true;
+        }
+        return $this->game->isValidExpansion($data['expansion']);
+    }
+    public function __get($property)
+    {
+        if (property_exists($this, $property)) {
+            return array_filter($this->$property, [$this, 'expansionFilter']);
+        }
     }
     public function getValidKnowledgeTree()
     {

@@ -653,8 +653,7 @@ $itemsData = [
             'herb' => 1,
         ],
         'onGetCharacterData' => function (Game $game, $item, &$data) {
-            $char = $game->character->getCharacterData($item['characterId']);
-            if ($char['isActive']) {
+            if ($item['characterId'] == $data['id']) {
                 $data['maxHealth'] += 1;
                 $data['health'] = min($data['maxHealth'], $data['health']);
             }
@@ -674,11 +673,10 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => clienttranslate('Skull Shield'),
         'itemType' => 'tool',
-        'character' => 'Faye',
+        // 'character' => 'Faye',
         'cost' => [],
         'onGetCharacterData' => function (Game $game, $item, &$data) {
-            $char = $game->character->getCharacterData($item['characterId']);
-            if ($char['isActive']) {
+            if ($item['characterId'] == $data['id']) {
                 $data['maxHealth'] += 1;
                 $data['health'] = min($data['maxHealth'], $data['health']);
             }
@@ -816,7 +814,7 @@ $itemsData = [
         'itemType' => 'weapon',
         'range' => 1,
         'damage' => 1,
-        'character' => 'Rex',
+        // 'character' => 'Rex',
         'cost' => [],
         'onEncounter' => function (Game $game, $item, &$data) {
             $data['characterDamage'] = $game->rollFireDie($item['characterId']);

@@ -1179,7 +1179,11 @@ class Game extends \Table
     }
     public function log(...$args)
     {
-        $this->trace('TRACE [' . $this->gamestate->state()['name'] . '] ' . json_encode($args));
+        if ($this->gamestate == null) {
+            $this->trace('TRACE [__init] ' . json_encode($args));
+        } else {
+            $this->trace('TRACE [' . $this->gamestate->state()['name'] . '] ' . json_encode($args));
+        }
     }
     public function argPlayerState(): array
     {
@@ -1588,6 +1592,9 @@ class Game extends \Table
     public function isValidExpansion(string $expansion)
     {
         $expansionI = array_search($this->getExpansion(), $this::$expansionList);
+        if ($expansionI === false) {
+            throw new Exception('Can\'t find expansion ' . $this->getExpansion() . ' in ' . json_encode($this::$expansionList));
+        }
         $expansionList = $this::$expansionList;
         return array_search($expansion, $expansionList) <= $expansionI;
     }

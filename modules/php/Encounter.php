@@ -122,9 +122,11 @@ class Encounter
                 $state = $_this->gameData->get('state');
                 $card = $state['card'];
                 $deck = $state['deck'];
-                $weapons = array_filter($this->game->character->getActiveEquipment(), function ($item) {
-                    return $item['itemType'] == 'weapon';
-                });
+                $weapons = array_values(
+                    array_filter($this->game->character->getActiveEquipment(), function ($item) {
+                        return $item['itemType'] == 'weapon';
+                    })
+                );
                 $weapon = null;
                 $chooseWeapons = $_this->gameData->get('chooseWeapons');
                 $noneChoice = [
