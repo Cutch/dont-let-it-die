@@ -7,7 +7,7 @@ class Tooltip {
         <div class="body"></div>
       </div></div>`,
     );
-    this.tooltipElem = document.getElementById('tooltip-overlay');
+    this.tooltipElem = $('tooltip-overlay');
     this.tooltipBody = document.querySelector('#tooltip-overlay .body');
     this.hide();
 

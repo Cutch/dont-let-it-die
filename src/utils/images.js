@@ -8,7 +8,7 @@ const getSpriteSize = (name, scale = 2) => {
 };
 const renderImage = (
   name,
-  div,
+  div = null,
   { scale = 2, pos = 'append', card = true, css: extraCss = '', overridePos = null, rotate: rotateAPI = 0, centered = false } = {},
 ) => {
   // example of adding a div for each player
@@ -50,6 +50,7 @@ const renderImage = (
     } ${name}" style="background-size: ${scaledSpriteWidth}px ${scaledSpriteHeight}px;background-position: -${scaledX}px -${scaledY}px;width: ${scaledWidth}px;height: ${scaledHeight}px;"></div>`;
 
   if (pos === 'replace') div.innerHTML = html;
+  else if (pos === 'return') return html;
   else if (pos === 'insert') div.insertAdjacentHTML('afterbegin', html);
   else div.insertAdjacentHTML('beforeend', html);
 };

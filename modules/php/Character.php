@@ -265,6 +265,27 @@ class Character
             $data['equipment'] = $equipment;
         });
     }
+    public function addHindrance(string $characterName, array $card): void
+    {
+        $this->updateCharacterData($characterName, function (&$data) use ($card) {
+            $this->game->log('$card2', $card);
+            array_push($data[$card['deck'] == 'physical-hindrance' ? 'physicalHindrance' : 'mentalHindrance'], $card);
+        });
+        $this->game->decks->removeFromDeck($card['deck'], $card['id']);
+    }
+    public function removeHindrance(string $characterName, array $card): void
+    {
+        $this->updateCharacterData($characterName, function (&$data) use ($card) {
+            $this->game->log('$card2', $card);
+            $data[$card['deck'] == 'physical-hindrance' ? 'physicalHindrance' : 'mentalHindrance'] = array_filter(
+                $data[$card['deck'] == 'physical-hindrance' ? 'physicalHindrance' : 'mentalHindrance'],
+                function ($hindrance) use ($card) {
+                    return $hindrance['id'] != $card['id'];
+                }
+            );
+        });
+        $this->game->decks->addBackToDeck($card['deck'], $card['id']);
+    }
     public function setSubmittingCharacter(?string $action, ?string $subAction = null): void
     {
         if ($action == 'actUseSkill') {

@@ -47,7 +47,7 @@ class ItemTradeScreen {
     }
   }
   update({ itemId1, itemId2, itemName1, itemName2, character1, character2, gameData }) {
-    const tween = new Tweening(document.querySelector(`#item-trade-screen`));
+    const tween = new Tweening(this.game, document.querySelector(`#item-trade-screen`));
 
     const end1 =
       itemName1 &&

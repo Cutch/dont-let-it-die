@@ -501,150 +501,176 @@ $expansionData = [
     ],
     'hindrance_1_0' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Blind'),
     ],
     'hindrance_1_1' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Broken Arm'),
     ],
     'hindrance_1_10' => [
         'deck' => 'mental-hindrance',
+        'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Berserk'),
     ],
     'hindrance_1_11' => [
         'deck' => 'mental-hindrance',
+        'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Cowardly'),
     ],
     'hindrance_1_2' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Broken Leg'),
     ],
     'hindrance_1_3' => [
         'deck' => 'mental-hindrance',
+        'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Obsessive'),
     ],
     'hindrance_1_4' => [
         'deck' => 'mental-hindrance',
+        'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Paranoid'),
     ],
     'hindrance_1_5' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Bad Back'),
     ],
     'hindrance_1_6' => [
         'deck' => 'mental-hindrance',
+        'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Depressed'),
     ],
     'hindrance_1_7' => [
         'deck' => 'mental-hindrance',
+        'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Dumb'),
     ],
     'hindrance_1_8' => [
         'deck' => 'mental-hindrance',
+        'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Forgetful'),
     ],
     'hindrance_1_9' => [
         'deck' => 'mental-hindrance',
+        'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Anti-Social'),
     ],
     'physical-hindrance-back' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'back',
         'expansion' => 'hindrance',
     ],
     'mental-hindrance-back' => [
         'deck' => 'mental-hindrance',
+        'deckType' => 'mental-hindrance',
         'type' => 'back',
         'expansion' => 'hindrance',
     ],
-    'hindrance_1_0' => [
+    'hindrance_2_0' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Sun Burnt'),
     ],
-    'hindrance_1_1' => [
+    'hindrance_2_1' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Swollen Eyes'),
     ],
-    'hindrance_1_10' => [
+    'hindrance_2_10' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Deep Wound'),
     ],
-    'hindrance_1_11' => [
+    'hindrance_2_11' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Dehydrated'),
     ],
-    'hindrance_1_2' => [
+    'hindrance_2_2' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Twisted Ankle'),
     ],
-    'hindrance_1_3' => [
+    'hindrance_2_3' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Nauseous'),
     ],
-    'hindrance_1_4' => [
+    'hindrance_2_4' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Parasites'),
     ],
-    'hindrance_1_5' => [
+    'hindrance_2_5' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Sick'),
     ],
-    'hindrance_1_6' => [
+    'hindrance_2_6' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Diseased'),
     ],
-    'hindrance_1_7' => [
+    'hindrance_2_7' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Exhausted'),
     ],
-    'hindrance_1_8' => [
+    'hindrance_2_8' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Malnourished'),
     ],
-    'hindrance_1_9' => [
+    'hindrance_2_9' => [
         'deck' => 'physical-hindrance',
+        'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
         'name' => clienttranslate('Concussion'),

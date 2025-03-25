@@ -358,7 +358,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_0: {
+    hindrance_2_0: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -372,7 +372,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_1: {
+    hindrance_2_1: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -386,7 +386,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_10: {
+    hindrance_2_10: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -400,7 +400,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_11: {
+    hindrance_2_11: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -414,7 +414,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_2: {
+    hindrance_2_2: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -428,7 +428,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_3: {
+    hindrance_2_3: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -442,7 +442,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_4: {
+    hindrance_2_4: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -456,7 +456,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_5: {
+    hindrance_2_5: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -470,7 +470,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_6: {
+    hindrance_2_6: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -484,7 +484,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_7: {
+    hindrance_2_7: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -498,7 +498,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_8: {
+    hindrance_2_8: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',
@@ -512,7 +512,7 @@ const expansionSprites = {
       },
       rotate: 0,
     },
-    hindrance_1_9: {
+    hindrance_2_9: {
       options: {
         type: 'card',
         deck: 'physical-hindrance',

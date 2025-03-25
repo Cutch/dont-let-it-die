@@ -256,6 +256,7 @@ class Encounter
                     foreach ($data['itemIds'] as $k => $itemId) {
                         $itemObj = $this->game->data->items[$items[$itemId]];
                         if (array_key_exists('onUse', $itemObj)) {
+                            $itemObj['characterId'] = $this->game->character->getSubmittingCharacterId();
                             $itemObj['onUse']($this->game, $itemObj);
                         }
                     }

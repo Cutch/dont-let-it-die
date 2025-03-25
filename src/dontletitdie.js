@@ -102,7 +102,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         const equipments = character.equipment;
         const hindrance = [...character.physicalHindrance, ...character.mentalHindrance];
         const characterSideId = `player-side-${character.playerId}-${character.name}`;
-        const playerSideContainer = document.getElementById(characterSideId);
+        const playerSideContainer = $(characterSideId);
         if (!playerSideContainer) {
           playerPanel.insertAdjacentHTML(
             'beforeend',
@@ -129,7 +129,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             card: false,
             css: 'side-panel-skull',
           });
-          playerSideContainer = document.getElementById(characterSideId);
+          playerSideContainer = $(characterSideId);
           addClickListener(playerSideContainer.querySelector(`.character-name`), character.name, () => {
             this.tooltip.show();
             renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
@@ -166,15 +166,15 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         hindrance.forEach((d) => {
           addClickListener(playerSideContainer.querySelector(`.hindrance-${d.itemId}`), _(d.name), () => {
             this.tooltip.show();
-            renderImage(d.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace', rotate: d.rotate, centered: true });
+            renderImage(d.id, this.tooltip.renderByElement(), { scale: 2, pos: 'replace', rotate: d.rotate, centered: true });
           });
         });
 
         document.querySelector(`#${characterSideId} .first-player-marker`).style['display'] = character?.isFirst ? 'inline-block' : 'none';
         // Player main board
         if (gameData.gamestate.name !== 'characterSelect') {
-          const container = document.getElementById(`player-container-${Math.floor(i / 2) + 1}`);
-          if (container && !document.getElementById(`player-${character.name}`)) {
+          const container = $(`player-container-${Math.floor(i / 2) + 1}`);
+          if (container && !$(`player-${character.name}`)) {
             container.insertAdjacentHTML(
               'beforeend',
               `<div id="player-${character.name}" class="player-card">
@@ -304,11 +304,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           hindranceElem.querySelector('span').innerHTML = hindrance.length;
           addClickListener(hindranceElem, _('Hindrance'), () => {
             this.tooltip.show();
-            character.physicalHindrance.forEach((id) => {
-              renderImage(id, this.tooltip.renderByElement(), { scale: 1, pos: 'append' });
+            character.physicalHindrance.forEach((hindrance) => {
+              renderImage(hindrance.id, this.tooltip.renderByElement(), { scale: 2, pos: 'append' });
             });
-            character.mentalHindrance.forEach((id) => {
-              renderImage(id, this.tooltip.renderByElement(), { scale: 1, pos: 'append' });
+            character.mentalHindrance.forEach((hindrance) => {
+              renderImage(hindrance.id, this.tooltip.renderByElement(), { scale: 2, pos: 'append' });
             });
           });
           const displayContainer = !hindranceElem.style['display'] || !extraEquipmentElem.style['display'];
@@ -342,12 +342,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       // Shared Resource Pool
       let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
       if (!sharedElem) {
-        document
-          .getElementById('game_play_area')
-          .insertAdjacentHTML(
-            'beforeend',
-            `<div id="shared-resource-container" class="dlid__container"><h3>${_('Shared Resources')}</h3><div class="tokens"></div></div>`,
-          );
+        $('game_play_area').insertAdjacentHTML(
+          'beforeend',
+          `<div id="shared-resource-container" class="dlid__container"><h3>${_('Shared Resources')}</h3><div class="tokens"></div></div>`,
+        );
         sharedElem = document.querySelector(`#shared-resource-container .tokens`);
       }
       sharedElem.innerHTML = '';
@@ -357,14 +355,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       // Available Resource Pool
       let availableElem = document.querySelector(`#discoverable-container .tokens`);
       if (!availableElem) {
-        document
-          .getElementById('game_play_area')
-          .insertAdjacentHTML(
-            'beforeend',
-            `<div id="discoverable-container" class="dlid__container"><h3>${_(
-              'Discoverable Resources',
-            )}</h3><div class="tokens"></div></div>`,
-          );
+        $('game_play_area').insertAdjacentHTML(
+          'beforeend',
+          `<div id="discoverable-container" class="dlid__container"><h3>${_(
+            'Discoverable Resources',
+          )}</h3><div class="tokens"></div></div>`,
+        );
         availableElem = document.querySelector(`#discoverable-container .tokens`);
       }
       availableElem.innerHTML = '';
@@ -443,15 +439,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     updateItems: function (gameData) {
       let campElem = document.querySelector(`#camp-items-container .items`);
       if (!campElem) {
-        document
-          .getElementById('game_play_area')
-          .insertAdjacentHTML(
-            'beforeend',
-            `<div id="camp-items-container" class="dlid__container"><h3>${_('Camp Items')}</h3><div class="items"></div></div>`,
-          );
+        $('game_play_area').insertAdjacentHTML(
+          'beforeend',
+          `<div id="camp-items-container" class="dlid__container"><h3>${_('Camp Items')}</h3><div class="items"></div></div>`,
+        );
         campElem = document.querySelector(`#camp-items-container .items`);
       }
-      document.getElementById('camp-items-container').style.display = Object.keys(gameData.campEquipmentCounts).length > 0 ? '' : 'none';
+      $('camp-items-container').style.display = Object.keys(gameData.campEquipmentCounts).length > 0 ? '' : 'none';
       campElem.innerHTML = '';
       Object.keys(gameData.campEquipmentCounts).forEach((name) => {
         this.updateItem(name, campElem, gameData.campEquipmentCounts?.[name] ?? 0);
@@ -460,12 +454,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       // Available Resource Pool
       let availableElem = document.querySelector(`#items-container .items`);
       if (!availableElem) {
-        document
-          .getElementById('game_play_area')
-          .insertAdjacentHTML(
-            'beforeend',
-            `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div></div>`,
-          );
+        $('game_play_area').insertAdjacentHTML(
+          'beforeend',
+          `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div></div>`,
+        );
         availableElem = document.querySelector(`#items-container .items`);
       }
       availableElem.innerHTML = '';
@@ -517,9 +509,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updateResources(gameData);
     },
     setupCharacterSelections: function (gameData) {
-      const playArea = document.getElementById('game_play_area');
+      const playArea = $('game_play_area');
       playArea.parentElement.insertAdjacentHTML('beforeend', `<div id="character-selector" class="dlid__container"></div>`);
-      const elem = document.getElementById('character-selector');
+      const elem = $('character-selector');
       if (gameData.gamestate.name === 'characterSelect') playArea.style.display = 'none';
       else elem.style.display = 'none';
       Object.keys(this.data)
@@ -547,7 +539,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         });
     },
     updateCharacterSelections: function (gameData) {
-      const elem = document.getElementById('character-selector');
+      const elem = $('character-selector');
       const myCharacters = this.selectedCharacters
         .filter((d) => d.playerId == gameui.player_id)
         .map((d) => d.name)
@@ -568,7 +560,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updatePlayers(gameData);
     },
     updateTrack: function (gameData) {
-      let trackContainer = document.getElementById('track-container');
+      let trackContainer = $('track-container');
       const decks = [
         { name: 'night-event', expansion: 'base', scale: 1.5 },
         { name: 'day-event', expansion: 'mini-expansion', scale: 3 },
@@ -576,24 +568,24 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         { name: 'physical-hindrance', expansion: 'hindrance', scale: 3 },
       ].filter((d) => this.expansions.includes(d.expansion));
       if (!trackContainer) {
-        const playArea = document.getElementById('game_play_area');
+        const playArea = $('game_play_area');
         playArea.insertAdjacentHTML(
           'beforeend',
           `<div id="track-container" class="dlid__container"><div id="event-deck-container">${decks
             .map((d) => `<div class="${d.name}"></div>`)
             .join('')}</div></div>`,
         );
-        trackContainer = document.getElementById('track-container');
+        trackContainer = $('track-container');
         renderImage(`track-${gameData.trackDifficulty}`, trackContainer, { scale: 2, pos: 'insert' });
 
         trackContainer
           .querySelector(`.track-${gameData.trackDifficulty}`)
           .insertAdjacentHTML('beforeend', `<div id="track-marker" class="marker"></div>`);
       }
-      const marker = document.getElementById('track-marker');
+      const marker = $('track-marker');
       marker.style.top = `${(gameData.game.day - 1) * 35 + 236}px`;
 
-      const eventDeckContainer = document.getElementById('event-deck-container');
+      const eventDeckContainer = $('event-deck-container');
       decks.forEach(({ name: deck, scale }) => {
         if (gameData.decks[deck])
           if (!this.decks[deck]) {
@@ -612,8 +604,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       });
     },
     setup: function (gameData) {
-      document.getElementById('game_play_area_wrap').classList.add('dlid');
-      document.getElementById('right-side').classList.add('dlid');
+      $('game_play_area_wrap').classList.add('dlid');
+      $('right-side').classList.add('dlid');
 
       expansionI = gameData.expansionList.indexOf(gameData.expansion);
       this.expansions = gameData.expansionList.slice(0, expansionI + 1);
@@ -624,13 +616,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         return { ...acc, [k]: d };
       }, {});
 
-      const playArea = document.getElementById('game_play_area');
-      this.tweening = new Tweening(playArea);
+      const playArea = $('game_play_area');
+      this.tweening = new Tweening(this, playArea);
       this.selector = new Selector(playArea);
       this.tooltip = new Tooltip(playArea);
       this.setupCharacterSelections(gameData);
       this.setupBoard(gameData);
-      this.dice = new Dice(document.getElementById('board-container'));
+      this.dice = new Dice($('board-container'));
       window.dice = this.dice;
       // this.dice.roll(5);
       // renderImage(`board`, playArea);
@@ -644,7 +636,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updateKnowledgeTree(gameData);
       this.updateItems(gameData);
       playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid__container"></div>`);
-      renderImage(`instructions`, document.getElementById('instructions-container'));
+      renderImage(`instructions`, $('instructions-container'));
 
       // Setup game notifications to handle (see "setupNotifications" method below)
       this.setupNotifications();
@@ -652,7 +644,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     updateKnowledgeTree(gameData) {
       let knowledgeContainer = document.querySelector('#knowledge-container .unlocked-tokens');
       if (!knowledgeContainer) {
-        const playArea = document.getElementById('game_play_area');
+        const playArea = $('game_play_area');
         playArea.insertAdjacentHTML(
           'beforeend',
           `<div id="knowledge-container" class="dlid__container"><div class="board"><div class="unlocked-tokens"></div></div></div>`,
@@ -668,7 +660,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           'beforeend',
           `<div id="knowledge-${unlockName}" class="fkp" style="top: ${y}px; left: ${x}px;"></div>`,
         );
-        renderImage(`fkp-unlocked`, document.getElementById(`knowledge-${unlockName}`), { scale: 2.5 });
+        renderImage(`fkp-unlocked`, $(`knowledge-${unlockName}`), { scale: 2.5 });
       });
     },
     ///////////////////////////////////////////////////
@@ -1082,7 +1074,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.notificationWrapper(notification);
       console.log('notification_cardDrawn', notification);
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
-      // this.decks[notification.args.deck].drawCard(notification.args.card.id).then(console.log)
       return this.decks[notification.args.deck].drawCard(notification.args.card.id);
     },
     notification_shuffle: async function (notification) {

@@ -19,6 +19,7 @@ class Hooks
         $activeNightCards = $this->game->getActiveNightCards();
         // var_dump(json_encode($activeNightCards));
         $buildings = $this->game->getBuildings();
+        $actions = $this->game->actions->getActions();
         $characters = $this->game->character->getAllCharacterData(true);
         $equipment = array_merge(
             ...array_map(function ($c) {
@@ -72,7 +73,7 @@ class Hooks
                 return [];
             }, $this->game->actions->getActiveDayEvents())
         );
-        return [...$unlocks, ...$buildings, ...$characters, ...$skills, ...$equipment, ...$activeNightCards];
+        return [...$actions, ...$unlocks, ...$buildings, ...$characters, ...$skills, ...$equipment, ...$activeNightCards];
     }
     private function callHooks($functionName, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
     {

@@ -336,7 +336,7 @@ class Game extends \Table
                 if (!$itemName) {
                     throw new BgaUserException($_this->translate('Select an item'));
                 }
-                $_this->actions->validateCanRunAction('actCraft');
+                $_this->actions->validateCanRunAction('actCraft', $itemName);
                 if (!array_key_exists($itemName, $_this->data->items)) {
                     throw new BgaUserException($_this->translate('Invalid Item'));
                 }
@@ -1073,7 +1073,8 @@ class Game extends \Table
                             'deck' => str_replace('-', ' ', $deck),
                         ]);
                     }
-                } elseif ($card['deckType'] == 'hindrance') {
+                } elseif ($card['deckType'] == 'physical-hindrance') {
+                } elseif ($card['deckType'] == 'mental-hindrance') {
                 } else {
                 }
                 return $state;
@@ -1081,6 +1082,7 @@ class Game extends \Table
             function (Game $_this, bool $finalizeInterrupt, $data) use (&$moveToDrawCardState) {
                 $deck = $data['deck'];
                 $card = $data['card'];
+                $this->log('$card', $card);
                 if ($card['deckType'] == 'resource') {
                     $this->gamestate->nextState('playerTurn');
                 } elseif ($card['deckType'] == 'encounter') {
@@ -1094,8 +1096,14 @@ class Game extends \Table
                     } else {
                         $this->gamestate->nextState('playerTurn');
                     }
-                } elseif ($card['deckType'] == 'hindrance') {
-                    $this->gamestate->nextState('playerTurn');
+                } elseif (
+                    $card['deck'] != $card['deckType'] &&
+                    ($card['deckType'] == 'physical-hindrance' || $card['deckType'] == 'mental-hindrance')
+                ) {
+                    $card = $this->decks->pickCard($card['deckType']);
+                    $this->character->addHindrance($this->character->getSubmittingCharacterId(), $card);
+                    $this->gameData->set('state', ['card' => $card, 'deck' => $card['deckType']]);
+                    $moveToDrawCardState = true;
                 } elseif ($card['deckType'] == 'day-event') {
                     $this->gamestate->nextState('dayEvent');
                 } else {

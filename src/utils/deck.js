@@ -65,12 +65,12 @@ class Deck {
     this.topDiscard = cardId;
   }
   async drawCard(cardId) {
-    return new Promise((resolve) => {
-      this.drawing.push(cardId);
-      if (this.drawing.length === 1) this._drawCard(this.drawing[0], (id) => id === cardId && resolve());
-    });
+    this.drawing.push(cardId);
+    if (this.drawing.length === 1) {
+      await this._drawCard(this.drawing[0]);
+    }
   }
-  _drawCard(cardId, callback) {
+  async _drawCard(cardId) {
     this.div.insertAdjacentHTML(
       'beforeend',
       `<div class="flip-card">
@@ -82,18 +82,16 @@ class Deck {
     );
     renderImage(`${this.deck}-back`, this.div.querySelector(`.flip-card-front`), { scale: this.scale, pos: 'replace' });
     renderImage(cardId, this.div.querySelector(`.flip-card-back`), { scale: this.scale, pos: 'replace' });
-    setTimeout(() => {
-      this.div.querySelector(`.flip-card`).classList.add('flip');
-      setTimeout(() => {
-        this.div.querySelector(`.flip-card`).classList.add('discard');
-        setTimeout(() => {
-          this.setDiscard(cardId);
-          this.div.querySelector('.flip-card').remove();
-          this.drawing.splice(this.drawing.indexOf(cardId), 1);
-          callback(cardId);
-          if (this.drawing.length > 0) this._drawCard(this.drawing[0]);
-        }, 1000);
-      }, 1000);
-    }, 100);
+    await this.game.wait(100);
+    this.div.querySelector(`.flip-card`).classList.add('flip');
+    await this.game.wait(1000);
+    this.div.querySelector(`.flip-card`).classList.add('discard');
+    await this.game.wait(1000);
+    this.setDiscard(cardId);
+    this.div.querySelector('.flip-card').remove();
+    this.drawing.splice(0, 1);
+    if (this.drawing.length > 0) {
+      await this._drawCard(this.drawing[0]);
+    }
   }
 }

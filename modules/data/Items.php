@@ -817,7 +817,10 @@ $itemsData = [
         // 'character' => 'Rex',
         'cost' => [],
         'onEncounter' => function (Game $game, $item, &$data) {
-            $data['characterDamage'] = $game->rollFireDie($item['characterId']);
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive']) {
+                $data['characterDamage'] = $game->rollFireDie($item['characterId']);
+            }
         },
         'skills' => [
             'skill1' => [
@@ -830,9 +833,14 @@ $itemsData = [
                         $game->actInterrupt->addSkillInterrupt($skill);
                     }
                 },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $game->adjustResource('fkp', -3);
+                    }
+                },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return $char['isActive'];
+                    return $char['isActive'] && $game->gameData->getResource('fkp') >= 3;
                 },
             ],
         ],
@@ -854,12 +862,6 @@ $itemsData = [
             $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and lost their ${item_name}'), [
                 'item_name' => $item['name'],
             ]);
-        },
-        'onGetActionCost' => function (Game $game, $item, &$data) {
-            $char = $game->character->getCharacterData($item['characterId']);
-            if ($char['isActive'] && $data['action'] == 'actCraft' && $data['subAction'] == 'rock') {
-                $data['stamina'] = 1;
-            }
         },
     ],
     'bola' => [

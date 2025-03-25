@@ -1,7 +1,7 @@
 class Selector {
   constructor(gamePlayAreaElem) {
     gamePlayAreaElem.insertAdjacentHTML('beforeend', `<div id="selector-overlay"></div>`);
-    this.selectorElem = document.getElementById('selector-overlay');
+    this.selectorElem = $('selector-overlay');
     this.screenName = null;
     this.hide(null);
   }

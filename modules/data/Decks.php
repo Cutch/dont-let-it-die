@@ -6,7 +6,7 @@ $decksData = [
     'explore-7_0' => [
         'deck' => 'explore',
         'type' => 'deck',
-        'deckType' => 'hindrance',
+        'deckType' => 'physical-hindrance',
         'expansion' => 'hindrance',
     ],
     'explore-7_1' => [
@@ -113,7 +113,7 @@ $decksData = [
     'forage-7_10' => [
         'deck' => 'forage',
         'type' => 'deck',
-        'deckType' => 'hindrance',
+        'deckType' => 'physical-hindrance',
         'expansion' => 'hindrance',
     ],
     'forage-7_11' => [
@@ -210,7 +210,7 @@ $decksData = [
     'gather-7_14' => [
         'deck' => 'gather',
         'type' => 'deck',
-        'deckType' => 'hindrance',
+        'deckType' => 'physical-hindrance',
         'expansion' => 'hindrance',
     ],
     'gather-7_15' => [
@@ -277,7 +277,7 @@ $decksData = [
     'harvest-7_14' => [
         'deck' => 'harvest',
         'type' => 'deck',
-        'deckType' => 'hindrance',
+        'deckType' => 'physical-hindrance',
         'expansion' => 'hindrance',
     ],
     'harvest-7_15' => [

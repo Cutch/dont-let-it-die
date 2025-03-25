@@ -12,8 +12,8 @@ class Dice {
     }
     html += `</div></div>`;
     this.div.insertAdjacentHTML('beforeend', html);
-    this.container = document.getElementById('dice-container');
-    this.dice = document.getElementById('dice');
+    this.container = $('dice-container');
+    this.dice = $('dice');
     this.dice.addEventListener('animationEnd', () => {
       this.dice.style.animationPlayState = 'paused';
     });

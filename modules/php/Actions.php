@@ -202,6 +202,11 @@ class Actions
                         )
                     );
                 },
+                'onGetActionCost' => function (Game $game, $action, &$data) {
+                    if ($data['action'] == 'actCraft' && $data['subAction'] == 'rock-weapon') {
+                        $data['stamina'] = 1;
+                    }
+                },
             ],
             'actInvestigateFire' => [
                 'state' => ['playerTurn'],
@@ -258,7 +263,7 @@ class Actions
         }
         return $this->game->isValidExpansion($data['expansion']);
     }
-    private function getActions()
+    public function getActions()
     {
         return array_filter($this->actions, [$this, 'expansionFilter']);
     }
@@ -367,7 +372,7 @@ class Actions
                 $stamina = $character['stamina'];
                 $health = $character['health'];
 
-                $this->skillActionCost('actUseSkill', $skill);
+                $this->skillActionCost('actUseSkill', null, $skill);
                 return $this->game->hooks->onCheckSkillRequirements($skill) &&
                     $this->checkRequirements($skill, $character) &&
                     (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']) &&
@@ -380,12 +385,11 @@ class Actions
     {
         $character = $this->game->character->getSubmittingCharacter();
         $skills = $this->getActiveEquipmentSkills();
-        $this->game->log('$getAvailableItemSkills', $skills);
         return array_values(
             array_filter($skills, function ($skill) use ($character) {
                 $stamina = $character['stamina'];
                 $health = $character['health'];
-                $this->skillActionCost('actUseItem', $skill);
+                $this->skillActionCost('actUseItem', null, $skill);
                 return $this->checkRequirements($skill, $character) &&
                     (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']) &&
                     (!array_key_exists('health', $skill) || $health >= $skill['health']);
@@ -408,14 +412,14 @@ class Actions
     public function getActionCost(string $action, ?string $subAction = null): array
     {
         $actionObj = $this->getAction($action, $subAction);
-        $this->skillActionCost($action, $actionObj);
+        $this->skillActionCost($action, $subAction, $actionObj);
         return $actionObj;
     }
-    private function skillActionCost(string $type, array &$skill)
+    private function skillActionCost(string $action, ?string $subAction = null, array &$skill)
     {
         $actionCost = [
-            'action' => $type,
-            'subAction' => array_key_exists('id', $skill) ? $skill['id'] : null,
+            'action' => $action,
+            'subAction' => $subAction ?? (array_key_exists('id', $skill) ? $skill['id'] : null),
             'stamina' => array_key_exists('stamina', $skill) ? $skill['stamina'] : null,
             'health' => array_key_exists('health', $skill) ? $skill['health'] : null,
             'perDay' => array_key_exists('perDay', $skill) ? $skill['perDay'] : null,
@@ -444,7 +448,7 @@ class Actions
     public function wrapSkills(array $skills, string $action): array
     {
         return array_map(function ($skill) use ($action) {
-            $this->skillActionCost($action, $skill);
+            $this->skillActionCost($action, null, $skill);
             return $skill;
         }, $skills);
     }
