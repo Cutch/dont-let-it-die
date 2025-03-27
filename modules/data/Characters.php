@@ -614,16 +614,34 @@ $charactersData = [
         'slots' => ['weapon', 'tool'],
         'onNight' => function (Game $game, $char, &$data) {
             if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
-                $game->character->adjustHealth($char['character_name'], 1);
+                foreach ($game->character->getAllCharacterData() as $k => $character) {
+                    if (
+                        sizeof(
+                            array_filter($char['mentalHindrance'], function ($hindrance) {
+                                return $hindrance['id'] == 'hindrance_1_9';
+                            })
+                        ) == 0
+                    ) {
+                        $game->character->adjustHealth($character['character_name'], 1);
+                    }
+                }
                 $game->activeCharacterEventLog('All tribe members gained 1 hp after the rival tribe event');
             }
         },
         'onEncounter' => function (Game $game, $char, &$data) {
             if ($data['encounterHealth'] <= $data['characterDamage']) {
-                $game->character->adjustHealth($char['character_name'], 1);
-                $game->activeCharacterEventLog('gained 1 hp after the danger cards death', [
-                    'character_name' => $game->getCharacterHTML($char['character_name']),
-                ]);
+                if (
+                    sizeof(
+                        array_filter($char['mentalHindrance'], function ($hindrance) {
+                            return $hindrance['id'] == 'hindrance_1_9';
+                        })
+                    ) == 0
+                ) {
+                    $game->character->adjustHealth($char['character_name'], 1);
+                    $game->activeCharacterEventLog('gained 1 hp after the danger cards death', [
+                        'character_name' => $game->getCharacterHTML($char['character_name']),
+                    ]);
+                }
             }
         },
         'onGetActionCost' => function (Game $game, $char, &$data) {
@@ -775,7 +793,14 @@ $charactersData = [
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
                         foreach ($game->character->getAllCharacterData() as $k => $character) {
-                            if ($character['character_name'] != $char['character_name']) {
+                            if (
+                                $character['character_name'] != $char['character_name'] &&
+                                sizeof(
+                                    array_filter($char['mentalHindrance'], function ($hindrance) {
+                                        return $hindrance['id'] == 'hindrance_1_9';
+                                    })
+                                ) == 0
+                            ) {
                                 $game->character->adjustHealth($character['character_name'], 1);
                             }
                         }
@@ -875,6 +900,13 @@ $charactersData = [
                 }
             }
         },
+        // Not affected by mental hindrance, can hold 4 physical
+        'onMaxHindrance' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                $data['maxPhysicalHindrance'] = 4;
+                $data['canDrawMentalHindrance'] = false;
+            }
+        },
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
@@ -896,7 +928,6 @@ $charactersData = [
                 },
             ],
         ],
-        // TODO not affected by mental hindrance, can hold 4 physical
     ],
     'Vog' => [
         'type' => 'character',
@@ -946,13 +977,16 @@ $charactersData = [
                 },
                 'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                     if ($skill['id'] == $activatedSkill['id']) {
-                        $game->character->adjustHealth($data['data']['resourceType'], $data['data']['count']);
-
-                        $char = $game->character->getCharacterData($skill['characterId']);
-                        $game->activeCharacterEventLog('is re-rolling ${active_character_name}\'s fire die', [
-                            ...$char,
-                            'active_character_name' => $game->character->getTurnCharacter()['character_name'],
+                        $interruptState = $game->actInterrupt->getState('stResolveEncounter');
+                        $damageTaken = $game->encounter->countDamageTaken($interruptState['data']);
+                        $game->character->adjustHealth($skill['characterId'], $damageTaken);
+                        $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
+                            'count' => 1,
+                            'character_resource' => 'health',
+                            'character_name' => 'Vog',
                         ]);
+                        $interruptState['willTakeDamage'] = 0;
+                        $game->actInterrupt->setState('stResolveEncounter', $interruptState);
                     }
                 },
                 'onUse' => function (Game $game, $skill) {

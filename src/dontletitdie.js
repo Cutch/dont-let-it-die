@@ -31,6 +31,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         actRevive: _('Revive'),
         actEat: _('Eat'),
         actCook: _('Cook'),
+        actUseHerb: _('Use Herb'),
         actTrade: _('Trade Resources'),
         actUseSkill: _('Use Skill'),
         actUseItem: _('Use Item'),
@@ -70,6 +71,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         'berry-cooked',
         'hide',
         'fkp',
+        'dino-egg',
+        'dino-egg-cooked',
+        'gem-y',
+        'gem-b',
+        'gem-p',
       ];
     },
     getResourcesForDisplay: function (gameData) {
@@ -166,7 +172,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         hindrance.forEach((d) => {
           addClickListener(playerSideContainer.querySelector(`.hindrance-${d.itemId}`), _(d.name), () => {
             this.tooltip.show();
-            renderImage(d.id, this.tooltip.renderByElement(), { scale: 2, pos: 'replace', rotate: d.rotate, centered: true });
+            renderImage(d.id, this.tooltip.renderByElement(), { scale: 1.5, pos: 'replace', rotate: d.rotate, centered: true });
           });
         });
 
@@ -305,10 +311,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           addClickListener(hindranceElem, _('Hindrance'), () => {
             this.tooltip.show();
             character.physicalHindrance.forEach((hindrance) => {
-              renderImage(hindrance.id, this.tooltip.renderByElement(), { scale: 2, pos: 'append' });
+              renderImage(hindrance.id, this.tooltip.renderByElement(), { scale: 1.5, pos: 'append' });
             });
             character.mentalHindrance.forEach((hindrance) => {
-              renderImage(hindrance.id, this.tooltip.renderByElement(), { scale: 2, pos: 'append' });
+              renderImage(hindrance.id, this.tooltip.renderByElement(), { scale: 1.5, pos: 'append' });
             });
           });
           const displayContainer = !hindranceElem.style['display'] || !extraEquipmentElem.style['display'];

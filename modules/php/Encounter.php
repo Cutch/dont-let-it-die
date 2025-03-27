@@ -35,8 +35,51 @@ class Encounter
     public function stPostEncounter()
     {
         $validActions = $this->game->actions->getValidActions();
-        $this->game->gameData->set('encounterState', []);
+
+        $this->game->log('$getHindrance');
         if (sizeof($validActions) == 0) {
+            $this->game->gamestate->nextState('getHindrance');
+        }
+    }
+    public function stGetHindrance()
+    {
+        $encounterState = $this->game->gameData->get('encounterState');
+        // $this->game->log($encounterState);
+        $data = ['maxPhysicalHindrance' => 3, 'canDrawMentalHindrance' => true];
+        $this->game->hooks->onMaxHindrance($data);
+
+        $this->game->log('$encounterState', $encounterState);
+        if ($encounterState['damageTaken'] > 0) {
+            $char = $this->game->character->getSubmittingCharacter();
+            $deckType = 'physical-hindrance';
+            $this->game->log("char['physicalHindrance']", $char['physicalHindrance']);
+            if (sizeof($char['physicalHindrance']) == $data['maxPhysicalHindrance']) {
+                $deckType = 'mental-hindrance';
+                foreach ($char['physicalHindrance'] as $i => $card) {
+                    $this->game->character->removeHindrance($char['character_name'], $card);
+                }
+            }
+            if ($deckType != 'mental-hindrance' || $data['canDrawMentalHindrance']) {
+                $card = $this->game->decks->pickCard($deckType);
+                if ($card) {
+                    $this->game->character->addHindrance($this->game->character->getSubmittingCharacterId(), $card);
+                    $this->game->hooks->onAcquireHindrance($card);
+                    $this->game->gameData->set('state', ['card' => $card, 'deck' => $deckType]);
+                    $this->game->activeCharacterEventLog('${sentence} ${name}', [
+                        'sentence' => $card['sentence'],
+                        'name' => $card['name'],
+                    ]);
+                    $this->game->gamestate->nextState('drawCard');
+                } else {
+                    $this->game->gameData->set('encounterState', []);
+                    $this->game->gamestate->nextState('playerTurn');
+                }
+            } else {
+                $this->game->gameData->set('encounterState', []);
+                $this->game->gamestate->nextState('playerTurn');
+            }
+        } else {
+            $this->game->gameData->set('encounterState', []);
             $this->game->gamestate->nextState('playerTurn');
         }
     }
@@ -219,7 +262,6 @@ class Encounter
                     ];
                 }
 
-                $this->game->log('onEncounter', 'here');
                 return [
                     'cardId' => $card['id'],
                     'itemIds' => array_values(
@@ -260,8 +302,9 @@ class Encounter
                             $itemObj['onUse']($this->game, $itemObj);
                         }
                     }
+                    $damageTaken = $this->countDamageTaken($data);
+                    $data['damageTaken'] = $damageTaken;
                     if ($data['encounterHealth'] <= $data['characterDamage']) {
-                        $damageTaken = $this->countDamageTaken($data);
                         if ($damageTaken != 0) {
                             $_this->character->adjustActiveHealth(-$damageTaken);
                         }
@@ -277,10 +320,12 @@ class Encounter
                             }
                         }
                     } else {
-                        $damageTaken = $this->countDamageTaken($data);
                         if ($damageTaken > 0) {
-                            $_this->character->adjustActiveHealth(-$data['willTakeDamage']);
-                            $_this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', $data);
+                            $_this->character->adjustActiveHealth(-$damageTaken);
+                            $_this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', [
+                                ...$data,
+                                'damageTaken' => $damageTaken,
+                            ]);
                         } else {
                             $_this->activeCharacterEventLog('was attacked by a ${name} but lost no health', $data);
                         }

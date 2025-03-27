@@ -140,7 +140,7 @@ class Game extends \Table
     {
         return $this->_($str);
     }
-    public function activeCharacterEventLog($message, $arg = [])
+    public function activeCharacterEventLog($message = '', $arg = [], $translatedMessage = '')
     {
         // $result = [
         //     'character_name' => $this->getCharacterHTML(),
@@ -148,7 +148,7 @@ class Game extends \Table
         // ];
         // $this->getAllCharacters($result);
         // $this->getAllPlayers($result);
-        $this->notify->all('activeCharacter', clienttranslate('${character_name} ' . $message), [
+        $this->notify->all('activeCharacter', clienttranslate('${character_name} ' . $message) . $translatedMessage, [
             ...$arg,
             'gameData' => $this->getAllDatas(),
         ]);
@@ -395,7 +395,7 @@ class Game extends \Table
                                 }
                             })
                         );
-                        $_this->gameData->set('state', [
+                        $_this->gameData->set('tooManyItemsState', [
                             'itemType' => $itemType,
                             'items' => [...$existingItems, ['name' => $itemName, 'itemId' => $itemId]],
                         ]);
@@ -860,13 +860,18 @@ class Game extends \Table
             func_get_args(),
             [$this->hooks, 'onDraw'],
             function (Game $_this, $deck) {
-                $_this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
-                $card = $_this->decks->pickCard($deck);
-                $_this->activeCharacterEventLog('draws from the ${deck} deck', [
-                    'deck' => str_replace('-', ' ', $deck),
-                    'gameData' => $_this->getAllDatas(),
-                ]);
-                return ['deck' => $deck, 'card' => $card];
+                $this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
+                $data = ['deck' => $deck, 'cancel' => false];
+                $this->hooks->onActDraw($data);
+                $card = [];
+                if (!$data['cancel']) {
+                    $card = $this->decks->pickCard($deck);
+                    $this->activeCharacterEventLog('draws from the ${deck} deck', [
+                        'deck' => str_replace('-', ' ', $deck),
+                        'gameData' => $this->getAllDatas(),
+                    ]);
+                }
+                return ['deck' => $deck, 'card' => [...$card], ...$data];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 extract($data);
@@ -874,8 +879,10 @@ class Game extends \Table
                     $_this->actions->spendActionCost('actDraw' . ucfirst($deck));
                 }
 
-                $_this->gameData->set('state', ['card' => $card, 'deck' => $deck]);
-                $_this->gamestate->nextState('drawCard');
+                if (!$data['cancel']) {
+                    $_this->gameData->set('state', ['card' => $card, 'deck' => $deck]);
+                    $_this->gamestate->nextState('drawCard');
+                }
             }
         );
     }
@@ -931,7 +938,7 @@ class Game extends \Table
 
     public function argTooManyItems()
     {
-        return [...$this->gameData->get('state'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
+        return [...$this->gameData->get('tooManyItemsState'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
     }
     public function argDeckSelection()
     {
@@ -1024,6 +1031,10 @@ class Game extends \Table
     {
         $this->encounter->stPostEncounter();
     }
+    public function stGetHindrance()
+    {
+        $this->encounter->stGetHindrance();
+    }
     public function stResolveEncounter()
     {
         $this->encounter->stResolveEncounter();
@@ -1073,17 +1084,17 @@ class Game extends \Table
                             'deck' => str_replace('-', ' ', $deck),
                         ]);
                     }
-                } elseif ($card['deckType'] == 'physical-hindrance') {
-                } elseif ($card['deckType'] == 'mental-hindrance') {
+                } elseif ($card['deckType'] == 'physical-hindrance' || $card['deckType'] == 'mental-hindrance') {
                 } else {
                 }
-                return $state;
+                return [...$state, 'discard' => false];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) use (&$moveToDrawCardState) {
                 $deck = $data['deck'];
                 $card = $data['card'];
-                $this->log('$card', $card);
-                if ($card['deckType'] == 'resource') {
+                if ($data['discard']) {
+                    $this->gamestate->nextState('playerTurn');
+                } elseif ($card['deckType'] == 'resource') {
                     $this->gamestate->nextState('playerTurn');
                 } elseif ($card['deckType'] == 'encounter') {
                     $this->gamestate->nextState('resolveEncounter');
@@ -1102,8 +1113,13 @@ class Game extends \Table
                 ) {
                     $card = $this->decks->pickCard($card['deckType']);
                     $this->character->addHindrance($this->character->getSubmittingCharacterId(), $card);
+                    $this->hooks->onAcquireHindrance($card);
                     $this->gameData->set('state', ['card' => $card, 'deck' => $card['deckType']]);
                     $moveToDrawCardState = true;
+                    $this->activeCharacterEventLog('${sentence} ${name}', [
+                        'sentence' => $card['sentence'],
+                        'name' => $card['name'],
+                    ]);
                 } elseif ($card['deckType'] == 'day-event') {
                     $this->gamestate->nextState('dayEvent');
                 } else {
@@ -1171,7 +1187,10 @@ class Game extends \Table
                 $_this->hooks->reconnectHooks($card, $_this->decks->getCard($card['id']));
 
                 $this->setActiveNightCard($card['id']);
-                $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
+
+                if (!$data || !array_key_exists('onUse', $data) || $data['onUse'] != false) {
+                    $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
+                }
 
                 $this->gamestate->nextState('morningPhase');
             }
@@ -1420,6 +1439,7 @@ class Game extends \Table
         if ($this->adjustResource('fireWood', -$woodNeeded) != 0) {
             $this->lose();
         }
+        $this->hooks->onMorningAfter($data);
         $this->actions->resetTurnActions();
         $this->character->rotateTurnOrder();
         $this->gamestate->nextState('tradePhase');
@@ -1827,7 +1847,9 @@ class Game extends \Table
             'trap' => 0,
             'herb' => 0,
             'fkp' => 40,
-            'gem' => 0,
+            'gem-y' => 1,
+            'gem-b' => 1,
+            'gem-p' => 1,
         ]);
         $this->notify->all('tokenUsed', '', [
             'gameData' => $this->getAllDatas(),
@@ -1935,7 +1957,9 @@ class Game extends \Table
             'hide' => 4,
             'herb' => 4,
             'fkp' => 1,
-            'gem' => 3,
+            'gem-y' => 1,
+            'gem-b' => 1,
+            'gem-p' => 1,
         ]);
         $this->adjustResource('fireWood', 2);
         $this->character->updateAllCharacterData(function (&$data) {

@@ -164,7 +164,7 @@ $machinestates = [
         'type' => 'activeplayer',
         'args' => 'argCardSelection',
         'possibleactions' => ['actSelectCard', 'actSelectCardCancel'],
-        'transitions' => ['playerTurn' => 10, 'drawCard' => 11, 'morningPhase' => 50, 'interrupt' => 22],
+        'transitions' => ['playerTurn' => 10, 'morningPhase' => 50, 'interrupt' => 22],
     ],
     20 => [
         'name' => 'resolveEncounter',
@@ -183,8 +183,17 @@ $machinestates = [
         'type' => 'activeplayer',
         'action' => 'stPostEncounter',
         'args' => 'argPostEncounter',
+        'possibleactions' => [],
+        'transitions' => ['playerTurn' => 10, 'getHindrance' => 25, 'drawCard' => 11],
+    ],
+    25 => [
+        'name' => 'getHindrance',
+        'description' => clienttranslate('Resolving Encounter'),
+        'descriptionmyturn' => clienttranslate('Resolving Encounter'),
+        'type' => 'activeplayer',
+        'action' => 'stGetHindrance',
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
-        'transitions' => ['playerTurn' => 10],
+        'transitions' => ['playerTurn' => 10, 'drawCard' => 11],
     ],
     22 => [
         'name' => 'interrupt',

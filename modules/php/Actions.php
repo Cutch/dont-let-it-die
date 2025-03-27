@@ -92,6 +92,18 @@ class Actions
                     return $wood > 0;
                 },
             ],
+            'actUseHerb' => [
+                'state' => ['playerTurn'],
+                'stamina' => 1,
+                'type' => 'action',
+                'requires' => function (Game $game, $action) {
+                    return sizeof($this->game->character->getTurnCharacter()['physicalHindrance']) > 0 &&
+                        $game->gameData->getResource('herb') > 0;
+                },
+                'selectable' => function (Game $game) {
+                    return [];
+                },
+            ],
             'actCook' => [
                 'state' => ['playerTurn'],
                 'stamina' => 1,

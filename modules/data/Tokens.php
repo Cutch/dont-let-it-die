@@ -146,19 +146,19 @@ $tokensData = [
         'type' => 'marker',
         'name' => clientTranslate('Unlocked Fire Knowledge Point'),
     ],
-    'gem-1' => [
+    'gem-b' => [
         'count' => 1,
         'type' => 'resource',
         'name' => clientTranslate('Gem'),
         'expansion' => 'hindrance',
     ],
-    'gem-2' => [
+    'gem-p' => [
         'count' => 1,
         'type' => 'resource',
         'name' => clientTranslate('Gem'),
         'expansion' => 'hindrance',
     ],
-    'gem-3' => [
+    'gem-y' => [
         'count' => 1,
         'type' => 'resource',
         'name' => clientTranslate('Gem'),

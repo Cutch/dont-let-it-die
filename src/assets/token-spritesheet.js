@@ -252,7 +252,7 @@ const tokenSprites = {
         h: 111,
       },
     },
-    'gem-1': {
+    'gem-b': {
       options: {
         type: 'resource',
         name: 'Gem 1',
@@ -264,7 +264,7 @@ const tokenSprites = {
         h: 111,
       },
     },
-    'gem-2': {
+    'gem-p': {
       options: {
         type: 'resource',
         name: 'Gem 2',
@@ -276,7 +276,7 @@ const tokenSprites = {
         h: 111,
       },
     },
-    'gem-3': {
+    'gem-y': {
       options: {
         type: 'resource',
         name: 'Gem 3',

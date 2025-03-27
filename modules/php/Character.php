@@ -268,7 +268,6 @@ class Character
     public function addHindrance(string $characterName, array $card): void
     {
         $this->updateCharacterData($characterName, function (&$data) use ($card) {
-            $this->game->log('$card2', $card);
             array_push($data[$card['deck'] == 'physical-hindrance' ? 'physicalHindrance' : 'mentalHindrance'], $card);
         });
         $this->game->decks->removeFromDeck($card['deck'], $card['id']);
@@ -276,7 +275,6 @@ class Character
     public function removeHindrance(string $characterName, array $card): void
     {
         $this->updateCharacterData($characterName, function (&$data) use ($card) {
-            $this->game->log('$card2', $card);
             $data[$card['deck'] == 'physical-hindrance' ? 'physicalHindrance' : 'mentalHindrance'] = array_filter(
                 $data[$card['deck'] == 'physical-hindrance' ? 'physicalHindrance' : 'mentalHindrance'],
                 function ($hindrance) use ($card) {
@@ -459,15 +457,20 @@ class Character
             $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
         });
     }
-    public function adjustHealth(string $characterName, int $health): int
+    public function adjustHealth(string $characterName, int $healthChange): int
     {
         $prev = 0;
-        $this->updateCharacterData($characterName, function (&$data) use ($health, &$prev, $characterName) {
-            if ($data['incapacitated'] && $health > 0) {
+        $this->updateCharacterData($characterName, function (&$data) use ($healthChange, &$prev, $characterName) {
+            if ($data['incapacitated'] && $healthChange > 0) {
                 return;
             }
             $prev = $data['health'];
-            $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
+            $hookData = [
+                'currentHealth' => $prev,
+                'change' => $healthChange,
+            ];
+            $this->game->hooks->onHealthChange($hookData);
+            $data['health'] = max(min($data['health'] + $hookData['change'], $data['maxHealth']), 0);
             $prev = $data['health'] - $prev;
             if ($data['health'] == 0 && !$data['incapacitated']) {
                 $this->game->activeCharacterEventLog('has been incapacitated', [

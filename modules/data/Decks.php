@@ -37,21 +37,21 @@ $decksData = [
         'type' => 'deck',
         'deckType' => 'resource',
         'count' => 1,
-        'resourceType' => 'gem-1',
+        'resourceType' => 'gem-b',
     ],
     'explore-7_13' => [
         'deck' => 'explore',
         'type' => 'deck',
         'deckType' => 'resource',
         'count' => 1,
-        'resourceType' => 'gem-2',
+        'resourceType' => 'gem-p',
     ],
     'explore-7_14' => [
         'deck' => 'explore',
         'type' => 'deck',
         'deckType' => 'resource',
         'count' => 1,
-        'resourceType' => 'gem-3',
+        'resourceType' => 'gem-y',
     ],
     'explore-7_15' => [
         'deck' => 'explore',
@@ -625,6 +625,7 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'onUse' => function (Game $game, $nightCard) {
+            $game->nightEventLog('Everyone is injured');
             // Everyone take physical hindrance
         },
     ],
@@ -635,6 +636,16 @@ $decksData = [
         'onUse' => function (Game $game, $nightCard) {
             // Add 3 raw eggs to supply
             // If 3 raw eggs are not there by night, everyone takes 1 damage
+            $game->nightEventLog('Received ${count} ${resource_type}', ['count' => 3, 'resource_type' => 'dino-egg']);
+            $game->adjustResource('dino-egg', 3);
+        },
+        'onNight' => function (Game $game, $nightCard, &$data) {
+            if (in_array($nightCard['id'], $game->getActiveNightCardIds()) && $game->gameData->getResource('dino-egg') < 3) {
+                $game->character->adjustAllHealth(-1);
+                $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} health'), [
+                    'amount' => 1,
+                ]);
+            }
         },
     ],
     'night-event-8_10' => [

@@ -503,81 +503,258 @@ $expansionData = [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Blind'),
+        'onAcquireHindrance' => function (Game $game, $card, &$data) {
+            if ($card['id'] == $data['id']) {
+                $character = $game->character->getTurnCharacter();
+                $weapons = array_filter($character['equipment'], function ($item) {
+                    return $item['range'] > 1;
+                });
+                // Only range 1 weapon can be equipped
+                if (sizeof($weapons) > 0) {
+                    $game->character->unequipEquipment(
+                        $game->character->getTurnCharacterId(),
+                        array_map(function ($item) {
+                            return $item['id'];
+                        }, $weapons)
+                    );
+                    $game->activeCharacterEventLog('sent their weapon to camp');
+                }
+            }
+        },
     ],
     'hindrance_1_1' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'name' => clienttranslate('Broken Arm'),
+        'onAcquireHindrance' => function (Game $game, $card, &$data) {
+            if ($card['id'] == $data['id']) {
+                // No weapon can be equipped
+                $character = $game->character->getTurnCharacter();
+                $weaponIds = array_map(
+                    function ($item) {
+                        return $item['id'];
+                    },
+                    array_filter($character['equipment'], function ($item) {
+                        return $item['itemType'] == 'weapon';
+                    })
+                );
+                if (sizeof($weaponIds) > 0) {
+                    $game->character->unequipEquipment($game->character->getTurnCharacterId(), $weaponIds);
+                    $game->activeCharacterEventLog('sent their weapon to camp');
+                }
+            }
+        },
     ],
     'hindrance_1_10' => [
         'deck' => 'mental-hindrance',
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Berserk'),
+        'onHealthChange' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+            }
+        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'name' => clienttranslate('Sorry about that!'),
+                'state' => ['dayEvent'],
+                'onUse' => function (Game $game, $skill) {
+                    $currentCharacter = $game->character->getTurnCharacterId();
+                    $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use ($currentCharacter) {
+                        return $character != $currentCharacter;
+                    });
+
+                    $game->gameData->set('characterSelectionState', [
+                        'selectableCharacters' => array_values($characters),
+                        'cancellable' => false,
+                        'id' => $skill['id'],
+                    ]);
+                    $data['interrupt'] = true;
+                    $game->gamestate->nextState('characterSelection');
+                    return ['notify' => false, 'nextState' => false];
+                },
+                'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->gameData->get('characterSelectionState');
+                    $game->log('onCharacterSelection', $skill, $data, $state);
+                    if ($state && $state['id'] == $skill['id']) {
+                        $game->character->adjustHealth($data['characterId'], -1);
+                        $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
+                            'count' => 1,
+                            'character_resource' => 'health',
+                            'character_name' => $data['characterId'],
+                        ]);
+                        $data['nextState'] = 'playerTurn';
+                    }
+                },
+            ],
+        ],
     ],
     'hindrance_1_11' => [
         'deck' => 'mental-hindrance',
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Cowardly'),
+        'onResolveDraw' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                $data['discard'] = true;
+                $game->activeCharacterEventLog('ran from the encounter');
+                $game->character->adjustActiveHealth(-1);
+                $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
+                    'count' => 1,
+                    'character_resource' => 'health',
+                ]);
+            }
+        },
     ],
     'hindrance_1_2' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('has a'),
         'name' => clienttranslate('Broken Leg'),
+        'onGetValidActions' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                unset($data['actDrawForage']);
+                unset($data['actDrawGather']);
+                unset($data['actDrawHunt']);
+                unset($data['actDrawHarvest']);
+                unset($data['actDrawExplore']);
+            }
+        },
     ],
     'hindrance_1_3' => [
         'deck' => 'mental-hindrance',
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Obsessive'),
+        'onEndTurn' => function (Game $game, $card, &$data) {
+            if ($card['id'] == $data['id']) {
+                $character = $game->character->getTurnCharacter();
+                if ($character['health'] % 2 == 1) {
+                    $game->character->adjustActiveHealth(-1);
+                    $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
+                        'count' => 1,
+                        'character_resource' => 'health',
+                    ]);
+                }
+            }
+        },
     ],
     'hindrance_1_4' => [
         'deck' => 'mental-hindrance',
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Paranoid'),
+        // Always eat
     ],
     'hindrance_1_5' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('has a'),
         'name' => clienttranslate('Bad Back'),
+        'onAcquireHindrance' => function (Game $game, $card, &$data) {
+            if ($card['id'] == $data['id']) {
+                // No weapon can be equipped
+                $character = $game->character->getTurnCharacter();
+                $toolIds = array_map(
+                    function ($item) {
+                        return $item['id'];
+                    },
+                    array_filter($character['equipment'], function ($item) {
+                        return $item['itemType'] == 'tool';
+                    })
+                );
+                if (sizeof($toolIds) > 0) {
+                    $game->character->unequipEquipment($game->character->getTurnCharacterId(), $toolIds);
+                    $game->activeCharacterEventLog('sent their tool to camp');
+                }
+            }
+        },
     ],
     'hindrance_1_6' => [
         'deck' => 'mental-hindrance',
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Depressed'),
+        'onGetActionCost' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['stamina'] > 0) {
+                $data['stamina'] += 1;
+            }
+        },
     ],
     'hindrance_1_7' => [
         'deck' => 'mental-hindrance',
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Dumb'),
+        'onGetActionCost' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['action'] == 'actInvestigateFire') {
+                $data['stamina'] += 1;
+            }
+        },
+        'onInvestigateFire' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {
+                $game->activeCharacterEventLog('is dumb');
+                $data['roll'] -= 1;
+            }
+        },
     ],
     'hindrance_1_8' => [
         'deck' => 'mental-hindrance',
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Forgetful'),
+        'onActDraw' => function (Game $game, $card, &$data) {
+            if (
+                $card['characterId'] == $game->character->getTurnCharacterId() &&
+                in_array($data['deck'], ['gather', 'hunt', 'harvest', 'forage'])
+            ) {
+                if ($game->rollFireDie($game->character->getTurnCharacterId()) == 0) {
+                    $game->activeCharacterEventLog('forgot what they were doing');
+                    $data['spendActionCost'] = true;
+                    $data['cancel'] = true;
+                }
+            }
+        },
     ],
     'hindrance_1_9' => [
         'deck' => 'mental-hindrance',
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Anti-Social'),
+        // Can't trade
+        // Can't be healed by skills, going to handle this on the individual skills
+        'onItemTrade' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                if (
+                    (isset($data['trade1']['character']['id']) && $data['trade1']['character']['id'] == $card['characterId']) ||
+                    (isset($data['trade2']['character']['id']) && $data['trade2']['character']['id'] == $card['characterId'])
+                ) {
+                    throw new BgaUserException($this->game->translate('Cannot trade with') . $card['characterId']);
+                }
+            }
+        },
     ],
     'physical-hindrance-back' => [
         'deck' => 'physical-hindrance',
@@ -596,83 +773,163 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Sun Burnt'),
+        'onGetValidActions' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                unset($data['actInvestigateFire']);
+            }
+        },
     ],
     'hindrance_2_1' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('has'),
         'name' => clienttranslate('Swollen Eyes'),
+        'onDraw' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId() && $card['deckType'] == 'resource') {
+                $card['count'] -= 1;
+            }
+        },
     ],
     'hindrance_2_10' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('has a'),
         'name' => clienttranslate('Deep Wound'),
+        'onGetCharacterData' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                $data['maxHealth'] -= 1;
+                $data['health'] = min($data['maxHealth'], $data['health']);
+            }
+        },
     ],
     'hindrance_2_11' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Dehydrated'),
+        'onEncounter' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                $data['willTakeDamage'] += 1;
+            }
+        },
     ],
     'hindrance_2_2' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('has a'),
         'name' => clienttranslate('Twisted Ankle'),
+        'onGetCharacterData' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                $data['maxStamina'] -= 1;
+                $data['stamina'] = min($data['maxStamina'], $data['stamina']);
+            }
+        },
     ],
     'hindrance_2_3' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Nauseous'),
+        'onGetValidActions' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId() && getUsePerDay($card['id'] . 'nauseous', $game) < 1) {
+                unset($data['actEat']);
+            }
+        },
+        'onEat' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId() && getUsePerDay($card['id'] . 'nauseous', $game) < 1) {
+                usePerDay($card['id'] . 'nauseous', $game);
+                $game->activeCharacterEventLog('feels nauseous');
+            }
+        },
     ],
     'hindrance_2_4' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('has'),
         'name' => clienttranslate('Parasites'),
+        'onHealthChange' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['change'] > 0) {
+                $data['change'] -= 1;
+            }
+        },
     ],
     'hindrance_2_5' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Sick'),
+        // Physical hindrances need medical herbs to remove
     ],
     'hindrance_2_6' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Diseased'),
+        'onMorning' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                $game->character->adjustActiveHealth(-1);
+                $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
+                    'count' => 1,
+                    'character_resource' => 'health',
+                ]);
+            }
+        },
     ],
     'hindrance_2_7' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Exhausted'),
+        'onMorningAfter' => function (Game $game, $card, &$data) {
+            $game->character->adjustStamina($game->character->getTurnCharacterId(), -2);
+            $game->activeCharacterEventLog('is exhausted');
+        },
     ],
     'hindrance_2_8' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Malnourished'),
+        'onEncounter' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                $data['encounterHealth'] += 1;
+            }
+        },
     ],
     'hindrance_2_9' => [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'sentence' => clienttranslate('has a'),
         'name' => clienttranslate('Concussion'),
+        'onInvestigateFire' => function (Game $game, $card, &$data) {
+            if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {
+                $game->activeCharacterEventLog('', [], clienttranslate('has a') . clienttranslate('Concussion'));
+                $data['roll'] -= 1;
+            }
+        },
     ],
 ];

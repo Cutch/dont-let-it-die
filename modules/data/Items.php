@@ -264,10 +264,10 @@ $itemsData = [
             'rock' => 3,
             'bone' => 2,
         ],
-        'onNight' => function (Game $game, $item, &$data) {
+        'onNightDrawCard' => function (Game $game, $item, &$data) {
             if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
-                $game->character->adjustHealth($item['characterId'], 1);
                 $game->activeCharacterEventLog('Camp walls protect against the rival tribe');
+                $data['onUse'] = false;
             }
         },
     ],
@@ -639,6 +639,12 @@ $itemsData = [
         'cost' => [
             'rock' => 3,
         ],
+        'onGetActionCost' => function (Game $game, $item, &$data) {
+            $char = $game->character->getCharacterData($item['characterId']);
+            if ($char['isActive'] && $data['action'] == 'actUseHerb') {
+                $data['action'] = 0;
+            }
+        },
     ],
     'bandage' => [
         'type' => 'item',

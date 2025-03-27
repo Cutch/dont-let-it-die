@@ -28,6 +28,27 @@ class Decks
         foreach ($this->getAllDeckNames() as $i => $deck) {
             $this->decks[$deck] = $this->game->initDeck(str_replace('-', '', $deck));
         }
+        $type = 'explore';
+        $filtered_cards = array_filter(
+            $this->game->data->decks,
+            function ($v, $k) use ($type) {
+                return $v['type'] == 'deck' && $v['deck'] == $type;
+            },
+            ARRAY_FILTER_USE_BOTH
+        );
+        $cards = array_map(
+            function ($k, $v) {
+                return [
+                    'type' => $v['deck'],
+                    'card_location' => 'deck',
+                    'type_arg' => $k,
+                    'nbr' => 1,
+                ];
+            },
+            array_keys($filtered_cards),
+            $filtered_cards
+        );
+        $this->game->log($cards);
     }
     public function getDeck(string $name): Deck
     {

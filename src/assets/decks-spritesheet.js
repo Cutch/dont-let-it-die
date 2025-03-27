@@ -4,7 +4,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 0.5,
@@ -18,7 +17,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 155,
@@ -32,7 +30,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 309.5,
@@ -46,7 +43,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 464,
@@ -60,7 +56,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 618.5,
@@ -74,7 +69,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 773,
@@ -88,7 +82,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 927.5,
@@ -102,7 +95,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 1082,
@@ -116,7 +108,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 1236.5,
@@ -130,7 +121,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 1391,
@@ -144,7 +134,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 1545.5,
@@ -158,7 +147,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 1700,
@@ -172,7 +160,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 0.5,
@@ -186,7 +173,6 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'explore',
-        expansion: 'hindrance',
       },
       frame: {
         x: 155,
@@ -199,7 +185,6 @@ const decksSprites = {
     'explore-back': {
       options: {
         deck: 'explore',
-        expansion: 'hindrance',
         type: 'back',
       },
       frame: {

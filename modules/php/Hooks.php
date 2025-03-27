@@ -127,6 +127,12 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
+    function onMorningAfter(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
     function onNight(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
@@ -140,6 +146,11 @@ class Hooks
         return $data;
     }
     function onDraw(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+    }
+    function onActDraw(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
@@ -285,6 +296,24 @@ class Hooks
         return $data;
     }
     function onEndTurn(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onAcquireHindrance(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onHealthChange(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onMaxHindrance(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);

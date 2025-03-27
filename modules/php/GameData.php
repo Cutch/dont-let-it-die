@@ -64,7 +64,9 @@ class GameData
             'trap' => 0,
             'herb' => 0,
             'fkp' => 0,
-            'gem' => 0,
+            'gem-y' => 0,
+            'gem-b' => 0,
+            'gem-p' => 0,
         ],
     ];
     public function __construct(Game $game)
