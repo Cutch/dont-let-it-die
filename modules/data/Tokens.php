@@ -1,5 +1,7 @@
 <?php
 
+use Bga\Games\DontLetItDie\Game;
+
 $tokensData = [
     '1-token' => [
         'count' => 1,
@@ -190,12 +192,18 @@ $tokensData = [
         'type' => 'resource',
         'name' => clientTranslate('Stew'),
         'expansion' => 'hindrance',
+        'requires' => function (Game $game) {
+            return in_array('Tiku', $game->character->getAllCharacterIds());
+        },
     ],
     'trap' => [
         'count' => 2,
         'type' => 'resource',
         'name' => clientTranslate('Trap'),
         'expansion' => 'hindrance',
+        'requires' => function (Game $game) {
+            return in_array('Rex', $game->character->getAllCharacterIds());
+        },
     ],
     'wood' => [
         'count' => 8,

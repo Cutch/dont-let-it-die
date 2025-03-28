@@ -52,12 +52,18 @@ class Data
     {
         $data = $this->boards['knowledge-tree-' . $this->game->getDifficulty()]['track'];
         $unlocks = $this->game->getUnlockedKnowledgeIds();
-        return array_filter(
-            $data,
-            function ($v, $k) use ($unlocks) {
-                return !in_array($k, $unlocks) && (!array_key_exists('requires', $v) || $v['requires']($this->game, $v));
+        return array_map(
+            function ($data) {
+                $this->game->hooks->onGetUnlockCost($data);
+                return $data;
             },
-            ARRAY_FILTER_USE_BOTH
+            array_filter(
+                $data,
+                function ($v, $k) use ($unlocks) {
+                    return !in_array($k, $unlocks) && (!array_key_exists('requires', $v) || $v['requires']($this->game, $v));
+                },
+                ARRAY_FILTER_USE_BOTH
+            )
         );
     }
 }

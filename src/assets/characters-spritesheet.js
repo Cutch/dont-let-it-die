@@ -258,9 +258,10 @@ const charactersSprites = {
         h: 628,
       },
     },
-    'back-character': {
+    Blarg: {
       options: {
-        type: 'back',
+        expansion: 'death-valley',
+        type: 'character',
       },
       frame: {
         x: 1971,
@@ -269,9 +270,10 @@ const charactersSprites = {
         h: 628,
       },
     },
-    'back-character-hindrance': {
+    Cali: {
       options: {
-        type: 'back',
+        expansion: 'death-valley',
+        type: 'character',
       },
       frame: {
         x: 2365,
@@ -303,6 +305,66 @@ const charactersSprites = {
         w: 392,
         h: 628,
       },
+      Loka: {
+        options: {
+          expansion: 'death-valley',
+          type: 'character',
+        },
+        frame: {
+          x: 2365,
+          y: 1891,
+          w: 392,
+          h: 628,
+        },
+      },
+      Tooth: {
+        options: {
+          expansion: 'death-valley',
+          type: 'character',
+        },
+        frame: {
+          x: 2759,
+          y: 1,
+          w: 392,
+          h: 628,
+        },
+      },
+      Sooha: {
+        options: {
+          expansion: 'death-valley',
+          type: 'character',
+        },
+        frame: {
+          x: 2759,
+          y: 631,
+          w: 392,
+          h: 628,
+        },
+      },
+      Samp: {
+        options: {
+          expansion: 'death-valley',
+          type: 'character',
+        },
+        frame: {
+          x: 2759,
+          y: 1261,
+          w: 392,
+          h: 628,
+        },
+      },
+      Yurt: {
+        options: {
+          expansion: 'death-valley',
+          type: 'character',
+        },
+        frame: {
+          x: 2759,
+          y: 1891,
+          w: 392,
+          h: 628,
+        },
+      },
     },
   },
   meta: {
@@ -310,7 +372,7 @@ const charactersSprites = {
     image: 'characters-spritesheet.png',
     css: 'characters-card',
     size: {
-      w: 2758,
+      w: 3152,
       h: 2520,
     },
     scale: '1',

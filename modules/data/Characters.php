@@ -503,7 +503,7 @@ $charactersData = [
         },
         'onDraw' => function (Game $game, $char, &$data) {
             $card = $data['card'];
-            if ($char['isActive'] && $card['name'] == 'Nothing') {
+            if ($char['isActive'] && $card['deckType'] == 'nothing') {
                 $game->adjustResource('fkp', 2);
                 $game->activeCharacterEventLog('received ${count} ${resource_type}', [
                     'count' => 2,
@@ -1002,17 +1002,66 @@ $charactersData = [
     'AlternateUpgradeTrack' => [
         'type' => 'instructions',
     ],
-    'back-character' => [
-        'type' => 'back',
-    ],
-    'back-character-hindrance' => [
-        'type' => 'back',
-        'expansion' => 'hindrance',
-    ],
     'instructions-1' => [
         'type' => 'instructions',
     ],
     'instructions-2' => [
         'type' => 'instructions',
+    ],
+    'Blarg' => [
+        'type' => 'character',
+        'expansion' => 'death-valley',
+        'health' => '6',
+        'stamina' => '6',
+        'name' => 'Blarg',
+        'slots' => ['weapon', 'tool'],
+    ],
+    'Cali' => [
+        'type' => 'character',
+        'expansion' => 'death-valley',
+        'health' => '2',
+        'stamina' => '6',
+        'name' => 'Cali',
+        'slots' => ['weapon', 'tool'],
+    ],
+    'Loka' => [
+        'type' => 'character',
+        'expansion' => 'death-valley',
+        'health' => '4',
+        'stamina' => '7',
+        'name' => 'Loka',
+        'slots' => ['weapon', 'tool'],
+    ],
+    'Tooth' => [
+        'type' => 'character',
+        'expansion' => 'death-valley',
+        'health' => '8',
+        'stamina' => '7',
+        'name' => 'Tooth',
+        'slots' => ['weapon', 'tool'],
+    ],
+    'Sooha' => [
+        'type' => 'character',
+        'expansion' => 'death-valley',
+        'health' => '8',
+        'stamina' => '7',
+        'name' => 'Sooha',
+        'slots' => ['weapon', 'tool'],
+    ],
+    'Samp' => [
+        'type' => 'character',
+        'expansion' => 'death-valley',
+        'health' => '8',
+        'stamina' => '7',
+        'name' => 'Samp',
+        'slots' => ['weapon', 'tool'],
+    ],
+    'Yurt' => [
+        'type' => 'character',
+        'expansion' => 'death-valley',
+        'health' => '8',
+        'stamina' => '7',
+        'name' => 'Yurt',
+        'slots' => ['weapon', 'tool'],
     ],
 ];

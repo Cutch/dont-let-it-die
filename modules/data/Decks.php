@@ -590,7 +590,7 @@ $decksData = [
         'type' => 'deck',
         'onUse' => function (Game $game, $nightCard) {
             $game->character->adjustAllHealth(2);
-            $game->nightEventLog('Everyone heals 2 hp');
+            $game->nightEventLog('Everyone gained ${count} ${character_resource}', ['count' => 2, 'character_resource' => 'health']);
         },
     ],
     'night-event-7_8' => [
@@ -642,8 +642,9 @@ $decksData = [
         'onNight' => function (Game $game, $nightCard, &$data) {
             if (in_array($nightCard['id'], $game->getActiveNightCardIds()) && $game->gameData->getResource('dino-egg') < 3) {
                 $game->character->adjustAllHealth(-1);
-                $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} health'), [
-                    'amount' => 1,
+                $this->notify->all('morningPhase', clienttranslate('Everyone lost ${count} ${character_resource}'), [
+                    'count' => 1,
+                    'character_resource' => 'health',
                 ]);
             }
         },

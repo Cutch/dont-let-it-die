@@ -319,4 +319,16 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
+    function onGetUnlockCost(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onGetReviveCost(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
 }

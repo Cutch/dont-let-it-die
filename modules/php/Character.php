@@ -423,7 +423,7 @@ class Character
     public function adjustAllStamina(int $stamina): void
     {
         $this->updateAllCharacterData(function (&$data) use ($stamina) {
-            $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
+            $data['stamina'] = clamp($data['stamina'] + $stamina, 0, $data['maxStamina']);
         });
     }
     public function adjustStamina(string $characterName, int $stamina): int
@@ -432,7 +432,7 @@ class Character
         $this->updateCharacterData($characterName, function (&$data) use ($stamina, &$prev) {
             $this->game->hooks->onAdjustStamina($stamina);
             $prev = $data['stamina'];
-            $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
+            $data['stamina'] = clamp($data['stamina'] + $stamina, 0, $data['maxStamina']);
             $prev = $data['stamina'] - $prev;
             $this->game->log('stamina', $data['stamina']);
             return $prev == 0;
@@ -454,7 +454,7 @@ class Character
     public function adjustAllHealth(int $health): void
     {
         $this->updateAllCharacterData(function (&$data) use ($health) {
-            $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
+            $data['health'] = clamp($data['health'] + $health, 0, $data['maxHealth']);
         });
     }
     public function adjustHealth(string $characterName, int $healthChange): int
@@ -470,7 +470,7 @@ class Character
                 'change' => $healthChange,
             ];
             $this->game->hooks->onHealthChange($hookData);
-            $data['health'] = max(min($data['health'] + $hookData['change'], $data['maxHealth']), 0);
+            $data['health'] = clamp($data['health'] + $hookData['change'], 0, $data['maxHealth']);
             $prev = $data['health'] - $prev;
             if ($data['health'] == 0 && !$data['incapacitated']) {
                 $this->game->activeCharacterEventLog('has been incapacitated', [

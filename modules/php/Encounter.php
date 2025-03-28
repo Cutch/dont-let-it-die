@@ -322,7 +322,7 @@ class Encounter
                     } else {
                         if ($damageTaken > 0) {
                             $_this->character->adjustActiveHealth(-$damageTaken);
-                            $_this->activeCharacterEventLog('was attacked by a ${name} and lost ${willTakeDamage} health', [
+                            $_this->activeCharacterEventLog('was attacked by a ${name} and lost ${damageTaken} health', [
                                 ...$data,
                                 'damageTaken' => $damageTaken,
                             ]);

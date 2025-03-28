@@ -1,398 +1,365 @@
 const upgradesSprites = {
   sprites: {
-    upgrades_2_44_0: {
+    '1-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1,
-        y: 1,
-        w: 181,
-        h: 367,
+        x: 0,
+        y: 0,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_1: {
+    '1-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 184,
-        y: 1,
-        w: 181,
-        h: 367,
+        x: 276,
+        y: 0,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_10: {
+    '10-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 367,
-        y: 1,
-        w: 181,
-        h: 367,
+        x: 552,
+        y: 0,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_11: {
+    '10-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 550,
-        y: 1,
-        w: 181,
-        h: 367,
+        x: 0,
+        y: 123,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_12: {
+    '11-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 733,
-        y: 1,
-        w: 181,
-        h: 367,
+        x: 276,
+        y: 123,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_13: {
+    '11-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 916,
-        y: 1,
-        w: 181,
-        h: 367,
+        x: 552,
+        y: 123,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_14: {
+    '12-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1099,
-        y: 1,
-        w: 181,
-        h: 367,
+        x: 0,
+        y: 246,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_15: {
+    '12-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1282,
-        y: 1,
-        w: 181,
-        h: 367,
+        x: 276,
+        y: 246,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_2: {
+    '13-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1,
-        y: 370,
-        w: 181,
-        h: 367,
+        x: 552,
+        y: 246,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_3: {
+    '13-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 184,
-        y: 370,
-        w: 181,
-        h: 367,
+        x: 0,
+        y: 369,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_4: {
+    '14-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 367,
-        y: 370,
-        w: 181,
-        h: 367,
+        x: 276,
+        y: 369,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_5: {
+    '14-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 550,
-        y: 370,
-        w: 181,
-        h: 367,
+        x: 552,
+        y: 369,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_6: {
+    '15-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 733,
-        y: 370,
-        w: 181,
-        h: 367,
+        x: 0,
+        y: 492,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_7: {
+    '15-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 916,
-        y: 370,
-        w: 181,
-        h: 367,
+        x: 276,
+        y: 492,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_8: {
+    '16-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1099,
-        y: 370,
-        w: 181,
-        h: 367,
+        x: 552,
+        y: 492,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_2_44_9: {
+    '16-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1282,
-        y: 370,
-        w: 181,
-        h: 367,
+        x: 0,
+        y: 615,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_0: {
+    '2-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1,
-        y: 739,
-        w: 181,
-        h: 367,
+        x: 276,
+        y: 615,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_1: {
+    '2-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 184,
-        y: 739,
-        w: 181,
-        h: 367,
+        x: 552,
+        y: 615,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_10: {
+    '3-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 367,
-        y: 739,
-        w: 181,
-        h: 367,
+        x: 0,
+        y: 738,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_11: {
+    '3-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 550,
-        y: 739,
-        w: 181,
-        h: 367,
+        x: 276,
+        y: 738,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_12: {
+    '4-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 733,
-        y: 739,
-        w: 181,
-        h: 367,
+        x: 552,
+        y: 738,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_13: {
+    '4-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 916,
-        y: 739,
-        w: 181,
-        h: 367,
+        x: 0,
+        y: 861,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_14: {
+    '5-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1099,
-        y: 739,
-        w: 181,
-        h: 367,
+        x: 276,
+        y: 861,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_15: {
+    '5-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1282,
-        y: 739,
-        w: 181,
-        h: 367,
+        x: 552,
+        y: 861,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_2: {
+    '6-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1465,
-        y: 1,
-        w: 181,
-        h: 367,
+        x: 828,
+        y: 0,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_3: {
+    '6-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1465,
-        y: 370,
-        w: 181,
-        h: 367,
+        x: 828,
+        y: 123,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_4: {
+    '7-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1465,
-        y: 739,
-        w: 181,
-        h: 367,
+        x: 828,
+        y: 246,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_5: {
+    '7-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 1,
-        y: 1108,
-        w: 181,
-        h: 367,
+        x: 828,
+        y: 369,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_6: {
+    '8-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 184,
-        y: 1108,
-        w: 181,
-        h: 367,
+        x: 828,
+        y: 492,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_7: {
+    '8-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 367,
-        y: 1108,
-        w: 181,
-        h: 367,
+        x: 828,
+        y: 615,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_8: {
+    '9-A': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 550,
-        y: 1108,
-        w: 181,
-        h: 367,
+        x: 828,
+        y: 738,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
-    upgrades_43_9: {
+    '9-B': {
       options: {
-        type: "upgrade",
+        type: 'upgrade',
       },
       frame: {
-        x: 733,
-        y: 1108,
-        w: 181,
-        h: 367,
+        x: 828,
+        y: 861,
+        w: 276,
+        h: 123,
       },
-      rotate: 0,
     },
   },
   meta: {
-    version: "1.0",
-    image: "upgrades-spritesheet.png",
-    css: "upgrades-card",
+    version: '1.0',
+    css: 'upgrades-card',
     size: {
-      w: 1647,
-      h: 1476,
+      w: 1104,
+      h: 984,
     },
-    scale: "1",
+    scale: '1',
   },
 };

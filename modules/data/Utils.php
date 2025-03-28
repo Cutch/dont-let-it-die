@@ -1,6 +1,10 @@
 <?php
 
 if (!function_exists('addId')) {
+    function clamp($current, $min, $max)
+    {
+        return max($min, min($max, $current));
+    }
     function addId($data)
     {
         array_walk($data, function (&$v, $k) {

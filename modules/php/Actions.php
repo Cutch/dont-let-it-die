@@ -19,7 +19,7 @@ class Actions
                 'requires' => function (Game $game, $action) {
                     $variables = $game->gameData->getResources('fish-cooked', 'meat-cooked');
                     $total = array_sum($variables);
-                    return $total >= 3 &&
+                    return $total >= $game->getReviveCost() &&
                         sizeof(
                             array_filter($game->character->getAllCharacterData(), function ($char) {
                                 return $char['incapacitated'] && ($char['health'] ?? 0) == 0;

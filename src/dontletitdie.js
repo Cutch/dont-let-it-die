@@ -73,6 +73,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         'fkp',
         'dino-egg',
         'dino-egg-cooked',
+        'trap',
+        'stew',
         'gem-y',
         'gem-b',
         'gem-p',

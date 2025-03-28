@@ -95,6 +95,9 @@ class Game extends \Table
             if (str_contains($message, '${resource_type}')) {
                 $args['resource_type'] = $this->data->tokens[$args['resource_type']]['name'];
             }
+            if (array_key_exists('character_resource', $args)) {
+                $args['character_resource'] = clienttranslate($args['character_resource']);
+            }
             return $args;
         });
     }
@@ -184,7 +187,7 @@ class Game extends \Table
         if ($resourceType == 'wood') {
             $maxCount -= $this->gameData->getResource('fireWood');
         }
-        $newValue = max(min($currentCount + $change, $maxCount), 0);
+        $newValue = clamp($currentCount + $change, 0, $maxCount);
         $this->gameData->setResource($resourceType, $newValue);
         $difference = $currentCount - $newValue + $change;
         return $difference;
@@ -264,6 +267,12 @@ class Game extends \Table
             'type' => $type,
         ]);
     }
+    public function getReviveCost(): int
+    {
+        $data = ['amount' => 3];
+        $this->hooks->onGetReviveCost($data);
+        return $data['amount'];
+    }
     public function actRevive(?string $character): void
     {
         if (!$character) {
@@ -273,11 +282,11 @@ class Game extends \Table
             throw new BgaUserException($this->translate('That character is not incapacitated'));
         }
         $this->actions->validateCanRunAction('actRevive');
-        $left = $this->adjustResource('fish-cooked', -3);
+        $left = $this->adjustResource('fish-cooked', -$this->getReviveCost());
         $this->adjustResource('meat-cooked', $left);
 
         $this->character->updateCharacterData($character, function (&$data) {
-            $data['health'] = max(min(3, $data['maxHealth']), 0);
+            $data['health'] = clamp(3, 0, $data['maxHealth']);
             $this->log('actRevive', $data['health'], $data['incapacitated'], $data['maxHealth']);
         });
         $this->notify->all(
@@ -1374,75 +1383,89 @@ class Game extends \Table
     }
     public function stMorningPhase()
     {
-        $day = $this->gameData->get('day');
-        $day += 1;
-        $this->gameData->set('day', $day);
-        $woodNeeded = $this->getFirewoodCost();
-        $fireWood = $this->gameData->get('fireWood');
-        if (array_key_exists('allowFireWoodAddition', $this->gameData->get('morningState') ?? []) && $fireWood < $woodNeeded) {
-            $missingWood = $woodNeeded - $fireWood;
-            $wood = $this->gameData->get('wood');
-            $this->gameData->setResource('fireWood', min($fireWood + $missingWood, $this->data->tokens['wood']['count']));
-            $this->gameData->setResource('wood', max($wood - $missingWood, 0));
-            $this->notify->all(
-                'tokenUsed',
-                clienttranslate('During the night the tribe quickly added ${woodNeeded} ${token_name} to the fire'),
-                [
-                    'gameData' => $this->getAllDatas(),
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onMorning'],
+            function (Game $_this) {
+                $day = $this->gameData->get('day');
+                $day += 1;
+                $this->gameData->set('day', $day);
+                $woodNeeded = $this->getFirewoodCost();
+                $fireWood = $this->gameData->get('fireWood');
+                if (array_key_exists('allowFireWoodAddition', $this->gameData->get('morningState') ?? []) && $fireWood < $woodNeeded) {
+                    $missingWood = $woodNeeded - $fireWood;
+                    $wood = $this->gameData->get('wood');
+                    $this->gameData->setResource('fireWood', min($fireWood + $missingWood, $this->data->tokens['wood']['count']));
+                    $this->gameData->setResource('wood', max($wood - $missingWood, 0));
+                    $this->notify->all(
+                        'tokenUsed',
+                        clienttranslate('During the night the tribe quickly added ${woodNeeded} ${token_name} to the fire'),
+                        [
+                            'gameData' => $this->getAllDatas(),
+                            'woodNeeded' => $woodNeeded,
+                            'token_name' => 'wood',
+                        ]
+                    );
+                }
+
+                $this->notify->all('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
+                    'day' => $day,
+                ]);
+                if ($day == 14) {
+                    $this->lose();
+                }
+                $difficulty = $this->getTrackDifficulty();
+                $health = -1;
+                if ($difficulty == 'hard') {
+                    $health = -2;
+                }
+                return [
+                    'difficulty' => $difficulty,
+                    'health' => $health,
+                    'stamina' => 0,
+                    'skipMorningDamage' => [],
                     'woodNeeded' => $woodNeeded,
-                    'token_name' => 'wood',
-                ]
-            );
-        }
+                ];
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                // extract($data);
+                $health = $data['health'];
+                $stamina = $data['stamina'];
+                $skipMorningDamage = $data['skipMorningDamage'];
+                $woodNeeded = $data['woodNeeded'];
+                $this->character->updateAllCharacterData(function (&$data) use ($health, $stamina, $skipMorningDamage) {
+                    if (!in_array($data['id'], $skipMorningDamage)) {
+                        $data['health'] = clamp($data['health'] + $health, 0, $data['maxHealth']);
+                    }
+                    if ($data['incapacitated'] && $data['health'] > 0) {
+                        $data['incapacitated'] = false;
+                    }
 
-        $this->notify->all('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
-            'day' => $day,
-        ]);
-        if ($day == 14) {
-            $this->lose();
-        }
-        $difficulty = $this->getTrackDifficulty();
-        $health = -1;
-        if ($difficulty == 'hard') {
-            $health = -2;
-        }
-        $data = [
-            'difficulty' => $difficulty,
-            'health' => $health,
-            'stamina' => 0,
-            'skipMorningDamage' => [],
-        ];
-        $this->hooks->onMorning($data);
-        extract($data);
-        $this->character->updateAllCharacterData(function (&$data) use ($health, $stamina, $skipMorningDamage) {
-            if (!in_array($data['id'], $skipMorningDamage)) {
-                $data['health'] = max(min($data['health'] + $health, $data['maxHealth']), 0);
-            }
-            if ($data['incapacitated'] && $data['health'] > 0) {
-                $data['incapacitated'] = false;
-            }
+                    if (!$data['incapacitated']) {
+                        $data['stamina'] = $data['maxStamina'];
+                        $data['stamina'] = clamp($data['stamina'] + $stamina, 0, $data['maxStamina']);
+                    }
+                });
+                if ($health != 0) {
+                    $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} ${character_resource}'), [
+                        'amount' => -$health,
+                        'character_resource' => 'health',
+                    ]);
+                }
 
-            if (!$data['incapacitated']) {
-                $data['stamina'] = $data['maxStamina'];
-                $data['stamina'] = max(min($data['stamina'] + $stamina, $data['maxStamina']), 0);
+                $this->notify->all('morningPhase', clienttranslate('The fire pit used ${amount} wood'), [
+                    'amount' => $woodNeeded,
+                ]);
+                if ($this->adjustResource('fireWood', -$woodNeeded) != 0) {
+                    $this->lose();
+                }
+                $this->hooks->onMorningAfter($data);
+                $this->actions->resetTurnActions();
+                $this->character->rotateTurnOrder();
+                $this->gamestate->nextState('tradePhase');
             }
-        });
-        if ($health != 0) {
-            $this->notify->all('morningPhase', clienttranslate('Everyone lost ${amount} health'), [
-                'amount' => -$health,
-            ]);
-        }
-
-        $this->notify->all('morningPhase', clienttranslate('The fire pit used ${amount} wood'), [
-            'amount' => $woodNeeded,
-        ]);
-        if ($this->adjustResource('fireWood', -$woodNeeded) != 0) {
-            $this->lose();
-        }
-        $this->hooks->onMorningAfter($data);
-        $this->actions->resetTurnActions();
-        $this->character->rotateTurnOrder();
-        $this->gamestate->nextState('tradePhase');
+        );
     }
     public function stTradePhase()
     {
