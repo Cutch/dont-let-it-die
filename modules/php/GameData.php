@@ -33,6 +33,7 @@ class GameData
         'buildings' => [],
         'state' => [],
         'unlocks' => [],
+        'upgrades' => [],
         'campEquipment' => [],
         'destroyedEquipment' => [],
         'activeNightCards' => [],

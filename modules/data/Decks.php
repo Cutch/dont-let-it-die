@@ -106,7 +106,7 @@ $decksData = [
         'count' => 3,
         'resourceType' => 'dino-egg',
     ],
-    'explore-back-7_2' => [
+    'explore-back' => [
         'deck' => 'explore',
         'type' => 'back',
     ],

@@ -45,7 +45,7 @@ class Game extends \Table
     public Encounter $encounter;
     public ItemTrade $itemTrade;
     public ActInterrupt $actInterrupt;
-    public static array $expansionList = ['base', 'mini-expansion', 'hindrance'];
+    public static array $expansionList = ['base', 'mini-expansion', 'hindrance', 'death-valley'];
     /**
      * Your global variables labels:
      *
@@ -248,6 +248,17 @@ class Game extends \Table
             $this->addExtraTime();
         }
         $this->characterSelection->actChooseCharacters();
+    }
+    public function actMoveDiscovery(string $upgradeId, string $upgradeReplaceId): void
+    {
+        $upgrades = $this->gameData->get('upgrades');
+        if (array_key_exists($upgradeId, $upgrades) && array_key_exists($upgradeReplaceId, $upgrades)) {
+            $temp = $upgrades[$upgradeId];
+            $upgrades[$upgradeId] = $upgrades[$upgradeReplaceId];
+            $upgrades[$upgradeReplaceId] = $temp;
+        } else {
+            $upgrades[$upgradeId]['replaces'] = $upgradeReplaceId;
+        }
     }
     public function actCook(array $type): void
     {
@@ -942,6 +953,17 @@ class Game extends \Table
             $this->actInterrupt->onInterruptCancel();
         } elseif ($stateName == 'dinnerPhase') {
             $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'nightPhase');
+        } elseif ($stateName == 'startHindrance') {
+            if (
+                sizeof(
+                    array_filter($this->gameData->get('upgrades'), function ($v) {
+                        return $v['replaces'] == null;
+                    })
+                ) > 0
+            ) {
+                throw new BgaUserException($this->translate('All discoveries must replace an existing track discovery'));
+            }
+            $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'start');
         }
     }
 
@@ -1213,6 +1235,16 @@ class Game extends \Table
         $this->getAllPlayers($result);
         return $result;
     }
+    public function argStartHindrance(): array
+    {
+        $selectableUpgrades = array_keys(
+            array_filter($this->data->boards['knowledge-tree-' . $this->getDifficulty()]['track'], function ($v) {
+                return !array_key_exists('upgradeType', $v);
+            })
+        );
+        $result = [...$this->getAllDatas(), 'selectableUpgrades' => $selectableUpgrades];
+        return $result;
+    }
     public function log(...$args)
     {
         if ($this->gamestate == null) {
@@ -1352,6 +1384,32 @@ class Game extends \Table
         }
     }
     public function stSelectCharacter()
+    {
+        $this->gamestate->setAllPlayersMultiactive();
+        foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
+            $this->giveExtraTime((int) $playerId);
+        }
+        if ($this->isValidExpansion('hindrance')) {
+            $upgrades = array_keys($this->data->upgrades);
+            shuffle($upgrades);
+            $count = 5;
+            if ($this->getDifficulty() == 'easy') {
+                $count = 4;
+            } elseif ($this->getDifficulty() == 'hard') {
+                $count = 6;
+            }
+            $upgrades = array_slice($upgrades, 0, $count);
+            $upgrades = array_column(
+                array_map(function ($k) {
+                    return [$k, ['replaces' => null]];
+                }, $upgrades),
+                1,
+                0
+            );
+            $this->gameData->set('upgrades', $upgrades);
+        }
+    }
+    public function stStartHindrance()
     {
         $this->gamestate->setAllPlayersMultiactive();
         foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
@@ -1736,6 +1794,7 @@ class Game extends \Table
             'trackDifficulty' => $this->getTrackDifficulty(),
             'fireWoodCost' => $this->getFirewoodCost(),
             'tradeRatio' => $this->getTradeRatio(),
+            'upgrades' => $this->gameData->get('upgrades'),
             'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
                 return [
                     'id' => $id,

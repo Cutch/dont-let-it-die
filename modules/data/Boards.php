@@ -11,6 +11,7 @@ $boardsData = [
     'knowledge-tree-easy' => [
         'track' => [
             'warmth-1' => [
+                'upgradeType' => 'start',
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
@@ -74,6 +75,7 @@ $boardsData = [
                 },
             ],
             'fire-starter' => [
+                'upgradeType' => 'end',
                 'unlockCost' => 15,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
@@ -86,6 +88,7 @@ $boardsData = [
     'knowledge-tree-normal' => [
         'track' => [
             'warmth-1' => [
+                'upgradeType' => 'start',
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
@@ -197,6 +200,7 @@ $boardsData = [
                 },
             ],
             'fire-starter' => [
+                'upgradeType' => 'end',
                 'unlockCost' => 15,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
@@ -209,6 +213,7 @@ $boardsData = [
     'knowledge-tree-normal+' => [
         'track' => [
             'crafting-1' => [
+                'upgradeType' => 'start',
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
@@ -320,6 +325,7 @@ $boardsData = [
                 },
             ],
             'fire-starter' => [
+                'upgradeType' => 'end',
                 'unlockCost' => 15,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
@@ -332,6 +338,7 @@ $boardsData = [
     'knowledge-tree-hard' => [
         'track' => [
             'warmth-1' => [
+                'upgradeType' => 'start',
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
@@ -444,6 +451,7 @@ $boardsData = [
                 },
             ],
             'fire-starter' => [
+                'upgradeType' => 'end',
                 'unlockCost' => 20,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {

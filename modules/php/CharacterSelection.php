@@ -160,6 +160,6 @@ class CharacterSelection
         );
 
         // Deactivate player, and move to next state if none are active
-        $this->game->gamestate->setPlayerNonMultiactive($playerId, 'start');
+        $this->game->gamestate->setPlayerNonMultiactive($playerId, $this->game->isValidExpansion('hindrance') ? 'startHindrance' : 'start');
     }
 }

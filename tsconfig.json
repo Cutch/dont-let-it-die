@@ -15,6 +15,7 @@
       "src/assets/decks-spritesheet.js",
       "src/assets/expansion-spritesheet.js",
       "src/assets/items-spritesheet.js",
+      "src/assets/tech-spritesheet.js",
       "src/assets/token-spritesheet.js",
       "src/assets/upgrades-spritesheet.js",
       "src/assets/index.js",
@@ -36,6 +37,7 @@
       "src/screens/token-screen.js",
       "src/screens/trade-screen.js",
       "src/screens/too-many-items-screen.js",
+      "src/screens/upgrade-selection-screen.js",
       "src/screens/weapon-screen.js",
       "src/dontletitdie.js"
     ]

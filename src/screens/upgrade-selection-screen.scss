@@ -1,0 +1,33 @@
+#upgrade-selection-screen {
+  margin-top: 1rem;
+  overflow: hidden;
+  padding: 1rem;
+  position: relative;
+  .board {
+    position: relative;
+    margin-bottom: 1rem;
+    place-self: anchor-center;
+  }
+  .fkp-spot {
+    position: absolute;
+    width: 164px;
+    height: 72px;
+    border-radius: 10px;
+    outline: 4px dashed #00ff3a;
+  }
+  .selections {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  #upgrades {
+    background-color: #ffffff90;
+    padding: 2rem;
+    border-radius: 2rem;
+    .items {
+      display: flex;
+      gap: 1rem;
+      flex-flow: row wrap;
+    }
+  }
+}

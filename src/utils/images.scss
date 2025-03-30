@@ -30,6 +30,10 @@
 .items-card {
   background-image: url(img/items-spritesheet.png);
 }
+.tech-card {
+  background-image: url(img/tech-spritesheet.png);
+  position: relative;
+}
 .token-card {
   background-image: url(img/token-spritesheet.png);
   border-radius: 50%;

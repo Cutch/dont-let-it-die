@@ -57,6 +57,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.reviveScreen = new ReviveScreen(this);
       this.tokenScreen = new TokenScreen(this);
       this.tooManyItemsScreen = new TooManyItemsScreen(this);
+      this.upgradeSelectionScreen = new UpgradeSelectionScreen(this);
       this.weaponScreen = new WeaponScreen(this);
       this.resourcesForDisplay = [
         'wood',
@@ -657,7 +658,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           'beforeend',
           `<div id="knowledge-container" class="dlid__container"><div class="board"><div class="unlocked-tokens"></div></div></div>`,
         );
-        renderImage(`knowledge-tree-${gameData.difficulty}`, document.querySelector('#knowledge-container .board'), { pos: 'insert' });
+        renderImage(`knowledge-tree-${gameData.difficulty}`, document.querySelector('#knowledge-container .board'), {
+          pos: 'insert',
+          scale: 1.5,
+        });
         knowledgeContainer = document.querySelector('#knowledge-container .unlocked-tokens');
       }
       knowledgeContainer.innerHTML = '';
@@ -668,7 +672,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           'beforeend',
           `<div id="knowledge-${unlockName}" class="fkp" style="top: ${y}px; left: ${x}px;"></div>`,
         );
-        renderImage(`fkp-unlocked`, $(`knowledge-${unlockName}`), { scale: 2.5 });
+        renderImage(`fkp-unlocked`, $(`knowledge-${unlockName}`), { scale: 2 });
       });
     },
     ///////////////////////////////////////////////////
@@ -686,6 +690,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       switch (stateName) {
         case 'tooManyItems':
           if (isActive) this.tooManyItemsScreen.show(args.args);
+          break;
+        case 'startHindrance':
+          if (isActive) this.upgradeSelectionScreen.show(args.args);
           break;
         case 'deckSelection':
           if (isActive) this.deckSelectionScreen.show(args.args);
@@ -732,6 +739,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     onLeavingState: function (stateName) {
       console.log('Leaving state: ' + stateName);
       switch (stateName) {
+        case 'startHindrance':
+          this.upgradeSelectionScreen.hide();
+          break;
         case 'deckSelection':
           this.deckSelectionScreen.hide();
           break;
@@ -922,6 +932,20 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             });
           });
         switch (stateName) {
+          case 'startHindrance':
+            this.statusBar.addActionButton(_('Move Discovery'), () => {
+              this.bgaPerformAction('actMoveDiscovery', { deckName: this.deckSelectionScreen.getSelectedId() }).then(() =>
+                this.deckSelectionScreen.hide(),
+              );
+            });
+            this.statusBar.addActionButton(
+              _('Done'),
+              () => {
+                this.bgaPerformAction('actDone').then(() => this.deckSelectionScreen.hide());
+              },
+              { color: 'secondary' },
+            );
+            break;
           case 'deckSelection':
             this.statusBar.addActionButton(_('Select Deck'), () => {
               this.bgaPerformAction('actSelectDeck', { deckName: this.deckSelectionScreen.getSelectedId() }).then(() =>
