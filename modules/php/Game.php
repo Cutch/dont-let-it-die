@@ -251,14 +251,45 @@ class Game extends \Table
     }
     public function actMoveDiscovery(string $upgradeId, string $upgradeReplaceId): void
     {
+        $selectableUpgrades = array_keys(
+            array_filter($this->data->boards['knowledge-tree-' . $this->getDifficulty()]['track'], function ($v) {
+                return !array_key_exists('upgradeType', $v);
+            })
+        );
         $upgrades = $this->gameData->get('upgrades');
-        if (array_key_exists($upgradeId, $upgrades) && array_key_exists($upgradeReplaceId, $upgrades)) {
-            $temp = $upgrades[$upgradeId];
-            $upgrades[$upgradeId] = $upgrades[$upgradeReplaceId];
-            $upgrades[$upgradeReplaceId] = $temp;
+        // This is a swap
+        if (in_array($upgradeId, $selectableUpgrades) && in_array($upgradeReplaceId, $selectableUpgrades)) {
+            $keys = [];
+            array_walk($upgrades, function ($upgrade, $k) use ($upgradeId, $upgradeReplaceId, &$keys) {
+                if ($upgrade['replace'] == $upgradeId || $upgrade['replace'] == $upgradeReplaceId) {
+                    array_push($keys, $k);
+                }
+            });
+            if (sizeof($keys) == 2) {
+                $temp = $upgrades[$keys[0]];
+                $upgrades[$keys[0]] = $upgrades[$keys[1]];
+                $upgrades[$keys[1]] = $temp;
+            } else {
+                $temp = $upgrades[$keys[0]]['replace'];
+                if ($temp == $upgradeId) {
+                    $upgrades[$keys[0]]['replace'] = $upgradeReplaceId;
+                } else {
+                    $upgrades[$keys[0]]['replace'] = $upgradeId;
+                }
+            }
         } else {
-            $upgrades[$upgradeId]['replaces'] = $upgradeReplaceId;
+            array_walk($upgrades, function (&$upgrade) use ($upgradeReplaceId) {
+                if ($upgrade['replace'] == $upgradeReplaceId) {
+                    $upgrade['replace'] = null;
+                }
+            });
+            $upgrades[$upgradeId]['replace'] = $upgradeReplaceId;
         }
+        $this->gameData->set('upgrades', $upgrades);
+        $result = [...$this->getAllDatas(), 'selectableUpgrades' => $selectableUpgrades];
+        $this->notify->all('updateGameData', '', [
+            'gameData' => $result,
+        ]);
     }
     public function actCook(array $type): void
     {
@@ -957,7 +988,7 @@ class Game extends \Table
             if (
                 sizeof(
                     array_filter($this->gameData->get('upgrades'), function ($v) {
-                        return $v['replaces'] == null;
+                        return $v['replace'] == null;
                     })
                 ) > 0
             ) {
@@ -1401,7 +1432,7 @@ class Game extends \Table
             $upgrades = array_slice($upgrades, 0, $count);
             $upgrades = array_column(
                 array_map(function ($k) {
-                    return [$k, ['replaces' => null]];
+                    return [$k, ['replace' => null]];
                 }, $upgrades),
                 1,
                 0

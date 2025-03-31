@@ -656,16 +656,41 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         const playArea = $('game_play_area');
         playArea.insertAdjacentHTML(
           'beforeend',
-          `<div id="knowledge-container" class="dlid__container"><div class="board"><div class="unlocked-tokens"></div></div></div>`,
+          `<div id="knowledge-container" class="dlid__container"><div class="board"><div class="selections"></div><div class="unlocked-tokens"></div></div></div>`,
         );
         renderImage(`knowledge-tree-${gameData.difficulty}`, document.querySelector('#knowledge-container .board'), {
           pos: 'insert',
-          scale: 1.5,
+          scale: 1.25,
         });
         knowledgeContainer = document.querySelector('#knowledge-container .unlocked-tokens');
       }
-      knowledgeContainer.innerHTML = '';
 
+      const selections = document.querySelector(`#knowledge-container .selections`);
+      selections.innerHTML = '';
+      // Hindrance show new discoveries
+      if (gameData.upgrades) {
+        Object.keys(gameData.upgrades).forEach((unlockId) => {
+          const unlockSpot = gameData.upgrades[unlockId].replace;
+          const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockSpot];
+          selections.insertAdjacentHTML(
+            'beforeend',
+            `<div class="discovery-spot ${unlockSpot}" style="position: absolute;top: ${(y - 7) * 1.2}px; left: ${
+              (x - 103) * 1.2
+            }px;"></div>`,
+          );
+          const elem = selections.querySelector(`.discovery-spot.${unlockSpot}`);
+          renderImage(unlockId, elem, { scale: 1.7 / 1.2 });
+          addClickListener(document.querySelector(`#knowledge-container *[name="${unlockId}"]`), 'Unlocks', () => {
+            this.tooltip.show();
+            renderImage(unlockId, this.tooltip.renderByElement(), {
+              pos: 'insert',
+              scale: 0.75,
+            });
+          });
+        });
+      }
+
+      knowledgeContainer.innerHTML = '';
       gameData.game.unlocks.forEach((unlockName) => {
         const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockName];
         knowledgeContainer.insertAdjacentHTML(
@@ -692,7 +717,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           if (isActive) this.tooManyItemsScreen.show(args.args);
           break;
         case 'startHindrance':
-          if (isActive) this.upgradeSelectionScreen.show(args.args);
+          this.upgradeSelectionScreen.show(args.args);
           break;
         case 'deckSelection':
           if (isActive) this.deckSelectionScreen.show(args.args);
@@ -933,18 +958,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           });
         switch (stateName) {
           case 'startHindrance':
-            this.statusBar.addActionButton(_('Move Discovery'), () => {
-              this.bgaPerformAction('actMoveDiscovery', { deckName: this.deckSelectionScreen.getSelectedId() }).then(() =>
-                this.deckSelectionScreen.hide(),
-              );
+            this.statusBar.addActionButton(_('Done'), () => {
+              this.bgaPerformAction('actDone').then(() => this.upgradeSelectionScreen.hide());
             });
-            this.statusBar.addActionButton(
-              _('Done'),
-              () => {
-                this.bgaPerformAction('actDone').then(() => this.deckSelectionScreen.hide());
-              },
-              { color: 'secondary' },
-            );
             break;
           case 'deckSelection':
             this.statusBar.addActionButton(_('Select Deck'), () => {
@@ -1123,6 +1139,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updateKnowledgeTree(notification.args.gameData);
       if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
       if (notification.args?.gamestate?.name == 'tradePhase') this.itemTradeScreen.update(notification.args);
+      if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
     },
 
     notification_characterClicked: function (notification) {
