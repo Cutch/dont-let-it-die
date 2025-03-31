@@ -108,6 +108,9 @@ $tokensData = [
             'count' => 2,
             'health' => 1,
         ],
+        'requires' => function (Game $game) {
+            return in_array('Sig', $game->character->getAllCharacterIds());
+        },
     ],
     'fish-cooked' => [
         'cooked' => 'fish',
@@ -118,6 +121,9 @@ $tokensData = [
             'count' => 1,
             'health' => 2,
         ],
+        'requires' => function (Game $game) {
+            return in_array('Sig', $game->character->getAllCharacterIds());
+        },
     ],
     'meat' => [
         'count' => 8,

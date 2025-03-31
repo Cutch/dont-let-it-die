@@ -74,7 +74,7 @@ class Actions
                 'selectable' => function (Game $game) {
                     return array_values(
                         array_filter(
-                            $game->data->tokens,
+                            $game->getValidTokens(),
                             function ($v, $k) {
                                 return array_key_exists('actEat', $v);
                             },
@@ -139,15 +139,9 @@ class Actions
                     return $count >= $game->getTradeRatio();
                 },
                 'selectable' => function (Game $game) {
-                    return array_values(
-                        array_filter(
-                            $game->data->tokens,
-                            function ($v, $k) {
-                                return $v['type'] === 'resource';
-                            },
-                            ARRAY_FILTER_USE_BOTH
-                        )
-                    );
+                    $tokens = $game->getValidTokens();
+                    unset($tokens['trap']);
+                    return $tokens;
                 },
             ],
             'actDrawGather' => [

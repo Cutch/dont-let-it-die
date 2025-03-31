@@ -82,9 +82,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       ];
     },
     getResourcesForDisplay: function (gameData) {
-      if (gameData.characters && !gameData.characters.some((d) => d.name === 'Sig'))
-        return this.resourcesForDisplay.filter((d) => !d.includes('fish'));
-      else return this.resourcesForDisplay;
+      return this.resourcesForDisplay.filter((d) => d in gameData.game.resources);
     },
 
     /*
@@ -671,22 +669,24 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (gameData.upgrades) {
         Object.keys(gameData.upgrades).forEach((unlockId) => {
           const unlockSpot = gameData.upgrades[unlockId].replace;
-          const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockSpot];
-          selections.insertAdjacentHTML(
-            'beforeend',
-            `<div class="discovery-spot ${unlockSpot}" style="position: absolute;top: ${(y - 7) * 1.2}px; left: ${
-              (x - 103) * 1.2
-            }px;"></div>`,
-          );
-          const elem = selections.querySelector(`.discovery-spot.${unlockSpot}`);
-          renderImage(unlockId, elem, { scale: 1.7 / 1.2 });
-          addClickListener(document.querySelector(`#knowledge-container *[name="${unlockId}"]`), 'Unlocks', () => {
-            this.tooltip.show();
-            renderImage(unlockId, this.tooltip.renderByElement(), {
-              pos: 'insert',
-              scale: 0.75,
+          if (unlockSpot) {
+            const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockSpot];
+            selections.insertAdjacentHTML(
+              'beforeend',
+              `<div class="discovery-spot ${unlockSpot}" style="position: absolute;top: ${(y - 7) * 1.2}px; left: ${
+                (x - 103) * 1.2
+              }px;"></div>`,
+            );
+            const elem = selections.querySelector(`.discovery-spot.${unlockSpot}`);
+            renderImage(unlockId, elem, { scale: 1.7 / 1.2 });
+            addClickListener(document.querySelector(`#knowledge-container *[name="${unlockId}"]`), 'Unlocks', () => {
+              this.tooltip.show();
+              renderImage(unlockId, this.tooltip.renderByElement(), {
+                pos: 'insert',
+                scale: 0.75,
+              });
             });
-          });
+          }
         });
       }
 

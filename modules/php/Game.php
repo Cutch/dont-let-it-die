@@ -1699,25 +1699,41 @@ class Game extends \Table
             })
         );
     }
+    public function getValidTokens(): array
+    {
+        return array_filter($this->data->tokens, function ($v) {
+            return $v['type'] == 'resource' &&
+                (!array_key_exists('requires', $v) || $v['requires']($this, $v)) &&
+                (!array_key_exists('expansion', $v) || $this->isValidExpansion($v['expansion']));
+        });
+    }
     public function getGameData(&$result): void
     {
         $result['game'] = $this->gameData->getAll();
         $result['game']['prevResources'] = $this->gameData->getPreviousResources();
 
         $resourcesAvailable = [];
-        array_walk($this->data->tokens, function ($v, $k) use ($result, &$resourcesAvailable) {
+        array_walk($this->data->tokens, function ($v, $k) use (&$result, &$resourcesAvailable) {
             if ($v['type'] == 'resource' && isset($result['game']['resources'][$k])) {
-                if (array_key_exists('cooked', $v)) {
-                    $cooked = $v['cooked'];
-                    $resourcesAvailable[$cooked] =
-                        (array_key_exists($cooked, $resourcesAvailable) ? $resourcesAvailable[$cooked] : 0) -
-                        $result['game']['resources'][$k];
+                if (
+                    (!array_key_exists('requires', $v) || $v['requires']($this, $v)) &&
+                    (!array_key_exists('expansion', $v) || $this->isValidExpansion($v['expansion']))
+                ) {
+                    if (array_key_exists('cooked', $v)) {
+                        $cooked = $v['cooked'];
+                        $resourcesAvailable[$cooked] =
+                            (array_key_exists($cooked, $resourcesAvailable) ? $resourcesAvailable[$cooked] : 0) -
+                            $result['game']['resources'][$k];
+                    } else {
+                        $resourcesAvailable[$k] =
+                            (array_key_exists($k, $resourcesAvailable) ? $resourcesAvailable[$k] : 0) +
+                            $v['count'] -
+                            $result['game']['resources'][$k] -
+                            ($k === 'wood' ? $result['game']['resources']['fireWood'] ?? 0 : 0);
+                    }
                 } else {
-                    $resourcesAvailable[$k] =
-                        (array_key_exists($k, $resourcesAvailable) ? $resourcesAvailable[$k] : 0) +
-                        $v['count'] -
-                        $result['game']['resources'][$k] -
-                        ($k === 'wood' ? $result['game']['resources']['fireWood'] ?? 0 : 0);
+                    unset($result['game']['resources'][$k]);
+                    unset($result['game']['prevResources'][$k]);
                 }
             }
         });
