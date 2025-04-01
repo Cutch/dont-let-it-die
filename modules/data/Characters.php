@@ -235,7 +235,7 @@ $charactersData = [
                     if ($char['isActive']) {
                         // Shuffle it
                         $game->gameData->set('state', ['id' => $skill['id']]);
-                        $game->gamestate->nextState('deckSelection');
+                        $game->deckSelection();
                         return ['spendActionCost' => false, 'notify' => false];
                     }
                 },
@@ -458,7 +458,7 @@ $charactersData = [
         'onGetActionCost' => function (Game $game, $char, &$data) {
             // Tested
             if ($char['isActive'] && $data['action'] == 'actDrawHunt') {
-                $data['stamina'] = 2;
+                $data['stamina'] = min($data['stamina'], 2);
             }
         },
         'skills' => [
@@ -511,7 +511,7 @@ $charactersData = [
         'slots' => ['weapon', 'tool'],
         'onGetActionCost' => function (Game $game, $char, &$data) {
             if ($char['isActive'] && $data['action'] == 'actInvestigateFire' && getUsePerDay($char['id'], $game) < 1) {
-                $data['stamina'] = 0;
+                $data['stamina'] = min($data['stamina'], 0);
             }
         },
         'onInvestigateFire' => function (Game $game, $char, &$data) {
@@ -665,7 +665,7 @@ $charactersData = [
         },
         'onGetActionCost' => function (Game $game, $char, &$data) {
             if ($char['isActive'] && $data['action'] == 'actDrawGather' && getUsePerDay($char['id'] . 'skillonDraw', $game) < 1) {
-                $data['stamina'] = 0;
+                $data['stamina'] = min($data['stamina'], 0);
             }
         },
         'onDraw' => function (Game $game, $char, &$data) {
@@ -684,6 +684,19 @@ $charactersData = [
         'name' => 'Oof',
         'startsWith' => 'mortar-and-pestle',
         'slots' => ['weapon', 'tool'],
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'name' => clienttranslate('Remove Physical Hindrance'),
+                'state' => ['playerTurn'],
+                'stamina' => 3,
+                'onUse' => function (Game $game, $skill) {},
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+        ],
     ],
     'Rex' => [
         'expansion' => 'hindrance',
@@ -693,6 +706,68 @@ $charactersData = [
         'name' => 'Rex',
         'startsWith' => 'fire-stick',
         'slots' => ['weapon', 'tool'],
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'name' => clienttranslate('View Top Card'),
+                'state' => ['playerTurn'],
+                'stamina' => 2,
+                'onUse' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($char['isActive']) {
+                        $game->gameData->set('state', ['id' => $skill['id']]);
+                        $game->deckSelection(
+                            array_intersect($game->decks->getAllDeckNames(), ['harvest', 'forage', 'hunt', 'gather', 'explore'])
+                        );
+                        return ['spendActionCost' => false, 'notify' => false];
+                    }
+                },
+                'onDeckSelection' => function (Game $game, $skill, $deckName) {
+                    if ($game->gameData->get('state')['id'] == $skill['id']) {
+                        $game->actions->spendActionCost('actUseSkill', $skill['id']);
+                        $topCard = $game->decks->getDeck($deckName)->getCardOnTop('deck');
+                        $card = $game->decks->getCard($topCard['type_arg']);
+                        $game->cardDrawEvent($card, $deckName, ['partial' => true]);
+                        $game->activeCharacterEventLog('viewed the top card', [
+                            'deck' => $deckName,
+                        ]);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+            'skill2' => [
+                'type' => 'skill',
+                'name' => clienttranslate('Place Trap'),
+                'state' => ['playerTurn'],
+                'stamina' => 1,
+                'onUse' => function (Game $game, $skill) {
+                    // TODO: Need to be able to place or move trap
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($char['isActive']) {
+                        $game->gameData->set('state', ['id' => $skill['id']]);
+                        $game->deckSelection(
+                            array_intersect($game->decks->getAllDeckNames(), ['harvest', 'forage', 'hunt', 'gather', 'explore'])
+                        );
+                        return ['spendActionCost' => false, 'notify' => false];
+                    }
+                },
+                'onDeckSelection' => function (Game $game, $skill, $deckName) {
+                    if ($game->gameData->get('state')['id'] == $skill['id']) {
+                        $game->actions->spendActionCost('actUseSkill', $skill['id']);
+                        $game->activeCharacterEventLog('placed a trap on ${deck}', [
+                            'deck' => $deckName,
+                        ]);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+        ],
     ],
     'Mabe' => [
         // Done
@@ -1046,6 +1121,27 @@ $charactersData = [
         'stamina' => '6',
         'name' => 'Blarg',
         'slots' => ['weapon', 'tool'],
+        'onGetMaxBuildingCount' => function (Game $game, $char, &$data) {
+            $data['count'] = 2;
+        },
+        'onGetUnlockCost' => function (Game $game, $unlock, &$data) {
+            $data['unlockCost'] -= 2;
+        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'name' => clienttranslate('Give Item'),
+                'state' => ['playerTurn'],
+                'stamina' => 1,
+                'onUse' => function (Game $game, $skill) {
+                    return ['notify' => false];
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return !$char['isActive'];
+                },
+            ],
+        ],
     ],
     'Cali' => [
         'type' => 'character',
@@ -1062,6 +1158,74 @@ $charactersData = [
         'stamina' => '7',
         'name' => 'Loka',
         'slots' => ['weapon', 'tool'],
+        'onUnlock' => function (Game $game, $char, &$data) {
+            $game->adjustResource('wood', 1);
+            $game->activeCharacterEventLog('received ${count} ${resource_type}', [
+                'count' => 1,
+                'resource_type' => 'wood',
+            ]);
+        },
+        'onGetResourceMax' => function (Game $game, $char, &$data) {
+            $data['maxCount'] -= getUsePerForever('hide-token', $game);
+        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'name' => clienttranslate('Hold Hide'),
+                'state' => ['playerTurn'],
+                'stamina' => 2,
+                'onUse' => function (Game $game, $skill) {
+                    usePerForever('hide-token', $game);
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+            'skill2' => [
+                'type' => 'skill',
+                'name' => clienttranslate('Reduce Damage'),
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        subtractPerForever('hide-token', $game);
+                    }
+                },
+                'onEncounter' => function (Game $game, $skill, &$data) {
+                    $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
+                    if ($char['isActive']) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && getUsePerForever('hide-token', $game) > 0;
+                },
+            ],
+            'skill3' => [
+                'type' => 'skill',
+                'name' => clienttranslate('+1 Resource'),
+                'state' => ['interrupt'],
+                'interruptState' => ['playerTurn'],
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        subtractPerForever('hide-token', $game);
+                    }
+                },
+                'onResolveDraw' => function (Game $game, $skill, &$data) {
+                    $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
+                    $card = $data['card'];
+                    if ($char['isActive'] && $card['deckType'] == 'resource') {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && getUsePerForever('hide-token', $game) > 0;
+                },
+            ],
+        ],
     ],
     'Tooth' => [
         'type' => 'character',
@@ -1069,7 +1233,39 @@ $charactersData = [
         'health' => '8',
         'stamina' => '7',
         'name' => 'Tooth',
-        'slots' => ['weapon', 'tool'],
+        'slots' => [],
+        'onGetValidActions' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                unset($data['actCook']);
+                unset($data['actCraft']);
+                unset($data['actTrade']);
+                unset($data['actInvestigateFire']);
+            }
+        },
+        'onEncounter' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                $data['characterDamage'] = 2;
+            }
+        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'state' => ['playerTurn'],
+                'name' => str_replace('${name}', 'Tooth', clienttranslate('Pet ${name}')),
+                'stamina' => 2,
+                'onUse' => function (Game $game, $skill) {
+                    $game->character->adjustActiveHealth(1);
+                    $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
+                        'count' => 1,
+                        'character_resource' => 'health',
+                    ]);
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return !$char['isActive'];
+                },
+            ],
+        ],
     ],
     'Sooha' => [
         'type' => 'character',
@@ -1078,6 +1274,35 @@ $charactersData = [
         'stamina' => '7',
         'name' => 'Sooha',
         'slots' => ['weapon', 'tool'],
+        'onInvestigateFire' => function (Game $game, $char, &$data) {
+            if ($char['isActive'] && $data['roll'] == 0) {
+                $game->character->adjustActiveHealth(-1);
+                $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
+                    'count' => 1,
+                    'character_resource' => 'health',
+                ]);
+                $game->adjustResource('fkp', 2);
+                $game->activeCharacterEventLog('received ${count} ${resource_type}', [
+                    'count' => 2,
+                    'resource_type' => 'fkp',
+                ]);
+            }
+        },
+        'onGetCharacterData' => function (Game $game, $char, &$data) {
+            if ($char['id'] == $data['id'] && in_array('relaxation', $game->getUnlockedKnowledgeIds())) {
+                $data['maxHealth'] = clamp($data['maxHealth'] + 2, 0, 10);
+            }
+        },
+        'onUnlock' => function (Game $game, $char, &$data) {
+            if ($data['id'] == 'relaxation') {
+                $game->character->adjustHealth($char['id'], 10);
+                $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
+                    'count' => clienttranslate('full'),
+                    'character_resource' => 'health',
+                ]);
+            }
+        },
+        // TODO: Can spend health as if it was stamina
     ],
     'Samp' => [
         'type' => 'character',
@@ -1094,5 +1319,14 @@ $charactersData = [
         'stamina' => '7',
         'name' => 'Yurt',
         'slots' => ['weapon', 'tool'],
+        'onCraftAfter' => function (Game $game, $unlock, &$data) {
+            // Choose tribe member to gain 1hp or 1 stamina
+        },
+        'onGetActionCost' => function (Game $game, $char, &$data) {
+            if ($data['action'] == 'actCraft') {
+                $data['stamina'] = max($data['stamina'] - 2, 0);
+            }
+        },
+        // Cannot be used with Atouk
     ],
 ];

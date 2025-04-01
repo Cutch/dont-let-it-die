@@ -47,6 +47,7 @@ class GameData
         'interruptState' => [],
         'activateCharacters' => [],
         'actInterruptState' => [],
+        'partials' => [],
         'resources' => [
             'fireWood' => 0,
             'wood' => 0,
@@ -155,7 +156,12 @@ class GameData
         $maxCount = $this->game->data->tokens[$resourceType]['count'];
         $data = $this->get('destroyedResources');
         $maxCount -= array_key_exists($resourceType, $data) ? $data[$resourceType] : 0;
-        return $maxCount;
+        $hookData = [
+            'resourceType' => $resourceType,
+            'maxCount' => $maxCount,
+        ];
+        $this->game->hooks->onGetResourceMax($hookData);
+        return $hookData['maxCount'];
     }
     public function getResources(...$names): array
     {

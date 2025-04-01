@@ -198,10 +198,10 @@ class Actions
                     return array_values(
                         array_filter(
                             $game->data->items,
-                            function ($v, $k) use ($craftingLevel, $craftedItems, $buildings) {
+                            function ($v, $k) use ($craftingLevel, $craftedItems, $buildings, $game) {
                                 return $v['type'] == 'item' &&
                                     $v['craftingLevel'] <= $craftingLevel &&
-                                    ($v['itemType'] != 'building' || sizeof($buildings) == 0) &&
+                                    ($v['itemType'] != 'building' || sizeof($buildings) < $game->getMaxBuildingCount()) &&
                                     (!array_key_exists($k, $craftedItems) || $craftedItems[$k] < $v['count']);
                             },
                             ARRAY_FILTER_USE_BOTH
@@ -210,7 +210,7 @@ class Actions
                 },
                 'onGetActionCost' => function (Game $game, $action, &$data) {
                     if ($data['action'] == 'actCraft' && $data['subAction'] == 'rock-weapon') {
-                        $data['stamina'] = 1;
+                        $data['stamina'] = min($data['stamina'], 1);
                     }
                 },
             ],

@@ -15,10 +15,10 @@ class CharacterSelection
     }
 
     public function actCharacterClicked(
-        string $character1 = null,
-        string $character2 = null,
-        string $character3 = null,
-        string $character4 = null
+        ?string $character1 = null,
+        ?string $character2 = null,
+        ?string $character3 = null,
+        ?string $character4 = null
     ): void {
         $characters = [$character1, $character2, $character3, $character4];
         $this->validateCharacterCount(false, $characters);
@@ -163,5 +163,34 @@ class CharacterSelection
 
         // Deactivate player, and move to next state if none are active
         $this->game->gamestate->setPlayerNonMultiactive($playerId, $this->game->isValidExpansion('hindrance') ? 'startHindrance' : 'start');
+    }
+    public function test_swapCharacter($character)
+    {
+        $oldChar = $this->game->character->getTurnCharacterId();
+        $playerId = $this->game->getCurrentPlayer();
+        // Remove player's previous selected
+        $this->game::DbQuery('DELETE FROM `character` WHERE character_name = "' . $oldChar . '"');
+        // Add player's current selected
+        $data = $this->game->data->characters[$character];
+        $health = $data['health'];
+        $stamina = $data['stamina'];
+        $char = $this->game::escapeStringForDB($character);
+        $this->game::DbQuery(
+            "INSERT INTO `character` (`character_name`, `player_id`, `stamina`, `health`) VALUES ('$char', $playerId, $stamina, $health)"
+        );
+        $turnOrder = $this->game->gameData->get('turnOrder');
+        $this->game->gameData->set(
+            'turnOrder',
+            array_map(function ($charId) use ($oldChar, $character) {
+                return $charId == $oldChar ? $character : $charId;
+            }, $turnOrder)
+        );
+        if (array_key_exists('startsWith', $data)) {
+            $itemId = $this->game->gameData->createItem($data['startsWith']);
+            $this->game->character->equipEquipment($character, [$itemId]);
+        }
+
+        $this->game->character->adjustAllHealth(10);
+        $this->game->character->adjustAllStamina(10);
     }
 }

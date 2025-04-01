@@ -160,6 +160,14 @@ class Game extends \Table
     {
         $this->notify->all('nightEvent', clienttranslate($message), $arg);
     }
+    public function deckSelection(?array $decks = null)
+    {
+        if ($decks == null) {
+            $decks = $this->decks->getAllDeckNames();
+        }
+        $this->gameData->set('deckSelection', ['decks' => $decks]);
+        $this->gamestate->nextState('deckSelection');
+    }
     public function cardDrawEvent($card, $deck, $arg = [])
     {
         $result = [
@@ -167,9 +175,24 @@ class Game extends \Table
             'deck' => $deck,
             'resolving' => $this->actInterrupt->isStateResolving(),
             'character_name' => $this->getCharacterHTML(),
+            ...$arg,
         ];
         $this->getDecks($result);
         $this->notify->all('cardDrawn', '', $result);
+        $partials = $this->gameData->get('partials');
+        if ($arg['partial']) {
+            $partials[$deck] = $card;
+            $this->gameData->set('partials', $partials);
+        } elseif (array_key_exists($deck, $partials)) {
+            unset($partials[$deck]);
+            $this->gameData->set('partials', $partials);
+        }
+    }
+    public function getMaxBuildingCount()
+    {
+        $data = ['count' => 1];
+        $this->hooks->onGetMaxBuildingCount($data);
+        return $data['count'];
     }
     public function getTradeRatio($checkOnly = true)
     {
@@ -375,6 +398,7 @@ class Game extends \Table
         $this->unlockKnowledge($knowledgeId);
         $knowledgeObj = $this->data->knowledgeTree[$knowledgeId];
         array_key_exists('onUse', $knowledgeObj) ? $knowledgeObj['onUse']($this, $knowledgeObj) : null;
+        $this->hooks->onUnlock($knowledgeObj);
         $this->notify->all('tokenUsed', clienttranslate('${character_name} unlocked ${knowledge_name}'), [
             'gameData' => $this->getAllDatas(),
             'knowledgeId' => $knowledgeId,
@@ -464,6 +488,7 @@ class Game extends \Table
                         $_this->gamestate->nextState('tooManyItems');
                     }
                 }
+                $this->hooks->onCraftAfter($data);
                 $_this->notify->all('tokenUsed', clienttranslate('${character_name} crafted a ${item_name}'), [
                     'gameData' => $_this->getAllDatas(),
                     'item_name' => $item['name'],
@@ -1196,6 +1221,7 @@ class Game extends \Table
                     if (!$this->isValidExpansion('mini-expansion')) {
                         $this->activeCharacterEventLog('did nothing', [
                             'deck' => str_replace('-', ' ', $deck),
+                            ...$card,
                         ]);
                     }
                 } elseif ($card['deckType'] == 'physical-hindrance' || $card['deckType'] == 'mental-hindrance') {
@@ -1233,6 +1259,7 @@ class Game extends \Table
                     $this->activeCharacterEventLog('${sentence} ${name}', [
                         'sentence' => $card['sentence'],
                         'name' => $card['name'],
+                        ...$card,
                     ]);
                 } elseif ($card['deckType'] == 'day-event') {
                     $this->gamestate->nextState('dayEvent');
@@ -1851,12 +1878,9 @@ class Game extends \Table
     public function getUnlockedKnowledge(): array
     {
         $unlocks = $this->getUnlockedKnowledgeIds();
-        // return array_map(function ($unlock) {
-        //     return $this->data->knowledgeTree[$unlock];
-        // }, $unlocks);
         return array_map(function ($unlock) {
             return $this->data->knowledgeTree[$unlock];
-        }, array_keys($this->data->knowledgeTree));
+        }, $unlocks);
     }
     public function getUnlockedKnowledgeIds(): array
     {
@@ -2161,5 +2185,13 @@ class Game extends \Table
     public function shuffle()
     {
         $this->decks->shuffleInDiscard('gather', true);
+    }
+    public function unlockAll()
+    {
+        $this->gameData->set('unlocks', array_keys($this->data->knowledgeTree));
+    }
+    public function swapCharacter(string $char)
+    {
+        $this->characterSelection->test_swapCharacter($char);
     }
 }

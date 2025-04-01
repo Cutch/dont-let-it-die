@@ -201,6 +201,12 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
+    function onCraftAfter(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
     function onRollDie(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
@@ -319,12 +325,6 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onAdjustHealth(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
     function onMaxHindrance(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
@@ -344,6 +344,24 @@ class Hooks
         return $data;
     }
     function onAddFireWood(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onGetMaxBuildingCount(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onUnlock(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onGetResourceMax(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);

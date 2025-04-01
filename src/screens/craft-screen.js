@@ -42,7 +42,7 @@ class CraftScreen {
             <div class="token ${name}"><div class="counter dot">${count()}</div></div>
             <div>`,
       );
-      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1, pos: 'insert' });
+      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1.5, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), this.game.data[name].options.name, () => selectCallback(count));
       if (hasCost) document.querySelector(`#craft-screen .token.${name}`).classList.remove('disabled');
       else document.querySelector(`#craft-screen .token.${name}`).classList.add('disabled');

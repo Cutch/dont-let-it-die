@@ -119,6 +119,11 @@
   text-shadow: 0 0 4px black;
   font-size: 18px;
 }
+.deck-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 /* This container is needed to position the front and back side */
 .flip-card-inner {
   text-align: center;

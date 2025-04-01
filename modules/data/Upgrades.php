@@ -98,7 +98,7 @@ $upgradesData = [
         'unlockCost' => 5,
         'onGetActionCost' => function (Game $game, $unlock, &$data) {
             if ($data['action'] == 'actTrade') {
-                $data['stamina'] = 0;
+                $data['stamina'] = min($data['stamina'], 0);
             }
         },
     ],

@@ -250,7 +250,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           if (weapon) {
             renderedItems.push(weapon);
             renderImage(weapon.id, document.querySelector(`#player-${character.name} > .${weapon.itemType}`), {
-              scale: scale / 2,
+              scale: scale,
               pos: 'replace',
             });
             addClickListener(document.querySelector(`#player-${character.name} > .${weapon.itemType}`), _(weapon.name), () => {
@@ -263,7 +263,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           if (tool) {
             renderedItems.push(tool);
             renderImage(tool.id, document.querySelector(`#player-${character.name} > .${tool.itemType}`), {
-              scale: scale / 2,
+              scale: scale,
               pos: 'replace',
             });
             addClickListener(document.querySelector(`#player-${character.name} > .${tool.itemType}`), _(tool.name), () => {
@@ -492,7 +492,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     },
     updateItem: function (name, elem, count) {
       elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
-      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1, pos: 'insert' });
+      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
+      addClickListener(elem.querySelector(`.token.${name}`), name, () => {
+        this.tooltip.show();
+        renderImage(name, this.tooltip.renderByElement(), {
+          pos: 'insert',
+          scale: 1,
+        });
+      });
     },
     setupBoard: function (gameData) {
       this.firstPlayer = gameData.playerorder[0];
@@ -522,6 +529,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           const uppercaseDeck = deck[0].toUpperCase() + deck.slice(1);
           this.decks[deck] = new Deck(this, deck, gameData.decks[deck], document.querySelector(`.board > .${deck}`), 2);
           this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
+          if (gameData.game.partials && gameData.game.partials[deck]) {
+            this.decks[deck].drawCard(gameData.game.partials[deck].id, true);
+          }
+          this.decks[deck].updateMarker(gameData.decks[deck]);
 
           addClickListener(document.querySelector(`.board .${deck}-back`), `${uppercaseDeck} Deck`, () => {
             this.bgaPerformAction(`actDraw${uppercaseDeck}`);
@@ -1160,7 +1171,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.notificationWrapper(notification);
       console.log('notification_cardDrawn', notification);
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
-      return this.decks[notification.args.deck].drawCard(notification.args.card.id);
+      return this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
     },
     notification_shuffle: async function (notification) {
       this.notificationWrapper(notification);

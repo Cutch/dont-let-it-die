@@ -11,7 +11,7 @@ class Deck {
     renderImage(`${this.deck}-back`, this.div, { scale: this.scale, pos: 'replace' });
     this.div.insertAdjacentHTML(
       'beforeend',
-      `<div class="flipped-card"></div><div class="shuffle shuffle-1"></div><div class="shuffle shuffle-2"></div>`,
+      `<div class="flipped-card"></div><div class="deck-marker"></div><div class="shuffle shuffle-1"></div><div class="shuffle shuffle-2"></div>`,
     );
     renderImage(`${this.deck}-back`, this.div.querySelector(`.shuffle-1`), { scale: this.scale, pos: 'replace' });
     renderImage(`${this.deck}-back`, this.div.querySelector(`.shuffle-2`), { scale: this.scale, pos: 'replace' });
@@ -19,6 +19,7 @@ class Deck {
       .querySelector(`.${this.deck}-back`)
       .insertAdjacentHTML('beforeend', `<div class="deck-counter dot counter">${this.countData.count}</div>`);
     this.drawing = [];
+    this.partialDrawCard = null;
     this.topDiscard = null;
     this.setDiscard(this.topDiscard);
   }
@@ -64,13 +65,28 @@ class Deck {
       .insertAdjacentHTML('beforeend', `<div class="discard-counter dot counter">${this.countData.discardCount}</div>`);
     this.topDiscard = cardId;
   }
-  async drawCard(cardId) {
-    this.drawing.push(cardId);
+  updateMarker({ tokens }) {
+    const marker = this.div.querySelector(`.deck-marker`);
+    marker.innerHTML = '';
+    tokens?.forEach((token) => {
+      renderImage(token, marker, { scale: 2, pos: 'replace' });
+    });
+  }
+  async drawCard(cardId, partial = false) {
+    this.drawing.push([cardId, partial]);
     if (this.drawing.length === 1) {
-      await this._drawCard(this.drawing[0]);
+      await this._drawCard(...this.drawing[0]);
     }
   }
-  async _drawCard(cardId) {
+  async _drawCard(cardId, partial = false) {
+    if (!this.partialDrawCard) {
+      await this.partialDraw(cardId);
+    }
+    if (!partial) {
+      await this.finishPartialDraw(cardId);
+    }
+  }
+  async partialDraw(cardId) {
     this.div.insertAdjacentHTML(
       'beforeend',
       `<div class="flip-card">
@@ -85,13 +101,17 @@ class Deck {
     await this.game.wait(100);
     this.div.querySelector(`.flip-card`).classList.add('flip');
     await this.game.wait(1000);
+    this.partialDrawCard = cardId;
+  }
+  async finishPartialDraw(cardId) {
+    this.partialDrawCard = null;
     this.div.querySelector(`.flip-card`).classList.add('discard');
     await this.game.wait(1000);
     this.setDiscard(cardId);
     this.div.querySelector('.flip-card').remove();
     this.drawing.splice(0, 1);
     if (this.drawing.length > 0) {
-      await this._drawCard(this.drawing[0]);
+      await this._drawCard(...this.drawing[0]);
     }
   }
 }

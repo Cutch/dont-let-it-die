@@ -25,6 +25,12 @@ if (!function_exists('getUsePerDay')) {
         $foreverUseItems[$itemId] = array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] + 1 : 1;
         $game->gameData->set('foreverUseItems', $foreverUseItems);
     }
+    function subtractPerForever(string $itemId, $game)
+    {
+        $foreverUseItems = $game->gameData->get('foreverUseItems');
+        $foreverUseItems[$itemId] = min(0, array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] - 1 : 0);
+        $game->gameData->set('foreverUseItems', $foreverUseItems);
+    }
     function clearUsePerForever(string $itemId, $game)
     {
         $foreverUseItems = $game->gameData->get('foreverUseItems');
@@ -631,7 +637,7 @@ $itemsData = [
         'onGetActionCost' => function (Game $game, $item, &$data) {
             $char = $game->character->getCharacterData($item['characterId']);
             if ($char['isActive'] && $data['action'] == 'actCraft') {
-                $data['action'] -= 2;
+                $data['stamina'] = max($data['stamina'] - 2, 0);
             }
         },
     ],
@@ -648,7 +654,7 @@ $itemsData = [
         'onGetActionCost' => function (Game $game, $item, &$data) {
             $char = $game->character->getCharacterData($item['characterId']);
             if ($char['isActive'] && $data['action'] == 'actUseHerb') {
-                $data['action'] = 0;
+                $data['stamina'] = min($data['stamina'], 0);
             }
         },
     ],
@@ -716,7 +722,7 @@ $itemsData = [
         'onGetActionCost' => function (Game $game, $item, &$data) {
             $char = $game->character->getCharacterData($item['characterId']);
             if ($char['isActive'] && $data['action'] == 'actCook' && getUsePerDay($char['id'] . $item['itemId'], $game) % 2 == 0) {
-                $data['stamina'] = 0;
+                $data['stamina'] = min($data['stamina'], 0);
             }
         },
         'onCook' => function (Game $game, $item, &$data) {
@@ -724,7 +730,6 @@ $itemsData = [
             if ($char['isActive'] && getUsePerDay($char['id'] . $item['itemId'], $game) % 2 == 0) {
                 $game->activeCharacterEventLog('another cook action can be used for free');
                 usePerDay($char['id'] . $item['itemId'], $game);
-                $data['stamina'] = 0;
             }
         },
     ],
@@ -742,7 +747,7 @@ $itemsData = [
         'onGetActionCost' => function (Game $game, $item, &$data) {
             $char = $game->character->getCharacterData($item['characterId']);
             if ($char['isActive'] && $data['action'] == 'actExplore') {
-                $data['action'] -= 2;
+                $data['stamina'] = max($data['stamina'] - 2, 0);
             }
         },
     ],
@@ -997,6 +1002,9 @@ $itemsData = [
                 $data['maxStamina'] = clamp($data['maxStamina'] + 1, 0, 10);
             }
         },
+        'onCraftAfter' => function (Game $game, $unlock, &$data) {
+            $game->gameData->destroyResource('gem-y');
+        },
     ],
     'gem-b-necklace' => [
         'type' => 'item',
@@ -1014,6 +1022,9 @@ $itemsData = [
                 $data['maxHealth'] = clamp($data['maxHealth'] + 1, 0, 10);
             }
         },
+        'onCraftAfter' => function (Game $game, $unlock, &$data) {
+            $game->gameData->destroyResource('gem-b');
+        },
     ],
     'gem-p-necklace' => [
         'type' => 'item',
@@ -1026,6 +1037,9 @@ $itemsData = [
             'gem-p' => 1,
             'fiber' => 1,
         ],
+        'onCraftAfter' => function (Game $game, $unlock, &$data) {
+            $game->gameData->destroyResource('gem-p');
+        },
         'skills' => [
             'skill1' => [
                 'type' => 'item-skill',
