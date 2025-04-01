@@ -148,6 +148,8 @@ class CharacterSelection
             }
             $message = $message . '${character' . ($index + 1) . '}';
         }
+        $this->game->character->adjustAllHealth(10);
+        $this->game->character->adjustAllStamina(10);
 
         $this->setTurnOrder($playerId, $selectedCharacters);
         $results = ['player_id' => $playerId];

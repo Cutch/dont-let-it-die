@@ -31,6 +31,7 @@ class GameData
         'dailyUseItems' => [],
         'foreverUseItems' => [],
         'buildings' => [],
+        'lastAction' => null,
         'state' => [],
         'unlocks' => [],
         'upgrades' => [],
@@ -69,6 +70,7 @@ class GameData
             'gem-b' => 0,
             'gem-p' => 0,
         ],
+        'destroyedResources' => [],
     ];
     public function __construct(Game $game)
     {
@@ -109,7 +111,7 @@ class GameData
         $this->cachedGameItems[$this->game::DbGetLastId()] = $itemName;
         return $this->game::DbGetLastId();
     }
-    public function get($name): mixed
+    public function get(string $name): mixed
     {
         return array_key_exists($name, $this->cachedGameData) ? $this->cachedGameData[$name] : null;
     }
@@ -126,14 +128,34 @@ class GameData
             ARRAY_FILTER_USE_KEY
         );
     }
-    public function setResource($name, $value): void
+    public function setResource(string $name, int $value): void
     {
         $this->cachedGameData['resources'][$name] = max($value, 0);
         $this->game->globals->set('resources', $this->cachedGameData['resources']);
     }
-    public function getResource($name): int
+    public function getResource(string $name): int
     {
         return $this->cachedGameData['resources'][$name];
+    }
+    public function destroyResource(string $resourceType, int $count = 1): void
+    {
+        $data = $this->get('destroyedResources');
+        $data[$resourceType] = (array_key_exists($resourceType, $data) ? $data[$resourceType] : 0) + $count;
+        $this->set('destroyedResources', $data);
+        $this->game->adjustResource($resourceType, 0);
+        $this->game->notify->all('tokenUsed', clienttranslate('${count} ${resource_type} removed from the game'), [
+            'gameData' => $this->game->getAllDatas(),
+            'count' => 1,
+            'resource_type' => $resourceType,
+        ]);
+    }
+    public function getResourceMax(string $resourceType): int
+    {
+        $resourceType = str_replace('-cooked', '', $resourceType);
+        $maxCount = $this->game->data->tokens[$resourceType]['count'];
+        $data = $this->get('destroyedResources');
+        $maxCount -= array_key_exists($resourceType, $data) ? $data[$resourceType] : 0;
+        return $maxCount;
     }
     public function getResources(...$names): array
     {

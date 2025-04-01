@@ -4,6 +4,7 @@ const allSprites = [
   decksSprites,
   expansionSprites,
   itemsSprites,
+  necklaceSprites,
   techSprites,
   tokenSprites,
   upgradesSprites,

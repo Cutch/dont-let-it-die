@@ -5,8 +5,16 @@ class TradeScreen {
     this.error = false;
   }
   setError() {
-    const resourceCount = Object.keys(this.resourceSelected).reduce((a, name) => a + this.resourceSelected[name], 0);
-    const requestedCount = Object.keys(this.resourceRequested).reduce((a, name) => a + this.resourceRequested[name], 0);
+    const resourceCount = Object.keys(this.resourceSelected).reduce(
+      (a, name) => a + this.resourceSelected[name] * (name.includes('gem-') ? 2 : 1),
+      0,
+    );
+    const requestedCount = Object.keys(this.resourceRequested).reduce(
+      (a, name) => a + this.resourceRequested[name] * (name.includes('gem-') ? 2 : 1),
+      0,
+    );
+    document.querySelector(`#trade-resource .cost`).innerHTML = resourceCount;
+    document.querySelector(`#trade-for .cost`).innerHTML = requestedCount;
     const error = document.querySelector(`#trade-screen .error`);
     if (resourceCount != this.tradeRatio) {
       error.innerHTML = _('Select ${tradeRatio} of your resources').replace('${tradeRatio}', this.tradeRatio);
@@ -70,8 +78,12 @@ class TradeScreen {
         `<div id="trade-screen" class="dlid__container">
             <div class="error"></div>
             <div id="trade-body">
-              <div id="trade-resource" class="dlid__container"><h3>${_('Your Resources')}</h3><div class="tokens"></div></div>
-              <div id="trade-for" class="dlid__container"><h3>${_('Trade For')}</h3><div class="tokens"></div></div>
+              <div id="trade-resource" class="dlid__container"><div><h3>${_(
+                'Your Resources',
+              )}</h3><div class="cost"></div></div><div class="tokens"></div></div>
+              <div id="trade-for" class="dlid__container"><div><h3>${_(
+                'Trade For',
+              )}</h3><div class="cost"></div></div><div class="tokens"></div></div>
             </div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
@@ -122,7 +134,7 @@ class TradeScreen {
       );
     });
     this.getResourcesForDisplay(gameData)
-      .filter((d) => d !== 'fish' && !d.includes('-cooked'))
+      .filter((d) => d !== 'fish' && !d.includes('-cooked') && !d.includes('gem-'))
       .forEach((name) => {
         renderResource(
           name,

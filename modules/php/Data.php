@@ -31,7 +31,7 @@ class Data
         $this->expansion = addId($expansionData);
         $this->tokens = addId($tokensData);
         $this->boards = addId($boardsData);
-        $this->knowledgeTree = addId($knowledgeTreeData);
+        $this->knowledgeTree = array_merge(addId($knowledgeTreeData), addId($upgradesData));
         $this->items = addId($itemsData);
         $this->upgrades = addId($upgradesData);
     }

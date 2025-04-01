@@ -80,6 +80,7 @@ $itemsData = [
         'name' => clienttranslate('Medical Hut'),
         'expansion' => 'hindrance',
         'itemType' => 'building',
+        'global' => true,
         'cost' => [
             'fiber' => 3,
             'rock' => 3,
@@ -259,6 +260,7 @@ $itemsData = [
         'count' => 1,
         'name' => clienttranslate('Camp Walls'),
         'itemType' => 'building',
+        'global' => true,
         'cost' => [
             'fiber' => 3,
             'rock' => 3,
@@ -325,6 +327,7 @@ $itemsData = [
         'count' => 1,
         'name' => clienttranslate('Knowledge Hut'),
         'itemType' => 'building',
+        'global' => true,
         'cost' => [
             'fiber' => 3,
             'rock' => 3,
@@ -342,7 +345,7 @@ $itemsData = [
             if (getUsePerDay($item['name'] . $char['id'] . 'investigateFire', $game) < 1) {
                 usePerDay($item['name'] . $char['id'] . 'investigateFire', $game);
 
-                if ($game->adjustResource('fkp', 1) == 0) {
+                if ($game->adjustResource('fkp', 1)['changed'] > 0) {
                     $game->notify->all('usedItem', clienttranslate('The ${item_name} grants an extra fkp'), [
                         'item_name' => $item['name'],
                     ]);
@@ -400,6 +403,7 @@ $itemsData = [
         'count' => 1,
         'name' => clienttranslate('Cooking Hut'),
         'itemType' => 'building',
+        'global' => true,
         'cost' => [
             'fiber' => 3,
             'rock' => 3,
@@ -482,6 +486,7 @@ $itemsData = [
         'count' => 1,
         'name' => clienttranslate('Planning Hut'),
         'itemType' => 'building',
+        'global' => true,
         'cost' => [
             'fiber' => 3,
             'rock' => 3,
@@ -586,6 +591,7 @@ $itemsData = [
         'count' => 1,
         'name' => clienttranslate('Shelter'),
         'itemType' => 'building',
+        'global' => true,
         'cost' => [
             'fiber' => 3,
             'rock' => 3,
@@ -787,6 +793,7 @@ $itemsData = [
         'expansion' => 'hindrance',
         'name' => clienttranslate('Stock Hut'),
         'itemType' => 'building',
+        'global' => true,
         'cost' => [
             'fiber' => 3,
             'rock' => 3,
@@ -970,6 +977,84 @@ $itemsData = [
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'] && getUsePerDay($char['id'] . $skill['id'], $game) < 1;
+                },
+            ],
+        ],
+    ],
+    'gem-y-necklace' => [
+        'type' => 'item',
+        'craftingLevel' => 4,
+        'count' => 1,
+        'expansion' => 'hindrance',
+        'name' => clienttranslate('Yellow Necklace'),
+        'itemType' => 'necklace',
+        'cost' => [
+            'gem-y' => 1,
+            'fiber' => 1,
+        ],
+        'onGetCharacterData' => function (Game $game, $item, &$data) {
+            if ($data['character_name'] == $item['character_name']) {
+                $data['maxStamina'] = clamp($data['maxStamina'] + 1, 0, 10);
+            }
+        },
+    ],
+    'gem-b-necklace' => [
+        'type' => 'item',
+        'craftingLevel' => 4,
+        'count' => 1,
+        'expansion' => 'hindrance',
+        'name' => clienttranslate('Blue Necklace'),
+        'itemType' => 'necklace',
+        'cost' => [
+            'gem-b' => 1,
+            'fiber' => 1,
+        ],
+        'onGetCharacterData' => function (Game $game, $item, &$data) {
+            if ($data['character_name'] == $item['character_name']) {
+                $data['maxHealth'] = clamp($data['maxHealth'] + 1, 0, 10);
+            }
+        },
+    ],
+    'gem-p-necklace' => [
+        'type' => 'item',
+        'craftingLevel' => 4,
+        'count' => 1,
+        'expansion' => 'hindrance',
+        'name' => clienttranslate('Purple Necklace'),
+        'itemType' => 'necklace',
+        'cost' => [
+            'gem-p' => 1,
+            'fiber' => 1,
+        ],
+        'skills' => [
+            'skill1' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Re-Roll Fire Die'),
+                'state' => ['interrupt'],
+                'interruptState' => ['playerTurn'],
+                'perDay' => 1,
+                'onInvestigateFire' => function (Game $game, $skill, &$data) {
+                    $game->log('onInvestigateFire', $skill);
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($data['roll'] < 3 && getUsePerDay($char['id'] . 'gem-p-necklace', $game) < 1) {
+                        // If kara is not the character, and the roll is not the max
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $char = $game->character->getCharacterData($skill['characterId']);
+                        $game->activeCharacterEventLog('is re-rolling ${active_character_name}\'s fire die', [
+                            ...$char,
+                            'active_character_name' => $game->character->getTurnCharacter()['character_name'],
+                        ]);
+                        $data['data']['roll'] = $game->rollFireDie($char['character_name']);
+                        usePerDay($char['id'] . 'gem-p-necklace', $game);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return getUsePerDay($char['id'] . 'gem-p-necklace', $game) < 1;
                 },
             ],
         ],

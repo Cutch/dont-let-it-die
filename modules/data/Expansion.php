@@ -555,8 +555,9 @@ $expansionData = [
         'type' => 'deck',
         'sentence' => clienttranslate('is'),
         'name' => clienttranslate('Berserk'),
-        'onHealthChange' => function (Game $game, $card, &$data) {
+        'onAdjustHealth' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                // TODO
             }
         },
         'skills' => [
@@ -861,7 +862,7 @@ $expansionData = [
         'expansion' => 'hindrance',
         'sentence' => clienttranslate('has'),
         'name' => clienttranslate('Parasites'),
-        'onHealthChange' => function (Game $game, $card, &$data) {
+        'onAdjustHealth' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['change'] > 0) {
                 $data['change'] -= 1;
             }

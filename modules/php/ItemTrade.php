@@ -245,56 +245,6 @@ class ItemTrade
             ]);
         }
     }
-    public function actTrade(#[JsonParam] array $data): void
-    {
-        // $this->game->character->addExtraTime();
-        extract($data);
-        $this->game->actions->validateCanRunAction('actTrade');
-        $offeredSum = 0;
-        foreach ($offered as $key => $value) {
-            $offeredSum += $value;
-        }
-        $requestedSum = 0;
-        foreach ($requested as $key => $value) {
-            $requestedSum += $value;
-        }
-        if ($offeredSum != $this->game->getTradeRatio()) {
-            throw new BgaUserException(
-                str_replace(
-                    '${amount}',
-                    (string) $this->game->getTradeRatio(),
-                    $this->game->translate('You must offer ${amount} resources')
-                )
-            );
-        }
-        if ($requestedSum != 1) {
-            throw new BgaUserException($this->game->translate('You must request only one resource'));
-        }
-        $this->game->actions->spendActionCost('actTrade');
-        $offeredStr = [];
-        $requestedStr = [];
-        foreach ($offered as $key => $value) {
-            if ($value > 0) {
-                $this->game->adjustResource($key, -$value);
-                array_push($offeredStr, $this->game->data->tokens[$key]['name'] . "($value)");
-            }
-        }
-        foreach ($requested as $key => $value) {
-            if ($value > 0) {
-                if (str_contains($key, '-cooked')) {
-                    throw new BgaUserException($this->game->translate('You cannot trade for a cooked resource'));
-                }
-                $this->game->adjustResource($key, $value);
-                array_push($requestedStr, $this->game->data->tokens[$key]['name'] . "($value)");
-            }
-        }
-        // $this->game->hooks->onTrade($data);
-        $this->game->notify->all('tokenUsed', clienttranslate('${character_name} traded ${offered} for ${requested}'), [
-            'gameData' => $this->game->getAllDatas(),
-            'offered' => join(', ', $offeredStr),
-            'requested' => join(', ', $requestedStr),
-        ]);
-    }
     public function argTradePhaseActions($playerId)
     {
         $result = [

@@ -25,6 +25,7 @@ class Character
         'incapacitated',
         'hindrance',
         'day_event',
+        'necklace',
     ];
 
     public function __construct($game)
@@ -62,6 +63,13 @@ class Character
                 array_map(function ($dayEvent) {
                     return $dayEvent['id'];
                 }, $data['dayEvent'])
+            ) ?? '';
+        $data['necklace'] =
+            join(
+                ',',
+                array_map(function ($item) {
+                    return $item['itemId'];
+                }, $data['necklaces'])
             ) ?? '';
         $values = [];
         foreach ($data as $key => $value) {
@@ -147,6 +155,33 @@ class Character
         $characterData['dayEvent'] = array_map(function ($itemId) {
             return $this->game->data->expansion[$itemId];
         }, array_filter(explode(',', $characterData['day_event'] ?? '')));
+
+        $characterData['necklaces'] = array_map(function ($itemId) use ($itemsLookup, $characterName) {
+            $itemName = $itemsLookup[$itemId];
+            $skills = [];
+            if (array_key_exists('skills', $this->game->data->items[$itemName])) {
+                array_walk($this->game->data->items[$itemName]['skills'], function ($v, $k) use (
+                    $itemId,
+                    $itemName,
+                    $characterName,
+                    &$skills
+                ) {
+                    $skillId = $k . '_' . $itemId;
+                    $v['id'] = $skillId;
+                    $v['itemId'] = $itemId;
+                    $v['itemName'] = $itemName;
+                    $v['characterId'] = $characterName;
+                    $skills[$skillId] = $v;
+                });
+            }
+            return [
+                ...$this->game->data->items[$itemName],
+                'character_name' => $characterName,
+                'characterId' => $characterName,
+                'itemId' => $itemId,
+                'skills' => $skills,
+            ];
+        }, array_filter(explode(',', $characterData['necklace'] ?? '')));
 
         $hindrances = array_map(function ($itemId) {
             return $this->game->data->expansion[$itemId];
@@ -309,7 +344,7 @@ class Character
                     return ['character' => $v, 'skill' => $v['skills'][$skillId]];
                 }
             }
-            foreach ($v['equipment'] as $k => $equipment) {
+            foreach ([...$v['equipment'], ...$v['necklaces']] as $k => $equipment) {
                 if (array_key_exists('skills', $equipment)) {
                     if (array_key_exists($skillId, $equipment['skills'])) {
                         return ['character' => $v, 'skill' => $equipment['skills'][$skillId]];
@@ -332,6 +367,13 @@ class Character
                     if (array_key_exists($skillId, $expansion['skills'])) {
                         return ['character' => $currentCharacter, 'skill' => $expansion['skills'][$skillId]];
                     }
+                }
+            }
+        }
+        foreach ($this->game->data->knowledgeTree as $k => $knowledgeTree) {
+            if (array_key_exists('skills', $knowledgeTree)) {
+                if (array_key_exists($skillId, $knowledgeTree['skills'])) {
+                    return ['character' => $currentCharacter, 'skill' => $knowledgeTree['skills'][$skillId]];
                 }
             }
         }
@@ -426,13 +468,19 @@ class Character
             $data['stamina'] = clamp($data['stamina'] + $stamina, 0, $data['maxStamina']);
         });
     }
-    public function adjustStamina(string $characterName, int $stamina): int
+    public function adjustStamina(string $characterName, int $staminaChange): int
     {
         $prev = 0;
-        $this->updateCharacterData($characterName, function (&$data) use ($stamina, &$prev) {
-            $this->game->hooks->onAdjustStamina($stamina);
+        $this->updateCharacterData($characterName, function (&$data) use ($staminaChange, $characterName, &$prev) {
             $prev = $data['stamina'];
-            $data['stamina'] = clamp($data['stamina'] + $stamina, 0, $data['maxStamina']);
+            $hookData = [
+                'currentStamina' => $prev,
+                'change' => $staminaChange,
+                'characterId' => $characterName,
+                'maxStamina' => $data['maxStamina'],
+            ];
+            $this->game->hooks->onAdjustStamina($hookData);
+            $data['stamina'] = clamp($data['stamina'] + $hookData['change'], 0, $data['maxStamina']);
             $prev = $data['stamina'] - $prev;
             $this->game->log('stamina', $data['stamina']);
             return $prev == 0;
@@ -443,7 +491,6 @@ class Character
     {
         $characterName = $this->getSubmittingCharacter()['character_name'];
         $this->game->log('$cost', $characterName, $stamina);
-        $this->game->hooks->onAdjustStamina($stamina);
         return $this->adjustStamina($characterName, $stamina);
     }
     public function getActiveHealth(): int
@@ -468,8 +515,10 @@ class Character
             $hookData = [
                 'currentHealth' => $prev,
                 'change' => $healthChange,
+                'characterId' => $characterName,
+                'maxHealth' => $data['maxHealth'],
             ];
-            $this->game->hooks->onHealthChange($hookData);
+            $this->game->hooks->onAdjustHealth($hookData);
             $data['health'] = clamp($data['health'] + $hookData['change'], 0, $data['maxHealth']);
             $prev = $data['health'] - $prev;
             if ($data['health'] == 0 && !$data['incapacitated']) {
@@ -518,6 +567,7 @@ class Character
                 'dayEvent' => $char['dayEvent'],
                 'mentalHindrance' => $char['mentalHindrance'],
                 'physicalHindrance' => $char['physicalHindrance'],
+                'necklaces' => $char['necklaces'],
                 'health' => $char['health'],
                 'incapacitated' => !!$char['incapacitated'],
                 'slotsUsed' => $slotsUsed,

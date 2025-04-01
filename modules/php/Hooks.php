@@ -24,9 +24,21 @@ class Hooks
         $equipment = array_merge(
             ...array_map(function ($c) {
                 return $c['equipment'];
+            }, $characters),
+            ...array_map(function ($c) {
+                return $c['necklaces'];
             }, $characters)
         );
         $skills = array_merge(
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return array_map(function ($skill) use ($c) {
+                        $skill['characterId'] = $this->game->character->getSubmittingCharacterId();
+                        return $skill;
+                    }, $c['skills']);
+                }
+                return [];
+            }, $unlocks),
             ...array_map(function ($c) {
                 if (array_key_exists('skills', $c)) {
                     return $c['skills'];
@@ -307,7 +319,7 @@ class Hooks
         $this->callHooks(__FUNCTION__, $data);
         return $data;
     }
-    function onHealthChange(&$data, $checkInterrupt = false)
+    function onAdjustHealth(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);
@@ -326,6 +338,12 @@ class Hooks
         return $data;
     }
     function onGetReviveCost(&$data, $checkInterrupt = false)
+    {
+        $this->checkInterrupt = $checkInterrupt;
+        $this->callHooks(__FUNCTION__, $data);
+        return $data;
+    }
+    function onAddFireWood(&$data, $checkInterrupt = false)
     {
         $this->checkInterrupt = $checkInterrupt;
         $this->callHooks(__FUNCTION__, $data);

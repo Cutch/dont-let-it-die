@@ -2,6 +2,27 @@
 
 use Bga\Games\DontLetItDie\Game;
 
+if (!function_exists('rivalTribe')) {
+    function rivalTribe(Game $game, array $nightCard, int $roll)
+    {
+        $resourceType = $nightCard['resourceType'];
+        $left = $roll;
+        if ($resourceType == 'gem') {
+            $left = $game->adjustResource('gem-y', -$roll)['left'];
+            $left = $game->adjustResource('gem-p', $left)['left'];
+            $left = $game->adjustResource('gem-b', $left)['left'];
+        } else {
+            if (array_key_exists($resourceType . '-cooked', $game->data->tokens)) {
+                $left = $game->adjustResource($resourceType . '-cooked', -$roll)['left'];
+            }
+            $game->adjustResource($resourceType, $left);
+        }
+        $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
+            'number' => $roll,
+            'resource_type' => $resourceType,
+        ]);
+    }
+}
 $decksData = [
     'explore-7_0' => [
         'deck' => 'explore',
@@ -414,27 +435,20 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
+        'resourceType' => 'fiber',
         'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $game->adjustResource('fiber', -$roll);
-            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
-                'number' => $roll,
-                'resource_type' => 'fiber',
-            ]);
+            rivalTribe($game, $nightCard, $roll);
         },
     ],
     'night-event-7_1' => [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
+        'resourceType' => 'berry',
         'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $left = $game->adjustResource('berry-cooked', -$roll);
-            $game->adjustResource('berry', $left);
-            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
-                'number' => $roll,
-                'resource_type' => 'berry',
-            ]);
+            rivalTribe($game, $nightCard, $roll);
         },
     ],
     'night-event-7_10' => [
@@ -549,40 +563,30 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
+        'resourceType' => 'wood',
         'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $game->adjustResource('wood', -$roll);
-            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
-                'number' => $roll,
-                'resource_type' => 'wood',
-            ]);
+            rivalTribe($game, $nightCard, $roll);
         },
     ],
     'night-event-7_5' => [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
+        'resourceType' => 'rock',
         'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $game->adjustResource('rock', -$roll);
-            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
-                'number' => $roll,
-                'resource_type' => 'rock',
-            ]);
+            rivalTribe($game, $nightCard, $roll);
         },
     ],
     'night-event-7_6' => [
         'deck' => 'night-event',
         'type' => 'deck',
         'eventType' => 'rival-tribe',
+        'resourceType' => 'meat',
         'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $left = $game->adjustResource('meat-cooked', -$roll);
-            $game->adjustResource('meat', $left);
-            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
-                'number' => $roll,
-                'resource_type' => 'meat',
-            ]);
+            rivalTribe($game, $nightCard, $roll);
         },
     ],
     'night-event-7_7' => [
@@ -636,8 +640,8 @@ $decksData = [
         'onUse' => function (Game $game, $nightCard) {
             // Add 3 raw eggs to supply
             // If 3 raw eggs are not there by night, everyone takes 1 damage
-            $game->nightEventLog('Received ${count} ${resource_type}', ['count' => 3, 'resource_type' => 'dino-egg']);
-            $game->adjustResource('dino-egg', 3);
+            $count = $game->adjustResource('dino-egg', 3)['changed'];
+            $game->nightEventLog('Received ${count} ${resource_type}', ['count' => $count, 'resource_type' => 'dino-egg']);
         },
         'onNight' => function (Game $game, $nightCard, &$data) {
             if (in_array($nightCard['id'], $game->getActiveNightCardIds()) && $game->gameData->getResource('dino-egg') < 3) {
@@ -894,14 +898,10 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'eventType' => 'rival-tribe',
+        'resourceType' => 'dino-egg',
         'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $left = $game->adjustResource('dino-egg-cooked', -$roll);
-            $game->adjustResource('dino-egg', -$left);
-            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
-                'number' => $roll,
-                'resource_type' => 'dino-egg',
-            ]);
+            rivalTribe($game, $nightCard, $roll);
         },
     ],
     'night-event-9_4' => [
@@ -953,13 +953,10 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'eventType' => 'rival-tribe',
+        'resourceType' => 'gem',
         'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $game->adjustResource('gem', -$roll);
-            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
-                'number' => $roll,
-                'resource_type' => 'gem',
-            ]);
+            rivalTribe($game, $nightCard, $roll);
         },
     ],
     'night-event-10_9' => [
@@ -967,13 +964,10 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'eventType' => 'rival-tribe',
+        'resourceType' => 'herb',
         'onUse' => function (Game $game, $nightCard) {
             $roll = $game->rollFireDie();
-            $game->adjustResource('herb', -$roll);
-            $game->nightEventLog('A rival tribe tried to steal ${number} ${resource_type}', [
-                'number' => $roll,
-                'resource_type' => 'herb',
-            ]);
+            rivalTribe($game, $nightCard, $roll);
         },
     ],
 ];

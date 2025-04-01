@@ -104,25 +104,6 @@ class Actions
                     return [];
                 },
             ],
-            'actCook' => [
-                'state' => ['playerTurn'],
-                'stamina' => 1,
-                'type' => 'action',
-                'requires' => function (Game $game, $action) {
-                    $array = $this->getActionSelectable($action['id']);
-                    $variables = $game->gameData->getResources();
-                    $count = 0;
-                    foreach ($array as $key => $value) {
-                        if (array_key_exists($value, $variables)) {
-                            $count += $variables[$value];
-                        }
-                    }
-                    return $count > 0;
-                },
-                'selectable' => function (Game $game) {
-                    return [];
-                },
-            ],
             'actTrade' => [
                 'state' => ['playerTurn'],
                 'stamina' => 1,
@@ -142,6 +123,25 @@ class Actions
                     $tokens = $game->getValidTokens();
                     unset($tokens['trap']);
                     return $tokens;
+                },
+            ],
+            'actCook' => [
+                'state' => ['playerTurn'],
+                'stamina' => 1,
+                'type' => 'action',
+                'requires' => function (Game $game, $action) {
+                    $array = $this->getActionSelectable($action['id']);
+                    $variables = $game->gameData->getResources();
+                    $count = 0;
+                    foreach ($array as $key => $value) {
+                        if (array_key_exists($value, $variables)) {
+                            $count += $variables[$value];
+                        }
+                    }
+                    return $count > 0;
+                },
+                'selectable' => function (Game $game) {
+                    return [];
                 },
             ],
             'actDrawGather' => [
@@ -276,6 +276,7 @@ class Actions
     public function getSkills(): array
     {
         $characters = $this->game->character->getAllCharacterData();
+        $unlocks = $this->game->getUnlockedKnowledge();
         // $character = $this->game->character->getSubmittingCharacter();
         return array_merge(
             ...array_map(function ($c) {
@@ -284,6 +285,20 @@ class Actions
                 }
                 return [];
             }, $characters),
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return array_filter($c['skills'], function ($item) {
+                        return $item['type'] == 'skill';
+                    });
+                }
+                return [];
+            }, $this->getActiveDayEvents()),
+            ...array_map(function ($c) {
+                if (array_key_exists('skills', $c)) {
+                    return $c['skills'];
+                }
+                return [];
+            }, $unlocks),
             ...array_map(function ($c) {
                 if (array_key_exists('skills', $c)) {
                     return array_filter($c['skills'], function ($item) {
@@ -319,6 +334,12 @@ class Actions
                 }
                 return $item['skills'];
             }, $character['equipment']),
+            ...array_map(function ($item) {
+                if (!array_key_exists('skills', $item)) {
+                    return [];
+                }
+                return $item['skills'];
+            }, $character['necklaces']),
             ...array_map(function ($item) use ($character) {
                 if (!array_key_exists('skills', $item)) {
                     return [];
@@ -453,10 +474,12 @@ class Actions
     }
     public function wrapSkills(array $skills, string $action): array
     {
-        return array_map(function ($skill) use ($action) {
-            $this->skillActionCost($action, null, $skill);
-            return $skill;
-        }, $skills);
+        return array_values(
+            array_map(function ($skill) use ($action) {
+                $this->skillActionCost($action, null, $skill);
+                return $skill;
+            }, $skills)
+        );
     }
     public function resetTurnActions()
     {

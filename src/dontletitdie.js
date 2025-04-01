@@ -53,6 +53,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.tradeScreen = new TradeScreen(this);
       this.itemTradeScreen = new ItemTradeScreen(this);
       this.craftScreen = new CraftScreen(this);
+      this.cookScreen = new CookScreen(this);
       this.eatScreen = new EatScreen(this);
       this.reviveScreen = new ReviveScreen(this);
       this.tokenScreen = new TokenScreen(this);
@@ -158,13 +159,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         playerSideContainer.querySelector(`.health .value`).innerHTML = `${character.health ?? 0}/${character.maxHealth ?? 0}`;
         playerSideContainer.querySelector(`.stamina .value`).innerHTML = `${character.stamina ?? 0}/${character.maxStamina ?? 0}`;
         playerSideContainer.querySelector(`.equipment .value`).innerHTML =
-          [...equipments, ...character.dayEvent]
+          [...equipments, ...character.dayEvent, ...character.necklaces]
             .map((d) => `<span class="equipment-item equipment-${d.itemId}">${_(d.name)}</span>`)
             .join(', ') || 'None';
         playerSideContainer.querySelector(`.hindrance .value`).innerHTML =
           hindrance.map((d) => `<span class="hindrance-item hindrance-${d.itemId}">${_(d.name)}</span>`).join(', ') || 'None';
         playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
-        [...equipments, ...character.dayEvent].forEach((d) => {
+        [...equipments, ...character.dayEvent, ...character.necklaces].forEach((d) => {
           addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), _(d.name), () => {
             this.tooltip.show();
             renderImage(d.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace', rotate: d.rotate, centered: true });
@@ -290,13 +291,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           //   });
           // }
           const extraEquipmentElem = extraContainerButtons.querySelector(`.card-extra-equipment`);
-          extraEquipmentElem.style['display'] = !!item3 || character.dayEvent.length > 0 ? `` : 'none';
-          extraEquipmentElem.querySelector('span').innerHTML = (!!item3 ? 1 : 0) + character.dayEvent.length;
+          extraEquipmentElem.style['display'] = !!item3 || character.dayEvent.length > 0 || character.necklaces.length > 0 ? `` : 'none';
+          extraEquipmentElem.querySelector('span').innerHTML = (!!item3 ? 1 : 0) + character.dayEvent.length + character.necklaces.length;
           addClickListener(extraEquipmentElem, _('Extra Equipment'), () => {
             this.tooltip.show();
             if (item3)
               renderImage(item3.id, this.tooltip.renderByElement(), { scale: 1, pos: 'append', rotate: item3.rotate, centered: true });
-            character.dayEvent.forEach((dayEvent) => {
+            [...character.dayEvent, ...character.necklaces].forEach((dayEvent) => {
               renderImage(dayEvent.id, this.tooltip.renderByElement(), {
                 scale: 1,
                 pos: 'append',
@@ -400,10 +401,25 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         );
       }
       resourcesForDisplay.forEach((name) => {
-        if (prevResources[name] != null && prevResources[name] < gameData.game['resources'][name]) {
+        const rawName = name.replace('-cooked', '');
+        if (
+          prevResources[rawName] - 1 === gameData.game['resources'][rawName] &&
+          prevResources[rawName + '-cooked'] + 1 === gameData.game['resources'][rawName + '-cooked']
+        ) {
+          if (rawName === name) {
+            // Move resource to cooked resource
+            this.tweening.addTween(
+              sharedElem.querySelector(`.token.${name}`),
+              sharedElem.querySelector(`.token.${name + '-cooked'}`),
+              name + '-cooked',
+              2,
+              1,
+            );
+          }
+        } else if (prevResources[name] != null && prevResources[name] < gameData.game['resources'][name]) {
           // Discard to Shared Resources
           this.tweening.addTween(
-            availableElem.querySelector(`.token.${name.replace('-cooked', '')}`),
+            availableElem.querySelector(`.token.${rawName}`),
             sharedElem.querySelector(`.token.${name}`),
             name,
             2,
@@ -418,7 +434,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           // Shared Resources to Discard
           this.tweening.addTween(
             sharedElem.querySelector(`.token.${name}`),
-            availableElem.querySelector(`.token.${name.replace('-cooked', '')}`),
+            availableElem.querySelector(`.token.${rawName}`),
             name,
             2,
             prevResources[name] - gameData.game['resources'][name],
@@ -800,7 +816,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     //
     getActionSuffixHTML: function (action) {
       let suffix = '';
-      if (action['character'] != null) suffix += ` (${action['character']})`;
+      if (action['character'] != null && !action['global']) suffix += ` (${action['character']})`;
+      else if (action['characterId'] != null && !action['global']) suffix += ` (${action['characterId']})`;
       if (action['stamina'] != null) suffix += ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
       if (action['health'] != null) suffix += ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
       if (action['unlockCost'] != null) suffix += ` <i class="fa fa-graduation-cap dlid__fkp"></i> ${action['unlockCost']}`;
@@ -827,8 +844,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
                 return (actionId === 'actUseSkill' ? args.availableSkills : args.availableItemSkills)?.forEach((skill) => {
                   const suffix = this.getActionSuffixHTML(skill);
-                  const characterSuffix = skill.characterId ? ` (${skill.characterId})` : '';
-                  this.statusBar.addActionButton(`${skill.name}${characterSuffix}${suffix}`, () => {
+                  this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
                     return this.bgaPerformAction(actionId, { skillId: skill.id });
                   });
                 });
@@ -904,6 +920,28 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   () => {
                     this.onUpdateActionButtons(stateName, args);
                     this.craftScreen.hide();
+                  },
+                  { color: 'secondary' },
+                );
+              } else if (actionId === 'actCook') {
+                this.removeActionButtons();
+                this.cookScreen.show(args);
+                this.statusBar.addActionButton(_('Cook') + `${suffix}`, () => {
+                  if (!this.cookScreen.hasError()) {
+                    this.bgaPerformAction('actCook', {
+                      resourceType: this.cookScreen.getSelectedId(),
+                    })
+                      .then(() => {
+                        this.cookScreen.hide();
+                      })
+                      .catch(console.error);
+                  }
+                });
+                this.statusBar.addActionButton(
+                  _('Cancel'),
+                  () => {
+                    this.onUpdateActionButtons(stateName, args);
+                    this.cookScreen.hide();
                   },
                   { color: 'secondary' },
                 );

@@ -82,9 +82,10 @@ $knowledgeTreeData = [
         'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
-                if ($game->adjustResource('rock', 1) == 0) {
-                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                if ($game->adjustResource('rock', 1)['changed'] > 0) {
+                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
+                        'count' => 1,
                         'resource_type' => $card['resourceType'],
                     ]);
                 }
@@ -96,9 +97,10 @@ $knowledgeTreeData = [
         'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
-                if ($game->adjustResource('wood', 1) == 0) {
-                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                if ($game->adjustResource('wood', 1)['changed'] > 0) {
+                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
+                        'count' => 1,
                         'resource_type' => $card['resourceType'],
                     ]);
                 }
@@ -110,9 +112,10 @@ $knowledgeTreeData = [
         'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
-                if ($game->adjustResource('meat', 1) == 0) {
-                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                if ($game->adjustResource('meat', 1)['changed'] > 0) {
+                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
+                        'count' => 1,
                         'resource_type' => $card['resourceType'],
                     ]);
                 }
@@ -124,9 +127,10 @@ $knowledgeTreeData = [
         'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
-                if ($game->adjustResource('berry', 1) == 0) {
-                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                if ($game->adjustResource('berry', 1)['changed'] > 0) {
+                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
+                        'count' => 1,
                         'resource_type' => $card['resourceType'],
                     ]);
                 }
@@ -138,9 +142,10 @@ $knowledgeTreeData = [
         'onResolveDraw' => function (Game $game, $obj, &$data) {
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
-                if ($game->adjustResource('fiber', 1) == 0) {
-                    $game->notify->all('tree', clienttranslate('Received an additional ${resource_type} from ${action_name}'), [
+                if ($game->adjustResource('fiber', 1)['changed'] > 0) {
+                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
+                        'count' => 1,
                         'resource_type' => $card['resourceType'],
                     ]);
                 }

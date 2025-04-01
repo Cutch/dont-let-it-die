@@ -159,18 +159,21 @@ $tokensData = [
         'type' => 'resource',
         'name' => clientTranslate('Gem'),
         'expansion' => 'hindrance',
+        'worth' => 2,
     ],
     'gem-p' => [
         'count' => 1,
         'type' => 'resource',
         'name' => clientTranslate('Gem'),
         'expansion' => 'hindrance',
+        'worth' => 2,
     ],
     'gem-y' => [
         'count' => 1,
         'type' => 'resource',
         'name' => clientTranslate('Gem'),
         'expansion' => 'hindrance',
+        'worth' => 2,
     ],
     'fiber' => [
         'count' => 8,

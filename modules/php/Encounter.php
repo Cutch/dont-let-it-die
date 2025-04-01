@@ -137,7 +137,7 @@ class Encounter
 
         if (array_key_exists('useCost', $selectedWeapon)) {
             foreach ($selectedWeapon['useCost'] as $key => $value) {
-                if ($this->game->adjustResource($key, -$value) != 0) {
+                if ($this->game->adjustResource($key, -$value)['left'] > 0) {
                     throw new BgaUserException($this->game->translate('Missing resources'));
                 }
             }
