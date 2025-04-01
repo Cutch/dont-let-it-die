@@ -1,10 +1,11 @@
 #board-container {
   position: relative;
 }
-#board-container .fire-wood {
+#fire-pit .fire-wood {
   position: absolute;
-  top: 30px;
-  left: 66px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 .buildings {
   position: absolute;
@@ -38,7 +39,7 @@
 .board .explore {
   position: absolute;
   top: 30px;
-  left: 656px;
+  left: 52px;
 }
 /* Board Container Stop */
 .tokens {
@@ -104,6 +105,11 @@
   background-color: #000;
   border: 4px solid #fff;
   transition: top 1.5s linear, transform 1.5s linear;
+}
+.fire-pit {
+  position: absolute;
+  right: 10px;
+  top: 256px;
 }
 #event-deck-container {
   display: flex;

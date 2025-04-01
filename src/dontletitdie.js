@@ -132,7 +132,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           </div>`,
           );
           renderImage('skull', document.querySelector(`#${characterSideId} .first-player-marker`), {
-            scale: 10,
+            scale: 20,
             pos: 'replace',
             card: false,
             css: 'side-panel-skull',
@@ -200,7 +200,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             );
             // <div class="slot3" style="top: ${(80 * 4) / scale}px;left: ${(183 * 4) / scale}px"></div>
             renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), { scale, pos: 'insert' });
-            renderImage('skull', document.querySelector(`#player-${character.name} .first-player-marker`), { scale: 4, pos: 'replace' });
+            renderImage('skull', document.querySelector(`#player-${character.name} .first-player-marker`), { scale: 8, pos: 'replace' });
           }
           document.querySelector(`#player-${character.name} .card`).style['outline'] = character?.isActive
             ? `5px solid #fff` //#${character.playerColor}
@@ -342,10 +342,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (!gameData.resourcesAvailable || !gameData.game) return;
 
       const firewoodElem = document.querySelector(`#board-container .fire-wood`);
-      firewoodElem.innerHTML = '';
-      this.updateResource('wood', firewoodElem, gameData.game['resources']['fireWood'] ?? 0, {
-        warn: (gameData.game['resources']['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
-      });
 
       // Shared Resource Pool
       let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
@@ -441,18 +437,18 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           );
         }
       });
-      if (gameData.game.buildings.length > 0) {
-        const div = document.querySelector(`#board-container .buildings`);
-        if (div.childNodes.length == 0) {
-          gameData.game.buildings.forEach((building) => {
-            renderImage(building.name, div, { scale: 2, pos: 'append' });
-            addClickListener(div, 'Buildings', () => {
-              this.tooltip.show();
-              renderImage(building.name, this.tooltip.renderByElement(), { scale: 0.5, pos: 'replace' });
-            });
-          });
-        }
-      }
+      // if (gameData.game.buildings.length > 0) {
+      //   const div = document.querySelector(`#board-container .buildings`);
+      //   if (div.childNodes.length == 0) {
+      //     gameData.game.buildings.forEach((building) => {
+      //       renderImage(building.name, div, { scale: 2, pos: 'append' });
+      //       addClickListener(div, 'Buildings', () => {
+      //         this.tooltip.show();
+      //         renderImage(building.name, this.tooltip.renderByElement(), { scale: 0.5, pos: 'replace' });
+      //       });
+      //     });
+      //   }
+      // }
     },
     updateResource: function (name, elem, count, { warn = false } = {}) {
       elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
@@ -473,6 +469,21 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       Object.keys(gameData.campEquipmentCounts).forEach((name) => {
         this.updateItem(name, campElem, gameData.campEquipmentCounts?.[name] ?? 0);
       });
+      let buildingItems = document.querySelector(`#building-items-container .items`);
+      if (!buildingItems) {
+        $('game_play_area').insertAdjacentHTML(
+          'beforeend',
+          `<div id="building-items-container" class="dlid__container"><h3>${_('Buildings')}</h3><div class="items"></div></div>`,
+        );
+        buildingItems = document.querySelector(`#building-items-container .items`);
+      }
+      buildingItems.innerHTML = '';
+      $('building-items-container').style.display = gameData.game.buildings.length > 0 ? '' : 'none';
+      if (gameData.game.buildings.length > 0) {
+        gameData.game.buildings.forEach((building) => {
+          this.updateItem(building.name, buildingItems, null);
+        });
+      }
       // Shared Resource Pool
       // Available Resource Pool
       let availableElem = document.querySelector(`#items-container .items`);
@@ -491,7 +502,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       }
     },
     updateItem: function (name, elem, count) {
-      elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
+      elem.insertAdjacentHTML(
+        'beforeend',
+        `<div class="token ${name}">${count != null ? '<div class="counter dot">${count}</div>' : ''}</div>`,
+      );
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), name, () => {
         this.tooltip.show();
@@ -515,13 +529,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         .getElementById('game_play_area')
         .insertAdjacentHTML(
           'beforeend',
-          `<div id="board-container" class="dlid__container"><div class="board"><div class="fire-wood"></div><div class="buildings"></div>${decks
+          `<div id="board-container" class="dlid__container"><div class="board"><div class="buildings"></div>${decks
             .map((d) => `<div class="${d.name}"></div>`)
             .join('')}</div></div>`,
         );
-      addClickListener(document.querySelector(`#board-container .fire-wood`), 'Add Fire Wood', () => {
-        this.bgaPerformAction(`actAddWood`);
-      });
 
       renderImage(`board`, document.querySelector(`#board-container > .board`), { scale: 2, pos: 'insert' });
       decks.forEach(({ name: deck }) => {
@@ -615,7 +626,21 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         trackContainer
           .querySelector(`.track-${gameData.trackDifficulty}`)
           .insertAdjacentHTML('beforeend', `<div id="track-marker" class="marker"></div>`);
+        trackContainer
+          .querySelector(`.track-${gameData.trackDifficulty}`)
+          .insertAdjacentHTML('beforeend', `<div id="fire-pit" class="fire-pit"><div class="fire-wood"></div></div>`);
+        renderImage(`fire`, $('fire-pit'), { scale: 4, pos: 'insert' });
+
+        addClickListener(document.querySelector(`#fire-pit .fire-wood`), 'Add Fire Wood', () => {
+          this.bgaPerformAction(`actAddWood`);
+        });
       }
+      const firewoodElem = document.querySelector(`#fire-pit .fire-wood`);
+      firewoodElem.innerHTML = '';
+      this.updateResource('wood', firewoodElem, gameData.game['resources']['fireWood'] ?? 0, {
+        warn: (gameData.game['resources']['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
+      });
+
       const marker = $('track-marker');
       marker.style.top = `${(gameData.game.day - 1) * 35 + 236}px`;
 
