@@ -339,7 +339,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (!elem.classList.contains('disabled')) elem.classList.add('disabled');
     },
     updateResources: function (gameData) {
-      if (!gameData.resourcesAvailable || !gameData.game) return;
+      if (!gameData || !gameData.resourcesAvailable || !gameData.game) return;
 
       const firewoodElem = document.querySelector(`#board-container .fire-wood`);
 
@@ -504,7 +504,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     updateItem: function (name, elem, count) {
       elem.insertAdjacentHTML(
         'beforeend',
-        `<div class="token ${name}">${count != null ? '<div class="counter dot">${count}</div>' : ''}</div>`,
+        `<div class="token ${name}">${count != null ? `<div class="counter dot">${count}</div>` : ''}</div>`,
       );
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), name, () => {
@@ -764,6 +764,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       const isActive = this.isCurrentPlayerActive();
 
       console.log('Entering state: ' + stateName, args);
+      this.updateResources(args.args);
       switch (stateName) {
         case 'tooManyItems':
           if (isActive) this.tooManyItemsScreen.show(args.args);
@@ -792,7 +793,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           break;
         case 'playerTurn':
           this.updatePlayers(args.args);
-          this.updateResources(args.args);
           this.updateItems(args.args);
           this.updateKnowledgeTree(args.args);
           this.updateTrack(args.args);
@@ -868,6 +868,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       const actions = args?.actions;
       // this.currentActions = actions;
       console.log('onUpdateActionButtons', args, actions, stateName);
+      this.updateResources(args);
       const isActive = this.isCurrentPlayerActive();
       if (isActive && stateName && actions != null) {
         this.removeActionButtons();
@@ -1186,6 +1187,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (notification.args.gameData) {
         notification.args.gameData.gamestate = notification.args.gamestate;
       }
+      this.updateResources(notification.args.gameData);
     },
     notification_rollFireDie: async function (notification) {
       this.notificationWrapper(notification);
@@ -1208,7 +1210,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.notificationWrapper(notification);
       console.log('notification_updateGameData', notification);
       this.updatePlayers(notification.args.gameData);
-      this.updateResources(notification.args.gameData);
       this.updateItems(notification.args.gameData);
       this.updateKnowledgeTree(notification.args.gameData);
       if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
@@ -1227,7 +1228,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.notificationWrapper(notification);
       console.log('notification_tokenUsed', notification);
       this.updatePlayers(notification.args.gameData);
-      this.updateResources(notification.args.gameData);
       this.updateItems(notification.args.gameData);
       this.updateKnowledgeTree(notification.args.gameData);
       if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);

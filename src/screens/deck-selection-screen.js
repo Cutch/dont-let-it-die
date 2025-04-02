@@ -53,7 +53,7 @@ class DeckSelectionScreen {
       renderImage(name + '-back', elem.querySelector(`.token.${name}`), { scale: deckScaling[name] ?? 1, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), allSprites[name + '-back'].options.name, () => selectCallback());
     };
-    Object.keys(gameData.game.deckSelection.decks).forEach((deckName) => {
+    gameData.game.deckSelection.decks.forEach((deckName) => {
       renderItem(deckName, deckSelectionElem, () => {
         if (this.itemSelected) {
           document.querySelector(`#deck-selection-screen .token.${this.itemSelected} .card`).style['outline'] = '';

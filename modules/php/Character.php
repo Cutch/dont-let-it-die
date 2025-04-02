@@ -183,8 +183,8 @@ class Character
             ];
         }, array_filter(explode(',', $characterData['necklace'] ?? '')));
 
-        $hindrances = array_map(function ($itemId) {
-            return $this->game->data->expansion[$itemId];
+        $hindrances = array_map(function ($itemId) use ($characterName) {
+            return [...$this->game->data->expansion[$itemId], 'character_name' => $characterName, 'characterId' => $characterName];
         }, array_filter(explode(',', $characterData['hindrance'] ?? '')));
         $characterData['mentalHindrance'] = array_values(
             array_filter($hindrances, function ($hindrance) {

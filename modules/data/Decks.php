@@ -437,7 +437,7 @@ $decksData = [
         'eventType' => 'rival-tribe',
         'resourceType' => 'fiber',
         'onUse' => function (Game $game, $nightCard) {
-            $roll = $game->rollFireDie();
+            $roll = $game->rollFireDie(clienttranslate('Night Event'));
             rivalTribe($game, $nightCard, $roll);
         },
     ],
@@ -447,7 +447,7 @@ $decksData = [
         'eventType' => 'rival-tribe',
         'resourceType' => 'berry',
         'onUse' => function (Game $game, $nightCard) {
-            $roll = $game->rollFireDie();
+            $roll = $game->rollFireDie(clienttranslate('Night Event'));
             rivalTribe($game, $nightCard, $roll);
         },
     ],
@@ -464,7 +464,7 @@ $decksData = [
         'type' => 'deck',
         'onDraw' => function (Game $game, $nightCard, &$data) {
             $card = $data['card'];
-            $roll = $game->rollFireDie();
+            $roll = $game->rollFireDie(clienttranslate('Night Event'));
             if ($roll == 0) {
                 $game->character->adjustActiveHealth(-1);
                 $game->nightEventLog('${character_name} was struck by lightning (1 damage)');
@@ -484,7 +484,7 @@ $decksData = [
         'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Mammoths storm the camp');
             $game->character->updateAllCharacterData(function ($character) use ($game) {
-                $roll = $game->rollFireDie($character['character_name']);
+                $roll = $game->rollFireDie(clienttranslate('Night Event'), $character['character_name']);
                 // On blank roll take a damage
                 if ($roll == 0) {
                     $game->character->adjustHealth($character['character_name'], -1);
@@ -565,7 +565,7 @@ $decksData = [
         'eventType' => 'rival-tribe',
         'resourceType' => 'wood',
         'onUse' => function (Game $game, $nightCard) {
-            $roll = $game->rollFireDie();
+            $roll = $game->rollFireDie(clienttranslate('Night Event'));
             rivalTribe($game, $nightCard, $roll);
         },
     ],
@@ -575,7 +575,7 @@ $decksData = [
         'eventType' => 'rival-tribe',
         'resourceType' => 'rock',
         'onUse' => function (Game $game, $nightCard) {
-            $roll = $game->rollFireDie();
+            $roll = $game->rollFireDie(clienttranslate('Night Event'));
             rivalTribe($game, $nightCard, $roll);
         },
     ],
@@ -585,7 +585,7 @@ $decksData = [
         'eventType' => 'rival-tribe',
         'resourceType' => 'meat',
         'onUse' => function (Game $game, $nightCard) {
-            $roll = $game->rollFireDie();
+            $roll = $game->rollFireDie(clienttranslate('Night Event'));
             rivalTribe($game, $nightCard, $roll);
         },
     ],
@@ -900,7 +900,7 @@ $decksData = [
         'eventType' => 'rival-tribe',
         'resourceType' => 'dino-egg',
         'onUse' => function (Game $game, $nightCard) {
-            $roll = $game->rollFireDie();
+            $roll = $game->rollFireDie(clienttranslate('Night Event'));
             rivalTribe($game, $nightCard, $roll);
         },
     ],
@@ -955,7 +955,7 @@ $decksData = [
         'eventType' => 'rival-tribe',
         'resourceType' => 'gem',
         'onUse' => function (Game $game, $nightCard) {
-            $roll = $game->rollFireDie();
+            $roll = $game->rollFireDie(clienttranslate('Night Event'));
             rivalTribe($game, $nightCard, $roll);
         },
     ],
@@ -966,7 +966,7 @@ $decksData = [
         'eventType' => 'rival-tribe',
         'resourceType' => 'herb',
         'onUse' => function (Game $game, $nightCard) {
-            $roll = $game->rollFireDie();
+            $roll = $game->rollFireDie(clienttranslate('Night Event'));
             rivalTribe($game, $nightCard, $roll);
         },
     ],

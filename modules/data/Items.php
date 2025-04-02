@@ -233,7 +233,7 @@ $itemsData = [
                         $data['perDay'] = 2 - getUsePerDay($char['id'] . $skill['id'], $game);
                     }
                 },
-                'onEncounter' => function (Game $game, $skill, &$data) {
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
                     $damageTaken = $game->encounter->countDamageTaken($data);
                     $char = $game->character->getCharacterData($skill['characterId']);
 
@@ -300,7 +300,7 @@ $itemsData = [
                 'state' => ['interrupt'],
                 'interruptState' => ['resolveEncounter'],
                 'perDay' => 1,
-                'onEncounter' => function (Game $game, $skill, &$data) {
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
                     $damageTaken = $game->encounter->countDamageTaken($data);
                     $char = $game->character->getCharacterData($skill['characterId']);
 
@@ -699,10 +699,10 @@ $itemsData = [
                 $data['health'] = clamp($data['health'], 0, $data['maxHealth']);
             }
         },
-        'onEncounter' => function (Game $game, $item, &$data) {
+        'onEncounterPre' => function (Game $game, $item, &$data) {
             $damageTaken = $game->encounter->countDamageTaken($data);
             $char = $game->character->getCharacterData($item['characterId']);
-            if ($char['isActive'] && $damageTaken > 0 && $game->rollFireDie($item['characterId']) == 1) {
+            if ($char['isActive'] && $damageTaken > 0 && $game->rollFireDie($item['name'], $item['characterId']) == 1) {
                 $data['willTakeDamage'] -= 1;
             }
         },
@@ -769,7 +769,7 @@ $itemsData = [
                 'state' => ['interrupt'],
                 'interruptState' => ['resolveEncounter'],
                 'perDay' => 1,
-                'onEncounter' => function (Game $game, $skill, &$data) {
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
                     $damageTaken = $game->encounter->countDamageTaken($data);
                     $char = $game->character->getCharacterData($skill['characterId']);
 
@@ -834,19 +834,61 @@ $itemsData = [
         'damage' => 1,
         // 'character' => 'Rex',
         'cost' => [],
-        'onEncounter' => function (Game $game, $item, &$data) {
+        'onEncounterPre' => function (Game $game, $item, &$data) {
             $char = $game->character->getCharacterData($item['characterId']);
             if ($char['isActive']) {
-                $data['characterDamage'] = $game->rollFireDie($item['characterId']);
+                $data['characterDamage'] = $game->rollFireDie($item['name'], $item['characterId']);
             }
         },
         'skills' => [
             'skill1' => [
                 'type' => 'item-skill',
+                'name' => clienttranslate('Increase Attack (1 fkp)'),
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
+                    if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $game->adjustResource('fkp', -1);
+                        clearItemSkills($data['skills'], $skill['itemId']);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && $game->gameData->getResource('fkp') >= 1;
+                },
+            ],
+            'skill2' => [
+                'type' => 'item-skill',
+                'name' => clienttranslate('Increase Attack (2 fkp)'),
+                'state' => ['interrupt'],
+                'interruptState' => ['resolveEncounter'],
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
+                    if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $game->adjustResource('fkp', -2);
+                        clearItemSkills($data['skills'], $skill['itemId']);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'] && $game->gameData->getResource('fkp') >= 2;
+                },
+            ],
+            'skill3' => [
+                'type' => 'item-skill',
                 'name' => clienttranslate('Increase Attack (3 fkp)'),
                 'state' => ['interrupt'],
                 'interruptState' => ['resolveEncounter'],
-                'onEncounter' => function (Game $game, $skill, &$data) {
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
                     if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
                         $game->actInterrupt->addSkillInterrupt($skill);
                     }
@@ -854,6 +896,7 @@ $itemsData = [
                 'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                     if ($skill['id'] == $activatedSkill['id']) {
                         $game->adjustResource('fkp', -3);
+                        clearItemSkills($data['skills'], $skill['itemId']);
                     }
                 },
                 'requires' => function (Game $game, $skill) {
@@ -909,7 +952,7 @@ $itemsData = [
                 'state' => ['interrupt'],
                 'interruptState' => ['resolveEncounter'],
                 'stamina' => 2,
-                'onEncounter' => function (Game $game, $skill, &$data) {
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
                     if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
                         $game->actInterrupt->addSkillInterrupt($skill);
                     }
@@ -929,7 +972,7 @@ $itemsData = [
                 'name' => clienttranslate('Discard Bola'),
                 'state' => ['interrupt'],
                 'interruptState' => ['resolveEncounter'],
-                'onEncounter' => function (Game $game, $skill, &$data) {
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
                     if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
                         $game->actInterrupt->addSkillInterrupt($skill);
                     }
@@ -969,7 +1012,7 @@ $itemsData = [
                 'state' => ['interrupt'],
                 'interruptState' => ['resolveEncounter'],
                 'perDay' => 1,
-                'onEncounter' => function (Game $game, $skill, &$data) {
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
                     $game->actInterrupt->addSkillInterrupt($skill);
                 },
                 'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
@@ -1043,7 +1086,7 @@ $itemsData = [
         'skills' => [
             'skill1' => [
                 'type' => 'item-skill',
-                'name' => clienttranslate('Re-Roll Fire Die'),
+                'name' => clienttranslate('Re-Roll'),
                 'state' => ['interrupt'],
                 'interruptState' => ['playerTurn'],
                 'perDay' => 1,
@@ -1062,7 +1105,7 @@ $itemsData = [
                             ...$char,
                             'active_character_name' => $game->character->getTurnCharacter()['character_name'],
                         ]);
-                        $data['data']['roll'] = $game->rollFireDie($char['character_name']);
+                        $data['data']['roll'] = $game->rollFireDie($skill['parentName'], $char['character_name']);
                         usePerDay($char['id'] . 'gem-p-necklace', $game);
                     }
                 },

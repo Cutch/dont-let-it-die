@@ -27,6 +27,12 @@ class Hooks
             }, $characters),
             ...array_map(function ($c) {
                 return $c['necklaces'];
+            }, $characters),
+            ...array_map(function ($c) {
+                return $c['physicalHindrance'];
+            }, $characters),
+            ...array_map(function ($c) {
+                return $c['mentalHindrance'];
             }, $characters)
         );
         $skills = array_merge(
@@ -87,185 +93,42 @@ class Hooks
         );
         return [...$actions, ...$unlocks, ...$buildings, ...$characters, ...$skills, ...$equipment, ...$activeNightCards];
     }
-    private function callHooks($functionName, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
+    private function callHooks($functionName, $args, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
     {
+        $this->checkInterrupt = array_key_exists('checkInterrupt', $args) ? $args['checkInterrupt'] : false;
         $hooks = $this->getHook();
         if ($functionName == 'onEncounter') {
             $this->game->log('getHook start', $hooks);
         }
         if ($this->checkInterrupt) {
-            $hooks = array_filter($hooks, function ($object) use ($data1, $data2, $data3, $data4) {
+            $hooks = array_filter($hooks, function ($object) use ($data1, $data2, $data3, $data4, $args) {
                 // $interruptData = array_filter([$data1, $data2, $data3, $data4]);
                 // $interruptData = $interruptData[sizeof($interruptData) - 1];
                 return (!array_key_exists('state', $object) || in_array('interrupt', $object['state'])) &&
                     (!array_key_exists('interruptState', $object) || in_array($data1['currentState'], $object['interruptState'])) &&
-                    (!array_key_exists('requires', $object) || $object['requires']($this->game, $object, $data1, $data2, $data3, $data4));
+                    (!array_key_exists('requires', $object) ||
+                        $object['requires']($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4));
             });
         }
         foreach ($hooks as $i => $object) {
+            if (array_key_exists('suffix', $args)) {
+                if (array_key_exists($functionName . $args['suffix'], $object)) {
+                    $object[$functionName . $args['suffix']]($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
+                }
+            }
             if (array_key_exists($functionName, $object)) {
-                $object[$functionName]($this->game, $object, $data1, $data2, $data3, $data4);
+                $object[$functionName]($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
             }
         }
         $this->checkInterrupt = false;
     }
-    function onGetCharacterData(&$data, $checkInterrupt = false)
+    function onInterrupt(&$data, $activatedSkill, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onGetValidActions(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onGetActionCost(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onGetActionSelectable(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onMorning(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onMorningAfter(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onNight(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onNightDrawCard(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onDraw(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-    }
-    function onActDraw(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-    }
-    function onResolveDraw(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-    }
-    function onEncounter(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onUseSkill(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-    }
-    function onEat(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onGetEatData(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onCraft(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onCraftAfter(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onRollDie(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onInvestigateFire(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onItemTrade(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onGetTradeRatio(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onDeckSelection(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onCharacterSelection(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onCardSelection(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onResourceSelection(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onResourceSelectionOptions(&$data, $checkInterrupt = false)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
-        return $data;
-    }
-    function onInterrupt(&$data, $activatedSkill, $checkInterrupt = true)
-    {
-        $this->checkInterrupt = $checkInterrupt;
-        // var_dump(json_encode([$data, $activatedSkill]));
-        $this->callHooks(__FUNCTION__, $data, $activatedSkill);
+        // Default checkInterrupt to true
+        if (!array_key_exists('checkInterrupt', $args)) {
+            $args['checkInterrupt'] = true;
+        }
+        $this->callHooks(__FUNCTION__, $args, $data, $activatedSkill);
         return $data;
     }
     public function reconnectHooks(&$jsonData, $underlyingData)
@@ -276,95 +139,206 @@ class Hooks
             }
         });
     }
-    function onAdjustStamina(&$data, $checkInterrupt = false)
+    function onGetCharacterData(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onAdjustHealth(&$data, $checkInterrupt = false)
+    function onGetValidActions(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onCheckSkillRequirements(&$data, $checkInterrupt = false)
+    function onGetActionCost(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onGetActionSelectable(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onMorning(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onMorningAfter(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onNight(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onNightDrawCard(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onDraw(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+    }
+    function onActDraw(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+    }
+    function onResolveDraw(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+    }
+    function onEncounter(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onUseSkill(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+    }
+    function onEat(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onGetEatData(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onCraft(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onCraftAfter(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onRollDie(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onInvestigateFire(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onItemTrade(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onGetTradeRatio(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onDeckSelection(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onCharacterSelection(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onCardSelection(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onResourceSelection(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onResourceSelectionOptions(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onAdjustStamina(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onAdjustHealth(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onCheckSkillRequirements(&$data, array $args = [])
     {
         $requires = ['requires' => true];
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data, $requires);
+        $this->callHooks(__FUNCTION__, $args, $data, $requires);
         return $requires['requires'];
     }
-    function onCook(&$data, $checkInterrupt = false)
+    function onCook(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onIncapacitation(&$data, $checkInterrupt = false)
+    function onIncapacitation(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onDayEvent(&$data, $checkInterrupt = false)
+    function onDayEvent(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onEndTurn(&$data, $checkInterrupt = false)
+    function onEndTurn(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onAcquireHindrance(&$data, $checkInterrupt = false)
+    function onAcquireHindrance(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onMaxHindrance(&$data, $checkInterrupt = false)
+    function onMaxHindrance(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onGetUnlockCost(&$data, $checkInterrupt = false)
+    function onGetUnlockCost(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onGetReviveCost(&$data, $checkInterrupt = false)
+    function onGetReviveCost(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onAddFireWood(&$data, $checkInterrupt = false)
+    function onAddFireWood(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onGetMaxBuildingCount(&$data, $checkInterrupt = false)
+    function onGetMaxBuildingCount(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onUnlock(&$data, $checkInterrupt = false)
+    function onUnlock(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onGetResourceMax(&$data, $checkInterrupt = false)
+    function onGetResourceMax(&$data, array $args = [])
     {
-        $this->checkInterrupt = $checkInterrupt;
-        $this->callHooks(__FUNCTION__, $data);
+        $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
 }

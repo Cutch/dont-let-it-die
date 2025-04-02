@@ -17,7 +17,7 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('Tracking'),
         'unlockCost' => 5,
-        'onEncounter' => function (Game $game, $unlock, &$data) {
+        'onEncounterPre' => function (Game $game, $unlock, &$data) {
             $data['willReceiveMeat'] += 1;
         },
     ],
@@ -45,7 +45,7 @@ $upgradesData = [
                         // $interruptState = $game->actInterrupt->getState('actInvestigateFire');
                         $game->adjustResource('rock', -1);
                         $char = $game->character->getTurnCharacterId();
-                        $data['data']['roll'] = $data['data']['roll'] + $game->rollFireDie($char) - 1;
+                        $data['data']['roll'] = $data['data']['roll'] + $game->rollFireDie($skill['parentName'], $char) - 1;
                         usePerDay($char . 'flint', $game);
                     }
                 },
@@ -301,9 +301,9 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('Smoke Cover'),
         'unlockCost' => 4,
-        'onNightDrawCard' => function (Game $game, $item, &$data) {
+        'onNightDrawCard' => function (Game $game, $unlock, &$data) {
             if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
-                $roll = min($game->rollFireDie(), $game->rollFireDie());
+                $roll = min($game->rollFireDie($unlock['name']), $game->rollFireDie($unlock['name']));
                 rivalTribe($game, $data, $roll);
 
                 $data['onUse'] = false;
@@ -315,10 +315,10 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('Revenge'),
         'unlockCost' => 8,
-        'onNightDrawCard' => function (Game $game, $item, &$data) {
+        'onNightDrawCard' => function (Game $game, $unlock, &$data) {
             if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
                 $resourceType = $data['card']['resourceType'];
-                $roll = $game->rollFireDie();
+                $roll = $game->rollFireDie($unlock['name']);
                 if ($resourceType == 'gem') {
                     $left = $game->adjustResource('gem-y', $roll)['left'];
                     $left = $game->adjustResource('gem-p', $left)['left'];
@@ -553,7 +553,7 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('Torches'),
         'unlockCost' => 6,
-        'onEncounter' => function (Game $game, $unlock, &$data) {
+        'onEncounterPre' => function (Game $game, $unlock, &$data) {
             if ($data['willTakeDamage'] > 0) {
                 $data['willTakeDamage'] -= 1;
             }
@@ -564,7 +564,7 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('Tempering'),
         'unlockCost' => 7,
-        'onEncounter' => function (Game $game, $unlock, &$data) {
+        'onEncounterPre' => function (Game $game, $unlock, &$data) {
             if ($data['characterDamage'] > 0) {
                 $data['characterDamage'] += 1;
             }

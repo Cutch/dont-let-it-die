@@ -165,7 +165,7 @@ class Game extends \Table
         if ($decks == null) {
             $decks = $this->decks->getAllDeckNames();
         }
-        $this->gameData->set('deckSelection', ['decks' => $decks]);
+        $this->gameData->set('deckSelection', ['decks' => array_values($decks)]);
         $this->gamestate->nextState('deckSelection');
     }
     public function cardDrawEvent($card, $deck, $arg = [])
@@ -180,7 +180,7 @@ class Game extends \Table
         $this->getDecks($result);
         $this->notify->all('cardDrawn', '', $result);
         $partials = $this->gameData->get('partials');
-        if ($arg['partial']) {
+        if (array_key_exists('partial', $arg) && $arg['partial']) {
             $partials[$deck] = $card;
             $this->gameData->set('partials', $partials);
         } elseif (array_key_exists($deck, $partials)) {
@@ -218,7 +218,7 @@ class Game extends \Table
         $difference = $currentCount - $newValue + $change;
         return ['left' => $difference, 'changed' => $newValue - $currentCount];
     }
-    public function rollFireDie(?string $characterName = null): int
+    public function rollFireDie(string $actionName, ?string $characterName = null): int
     {
         $rand = rand(1, 6);
         $value = 0;
@@ -233,18 +233,20 @@ class Game extends \Table
         $data = [
             'value' => $value,
         ];
-        $data['sendNotification'] = function () use ($data, $characterName, &$notificationSent) {
+        $data['sendNotification'] = function () use ($data, $characterName, &$notificationSent, $actionName) {
             $sideNum = $data['value'] == 0 ? 1 : ($data['value'] == 3 ? 6 : ($data['value'] == 2 ? 5 : 2));
             if ($characterName) {
-                $this->notify->all('rollFireDie', clienttranslate('${character_name} rolled a ${value}'), [
+                $this->notify->all('rollFireDie', clienttranslate('${character_name} rolled a ${value} ${action_name}'), [
                     'value' => $data['value'] == 0 ? clienttranslate('blank') : $data['value'],
                     'character_name' => $this->getCharacterHTML($characterName),
                     'roll' => $sideNum,
+                    'action_name' => '(' . $actionName . ')',
                 ]);
             } else {
-                $this->notify->all('rollFireDie', clienttranslate('The fire die rolled a ${value}'), [
+                $this->notify->all('rollFireDie', clienttranslate('The fire die rolled a ${value} ${action_name}'), [
                     'value' => $data['value'] == 0 ? clienttranslate('blank') : $data['value'],
                     'roll' => $sideNum,
+                    'action_name' => '(' . $actionName . ')',
                 ]);
             }
             $notificationSent = true;
@@ -1022,7 +1024,7 @@ class Game extends \Table
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
                 $_this->activeCharacterEventLog('investigated the fire');
-                $roll = $_this->rollFireDie($character['character_name']);
+                $roll = $_this->rollFireDie(clienttranslate('Investigate Fire'), $character['character_name']);
                 $this->log('roll', $roll);
                 return ['roll' => $roll, 'originalRoll' => $roll];
             },
@@ -1082,6 +1084,7 @@ class Game extends \Table
     public function argDeckSelection()
     {
         $result = ['actions' => [], 'character_name' => $this->getCharacterHTML()];
+        $this->getGameData($result);
         $this->getDecks($result);
 
         return $result;

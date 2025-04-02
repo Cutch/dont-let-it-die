@@ -92,7 +92,11 @@ class GameData
     }
     public function getPreviousResources(): array
     {
-        return $this->resourcesBeforeTransaction;
+        $resourcesBeforeTransaction = $this->resourcesBeforeTransaction;
+        if (array_key_exists('resources', $this->cachedGameData)) {
+            $this->resourcesBeforeTransaction = $this->cachedGameData['resources'];
+        }
+        return $resourcesBeforeTransaction;
     }
     public function set($name, $value)
     {

@@ -53,7 +53,7 @@ $charactersData = [
                 },
             ],
         ],
-        'onEncounter' => function (Game $game, $char, &$data) {
+        'onEncounterPost' => function (Game $game, $char, &$data) {
             if ($char['isActive'] && $data['encounterHealth'] <= $data['characterDamage']) {
                 $data['stamina'] += 2;
                 $game->activeCharacterEventLog('gained ${count} ${character_resource}', ['count' => 2, 'character_resource' => 'stamina']);
@@ -72,7 +72,7 @@ $charactersData = [
                 unset($data['actDrawHunt']);
             }
         },
-        'onEncounter' => function (Game $game, $char, &$data) {
+        'onEncounterPre' => function (Game $game, $char, &$data) {
             if ($char['isActive']) {
                 $data['escape'] = true;
             }
@@ -108,7 +108,7 @@ $charactersData = [
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
-                'name' => clienttranslate('Re-Roll Fire Die'),
+                'name' => clienttranslate('Re-Roll'),
                 'state' => ['interrupt'],
                 'interruptState' => ['playerTurn'],
                 'perDay' => 1,
@@ -126,7 +126,7 @@ $charactersData = [
                             ...$char,
                             'active_character_name' => $game->character->getTurnCharacter()['character_name'],
                         ]);
-                        $data['data']['roll'] = $game->rollFireDie($char['character_name']);
+                        $data['data']['roll'] = $game->rollFireDie($skill['name'], $char['character_name']);
                         usePerDay($char['id'] . $skill['id'], $game);
                     }
                 },
@@ -254,7 +254,7 @@ $charactersData = [
                 },
             ],
         ],
-        'onEncounter' => function (Game $game, $char, $data) {
+        'onEncounterPost' => function (Game $game, $char, $data) {
             if ($data['encounterHealth'] <= $data['characterDamage']) {
                 $data['stamina'] += 1;
 
@@ -367,13 +367,13 @@ $charactersData = [
                 },
             ],
         ],
-        // 'onEncounter' => function (Game $game, $char, &$data) {
-        //     if ($char['isActive'] && $data['name'] == 'Beast') {
-        //         $data['encounterHealth'] = 0;
-        //         $data['willTakeDamage'] = 0;
-        //         $data['willReceiveMeat'] = 1;
-        //     }
-        // },
+        'onEncounterPre' => function (Game $game, $char, &$data) {
+            if ($char['isActive'] && $data['name'] == 'Beast') {
+                $data['encounterHealth'] = 0;
+                $data['willTakeDamage'] = 0;
+                $data['willReceiveMeat'] = 1;
+            }
+        },
     ],
     'Atouk' => [
         'type' => 'character',
@@ -555,10 +555,10 @@ $charactersData = [
                 $data['stamina'] = 5;
             }
         },
-        'onInvestigateFire' => function (Game $game, $skill, &$data) {
-            $char = $game->character->getCharacterData($skill['characterId']);
+        'onInvestigateFire' => function (Game $game, $char, &$data) {
+            $char = $game->character->getCharacterData($char['characterId']);
             if (!$char['isActive']) {
-                $roll2 = $game->rollFireDie();
+                $roll2 = $game->rollFireDie($char['character_name']);
                 $data['roll'] += $roll2;
             }
         },
@@ -571,7 +571,7 @@ $charactersData = [
                 'onUse' => function (Game $game, $skill) {
                     $skill['sendNotification']();
                     $game->activeCharacterEventLog('received ${count} ${resource_type}', [
-                        'count' => $game->rollFireDie(),
+                        'count' => $game->rollFireDie($skill['name']),
                         'resource_type' => 'fish',
                     ]);
                 },
@@ -647,7 +647,7 @@ $charactersData = [
                 $game->activeCharacterEventLog('All tribe members gained 1 health after the rival tribe event');
             }
         },
-        'onEncounter' => function (Game $game, $char, &$data) {
+        'onEncounterPost' => function (Game $game, $char, &$data) {
             if ($data['encounterHealth'] <= $data['characterDamage']) {
                 if (
                     sizeof(
@@ -814,7 +814,7 @@ $charactersData = [
                 'perDay' => 1,
                 'onUse' => function (Game $game, $skill) {
                     $skill['sendNotification']();
-                    $value = $game->rollFireDie($skill['characterId']);
+                    $value = $game->rollFireDie($skill['name'], $skill['characterId']);
                     usePerDay($skill['id'], $game);
                     if ($value == 0) {
                         $game->character->getActiveStamina(2);
@@ -1074,7 +1074,7 @@ $charactersData = [
                         $data['health'] = $damageTaken;
                     }
                 },
-                'onEncounter' => function (Game $game, $skill, &$data) {
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
                     $damageTaken = $game->encounter->countDamageTaken($data);
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if (!$char['isActive'] && $damageTaken > 0) {
@@ -1192,7 +1192,7 @@ $charactersData = [
                         subtractPerForever('hide-token', $game);
                     }
                 },
-                'onEncounter' => function (Game $game, $skill, &$data) {
+                'onEncounterPre' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
                     if ($char['isActive']) {
                         $game->actInterrupt->addSkillInterrupt($skill);
@@ -1242,7 +1242,7 @@ $charactersData = [
                 unset($data['actInvestigateFire']);
             }
         },
-        'onEncounter' => function (Game $game, $char, &$data) {
+        'onEncounterPre' => function (Game $game, $char, &$data) {
             if ($char['isActive']) {
                 $data['characterDamage'] = 2;
             }

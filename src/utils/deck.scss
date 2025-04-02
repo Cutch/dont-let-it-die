@@ -124,6 +124,9 @@
   align-items: center;
   justify-content: center;
 }
+.flip-card {
+  pointer-events: none;
+}
 /* This container is needed to position the front and back side */
 .flip-card-inner {
   text-align: center;

@@ -34,7 +34,7 @@ class ActInterrupt
             if (!$data) {
                 return;
             }
-            $res = $hook($data, false);
+            $res = $hook($data, ['suffix' => 'Pre']);
             $interrupt = $res && array_key_exists('interrupt', $res);
             $interruptData = [
                 'data' => $data,
@@ -69,7 +69,7 @@ class ActInterrupt
             $this->setState($functionName, ['activated' => true, ...$existingData]);
             $this->game->log('exitHook', 'finalize', $functionName, $this->game->gamestate->state()['name'], $existingData);
             // Don't need to re-check for interrupts
-            $hook($existingData['data'], false);
+            $hook($existingData['data'], ['suffix' => 'Post']);
             // Calling after skill screen
             $endCallback($this->game, true, $existingData['data'], ...$existingData['args']);
             $this->setState($functionName, null);
@@ -136,7 +136,9 @@ class ActInterrupt
     }
     public function addSkillInterrupt($skill): void
     {
-        array_push($this->activatableSkills, $skill);
+        if (!array_key_exists('requires', $skill) || $skill['requires']($this->game, $skill)) {
+            array_push($this->activatableSkills, $skill);
+        }
     }
     public function getLatestInterruptState(): ?array
     {

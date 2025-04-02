@@ -7,7 +7,7 @@ const itemsSprites = {
     },
     'medical-hut': {
       options: { type: 'item', itemType: 'building', name: 'Medical Hut' },
-      frame: { x: 438, y: 0, w: 438, h: 438 },
+      frame: { x: 439, y: 0, w: 438, h: 438 },
       rotate: 0,
     },
     'bone-club': { options: { type: 'item', itemType: 'weapon', name: 'Bone Club' }, frame: { x: 876, y: 0, w: 438, h: 438 }, rotate: 0 },
@@ -20,22 +20,22 @@ const itemsSprites = {
     'bone-armor': { options: { type: 'item', itemType: 'tool', name: 'Bone Armor' }, frame: { x: 2190, y: 0, w: 438, h: 438 }, rotate: 0 },
     'camp-walls': {
       options: { type: 'item', itemType: 'building', name: 'Camp Walls' },
-      frame: { x: 0, y: 440, w: 438, h: 438 },
+      frame: { x: 0, y: 439, w: 438, h: 438 },
       rotate: 0,
     },
-    fire: { options: { type: 'game-piece', name: 'Fire' }, frame: { x: 438, y: 440, w: 438, h: 438 }, rotate: 0 },
-    'hide-armor': { options: { type: 'item', itemType: 'tool', name: 'Hide Armor' }, frame: { x: 876, y: 440, w: 438, h: 438 }, rotate: 0 },
+    fire: { options: { type: 'game-piece', name: 'Fire' }, frame: { x: 439, y: 439, w: 438, h: 438 }, rotate: 0 },
+    'hide-armor': { options: { type: 'item', itemType: 'tool', name: 'Hide Armor' }, frame: { x: 876, y: 439, w: 438, h: 438 }, rotate: 0 },
     'knowledge-hut': {
       options: { type: 'item', itemType: 'building', name: 'Knowledge Hut' },
-      frame: { x: 1314, y: 440, w: 438, h: 438 },
+      frame: { x: 1314, y: 439, w: 438, h: 438 },
       rotate: 0,
     },
-    skull: { options: { type: 'game-piece', name: 'Skull' }, frame: { x: 1756, y: 440, w: 434, h: 438 }, rotate: 0 },
-    hatchet: { options: { type: 'item', itemType: 'tool', name: 'Hatchet' }, frame: { x: 2190, y: 440, w: 438, h: 438 }, rotate: 0 },
+    skull: { options: { type: 'game-piece', name: 'Skull' }, frame: { x: 1756, y: 439, w: 434, h: 438 }, rotate: 0 },
+    hatchet: { options: { type: 'item', itemType: 'tool', name: 'Hatchet' }, frame: { x: 2190, y: 439, w: 438, h: 438 }, rotate: 0 },
     club: { options: { type: 'item', itemType: 'weapon', name: 'Club' }, frame: { x: 0, y: 880, w: 438, h: 438 }, rotate: 0 },
     'cooking-hut': {
       options: { type: 'item', itemType: 'building', name: 'Cooking Hut' },
-      frame: { x: 438, y: 880, w: 438, h: 438 },
+      frame: { x: 439, y: 880, w: 438, h: 438 },
       rotate: 0,
     },
     'carving-knife': {
@@ -55,7 +55,7 @@ const itemsSprites = {
       frame: { x: 0, y: 1320, w: 438, h: 438 },
       rotate: 0,
     },
-    spear: { options: { type: 'item', itemType: 'weapon', name: 'Spear' }, frame: { x: 438, y: 1320, w: 438, h: 438 }, rotate: 0 },
+    spear: { options: { type: 'item', itemType: 'weapon', name: 'Spear' }, frame: { x: 439, y: 1320, w: 438, h: 438 }, rotate: 0 },
     'sharp-stick': {
       options: { type: 'item', itemType: 'weapon', name: 'Sharp Stick' },
       frame: { x: 876, y: 1320, w: 438, h: 438 },
@@ -77,7 +77,7 @@ const itemsSprites = {
       frame: { x: 0, y: 1760, w: 438, h: 438 },
       rotate: 0,
     },
-    bandage: { options: { type: 'item', itemType: 'tool', name: 'Bandage' }, frame: { x: 438, y: 1760, w: 438, h: 438 }, rotate: 0 },
+    bandage: { options: { type: 'item', itemType: 'tool', name: 'Bandage' }, frame: { x: 439, y: 1760, w: 438, h: 438 }, rotate: 0 },
     'skull-shield': {
       options: { type: 'item', itemType: 'tool', name: 'Skull Shield' },
       frame: { x: 876, y: 1760, w: 438, h: 438 },
@@ -103,7 +103,7 @@ const itemsSprites = {
       frame: { x: 0, y: 2200, w: 438, h: 438 },
       rotate: 0,
     },
-    whip: { options: { type: 'item', itemType: 'weapon', name: 'Whip' }, frame: { x: 438, y: 2200, w: 438, h: 438 }, rotate: 0 },
+    whip: { options: { type: 'item', itemType: 'weapon', name: 'Whip' }, frame: { x: 439, y: 2200, w: 438, h: 438 }, rotate: 0 },
     'fire-stick': {
       options: { type: 'item', itemType: 'weapon', name: 'Fire Stick' },
       frame: { x: 876, y: 2200, w: 438, h: 438 },
