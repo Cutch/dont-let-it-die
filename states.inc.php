@@ -111,6 +111,7 @@ $machinestates = [
             'deckSelection' => 13,
             'resourceSelection' => 14,
             'endTurn' => 15,
+            'characterSelection' => 16,
             'interrupt' => 22,
         ],
     ],

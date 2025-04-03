@@ -63,7 +63,6 @@ class Encounter
                 $card = $this->game->decks->pickCard($deckType);
                 if ($card) {
                     $this->game->character->addHindrance($this->game->character->getSubmittingCharacterId(), $card);
-                    $this->game->hooks->onAcquireHindrance($card);
                     $this->game->gameData->set('state', ['card' => $card, 'deck' => $deckType]);
                     $this->game->activeCharacterEventLog('${sentence} ${name}', [
                         'sentence' => $card['sentence'],

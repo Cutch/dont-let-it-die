@@ -26,7 +26,6 @@ class ActInterrupt
     ) {
         $entireState = $this->getEntireState();
         $existingData = $this->getState($functionName);
-        $this->game->log('onEncounter interrupt', $functionName, $existingData);
 
         if (!$existingData) {
             // First time calling

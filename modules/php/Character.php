@@ -306,6 +306,7 @@ class Character
             array_push($data[$card['deck'] == 'physical-hindrance' ? 'physicalHindrance' : 'mentalHindrance'], $card);
         });
         $this->game->decks->removeFromDeck($card['deck'], $card['id']);
+        $this->game->hooks->onAcquireHindrance($card);
     }
     public function removeHindrance(string $characterName, array $card): void
     {

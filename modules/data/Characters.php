@@ -16,6 +16,16 @@
 //         $this->characterId = $characterId;
 //     }
 // }
+if (!function_exists('clearCharacterSkills')) {
+    function clearCharacterSkills(&$skills, $itemId)
+    {
+        array_walk($skills, function ($v, $k) use (&$skills, $itemId) {
+            if ($v['characterId'] == $itemId) {
+                unset($skills[$k]);
+            }
+        });
+    }
+}
 use Bga\Games\DontLetItDie\Game;
 $charactersData = [
     'Gronk' => [
@@ -1150,6 +1160,62 @@ $charactersData = [
         'stamina' => '6',
         'name' => 'Cali',
         'slots' => ['weapon', 'tool'],
+        'onCharacterChoose' => function (Game $game, $char, &$data) {
+            $game->character->addHindrance($char['id'], $game->decks->getCard('hindrance_1_4'));
+        },
+        'onGetActionCostPre' => function (Game $game, $char, &$data) {
+            if ($char['isActive'] && $data['action'] == 'actInvestigateFire') {
+                $data['stamina'] = min($data['stamina'], 2);
+            }
+        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'name' => clienttranslate('Double Healing'),
+                'state' => ['interrupt'],
+                'interruptState' => ['playerTurn'],
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        clearCharacterSkills($data['skills'], $skill['characterId']);
+                        $data['data']['health'] *= 2;
+                    }
+                },
+                'onEat' => function (Game $game, $skill, &$data) {
+                    $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
+                    if ($char['isActive']) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+            'skill2' => [
+                'type' => 'skill',
+                'name' => clienttranslate('+1 Max Health'),
+                'state' => ['interrupt'],
+                'interruptState' => ['playerTurn'],
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        clearCharacterSkills($data['skills'], $skill['characterId']);
+                        $game->character->updateCharacterData($skill['characterId'], function (&$data) {
+                            $data['modifiedMaxHealth'] += 1;
+                        });
+                    }
+                },
+                'onEat' => function (Game $game, $skill, &$data) {
+                    $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
+                    if ($char['isActive']) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+        ],
     ],
     'Loka' => [
         'type' => 'character',
@@ -1311,6 +1377,44 @@ $charactersData = [
         'stamina' => '7',
         'name' => 'Samp',
         'slots' => ['weapon', 'tool'],
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'name' => '+1 ' . clientTranslate('Roll'),
+                'state' => ['interrupt'],
+                'interruptState' => ['playerTurn'],
+                'damage' => 1,
+                'onInvestigateFire' => function (Game $game, $skill, &$data) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    if ($char['isActive']) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $data['data']['roll'] += 1;
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+        ],
+        'onEncounterPost' => function (Game $game, $char, &$data) {
+            $damageTaken = $game->encounter->countDamageTaken($data);
+            if ($char['isActive'] && $damageTaken > 0) {
+                $data['stamina'] += 1;
+                $game->activeCharacterEventLog('gained ${count} ${character_resource}', ['count' => 1, 'character_resource' => 'stamina']);
+            }
+        },
+        'onInvestigateFire' => function (Game $game, $char, &$data) {
+            if ($data['roll'] == 3) {
+                $game->character->updateCharacterData($char['id'], function (&$data) {
+                    $data['modifiedMaxStamina'] += 1;
+                });
+            }
+        },
     ],
     'Yurt' => [
         'type' => 'character',
@@ -1319,14 +1423,38 @@ $charactersData = [
         'stamina' => '7',
         'name' => 'Yurt',
         'slots' => ['weapon', 'tool'],
-        'onCraftAfter' => function (Game $game, $unlock, &$data) {
+        'onCraft' => function (Game $game, $char, &$data) {
             // Choose tribe member to gain 1hp or 1 stamina
+            $game->gameData->set('characterSelectionState', [
+                'selectableCharacters' => $game->character->getAllCharacterIds(),
+                'cancellable' => false,
+                'id' => $char['id'] . 'craft',
+            ]);
+            $data['interrupt'] = true;
+            $game->gamestate->nextState('characterSelection');
+        },
+        'onCharacterSelection' => function (Game $game, $char, &$data) {
+            $state = $game->gameData->get('characterSelectionState');
+            $game->log('characterSelectionState', $state, $char);
+            if ($state && $state['id'] == $char['id'] . 'craft') {
+                $game->character->adjustHealth($data['characterId'], 1);
+                $game->character->adjustStamina($data['characterId'], 1);
+                $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
+                    'count' => 1,
+                    'character_resource' => 'health',
+                ]);
+                $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
+                    'count' => 1,
+                    'character_resource' => 'stamina',
+                ]);
+                $data['nextState'] = 'playerTurn';
+            }
         },
         'onGetActionCost' => function (Game $game, $char, &$data) {
             if ($data['action'] == 'actCraft') {
                 $data['stamina'] = max($data['stamina'] - 2, 0);
             }
         },
-        // Cannot be used with Atouk
+        // Cannot be used with Atouk, handled in choose
     ],
 ];

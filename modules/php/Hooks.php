@@ -97,9 +97,6 @@ class Hooks
     {
         $this->checkInterrupt = array_key_exists('checkInterrupt', $args) ? $args['checkInterrupt'] : false;
         $hooks = $this->getHook();
-        if ($functionName == 'onEncounter') {
-            $this->game->log('getHook start', $hooks);
-        }
         if ($this->checkInterrupt) {
             $hooks = array_filter($hooks, function ($object) use ($data1, $data2, $data3, $data4, $args) {
                 // $interruptData = array_filter([$data1, $data2, $data3, $data4]);
@@ -110,14 +107,26 @@ class Hooks
                         $object['requires']($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4));
             });
         }
-        foreach ($hooks as $i => $object) {
-            if (array_key_exists('suffix', $args)) {
-                if (array_key_exists($functionName . $args['suffix'], $object)) {
-                    $object[$functionName . $args['suffix']]($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
+        // Pre
+        if (!array_key_exists('suffix', $args) || $args['suffix'] == 'Pre') {
+            foreach ($hooks as $i => $object) {
+                if (array_key_exists($functionName . 'Pre', $object)) {
+                    $object[$functionName . 'Pre']($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
                 }
             }
+        }
+        // Normal
+        foreach ($hooks as $i => $object) {
             if (array_key_exists($functionName, $object)) {
                 $object[$functionName]($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
+            }
+        }
+        // Post
+        if (!array_key_exists('suffix', $args) || $args['suffix'] == 'Post') {
+            foreach ($hooks as $i => $object) {
+                if (array_key_exists($functionName . 'Post', $object)) {
+                    $object[$functionName . 'Post']($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
+                }
             }
         }
         $this->checkInterrupt = false;
@@ -337,6 +346,11 @@ class Hooks
         return $data;
     }
     function onGetResourceMax(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onCharacterChoose(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;

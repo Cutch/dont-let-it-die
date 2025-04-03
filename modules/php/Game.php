@@ -752,28 +752,37 @@ class Game extends \Table
     }
     public function actEat(string $resourceType): void
     {
-        // $this->character->addExtraTime();
-        $this->actions->validateCanRunAction('actEat', null, $resourceType);
-        $tokenData = $this->data->tokens[$resourceType];
-        $data = ['type' => $resourceType, ...$tokenData['actEat']];
-        $this->hooks->onEat($data);
-        if (array_key_exists('health', $data)) {
-            $this->character->adjustActiveHealth($data['health']);
-        }
-        if (array_key_exists('stamina', $data)) {
-            $this->character->adjustActiveStamina($data['stamina']);
-        }
-        $this->adjustResource($data['type'], -$data['count']);
-        $this->notify->all(
-            'tokenUsed',
-            clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health') .
-                (array_key_exists('stamina', $data) ? clienttranslate(' and ${stamina} stamina') : ''),
-            [
-                'gameData' => $this->getAllDatas(),
-                ...$data,
-                'token_name' => $tokenData['name'],
-            ]
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onEat'],
+            function (Game $_this) use ($resourceType) {
+                $this->actions->validateCanRunAction('actEat', null, $resourceType);
+                $tokenData = $this->data->tokens[$resourceType];
+                // $data = ['type' => $resourceType, ...$tokenData['actEat']];
+                return ['type' => $resourceType, ...$tokenData['actEat'], 'tokenName' => $tokenData['name']];
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                if (array_key_exists('health', $data)) {
+                    $this->character->adjustActiveHealth($data['health']);
+                }
+                if (array_key_exists('stamina', $data)) {
+                    $this->character->adjustActiveStamina($data['stamina']);
+                }
+                $this->adjustResource($data['type'], -$data['count']);
+                $this->notify->all(
+                    'tokenUsed',
+                    clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health') .
+                        (array_key_exists('stamina', $data) ? clienttranslate(' and ${stamina} stamina') : ''),
+                    [
+                        'gameData' => $this->getAllDatas(),
+                        ...$data,
+                        'token_name' => $data['tokenName'],
+                    ]
+                );
+            }
         );
+
         $this->gameData->set('lastAction', 'actEat');
     }
     public function actAddWood(): void
@@ -1013,20 +1022,20 @@ class Game extends \Table
             }
         );
     }
-    public function actInvestigateFire(): void
+    public function actInvestigateFire(?int $guess = null): void
     {
         // $this->character->addExtraTime();
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onInvestigateFire'],
-            function (Game $_this) {
+            function (Game $_this) use ($guess) {
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
                 $_this->activeCharacterEventLog('investigated the fire');
                 $roll = $_this->rollFireDie(clienttranslate('Investigate Fire'), $character['character_name']);
                 $this->log('roll', $roll);
-                return ['roll' => $roll, 'originalRoll' => $roll];
+                return ['roll' => $roll, 'originalRoll' => $roll, 'guess' => $guess];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 $this->log('actInvestigateFire', !array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false, $data);
@@ -1918,6 +1927,7 @@ class Game extends \Table
     {
         $availableUnlocks = $this->data->getValidKnowledgeTree();
         $result = [
+            'activeCharacter' => $this->character->getTurnCharacterId(),
             'expansionList' => self::$expansionList,
             'expansion' => $this->getExpansion(),
             'difficulty' => $this->getDifficulty(),

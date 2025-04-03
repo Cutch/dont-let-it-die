@@ -58,6 +58,10 @@ class CharacterSelection
             );
             $this->game::DbQuery("INSERT INTO `character` (`character_name`, `player_id`, `stamina`, `health`) VALUES $values");
         }
+        $characterIds = $this->game->character->getAllCharacterIds();
+        if (in_array('Atouk', $characterIds) && in_array('Yurt', $characterIds)) {
+            throw new BgaUserException($this->game->translate('Atouk and Yurt cannot be in the same tribe'));
+        }
         // Notify Players
         $results = [];
         $this->game->getAllCharacters($results);
@@ -135,10 +139,12 @@ class CharacterSelection
         $selectedCharactersArgs = [];
         $message = '${player_name} selected ';
         foreach ($selectedCharacters as $index => $value) {
-            if (array_key_exists('startsWith', $this->game->data->characters[$value])) {
-                $itemId = $this->game->gameData->createItem($this->game->data->characters[$value]['startsWith']);
+            $characterObject = $this->game->data->characters[$value];
+            if (array_key_exists('startsWith', $characterObject)) {
+                $itemId = $this->game->gameData->createItem($characterObject['startsWith']);
                 $this->game->character->equipEquipment($value, [$itemId]);
             }
+            $this->game->hooks->onCharacterChoose($characterObject);
 
             $selectedCharactersArgs['character' . ($index + 1)] = $value;
             if ($index + 1 == sizeof($selectedCharacters)) {
@@ -189,6 +195,7 @@ class CharacterSelection
             $itemId = $this->game->gameData->createItem($data['startsWith']);
             $this->game->character->equipEquipment($character, [$itemId]);
         }
+        $this->game->hooks->onCharacterChoose($data);
 
         $this->game->character->adjustAllHealth(10);
         $this->game->character->adjustAllStamina(10);

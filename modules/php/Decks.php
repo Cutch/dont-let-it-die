@@ -151,7 +151,9 @@ class Decks
     }
     public function removeFromDeck(string $deck, string $cardName): void
     {
-        $cards = array_filter($this->getDeck($deck)->getCardsInLocation('discard'), function ($card) use ($cardName) {
+        $cards = [...$this->getDeck($deck)->getCardsInLocation('discard'), ...$this->getDeck($deck)->getCardsInLocation('deck')];
+        //swapCharacter(Yurt)
+        $cards = array_filter($cards, function ($card) use ($cardName) {
             return $card['type_arg'] == $cardName;
         });
         if (sizeof($cards) > 0) {
