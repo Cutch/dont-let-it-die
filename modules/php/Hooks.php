@@ -117,6 +117,9 @@ class Hooks
         }
         // Normal
         foreach ($hooks as $i => $object) {
+            if ($functionName == 'onUseHerb') {
+                $this->game->log('hooks', array_key_exists($functionName, $object), $object);
+            }
             if (array_key_exists($functionName, $object)) {
                 $object[$functionName]($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
             }
@@ -209,6 +212,11 @@ class Hooks
     {
         $this->callHooks(__FUNCTION__, $args, $data);
     }
+    function onUseHerb(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
     function onEat(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
@@ -245,6 +253,11 @@ class Hooks
         return $data;
     }
     function onGetTradeRatio(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onHindranceSelection(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;

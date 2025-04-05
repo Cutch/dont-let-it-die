@@ -14,6 +14,7 @@
   @include meta.load-css('screens/cook-screen');
   @include meta.load-css('screens/deck-selection-screen');
   @include meta.load-css('screens/eat-screen');
+  @include meta.load-css('screens/hindrance-screen');
   @include meta.load-css('screens/item-trade-screen');
   @include meta.load-css('screens/revive-screen');
   @include meta.load-css('screens/token-screen');
@@ -25,7 +26,7 @@
   @include meta.load-css('boards');
   @include meta.load-css('player-card');
   @include meta.load-css('player-side-panel');
-  .selected {
+  .selected:not(#\9):not(#\9):not(#\9) {
     border: 5px solid var(--player-color, #fff);
     margin: 0;
     border-radius: 10px;

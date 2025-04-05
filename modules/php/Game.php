@@ -168,6 +168,25 @@ class Game extends \Table
         $this->gameData->set('deckSelection', ['decks' => array_values($decks)]);
         $this->gamestate->nextState('deckSelection');
     }
+    // $type = #, each, any
+    public function hindranceSelection(string $id, ?array $characters = null, ?string $title = null)
+    {
+        if ($characters == null) {
+            $characters = [$this->character->getTurnCharacterId()];
+        }
+        $characters = array_values(
+            array_map(
+                function ($d) {
+                    return ['physicalHindrance' => $d['physicalHindrance'], 'characterId' => $d['character_name']];
+                },
+                array_filter($this->character->getAllCharacterData(), function ($d) use ($characters) {
+                    return in_array($d['id'], $characters);
+                })
+            )
+        );
+        $this->gameData->set('hindranceSelectionState', ['id' => $id, 'characters' => $characters, 'title' => $title]);
+        $this->gamestate->nextState('hindranceSelection');
+    }
     public function cardDrawEvent($card, $deck, $arg = [])
     {
         $result = [
@@ -631,28 +650,31 @@ class Game extends \Table
         if ($data['nextState'] != false) {
             $this->gamestate->nextState($data['nextState']);
         }
-        // $this->actInterrupt->interruptableFunction(
-        //     __FUNCTION__,
-        //     func_get_args(),
-        //     [$this->hooks, 'onResourceSelection'],
-        //     function (Game $_this) use ($resourceType) {
-        //         if (!$resourceType) {
-        //             throw new BgaUserException($this->translate('Select a Resource'));
-        //         }
-        //         return [
-        //             'resourceType' => $resourceType,
-        //         ];
-        //     },
-        //     function (Game $_this, bool $finalizeInterrupt, $data) {
-        //         // $resourceType = $data['resourceType'];
-        //         // var_dump('actSelectResource playerTurn');
-        //         $this->gamestate->nextState('playerTurn');
-        //     },
-        //     'playerTurn'
-        // );
     }
     public function actSelectResourceCancel(): void
     {
+        if (!$this->actInterrupt->onInterruptCancel()) {
+            $this->gamestate->nextState('playerTurn');
+        }
+    }
+    public function actSelectHindrance(#[JsonParam] array $data): void
+    {
+        if (sizeof($data) == 0) {
+            throw new BgaUserException($this->translate('Select a Hindrance'));
+        }
+        $data = [
+            'selections' => $data,
+            'nextState' => 'playerTurn',
+        ];
+        $this->hooks->onHindranceSelection($data);
+
+        if ($data['nextState'] != false) {
+            $this->gamestate->nextState($data['nextState']);
+        }
+    }
+    public function actSelectHindranceCancel(): void
+    {
+        $this->gameData->set('hindranceSelectionState', [...$this->gameData->get('hindranceSelectionState'), 'cancelled' => true]);
         if (!$this->actInterrupt->onInterruptCancel()) {
             $this->gamestate->nextState('playerTurn');
         }
@@ -741,13 +763,25 @@ class Game extends \Table
         ]);
         $this->gameData->set('lastAction', 'actTrade');
     }
-    public function actUseHerb(string $physicalHindrance): void
+    public function actUseHerb(): void
     {
-        $this->actions->validateCanRunAction('actUseHerb', null, $physicalHindrance);
-        $this->adjustResource('herb', -1);
-        $this->notify->all('tokenUsed', clienttranslate('${character_name} used a herb to cure their wounds'), [
-            'gameData' => $this->getAllDatas(),
-        ]);
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onUseHerb'],
+            function (Game $_this) {
+                $this->log('onUseHerb');
+                // $this->actions->validateCanRunAction('actUseHerb');
+                return ['herb' => 1];
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                $this->adjustResource('herb', -$data['herb']);
+                $this->notify->all('tokenUsed', clienttranslate('${character_name} used a herb to cure their wounds'), [
+                    'gameData' => $this->getAllDatas(),
+                ]);
+            }
+        );
+
         $this->gameData->set('lastAction', 'actUseHerb');
     }
     public function actEat(string $resourceType): void
@@ -1101,6 +1135,16 @@ class Game extends \Table
     public function argCardSelection()
     {
         $result = [...$this->gameData->get('cardSelectionState'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
+        $this->getGameData($result);
+        return $result;
+    }
+    public function argHindranceSelection()
+    {
+        $result = [
+            'hindranceSelection' => $this->gameData->get('hindranceSelectionState'),
+            'actions' => [],
+            'character_name' => $this->getCharacterHTML(),
+        ];
         $this->getGameData($result);
         return $result;
     }
@@ -2058,8 +2102,9 @@ class Game extends \Table
             'meat-cooked' => 4,
             'fish' => 0,
             'fish-cooked' => 0,
-            'dino-egg' => 0,
-            'dino-egg-cooked' => 0,
+            'herb' => 4,
+            'dino-egg' => 4,
+            'dino-egg-cooked' => 4,
             'berry' => 4,
             'berry-cooked' => 4,
             'rock' => 6,
@@ -2067,7 +2112,6 @@ class Game extends \Table
             'fiber' => 6,
             'hide' => 8,
             'trap' => 0,
-            'herb' => 0,
             'fkp' => 40,
             'gem-y' => 1,
             'gem-b' => 1,

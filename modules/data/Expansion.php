@@ -329,7 +329,6 @@ $expansionData = [
                 },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
                     $state = $game->gameData->get('characterSelectionState');
-                    $game->log('onCharacterSelection', $skill, $data, $state);
                     if ($state && $state['id'] == $skill['id']) {
                         $game->character->adjustHealth($data['characterId'], -1);
                         $game->activeCharacterEventLog('lost ${count} ${character_resource}', [

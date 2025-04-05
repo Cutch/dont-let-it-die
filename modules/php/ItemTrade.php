@@ -15,26 +15,30 @@ class ItemTrade
     }
     public function actConfirmTradeItem(): void
     {
-        $selfId = $this->game->getCurrentPlayer();
-        $state = $this->game->gameData->get('tradeState' . $selfId);
+        $state = $this->game->gameData->get('tradeState');
         $trade1 = $state['trade1'];
         $trade2 = $state['trade2'];
 
         $responseData = [...$this->tradeProcess($trade1, $trade2), 'trade1' => $trade1, 'trade2' => $trade2];
         $this->completeTrade($responseData);
-        $this->game->gamestate->nextPrivateState($trade1['character']['player_id'], 'tradePhaseActions');
-        $this->game->gamestate->nextPrivateState($trade2['character']['player_id'], 'tradePhaseActions');
+        foreach ($this->game->gamestate->getActivePlayerList() as $i => $playerId) {
+            $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
+        }
+        // $this->game->gamestate->nextPrivateState($trade1['character']['player_id'], 'tradePhaseActions');
+        // $this->game->gamestate->nextPrivateState($trade2['character']['player_id'], 'tradePhaseActions');
     }
     public function actCancelTrade(): void
     {
-        $selfId = $this->game->getCurrentPlayer();
-        $state = $this->game->gameData->get('tradeState' . $selfId);
+        $state = $this->game->gameData->get('tradeState');
         $trade1 = $state['trade1'];
         $trade2 = $state['trade2'];
 
-        $this->game->gamestate->nextPrivateState($trade1['character']['player_id'], 'tradePhaseActions');
-        $this->game->gamestate->nextPrivateState($trade2['character']['player_id'], 'tradePhaseActions');
-        $this->game->gameData->set('tradeState' . $selfId, null);
+        foreach ($this->game->gamestate->getActivePlayerList() as $i => $playerId) {
+            $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
+        }
+        // $this->game->gamestate->nextPrivateState($trade1['character']['player_id'], 'tradePhaseActions');
+        // $this->game->gamestate->nextPrivateState($trade2['character']['player_id'], 'tradePhaseActions');
+        $this->game->gameData->set('tradeState', null);
     }
     public function actTradeDone(): void
     {
@@ -146,18 +150,24 @@ class ItemTrade
         } else {
             $this->game->log($trade1, $trade2);
             if ($trade1['character']['player_id'] != $trade2['character']['player_id']) {
-                $this->game->gameData->set('tradeState' . $trade2['character']['player_id'], [
+                $this->game->gameData->set('tradeState', [
                     'trade1' => $trade1,
                     'trade2' => $trade2,
                 ]);
-                if (!$this->game->gamestate->isPlayerActive($trade2['character']['player_id'])) {
-                    $this->game->gamestate->setPlayersMultiactive([$trade2['character']['player_id']], 'playerTurn', false);
-                    $this->game->gamestate->initializePrivateState($trade2['character']['player_id']);
-                    $this->game->gamestate->nextPrivateState($trade2['character']['player_id'], 'confirmTradePhase');
+                $toPlayerId = $trade2['character']['player_id'];
+                if (!$this->game->gamestate->isPlayerActive($toPlayerId)) {
+                    $this->game->gamestate->setPlayersMultiactive([$toPlayerId], 'playerTurn', false);
+                    $this->game->gamestate->initializePrivateState($toPlayerId);
+                    $this->game->gamestate->nextPrivateState($toPlayerId, 'confirmTradePhase');
                 } else {
-                    $this->game->gamestate->nextPrivateState($trade2['character']['player_id'], 'confirmTradePhase');
+                    $this->game->gamestate->nextPrivateState($toPlayerId, 'confirmTradePhase');
                 }
-                $this->game->gamestate->nextPrivateState($trade1['character']['player_id'], 'waitTradePhase');
+                foreach ($this->game->gamestate->getActivePlayerList() as $i => $playerId) {
+                    // $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
+                    if ($toPlayerId != $playerId) {
+                        $this->game->gamestate->nextPrivateState($playerId, 'waitTradePhase');
+                    }
+                }
             } else {
                 $responseData = [...$this->tradeProcess($trade1, $trade2), 'trade1' => $trade1, 'trade2' => $trade2];
                 $this->completeTrade($responseData);
@@ -265,7 +275,12 @@ class ItemTrade
     }
     public function argConfirmTradePhase($playerId)
     {
+        $state = $this->game->gameData->get('tradeState');
+        $trade1 = $state['trade1'];
+        $trade2 = $state['trade2'];
         $result = [
+            'trade1' => $trade1,
+            'trade2' => $trade2,
             'actions' => [
                 [
                     'action' => 'actConfirmTradeItem',

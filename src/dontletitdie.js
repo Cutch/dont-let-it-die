@@ -50,6 +50,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.cardSelectionScreen = new CardSelectionScreen(this);
       this.characterSelectionScreen = new CharacterSelectionScreen(this);
       this.deckSelectionScreen = new DeckSelectionScreen(this);
+      this.hindranceSelectionScreen = new HindranceSelectionScreen(this);
       this.tradeScreen = new TradeScreen(this);
       this.itemTradeScreen = new ItemTradeScreen(this);
       this.craftScreen = new CraftScreen(this);
@@ -73,6 +74,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         'berry-cooked',
         'hide',
         'fkp',
+        'herb',
         'dino-egg',
         'dino-egg-cooked',
         'trap',
@@ -341,7 +343,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     updateResources: function (gameData) {
       if (!gameData || !gameData.resourcesAvailable || !gameData.game) return;
 
-      const firewoodElem = document.querySelector(`#board-container .fire-wood`);
+      const firewoodElem = document.querySelector(`.fire-wood`);
 
       // Shared Resource Pool
       let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
@@ -781,6 +783,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'characterSelection':
           if (isActive) this.characterSelectionScreen.show(args.args);
           break;
+        case 'hindranceSelection':
+          if (isActive) this.hindranceSelectionScreen.show(args.args);
+          break;
         case 'cardSelection':
           if (isActive) this.cardSelectionScreen.show(args.args);
           break;
@@ -827,6 +832,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           break;
         case 'characterSelection':
           this.characterSelectionScreen.hide();
+          break;
+        case 'hindranceSelection':
+          this.hindranceSelectionScreen.hide();
           break;
         case 'cardSelection':
           this.cardSelectionScreen.hide();
@@ -912,7 +920,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 } else if (actionId === 'actTrade') {
                   this.removeActionButtons();
                   this.tradeScreen.show(args);
-                  this.statusBar.addActionButton(_('Trade') + `${suffix}`, () => {
+                  this.statusBar.addActionButton(this.actionMappings.actTradeItem + `${suffix}`, () => {
                     if (!this.tradeScreen.hasError()) {
                       this.bgaPerformAction('actTrade', {
                         data: JSON.stringify({
@@ -943,7 +951,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 } else if (actionId === 'actCraft') {
                   this.removeActionButtons();
                   this.craftScreen.show(args);
-                  this.statusBar.addActionButton(_('Craft') + `${suffix}`, () => {
+                  this.statusBar.addActionButton(this.actionMappings.actCraft + `${suffix}`, () => {
                     if (!this.craftScreen.hasError()) {
                       this.bgaPerformAction('actCraft', {
                         itemName: this.craftScreen.getSelectedId(),
@@ -965,7 +973,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 } else if (actionId === 'actCook') {
                   this.removeActionButtons();
                   this.cookScreen.show(args);
-                  this.statusBar.addActionButton(_('Cook') + `${suffix}`, () => {
+                  this.statusBar.addActionButton(this.actionMappings.actEat + `${suffix}`, () => {
                     if (!this.cookScreen.hasError()) {
                       this.bgaPerformAction('actCook', {
                         resourceType: this.cookScreen.getSelectedId(),
@@ -987,7 +995,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 } else if (actionId === 'actRevive') {
                   this.removeActionButtons();
                   this.reviveScreen.show(args);
-                  this.statusBar.addActionButton(_('Revive') + `${suffix}`, () => {
+                  this.statusBar.addActionButton(this.actionMappings.actRevive + `${suffix}`, () => {
                     if (!this.reviveScreen.hasError()) {
                       this.bgaPerformAction('actRevive', {
                         character: this.reviveScreen.getSelectedId(),
@@ -1006,7 +1014,31 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                     },
                     { color: 'secondary' },
                   );
-                } else if (actionId === 'actEat') {
+                }
+                // else if (actionId === 'actUseHerb') {
+                //   this.removeActionButtons();
+                //   this.eatScreen.show(args);
+                //   this.statusBar.addActionButton(this.actionMappings.actUseHerb + `${suffix}`, () => {
+                //     if (!this.eatScreen.hasError()) {
+                //       this.bgaPerformAction('actEat', {
+                //         resourceType: this.eatScreen.getSelectedId(),
+                //       })
+                //         .then(() => {
+                //           this.eatScreen.hide();
+                //         })
+                //         .catch(console.error);
+                //     }
+                //   });
+                //   this.statusBar.addActionButton(
+                //     _('Cancel'),
+                //     () => {
+                //       this.onUpdateActionButtons(stateName, args);
+                //       this.eatScreen.hide();
+                //     },
+                //     { color: 'secondary' },
+                //   );
+                // }
+                else if (actionId === 'actEat') {
                   this.removeActionButtons();
                   this.eatScreen.show(args);
                   this.statusBar.addActionButton(_('Eat') + `${suffix}`, () => {
@@ -1061,8 +1093,22 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               { color: 'secondary' },
             );
             break;
+          case 'hindranceSelection':
+            this.statusBar.addActionButton(args.hindranceSelection?.button ?? _('Remove Hindrance'), () => {
+              this.bgaPerformAction('actSelectHindrance', { data: JSON.stringify(this.hindranceSelectionScreen.getSelected()) }).then(() =>
+                this.hindranceSelectionScreen.hide(),
+              );
+            });
+            this.statusBar.addActionButton(
+              _('Cancel'),
+              () => {
+                this.bgaPerformAction('actSelectHindranceCancel').then(() => this.hindranceSelectionScreen.hide());
+              },
+              { color: 'secondary' },
+            );
+            break;
           case 'characterSelection':
-            this.statusBar.addActionButton(_('Select Character'), () => {
+            this.statusBar.addActionButton(this.actionMappings.actSelectCharacter, () => {
               this.bgaPerformAction('actSelectCharacter', { characterId: this.characterSelectionScreen.getSelectedId() }).then(() =>
                 this.characterSelectionScreen.hide(),
               );
@@ -1077,7 +1123,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               );
             break;
           case 'cardSelection':
-            this.statusBar.addActionButton(_('Select Card'), () => {
+            this.statusBar.addActionButton(this.actionMappings.actSelectCard, () => {
               this.bgaPerformAction('actSelectCard', { cardId: this.cardSelectionScreen.getSelectedId() }).then(() =>
                 this.cardSelectionScreen.hide(),
               );

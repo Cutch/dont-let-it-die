@@ -339,8 +339,29 @@ $charactersData = [
         'name' => 'Faye',
         'startsWith' => 'skull-shield',
         'slots' => ['weapon', 'tool'],
-        // Spend 2 to gain take a physical hindrance from another
+        // TODO: Spend 2 to gain take a physical hindrance from another
         // If using an herb to clear a physical hindrance gain a health
+        'onUseHerb' => function (Game $game, $char, &$data) {
+            if ($char['isActive']) {
+                // TODO Remove hindrance
+            }
+        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'state' => ['playerTurn'],
+                'name' => clienttranslate('Trade/Take 1 Physical Hindrance'),
+                'stamina' => 2,
+                'onUse' => function (Game $game, $skill) {
+                    // $char = $game->character->getCharacterData($skill['characterId']);
+                    // TODO
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    return $char['isActive'];
+                },
+            ],
+        ],
     ],
     'Ajax' => [
         // Done

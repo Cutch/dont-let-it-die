@@ -836,12 +836,26 @@ $decksData = [
         'onUse' => function (Game $game, $nightCard) {
             // Remove physical hindrance from each character
             // Skip morning phase damage
+            $game->hindranceSelection($nightCard['id']);
+            // $data['interrupt'] = true;
+            return ['notify' => false, 'nextState' => false, 'interrupt' => true];
         },
         'onMorning' => function (Game $game, $nightCard, &$data) {
             $turnOrder = $this->game->gameData->get('turnOrder');
             $turnOrder = array_values(array_filter($turnOrder));
             array_push($data['skipMorningDamage'], ...$turnOrder);
             $game->nightEventLog('No damage taken in the morning');
+        },
+        'onHindranceSelection' => function (Game $game, $nightCard, &$data) {
+            $state = $game->gameData->get('hindranceSelectionState');
+            if ($state && $state['id'] == $nightCard['id']) {
+                foreach ($state['characters'] as $i => $char) {
+                    foreach ($char['physicalHindrance'] as $i => $card) {
+                        $this->game->character->removeHindrance($char['characterId'], $card);
+                    }
+                }
+                $data['nextState'] = 'playerTurn';
+            }
         },
     ],
     'night-event-9_11' => [

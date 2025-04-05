@@ -26,11 +26,11 @@ class ActInterrupt
     ) {
         $entireState = $this->getEntireState();
         $existingData = $this->getState($functionName);
-
         if (!$existingData) {
             // First time calling
             $data = $startCallback($this->game, ...$args);
-            if (!$data) {
+            $currentState = $this->game->gamestate->state()['name'];
+            if ($data === null) {
                 return;
             }
             $res = $hook($data, ['suffix' => 'Pre']);
@@ -39,14 +39,14 @@ class ActInterrupt
                 'data' => $data,
                 'functionName' => $functionName,
                 'args' => $args,
-                'currentState' => $this->game->gamestate->state()['name'],
+                'currentState' => $currentState,
                 'skills' => $this->activatableSkills,
                 'stateNumber' => sizeof($entireState) + 1,
             ];
             $this->game->log($functionName, $data, $res, $interruptData);
             $this->activatableSkills = [];
             if (sizeof($interruptData['skills']) == 0 && !$interrupt) {
-                $this->game->log('exitHook', 'not interrupted', $this->game->gamestate->state()['name'], 'noSkill');
+                $this->game->log('exitHook', 'not interrupted', $currentState, 'noSkill');
                 // No skills can activate
                 $endCallback($this->game, false, $data, ...$args);
             } else {
@@ -245,7 +245,7 @@ class ActInterrupt
         // $this->setState($state['functionName'], [...$data, 'skills' => $skills, 'activated' => true]);
         // $this->setState($state['functionName'], null); // TODO: for items this doesnt work, but does work for player turn?
 
-        // var_dump(json_encode([$this->game->gamestate->state()['name'], $data['currentState'], $data['currentState']]));
+        // $this->game->log($this->game->gamestate->state()['name'], $state);
         // var_dump($this->game->gamestate->getActivePlayerList(), $this->game->gamestate->state()['name']);
         $changeState = false;
         foreach ($characterIds as $k => $v) {

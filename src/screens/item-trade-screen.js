@@ -2,6 +2,7 @@ class ItemTradeScreen {
   constructor(game) {
     this.game = game;
     this.selection = [];
+    this.scale = 2;
   }
   getTrade() {
     return { selection: this.selection.map(({ character, equipment }) => ({ character: character?.name, itemId: equipment?.itemId })) };
@@ -47,39 +48,32 @@ class ItemTradeScreen {
     }
   }
   update({ itemId1, itemId2, itemName1, itemName2, character1, character2, gameData }) {
+    document.querySelectorAll('#item-trade-screen .selected').forEach((d) => {
+      d.classList.remove('selected');
+    });
     const tween = new Tweening(this.game, document.querySelector(`#item-trade-screen`));
-
-    const end1 =
-      itemName1 &&
-      tween.addStartTween(
-        `.character-${character1 ?? null}.item-${itemId1 ?? null}`,
-        `.character-${character2 ?? null}.item-${itemId1 ?? null}`,
-        itemName1,
-        1,
-      );
-    const end2 =
-      itemName2 &&
-      tween.addStartTween(
-        `.character-${character2 ?? null}.item-${itemId2 ?? null}`,
-        `.character-${character1 ?? null}.item-${itemId2 ?? null}`,
-        itemName2,
-        1,
-      );
+    this.show(gameData);
     setTimeout(() => {
-      this.show(gameData);
-      if (end1) end1();
-      if (end2) end2();
+      if (itemName1)
+        tween.addDestroyTween(
+          document.querySelector(`.character-${character1 ?? null}.item-${itemId1 ?? null}`),
+          document.querySelector(`.character-${character2 ?? null}.item-${itemId1 ?? null}`),
+        );
+      if (itemName2)
+        tween.addDestroyTween(
+          document.querySelector(`.character-${character2 ?? null}.item-${itemId2 ?? null}`),
+          document.querySelector(`.character-${character1 ?? null}.item-${itemId2 ?? null}`),
+        );
+      this.selection = [];
     }, 0);
-    this.selection = [];
   }
   show(gameData) {
     this.itemSelected = null;
-    const scale = 1;
     const {
       frame: { w, h },
     } = allSprites['item-back'];
-    const scaledWidth = Math.round(w / scale);
-    const scaledHeight = Math.round(h / scale);
+    const scaledWidth = Math.round(w / this.scale);
+    const scaledHeight = Math.round(h / this.scale);
 
     let itemTradeElem = document.querySelector(`#item-trade-screen .items`);
     // Initial setup
@@ -134,55 +128,66 @@ class ItemTradeScreen {
         });
         addClickListener(document.querySelector(`#item-trade-screen__${character.name} .character-image`), character.name, () => {
           this.game.tooltip.show();
-          renderImage(character.name, this.game.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+          renderImage(character.name, this.game.tooltip.renderByElement(), { scale: this.scale, pos: 'replace' });
         });
       });
     }
     // Characters
     gameData.characters.forEach((character) => {
       const itemsElem = document.querySelector(`#item-trade-screen__${character.name} .items`);
-      itemsElem.innerHTML = '';
+      // itemsElem.innerHTML = '';
       character.equipment.forEach((equipment) => {
-        renderImage(equipment.id, itemsElem, { scale: 1, pos: 'insert', css: `character-${character.name} item-${equipment.itemId}` });
-        addClickListener(itemsElem.querySelector(`.item-${equipment.itemId}`), equipment.name, () => {
-          this.updateSelection(character, equipment);
-        });
+        if (!itemsElem.querySelector(`.item-${equipment.itemId}`)) {
+          renderImage(equipment.id, itemsElem, {
+            scale: this.scale,
+            pos: 'insert',
+            css: `character-${character.name} item-${equipment.itemId}`,
+          });
+          addClickListener(itemsElem.querySelector(`.item-${equipment.itemId}`), equipment.name, () => {
+            this.updateSelection(character, equipment);
+          });
+        }
       });
       // });
       // gameData.characters.forEach((character) => {
-      //   const itemsElem = document.querySelector(`#item-trade-screen__${character.name} .items`);
-      itemsElem.insertAdjacentHTML(
-        'beforeend',
-        `<div class="empty card character-${character.name} item-null" style="width: ${scaledWidth}px;height: ${scaledHeight}px;">
+      if (!itemsElem.querySelector(`#item-trade-screen__${character.name} .items .empty`)) {
+        itemsElem.insertAdjacentHTML(
+          'beforeend',
+          `<div class="empty card character-${character.name} item-null" style="width: ${scaledWidth}px;height: ${scaledHeight}px;">
         <div style="margin-bottom: 0.5rem">${_('Give')}</div>
         <div>${_('Weapon Slots')}: ${(character.slotsAllowed.weapon ?? 0) - (character.slotsUsed.weapon ?? 0)}</div>
         <div>${_('Tool Slots')}: ${(character.slotsAllowed.tool ?? 0) - (character.slotsUsed.tool ?? 0)}</div>
         </div>`,
-      );
-      addClickListener(document.querySelector(`#item-trade-screen__${character.name} .items .empty`), _('Give'), () => {
-        this.updateSelection(character, null);
-      });
+        );
+        addClickListener(document.querySelector(`#item-trade-screen__${character.name} .items .empty`), _('Give'), () => {
+          this.updateSelection(character, null);
+        });
+      }
     });
 
     // Camp
     if (true) {
       const itemsElem = document.querySelector(`#item-trade-screen__camp .items`);
-      itemsElem.innerHTML = '';
+      // itemsElem.innerHTML = '';
       gameData.campEquipment.forEach((equipment) => {
-        renderImage(equipment.name, itemsElem, { scale: 1, pos: 'insert', css: `character-null item-${equipment.itemId}` });
-        addClickListener(itemsElem.querySelector(`.item-${equipment.itemId}`), equipment.name, () => {
-          this.updateSelection(null, equipment);
+        if (!itemsElem.querySelector(`.item-${equipment.itemId}`)) {
+          renderImage(equipment.name, itemsElem, { scale: this.scale, pos: 'insert', css: `character-null item-${equipment.itemId}` });
+          addClickListener(itemsElem.querySelector(`.item-${equipment.itemId}`), equipment.name, () => {
+            this.updateSelection(null, equipment);
+          });
+        }
+      });
+      if (!document.querySelector(`#item-trade-screen__camp .items .empty`)) {
+        itemsElem.insertAdjacentHTML(
+          'beforeend',
+          `<div class="empty card character-null item-null" style="width: ${scaledWidth}px;height: ${scaledHeight}px;">${_(
+            'Send to Camp',
+          )}</div>`,
+        );
+        addClickListener(document.querySelector(`#item-trade-screen__camp .items .empty`), _('Send to Camp'), () => {
+          this.updateSelection(null, null);
         });
-      });
-      itemsElem.insertAdjacentHTML(
-        'beforeend',
-        `<div class="empty card character-null item-null" style="width: ${scaledWidth}px;height: ${scaledHeight}px;">${_(
-          'Send to Camp',
-        )}</div>`,
-      );
-      addClickListener(document.querySelector(`#item-trade-screen__camp .items .empty`), 'Send to Camp', () => {
-        this.updateSelection(null, null);
-      });
+      }
     }
     this.scroll();
   }

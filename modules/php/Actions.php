@@ -103,6 +103,21 @@ class Actions
                 'selectable' => function (Game $game) {
                     return [];
                 },
+                'onUseHerbPre' => function (Game $game, $action, &$data) {
+                    $game->hindranceSelection($action['id']);
+                    return ['notify' => false, 'nextState' => false, 'interrupt' => true];
+                },
+                'onHindranceSelection' => function (Game $game, $action, &$data) {
+                    $state = $game->gameData->get('hindranceSelectionState');
+                    if ($state && $state['id'] == $action['id']) {
+                        foreach ($state['characters'] as $i => $char) {
+                            foreach ($char['physicalHindrance'] as $i => $card) {
+                                $this->game->character->removeHindrance($char['characterId'], $card);
+                            }
+                        }
+                        $data['nextState'] = 'playerTurn';
+                    }
+                },
             ],
             'actTrade' => [
                 'state' => ['playerTurn'],
@@ -256,7 +271,7 @@ class Actions
                 // },
             ],
             'actConfirmTradeItem' => [
-                'state' => ['tradePhase'],
+                'state' => ['confirmTradePhase'],
                 'type' => 'action',
             ],
         ]);

@@ -157,6 +157,9 @@ class GameData
     public function getResourceMax(string $resourceType): int
     {
         $resourceType = str_replace('-cooked', '', $resourceType);
+        if ($resourceType == 'fireWood') {
+            $resourceType = 'wood';
+        }
         $maxCount = $this->game->data->tokens[$resourceType]['count'];
         $data = $this->get('destroyedResources');
         $maxCount -= array_key_exists($resourceType, $data) ? $data[$resourceType] : 0;

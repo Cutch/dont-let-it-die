@@ -45,15 +45,19 @@ class Encounter
     {
         $encounterState = $this->game->gameData->get('encounterState');
         // $this->game->log($encounterState);
-        $data = ['maxPhysicalHindrance' => 3, 'canDrawMentalHindrance' => true];
+        $data = ['maxPhysicalHindrance' => 3, 'maxMentalHindrance' => 1, 'canDrawMentalHindrance' => true];
         $this->game->hooks->onMaxHindrance($data);
 
-        $this->game->log('$encounterState', $encounterState);
         if ($encounterState['damageTaken'] > 0) {
             $char = $this->game->character->getSubmittingCharacter();
             $deckType = 'physical-hindrance';
-            $this->game->log("char['physicalHindrance']", $char['physicalHindrance']);
             if (sizeof($char['physicalHindrance']) == $data['maxPhysicalHindrance']) {
+                // Skip removal and hindrance draw if mental hindrance is maxed out
+                if (!$data['canDrawMentalHindrance'] || sizeof($char['mentalHindrance']) >= $data['maxMentalHindrance']) {
+                    $this->game->gameData->set('encounterState', []);
+                    $this->game->gamestate->nextState('playerTurn');
+                    return;
+                }
                 $deckType = 'mental-hindrance';
                 foreach ($char['physicalHindrance'] as $i => $card) {
                     $this->game->character->removeHindrance($char['character_name'], $card);
@@ -182,13 +186,11 @@ class Encounter
                     // TODO is this state reached? and how/why
                     $_this->gameData->set('chooseWeapons', null);
                     $weapon = $chooseWeapons[0];
-                    $this->game->log('stResolveEncounter', $chooseWeapons);
                 } elseif (sizeof($weapons) >= 2) {
                     // This resolved the weapon choice after the change of state
                     if ($chooseWeapons && sizeof($chooseWeapons) == 1) {
                         $_this->gameData->set('chooseWeapons', null);
                         $weapon = $chooseWeapons[0];
-                        $this->game->log('stResolveEncounter', $chooseWeapons);
                         $weapon['itemIds'] = [$weapon['itemId']];
                     } else {
                         // Highest range, lowest damage for combine
@@ -274,6 +276,7 @@ class Encounter
                     'encounterHealth' => $card['health'],
                     'escape' => false,
                     'soothe' => false,
+                    'trap' => false,
                     'characterRange' => $weapon['range'],
                     'characterDamage' => $weapon['damage'],
                     'willTakeDamage' => $card['damage'],
