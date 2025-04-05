@@ -160,6 +160,36 @@ class Game extends \Table
     {
         $this->notify->all('nightEvent', clienttranslate($message), $arg);
     }
+    public function checkHindrance(): bool
+    {
+        $data = ['maxPhysicalHindrance' => 3, 'maxMentalHindrance' => 1, 'canDrawMentalHindrance' => true];
+        $this->hooks->onMaxHindrance($data);
+        $char = $this->character->getSubmittingCharacter();
+        $deckType = 'physical-hindrance';
+        if (sizeof($char['physicalHindrance']) == $data['maxPhysicalHindrance']) {
+            // Skip removal and hindrance draw if mental hindrance is maxed out
+            if (!$data['canDrawMentalHindrance'] || sizeof($char['mentalHindrance']) >= $data['maxMentalHindrance']) {
+                return true;
+            }
+            $deckType = 'mental-hindrance';
+            foreach ($char['physicalHindrance'] as $i => $card) {
+                $this->character->removeHindrance($char['character_name'], $card);
+            }
+        }
+        if ($deckType != 'mental-hindrance' || $data['canDrawMentalHindrance']) {
+            $card = $this->decks->pickCard($deckType);
+            if ($card) {
+                $this->character->addHindrance($this->character->getSubmittingCharacterId(), $card);
+                $this->gameData->set('state', ['card' => $card, 'deck' => $deckType]);
+                $this->gamestate->nextState('drawCard');
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+        return false;
+    }
     public function deckSelection(?array $decks = null)
     {
         if ($decks == null) {
@@ -169,7 +199,7 @@ class Game extends \Table
         $this->gamestate->nextState('deckSelection');
     }
     // $type = #, each, any
-    public function hindranceSelection(string $id, ?array $characters = null, ?string $title = null)
+    public function hindranceSelection(string $id, ?array $characters = null, ?string $button = null)
     {
         if ($characters == null) {
             $characters = [$this->character->getTurnCharacterId()];
@@ -184,7 +214,7 @@ class Game extends \Table
                 })
             )
         );
-        $this->gameData->set('hindranceSelectionState', ['id' => $id, 'characters' => $characters, 'title' => $title]);
+        $this->gameData->set('hindranceSelectionState', ['id' => $id, 'characters' => $characters, 'button' => $button]);
         $this->gamestate->nextState('hindranceSelection');
     }
     public function cardDrawEvent($card, $deck, $arg = [])
@@ -671,6 +701,7 @@ class Game extends \Table
         if ($data['nextState'] != false) {
             $this->gamestate->nextState($data['nextState']);
         }
+        $this->hooks->onHindranceSelectionAfter($data);
     }
     public function actSelectHindranceCancel(): void
     {

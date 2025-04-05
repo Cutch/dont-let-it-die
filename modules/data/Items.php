@@ -103,41 +103,103 @@ $itemsData = [
                 'onMorning' => function (Game $game, $skill, &$data) {
                     $game->actInterrupt->addSkillInterrupt($skill);
                 },
-                'onUseSkill' => function (Game $game, $skill, &$data) {
-                    if ($data['skillId'] == $skill['id']) {
-                        $characters = $game->character->getAllCharacterData(true);
-                        $charactersWithHindrances = array_values(
-                            array_map(
-                                function ($character) {
-                                    return $character['id'];
-                                },
-                                array_filter($characters, function ($character) {
-                                    sizeof($character['physicalHindrance']) > 0;
-                                })
+                // 'onUseSkill' => function (Game $game, $skill, &$data) {
+                //     if ($data['skillId'] == $skill['id']) {
+                //         $characters = $game->character->getAllCharacterData(true);
+                //         $charactersWithHindrances = array_values(
+                //             array_map(
+                //                 function ($character) {
+                //                     return $character['id'];
+                //                 },
+                //                 array_filter($characters, function ($character) {
+                //                     sizeof($character['physicalHindrance']) > 0;
+                //                 })
+                //             )
+                //         );
+                //         $game->gameData->set('characterSelectionState', [
+                //             'selectableCharacters' => $charactersWithHindrances,
+                //             'cancellable' => false,
+                //             'id' => $skill['id'],
+                //         ]);
+                //         $data['interrupt'] = true;
+                //         $game->gamestate->nextState('characterSelection');
+                //     }
+                // },
+                // 'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                //     $state = $game->gameData->get('characterSelectionState');
+                //     if ($state && $state['id'] == $skill['id']) {
+                //         usePerDay($skill['id'], $game);
+                //         $data['nextState'] = false;
+                //     }
+                // },
+                // 'requires' => function (Game $game, $skill) {
+                //     $characters = $game->character->getAllCharacterData(true);
+                //     return getUsePerDay($skill['id'], $game) < 1 &&
+                //         sizeof(
+                //             array_filter($characters, function ($character) {
+                //                 return sizeof($character['physicalHindrance']) > 0;
+                //             })
+                //         ) > 0;
+                // },
+
+                'onUse' => function (Game $game, $skill, &$data) {
+                    $game->hindranceSelection(
+                        $skill['id'],
+                        array_map(
+                            function ($d) {
+                                return $d['id'];
+                            },
+                            array_filter($game->character->getAllCharacterData(false), function ($d) {
+                                return sizeof($d['physicalHindrance']) > 0;
+                            })
+                        )
+                    );
+                    $data['interrupt'] = true;
+                    return ['notify' => false, 'nextState' => false, 'interrupt' => true, 'spendActionCost' => false];
+                },
+                'onHindranceSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->gameData->get('hindranceSelectionState');
+                    if ($state && $state['id'] == $skill['id']) {
+                        $characterCount = sizeof(
+                            array_unique(
+                                array_map(function ($d) {
+                                    return $d['characterId'];
+                                }, $state['characters'])
                             )
                         );
-                        $game->gameData->set('characterSelectionState', [
-                            'selectableCharacters' => $charactersWithHindrances,
-                            'cancellable' => false,
-                            'id' => $skill['id'],
-                        ]);
-                        $data['interrupt'] = true;
-                        $game->gamestate->nextState('characterSelection');
-                    }
-                },
-                'onCharacterSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('characterSelectionState');
-                    if ($state && $state['id'] == $skill['id']) {
-                        usePerDay($skill['id'], $game);
-                        $data['nextState'] = false;
+                        if ($characterCount > 1) {
+                            throw new BgaUserException($this->game->translate('Only 1 character\'s hindrances can be selected'));
+                        }
+                        $count = 0;
+                        foreach ($state['characters'] as $i => $char) {
+                            $cardIds = array_map(
+                                function ($d) {
+                                    return $d['cardId'];
+                                },
+                                array_filter($data, function ($d) use ($char) {
+                                    return $d['characterId'] == $char['id'];
+                                })
+                            );
+                            foreach ($char['physicalHindrance'] as $i => $card) {
+                                if (in_array($card['id'], $cardIds)) {
+                                    $count++;
+                                    $this->game->character->removeHindrance($char['characterId'], $card);
+                                }
+                            }
+                        }
+                        if ($count > 2) {
+                            throw new BgaUserException($this->game->translate('Up to 2 hindrances can be removed'));
+                        }
+                        $game->actions->spendActionCost('actUseSkill', $skill['id']);
+                        $data['nextState'] = 'playerTurn';
                     }
                 },
                 'requires' => function (Game $game, $skill) {
-                    $characters = $game->character->getAllCharacterData(true);
-                    return getUsePerDay($skill['id'], $game) < 1 &&
+                    // $char = $game->character->getCharacterData($skill['characterId']);
+                    return ///$char['isActive'] &&
                         sizeof(
-                            array_filter($characters, function ($character) {
-                                return sizeof($character['physicalHindrance']) > 0;
+                            array_filter($game->character->getAllCharacterData(false), function ($d) {
+                                return sizeof($d['physicalHindrance']) > 0;
                             })
                         ) > 0;
                 },

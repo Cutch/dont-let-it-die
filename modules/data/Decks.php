@@ -849,10 +849,37 @@ $decksData = [
         'onHindranceSelection' => function (Game $game, $nightCard, &$data) {
             $state = $game->gameData->get('hindranceSelectionState');
             if ($state && $state['id'] == $nightCard['id']) {
+                $characterTotal = sizeof(
+                    array_filter($game->character->getAllCharacterData(false), function ($d) {
+                        return sizeof($d['physicalHindrance']) > 0;
+                    })
+                );
+                $characterCount = sizeof(
+                    array_unique(
+                        array_map(function ($d) {
+                            return $d['characterId'];
+                        }, $state['characters'])
+                    )
+                );
+                $count = 0;
                 foreach ($state['characters'] as $i => $char) {
+                    $cardIds = array_map(
+                        function ($d) {
+                            return $d['cardId'];
+                        },
+                        array_filter($data, function ($d) use ($char) {
+                            return $d['characterId'] == $char['id'];
+                        })
+                    );
                     foreach ($char['physicalHindrance'] as $i => $card) {
-                        $this->game->character->removeHindrance($char['characterId'], $card);
+                        if (in_array($card['id'], $cardIds)) {
+                            $count++;
+                            $this->game->character->removeHindrance($char['characterId'], $card);
+                        }
                     }
+                }
+                if ($characterTotal == $characterCount && $characterTotal == $count) {
+                    throw new BgaUserException($this->game->translate('Remove 1 hindrance from each character'));
                 }
                 $data['nextState'] = 'playerTurn';
             }

@@ -498,14 +498,46 @@ $upgradesData = [
                 'onUse' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getTurnCharacterId();
                     if (getUsePerDay($char . 'rest', $game) < 1) {
-                        usePerDay($char . 'rest', $game);
-                        $game->character->adjustHealth($char, 1);
-                        // TODO: Choose physical hindrance to remove
+                        $game->hindranceSelection($skill['id']);
                     }
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getTurnCharacterId();
-                    return getUsePerDay($char . 'rest', $game) < 1;
+                    return sizeof($this->game->character->getTurnCharacter()['physicalHindrance']) > 0 &&
+                        getUsePerDay($char . 'rest', $game) < 1;
+                },
+                'onUseHerbPre' => function (Game $game, $action, &$data) {
+                    return ['notify' => false, 'nextState' => false, 'interrupt' => true];
+                },
+                'onHindranceSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->gameData->get('hindranceSelectionState');
+                    $char = $game->character->getTurnCharacterId();
+                    if ($state && $state['id'] == $skill['id']) {
+                        usePerDay($char . 'rest', $game);
+                        $game->character->adjustHealth($char, 1);
+
+                        $count = 0;
+                        foreach ($state['characters'] as $i => $char) {
+                            $cardIds = array_map(
+                                function ($d) {
+                                    return $d['cardId'];
+                                },
+                                array_filter($data, function ($d) use ($char) {
+                                    return $d['characterId'] == $char['id'];
+                                })
+                            );
+                            foreach ($char['physicalHindrance'] as $i => $card) {
+                                if (in_array($card['id'], $cardIds)) {
+                                    $count++;
+                                    $this->game->character->removeHindrance($char['characterId'], $card);
+                                }
+                            }
+                        }
+                        if ($count > 1) {
+                            throw new BgaUserException($this->game->translate('Only 1 hindrance can be removed'));
+                        }
+                        $data['nextState'] = 'playerTurn';
+                    }
                 },
             ],
         ],

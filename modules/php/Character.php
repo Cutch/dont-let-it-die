@@ -307,6 +307,11 @@ class Character
         });
         $this->game->decks->removeFromDeck($card['deck'], $card['id']);
         $this->game->hooks->onAcquireHindrance($card);
+        $this->game->activeCharacterEventLog('${sentence} ${name}', [
+            'sentence' => $card['sentence'],
+            'name' => $card['name'],
+            'character_name' => $this->game->getCharacterHTML($characterName),
+        ]);
     }
     public function removeHindrance(string $characterName, array $card): void
     {
@@ -318,6 +323,11 @@ class Character
                 }
             );
         });
+        $this->game->activeCharacterEventLog('no longer ${sentence} ${cardName}', [
+            'sentence' => $card['sentence'],
+            'cardName' => $card['name'],
+            'character_name' => $this->game->getCharacterHTML($characterName),
+        ]);
         $this->game->decks->addBackToDeck($card['deck'], $card['id']);
     }
     public function setSubmittingCharacter(?string $action, ?string $subAction = null): void

@@ -36,7 +36,6 @@ class Encounter
     {
         $validActions = $this->game->actions->getValidActions();
 
-        $this->game->log('$getHindrance');
         if (sizeof($validActions) == 0) {
             $this->game->gamestate->nextState('getHindrance');
         }
@@ -44,46 +43,12 @@ class Encounter
     public function stGetHindrance()
     {
         $encounterState = $this->game->gameData->get('encounterState');
-        // $this->game->log($encounterState);
-        $data = ['maxPhysicalHindrance' => 3, 'maxMentalHindrance' => 1, 'canDrawMentalHindrance' => true];
-        $this->game->hooks->onMaxHindrance($data);
 
         if ($encounterState['damageTaken'] > 0) {
-            $char = $this->game->character->getSubmittingCharacter();
-            $deckType = 'physical-hindrance';
-            if (sizeof($char['physicalHindrance']) == $data['maxPhysicalHindrance']) {
-                // Skip removal and hindrance draw if mental hindrance is maxed out
-                if (!$data['canDrawMentalHindrance'] || sizeof($char['mentalHindrance']) >= $data['maxMentalHindrance']) {
-                    $this->game->gameData->set('encounterState', []);
-                    $this->game->gamestate->nextState('playerTurn');
-                    return;
-                }
-                $deckType = 'mental-hindrance';
-                foreach ($char['physicalHindrance'] as $i => $card) {
-                    $this->game->character->removeHindrance($char['character_name'], $card);
-                }
-            }
-            if ($deckType != 'mental-hindrance' || $data['canDrawMentalHindrance']) {
-                $card = $this->game->decks->pickCard($deckType);
-                if ($card) {
-                    $this->game->character->addHindrance($this->game->character->getSubmittingCharacterId(), $card);
-                    $this->game->gameData->set('state', ['card' => $card, 'deck' => $deckType]);
-                    $this->game->activeCharacterEventLog('${sentence} ${name}', [
-                        'sentence' => $card['sentence'],
-                        'name' => $card['name'],
-                    ]);
-                    $this->game->gamestate->nextState('drawCard');
-                } else {
-                    $this->game->gameData->set('encounterState', []);
-                    $this->game->gamestate->nextState('playerTurn');
-                }
-            } else {
+            if ($this->game->checkHindrance()) {
                 $this->game->gameData->set('encounterState', []);
                 $this->game->gamestate->nextState('playerTurn');
             }
-        } else {
-            $this->game->gameData->set('encounterState', []);
-            $this->game->gamestate->nextState('playerTurn');
         }
     }
     public function countDamageTaken($data)

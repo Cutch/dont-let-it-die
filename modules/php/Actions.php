@@ -110,10 +110,25 @@ class Actions
                 'onHindranceSelection' => function (Game $game, $action, &$data) {
                     $state = $game->gameData->get('hindranceSelectionState');
                     if ($state && $state['id'] == $action['id']) {
+                        $count = 0;
                         foreach ($state['characters'] as $i => $char) {
+                            $cardIds = array_map(
+                                function ($d) {
+                                    return $d['cardId'];
+                                },
+                                array_filter($data, function ($d) use ($char) {
+                                    return $d['characterId'] == $char['id'];
+                                })
+                            );
                             foreach ($char['physicalHindrance'] as $i => $card) {
-                                $this->game->character->removeHindrance($char['characterId'], $card);
+                                if (in_array($card['id'], $cardIds)) {
+                                    $count++;
+                                    $this->game->character->removeHindrance($char['characterId'], $card);
+                                }
                             }
+                        }
+                        if ($count > 1) {
+                            throw new BgaUserException($this->game->translate('Only 1 hindrance can be removed'));
                         }
                         $data['nextState'] = 'playerTurn';
                     }

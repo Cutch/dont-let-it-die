@@ -262,6 +262,11 @@ class Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
+    function onHindranceSelectionAfter(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
     function onDeckSelection(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
