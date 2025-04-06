@@ -164,7 +164,7 @@ $itemsData = [
                             array_unique(
                                 array_map(function ($d) {
                                     return $d['characterId'];
-                                }, $state['characters'])
+                                }, $state['selections'])
                             )
                         );
                         if ($characterCount > 1) {
@@ -176,8 +176,8 @@ $itemsData = [
                                 function ($d) {
                                     return $d['cardId'];
                                 },
-                                array_filter($data, function ($d) use ($char) {
-                                    return $d['characterId'] == $char['id'];
+                                array_filter($data['selections'], function ($d) use ($char) {
+                                    return $d['characterId'] == $char['characterId'];
                                 })
                             );
                             foreach ($char['physicalHindrance'] as $i => $card) {

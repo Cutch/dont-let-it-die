@@ -997,8 +997,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   this.reviveScreen.show(args);
                   this.statusBar.addActionButton(this.actionMappings.actRevive + `${suffix}`, () => {
                     if (!this.reviveScreen.hasError()) {
+                      const { characterSelected, foodSelected } = this.reviveScreen.getSelected();
                       this.bgaPerformAction('actRevive', {
-                        character: this.reviveScreen.getSelectedId(),
+                        character: characterSelected,
+                        food: foodSelected,
                       })
                         .then(() => {
                           this.reviveScreen.hide();

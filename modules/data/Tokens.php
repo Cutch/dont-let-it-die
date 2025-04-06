@@ -69,6 +69,9 @@ $tokensData = [
             'count' => 2,
             'health' => 2,
         ],
+        // 'actRevive' => [
+        //     'count' => 6,
+        // ],
     ],
     'bone' => [
         'count' => 8,
@@ -142,6 +145,9 @@ $tokensData = [
         'actEat' => [
             'count' => 1,
             'health' => 2,
+        ],
+        'actRevive' => [
+            'count' => 3,
         ],
     ],
     'fkp' => [

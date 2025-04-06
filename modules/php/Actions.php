@@ -17,9 +17,22 @@ class Actions
                 'state' => ['playerTurn'],
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {
-                    $variables = $game->gameData->getResources('fish-cooked', 'meat-cooked');
-                    $total = array_sum($variables);
-                    return $total >= $game->getReviveCost() &&
+                    $variables = $game->gameData->getResources();
+                    $array = $this->getActionSelectable($action['id']);
+                    $array = array_filter(
+                        $array,
+                        function ($v) use ($variables) {
+                            if (array_key_exists($v['id'], $variables)) {
+                                $available = $variables[$v['id']];
+                                if ($v['id'] == 'meat-cooked' && array_key_exists('fish-cooked', $variables)) {
+                                    $available += $variables['fish-cooked'];
+                                }
+                                return $v['actRevive']['count'] <= $available;
+                            }
+                        },
+                        ARRAY_FILTER_USE_BOTH
+                    );
+                    return sizeof($array) > 0 &&
                         sizeof(
                             array_filter($game->character->getAllCharacterData(), function ($char) {
                                 return $char['incapacitated'] && ($char['health'] ?? 0) == 0;
@@ -27,7 +40,15 @@ class Actions
                         ) > 0;
                 },
                 'selectable' => function (Game $game) {
-                    return ['fish-cooked', 'meat-cooked'];
+                    return array_values(
+                        array_filter(
+                            $game->getValidTokens(),
+                            function ($v, $k) {
+                                return array_key_exists('actRevive', $v);
+                            },
+                            ARRAY_FILTER_USE_BOTH
+                        )
+                    );
                 },
             ],
             'actSpendFKP' => [
@@ -116,8 +137,8 @@ class Actions
                                 function ($d) {
                                     return $d['cardId'];
                                 },
-                                array_filter($data, function ($d) use ($char) {
-                                    return $d['characterId'] == $char['id'];
+                                array_filter($data['selections'], function ($d) use ($char) {
+                                    return $d['characterId'] == $char['characterId'];
                                 })
                             );
                             foreach ($char['physicalHindrance'] as $i => $card) {

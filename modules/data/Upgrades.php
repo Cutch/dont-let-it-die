@@ -403,8 +403,14 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('First Aid'),
         'unlockCost' => 6,
-        'onGetReviveCost' => function (Game $game, $unlock, &$data) {
-            $data['cost'] = 1;
+        'onGetActionSelectable' => function (Game $game, $char, &$data) {
+            if ($data['action'] == 'actRevive') {
+                array_walk($data['selectable'], function (&$d) {
+                    if ($d['id'] == 'meat-cooked') {
+                        $d['actRevive']['count'] = 1;
+                    }
+                });
+            }
         },
     ],
     '5-A' => [
@@ -522,8 +528,8 @@ $upgradesData = [
                                 function ($d) {
                                     return $d['cardId'];
                                 },
-                                array_filter($data, function ($d) use ($char) {
-                                    return $d['characterId'] == $char['id'];
+                                array_filter($data['selections'], function ($d) use ($char) {
+                                    return $d['characterId'] == $char['characterId'];
                                 })
                             );
                             foreach ($char['physicalHindrance'] as $i => $card) {

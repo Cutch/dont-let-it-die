@@ -393,8 +393,8 @@ $charactersData = [
                                 function ($d) {
                                     return $d['cardId'];
                                 },
-                                array_filter($data, function ($d) use ($char) {
-                                    return $d['characterId'] == $char['id'];
+                                array_filter($data['selections'], function ($d) use ($char) {
+                                    return $d['characterId'] == $char['characterId'];
                                 })
                             );
                             foreach ($char['physicalHindrance'] as $i => $card) {
@@ -830,6 +830,12 @@ $charactersData = [
         'name' => 'Oof',
         'startsWith' => 'mortar-and-pestle',
         'slots' => ['weapon', 'tool'],
+        // Revive with 6 cooked berries
+        'onGetActionSelectable' => function (Game $game, $char, &$data) {
+            if ($data['action'] == 'actRevive') {
+                array_push($data['selectable'], [...$game->data->tokens['berry-cooked'], 'actRevive' => ['count' => 6]]);
+            }
+        },
         'skills' => [
             'skill1' => [
                 'type' => 'skill',
@@ -860,8 +866,8 @@ $charactersData = [
                                 function ($d) {
                                     return $d['cardId'];
                                 },
-                                array_filter($data, function ($d) use ($char) {
-                                    return $d['characterId'] == $char['id'];
+                                array_filter($data['selections'], function ($d) use ($char) {
+                                    return $d['characterId'] == $char['characterId'];
                                 })
                             );
                             foreach ($char['physicalHindrance'] as $i => $card) {

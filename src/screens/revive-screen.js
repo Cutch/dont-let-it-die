@@ -2,8 +2,8 @@ class ReviveScreen {
   constructor(game) {
     this.game = game;
   }
-  getSelectedId() {
-    return this.characterSelected;
+  getSelected() {
+    return { characterSelected: this.characterSelected, foodSelected: this.foodSelected };
   }
   hasError() {
     return false;
@@ -16,6 +16,7 @@ class ReviveScreen {
   }
   show(gameData) {
     this.characterSelected = null;
+    this.foodSelected = null;
     const canUseFish = gameData.characters && !gameData.characters.some((d) => d.name === 'Sig');
     let eatElem = document.querySelector(`#eat-resource .tokens`);
     let characterElem = document.querySelector(`#revive-character .tokens`);
@@ -27,7 +28,7 @@ class ReviveScreen {
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="revive-screen" class="dlid__container">
-            <div id="eat-resource" class="dlid__container"><h3>${_('Food')}</h3><div class="tokens selected"></div></div>
+            <div id="eat-resource" class="dlid__container"><h3>${_('Food')}</h3><div class="tokens"></div></div>
             <div id="revive-character" class="dlid__container"><h3>${_('Characters')}</h3><div class="tokens"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
           </div>`,
@@ -41,33 +42,48 @@ class ReviveScreen {
     }
     eatElem.innerHTML = '';
     characterElem.innerHTML = '';
-    const renderResource = (elem) => {
-      const available = gameData.game.resources['meat-cooked'] + gameData.game.resources['fish-cooked'];
-      const requires = 3;
+    const renderResource = (food, elem, selectCallback) => {
+      const available =
+        (gameData.game.resources[food.id] ?? 0) + (food.id == 'meat-cooked' ? gameData.game.resources['fish-cooked'] ?? 0 : 0);
+      const requires = food['count'];
       elem.insertAdjacentHTML(
         'beforeend',
-        `<div class="token-block ">
-            <div class="name">${_('Meat')}</div>
+        `<div class="token-block ${food['id']}">
+            <div class="name">${_(allSprites[food.id].options.name)}</div>
             <div class="available line"><span class="label">${_('Available')}: </span><span class="value">${available}</span></div>
             <div class="requires line"><span class="label">${_('Requires')}: </span><span class="value">${requires}</span></div>
             <div class="health line"><span class="label">${_(
               'Health',
             )}: </span><span class="value">3 <i class="fa fa-heart"></i></span></div>
             <div class="margin"></div>
-            <div class="token meat-tokens"></div>
+            <div class="token ${food['id']}"></div>
         <div>`,
       );
-      if (!canUseFish) renderImage('fish-cooked', elem.querySelector(`.token.meat-tokens`), { scale: 2, pos: 'insert' });
-      renderImage('meat-cooked', elem.querySelector(`.token.meat-tokens`), { scale: 2, pos: 'insert' });
+      if (food.id == 'meat-cooked')
+        if (!canUseFish) renderImage('fish-cooked', elem.querySelector(`.token.${food['id']}`), { scale: 2, pos: 'insert' });
+      renderImage(food.id, elem.querySelector(`.token.${food['id']}`), { scale: 2, pos: 'insert' });
+      addClickListener(elem.querySelector(`.token-block.${food['id']}`), _(this.game.data[food['id']].options.name), () =>
+        selectCallback(),
+      );
     };
-    renderResource(eatElem);
+    gameData.revivableFoods.forEach((food, i) => {
+      renderResource(food, eatElem, () => {
+        if (this.foodSelected) {
+          document.querySelector(`#revive-screen .token-block.${this.foodSelected}`).style['outline'] = '';
+        }
+        this.foodSelected = food['id'];
+        if (this.foodSelected) {
+          document.querySelector(`#revive-screen .token-block.${food['id']}`).style['outline'] = `5px solid #fff`;
+        }
+      });
+    });
 
     const renderItem = (name, elem, selectCallback) => {
       elem.insertAdjacentHTML(
         'beforeend',
         `<div class="token-number-counter ${name}">
             <div class="token ${name}"></div>
-            <div>`,
+        <div>`,
       );
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), name, () => selectCallback());

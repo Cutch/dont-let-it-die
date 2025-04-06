@@ -387,23 +387,32 @@ class Game extends \Table
         ]);
         $this->gameData->set('lastAction', 'actCook');
     }
-    public function getReviveCost(): int
-    {
-        $data = ['amount' => 3];
-        $this->hooks->onGetReviveCost($data);
-        return $data['amount'];
-    }
-    public function actRevive(?string $character): void
+    public function actRevive(?string $character, ?string $food): void
     {
         if (!$character) {
             throw new BgaUserException($this->translate('Select a character'));
+        }
+        if (!$food) {
+            throw new BgaUserException($this->translate('Select a food'));
         }
         if (!$this->character->getCharacterData($character)['incapacitated']) {
             throw new BgaUserException($this->translate('That character is not incapacitated'));
         }
         $this->actions->validateCanRunAction('actRevive');
-        $left = $this->adjustResource('fish-cooked', -$this->getReviveCost())['left'];
-        $this->adjustResource('meat-cooked', $left);
+        $requireCount = array_values(
+            array_filter($this->actions->getActionSelectable('actRevive'), function ($d) use ($food) {
+                return $d['id'] == $food;
+            })
+        )[0]['actRevive']['count'];
+        if ($food == 'meat-cooked') {
+            $left = $this->adjustResource('fish-cooked', -$requireCount)['left'];
+            $left = $this->adjustResource('meat-cooked', $left)['left'];
+        } else {
+            $left = $this->adjustResource('fish-cooked', -$requireCount);
+        }
+        if ($left != 0) {
+            throw new BgaUserException($this->translate('Not enough resources'));
+        }
 
         $this->character->updateCharacterData($character, function (&$data) {
             $data['health'] = clamp(3, 0, $data['maxHealth']);
@@ -1343,8 +1352,8 @@ class Game extends \Table
                     $this->hooks->onAcquireHindrance($card);
                     $this->gameData->set('state', ['card' => $card, 'deck' => $card['deckType']]);
                     $moveToDrawCardState = true;
-                    $this->activeCharacterEventLog('${sentence} ${name}', [
-                        'sentence' => $card['sentence'],
+                    $this->activeCharacterEventLog('${acquireSentence} ${name}', [
+                        'acquireSentence' => $card['acquireSentence'],
                         'name' => $card['name'],
                         ...$card,
                     ]);
@@ -1847,6 +1856,10 @@ class Game extends \Table
             $this->hooks->onGetEatData($data);
             return $data;
         }, $this->actions->getActionSelectable('actEat'));
+        $result['revivableFoods'] = array_map(function ($eatable) {
+            $data = [...$eatable['actRevive'], 'id' => $eatable['id']];
+            return $data;
+        }, $this->actions->getActionSelectable('actRevive'));
         $selectable = $this->actions->getActionSelectable('actCraft');
 
         $result['availableEquipment'] = array_combine(

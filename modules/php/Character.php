@@ -307,8 +307,8 @@ class Character
         });
         $this->game->decks->removeFromDeck($card['deck'], $card['id']);
         $this->game->hooks->onAcquireHindrance($card);
-        $this->game->activeCharacterEventLog('${sentence} ${name}', [
-            'sentence' => $card['sentence'],
+        $this->game->activeCharacterEventLog('${acquireSentence} ${name}', [
+            'acquireSentence' => $card['acquireSentence'],
             'name' => $card['name'],
             'character_name' => $this->game->getCharacterHTML($characterName),
         ]);
@@ -323,8 +323,8 @@ class Character
                 }
             );
         });
-        $this->game->activeCharacterEventLog('no longer ${sentence} ${cardName}', [
-            'sentence' => $card['sentence'],
+        $this->game->activeCharacterEventLog('no longer ${dropSentence} ${cardName}', [
+            'dropSentence' => $card['dropSentence'],
             'cardName' => $card['name'],
             'character_name' => $this->game->getCharacterHTML($characterName),
         ]);

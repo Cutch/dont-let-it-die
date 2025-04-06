@@ -502,7 +502,8 @@ $expansionData = [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Blind'),
         'onAcquireHindrance' => function (Game $game, $card, &$data) {
             if ($card['id'] == $data['id']) {
@@ -552,7 +553,8 @@ $expansionData = [
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Berserk'),
         'onAdjustHealth' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
@@ -599,7 +601,8 @@ $expansionData = [
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Cowardly'),
         'onResolveDraw' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
@@ -617,7 +620,8 @@ $expansionData = [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('has a'),
+        'acquireSentence' => clienttranslate('has a'),
+        'dropSentence' => clienttranslate('no longer has a'),
         'name' => clienttranslate('Broken Leg'),
         'onGetValidActions' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
@@ -634,7 +638,8 @@ $expansionData = [
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Obsessive'),
         'onEndTurn' => function (Game $game, $card, &$data) {
             if ($card['id'] == $data['id']) {
@@ -654,7 +659,8 @@ $expansionData = [
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Paranoid'),
         // Always eat
     ],
@@ -662,7 +668,8 @@ $expansionData = [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('has a'),
+        'acquireSentence' => clienttranslate('has a'),
+        'dropSentence' => clienttranslate('no longer has a'),
         'name' => clienttranslate('Bad Back'),
         'onAcquireHindrance' => function (Game $game, $card, &$data) {
             if ($card['id'] == $data['id']) {
@@ -688,7 +695,8 @@ $expansionData = [
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Depressed'),
         'onGetActionCost' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['stamina'] > 0) {
@@ -701,7 +709,8 @@ $expansionData = [
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Dumb'),
         'onGetActionCost' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['action'] == 'actInvestigateFire') {
@@ -720,7 +729,8 @@ $expansionData = [
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Forgetful'),
         'onActDraw' => function (Game $game, $card, &$data) {
             if (
@@ -740,7 +750,8 @@ $expansionData = [
         'deckType' => 'mental-hindrance',
         'expansion' => 'hindrance',
         'type' => 'deck',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Anti-Social'),
         // Can't trade
         // Can't be healed by skills, going to handle this on the individual skills
@@ -772,7 +783,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Sun Burnt'),
         'onGetValidActions' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
@@ -785,7 +797,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('has'),
+        'acquireSentence' => clienttranslate('has'),
+        'dropSentence' => clienttranslate('no longer has'),
         'name' => clienttranslate('Swollen Eyes'),
         'onDraw' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId() && $card['deckType'] == 'resource') {
@@ -798,7 +811,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('has a'),
+        'acquireSentence' => clienttranslate('has a'),
+        'dropSentence' => clienttranslate('no longer has a'),
         'name' => clienttranslate('Deep Wound'),
         'onGetCharacterData' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
@@ -812,7 +826,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Dehydrated'),
         'onEncounterPre' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
@@ -825,7 +840,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('has a'),
+        'acquireSentence' => clienttranslate('has a'),
+        'dropSentence' => clienttranslate('no longer has a'),
         'name' => clienttranslate('Twisted Ankle'),
         'onGetCharacterData' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
@@ -839,7 +855,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Nauseous'),
         'onGetValidActions' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId() && getUsePerDay($card['id'] . 'nauseous', $game) < 1) {
@@ -858,7 +875,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('has'),
+        'acquireSentence' => clienttranslate('has'),
+        'dropSentence' => clienttranslate('no longer has'),
         'name' => clienttranslate('Parasites'),
         'onAdjustHealth' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['change'] > 0) {
@@ -871,7 +889,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Sick'),
         // Physical hindrances need medical herbs to remove
     ],
@@ -880,7 +899,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Diseased'),
         'onMorning' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
@@ -897,7 +917,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Exhausted'),
         'onMorningAfter' => function (Game $game, $card, &$data) {
             $game->character->adjustStamina($game->character->getTurnCharacterId(), -2);
@@ -909,7 +930,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('is'),
+        'acquireSentence' => clienttranslate('is'),
+        'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Malnourished'),
         'onEncounterPre' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
@@ -922,7 +944,8 @@ $expansionData = [
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
         'expansion' => 'hindrance',
-        'sentence' => clienttranslate('has a'),
+        'acquireSentence' => clienttranslate('has a'),
+        'dropSentence' => clienttranslate('no longer has a'),
         'name' => clienttranslate('Concussion'),
         'onInvestigateFire' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {

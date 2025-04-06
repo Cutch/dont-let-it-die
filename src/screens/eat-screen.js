@@ -45,7 +45,7 @@ class EatScreen {
       elem.insertAdjacentHTML(
         'beforeend',
         `<div class="token-block ${food['id']}">
-            <div class="name">${allSprites[food['id']].options.name}</div>
+            <div class="name">${_(allSprites[food['id']].options.name)}</div>
             <div class="available line"><span class="label">${_('Available')}: </span><span class="value">${available}</span></div>
             <div class="requires line"><span class="label">${_('Requires')}: </span><span class="value">${requires}</span></div>
             <div class="health line ${food['health'] ? '' : 'hidden'}"><span class="label">${_('Health')}: </span><span class="value">${
@@ -59,7 +59,9 @@ class EatScreen {
         <div>`,
       );
       renderImage(food['id'], elem.querySelector(`.token.${food['id']}`), { scale: 2, pos: 'insert' });
-      addClickListener(elem.querySelector(`.token-block.${food['id']}`), this.game.data[food['id']].options.name, () => selectCallback());
+      addClickListener(elem.querySelector(`.token-block.${food['id']}`), _(this.game.data[food['id']].options.name), () =>
+        selectCallback(),
+      );
     };
     gameData.eatableFoods.forEach((food, i) => {
       const available = gameData.game.resources[food['id']];

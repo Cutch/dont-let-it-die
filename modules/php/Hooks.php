@@ -343,11 +343,6 @@ class Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onGetReviveCost(&$data, array $args = [])
-    {
-        $this->callHooks(__FUNCTION__, $args, $data);
-        return $data;
-    }
     function onAddFireWood(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
