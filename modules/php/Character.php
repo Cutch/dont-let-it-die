@@ -473,35 +473,38 @@ class Character
     {
         return (int) $this->getSubmittingCharacter()['stamina'];
     }
-    public function adjustAllStamina(int $stamina): void
+    public function _adjustStamina(array &$data, int $staminaChange, &$prev, $characterName): bool
     {
-        $this->updateAllCharacterData(function (&$data) use ($stamina) {
-            $data['stamina'] = clamp($data['stamina'] + $stamina, 0, $data['maxStamina']);
+        $prev = $data['stamina'];
+        $hookData = [
+            'currentStamina' => $prev,
+            'change' => $staminaChange,
+            'characterId' => $characterName,
+            'maxStamina' => $data['maxStamina'],
+        ];
+        $this->game->hooks->onAdjustStamina($hookData);
+        $data['stamina'] = clamp($data['stamina'] + $hookData['change'], 0, $data['maxStamina']);
+        $prev = $data['stamina'] - $prev;
+        return $prev == 0;
+    }
+    public function adjustAllStamina(int $staminaChange): void
+    {
+        $prev = 0;
+        $this->updateAllCharacterData(function (&$data) use ($staminaChange, &$prev) {
+            return $this->_adjustStamina($data, $staminaChange, $prev, $data['characterId']);
         });
     }
     public function adjustStamina(string $characterName, int $staminaChange): int
     {
         $prev = 0;
-        $this->updateCharacterData($characterName, function (&$data) use ($staminaChange, $characterName, &$prev) {
-            $prev = $data['stamina'];
-            $hookData = [
-                'currentStamina' => $prev,
-                'change' => $staminaChange,
-                'characterId' => $characterName,
-                'maxStamina' => $data['maxStamina'],
-            ];
-            $this->game->hooks->onAdjustStamina($hookData);
-            $data['stamina'] = clamp($data['stamina'] + $hookData['change'], 0, $data['maxStamina']);
-            $prev = $data['stamina'] - $prev;
-            $this->game->log('stamina', $data['stamina']);
-            return $prev == 0;
+        $this->updateCharacterData($characterName, function (&$data) use ($staminaChange, &$prev, $characterName) {
+            return $this->_adjustStamina($data, $staminaChange, $prev, $characterName);
         });
         return $prev;
     }
     public function adjustActiveStamina(int $stamina): int
     {
         $characterName = $this->getSubmittingCharacter()['character_name'];
-        $this->game->log('$cost', $characterName, $stamina);
         return $this->adjustStamina($characterName, $stamina);
     }
     public function getActiveHealth(): int
@@ -509,45 +512,51 @@ class Character
         return (int) $this->getSubmittingCharacter()['health'];
     }
 
-    public function adjustAllHealth(int $health): void
+    public function _adjustHealth(array &$data, $healthChange, &$prev, $characterName): bool
     {
-        $this->updateAllCharacterData(function (&$data) use ($health) {
-            $data['health'] = clamp($data['health'] + $health, 0, $data['maxHealth']);
+        if ($data['incapacitated'] && $healthChange > 0) {
+            return true;
+        }
+        $prev = $data['health'];
+        $hookData = [
+            'currentHealth' => $prev,
+            'change' => $healthChange,
+            'characterId' => $characterName,
+            'maxHealth' => $data['maxHealth'],
+        ];
+        $this->game->hooks->onAdjustHealth($hookData);
+        $data['health'] = clamp($data['health'] + $hookData['change'], 0, $data['maxHealth']);
+        $prev = $data['health'] - $prev;
+        if ($data['health'] == 0 && !$data['incapacitated']) {
+            $this->game->activeCharacterEventLog('is incapacitated', [
+                'character_name' => $this->game->getCharacterHTML($characterName),
+            ]);
+            $data['incapacitated'] = true;
+            $data['stamina'] = 0;
+            if ($data['isActive'] && $this->game->gamestate->state()['name'] == 'playerTurn') {
+                $this->game->endTurn();
+            }
+            $hookData = [
+                'characterId' => $characterName,
+            ];
+            $this->game->hooks->onIncapacitation($hookData);
+            return false;
+        } else {
+            return $prev == 0;
+        }
+    }
+    public function adjustAllHealth(int $healthChange): void
+    {
+        $prev = 0;
+        $this->updateAllCharacterData(function (&$data) use ($healthChange, &$prev) {
+            return $this->_adjustHealth($data, $healthChange, $prev, $data['characterId']);
         });
     }
     public function adjustHealth(string $characterName, int $healthChange): int
     {
         $prev = 0;
         $this->updateCharacterData($characterName, function (&$data) use ($healthChange, &$prev, $characterName) {
-            if ($data['incapacitated'] && $healthChange > 0) {
-                return;
-            }
-            $prev = $data['health'];
-            $hookData = [
-                'currentHealth' => $prev,
-                'change' => $healthChange,
-                'characterId' => $characterName,
-                'maxHealth' => $data['maxHealth'],
-            ];
-            $this->game->hooks->onAdjustHealth($hookData);
-            $data['health'] = clamp($data['health'] + $hookData['change'], 0, $data['maxHealth']);
-            $prev = $data['health'] - $prev;
-            if ($data['health'] == 0 && !$data['incapacitated']) {
-                $this->game->activeCharacterEventLog('has been incapacitated', [
-                    'character_name' => $this->game->getCharacterHTML($characterName),
-                ]);
-                $data['incapacitated'] = true;
-                $data['stamina'] = 0;
-                if ($data['isActive'] && $this->game->gamestate->state()['name'] == 'playerTurn') {
-                    $this->game->endTurn();
-                }
-                $hookData = [
-                    'characterId' => $characterName,
-                ];
-                $this->game->hooks->onIncapacitation($hookData);
-            } else {
-                return $prev == 0;
-            }
+            return $this->_adjustHealth($data, $healthChange, $prev, $characterName);
         });
         return $prev;
     }

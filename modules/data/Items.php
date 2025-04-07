@@ -200,7 +200,7 @@ $itemsData = [
                         array_filter($game->character->getAllCharacterData(false), function ($d) {
                             return sizeof($d['physicalHindrance']) > 0;
                         })
-                        ) > 0;
+                    ) > 0;
                 },
             ],
         ],
@@ -738,7 +738,7 @@ $itemsData = [
             }
         },
         'onIncapacitation' => function (Game $game, $item, &$data) {
-            $char = $game->character->getCharacterData($item['characterId']);
+            $char = $game->character->getCharacterData($item['characterId'], true);
             if ($char['isActive']) {
                 $game->activeCharacterEventLog('used their bandage to revive');
                 $game->destroyItem($item['itemId']);

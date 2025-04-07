@@ -1285,7 +1285,7 @@ class Game extends \Table
         // if (!$this->actInterrupt->checkForInterrupt()) {
         $char = $this->character->getTurnCharacter();
         if ($char['isActive'] && $char['incapacitated']) {
-            $this->activeCharacterEventLog('is still incapacitated');
+            $this->activeCharacterEventLog('is incapacitated');
             $this->endTurn();
         }
         // }
@@ -1697,7 +1697,8 @@ class Game extends \Table
                 $woodNeeded = $data['woodNeeded'];
                 $this->character->updateAllCharacterData(function (&$data) use ($health, $stamina, $skipMorningDamage) {
                     if (!in_array($data['id'], $skipMorningDamage)) {
-                        $data['health'] = clamp($data['health'] + $health, 0, $data['maxHealth']);
+                        $prev = 0;
+                        $this->character->_adjustHealth($data, $health, $prev, $data['id']);
                     }
                     if ($data['incapacitated'] && $data['health'] > 0) {
                         $data['incapacitated'] = false;
@@ -1887,7 +1888,12 @@ class Game extends \Table
     {
         $result['game'] = $this->gameData->getAll();
         $result['game']['prevResources'] = $this->gameData->getPreviousResources();
-
+        // Need to remove these otherwise the response is too big
+        unset($result['game']['encounterState']);
+        unset($result['game']['hindranceSelectionState']);
+        unset($result['game']['interruptState']);
+        unset($result['game']['actInterruptState']);
+        unset($result['game']['characterSelectionState']);
         $resourcesAvailable = [];
         array_walk($this->data->tokens, function ($v, $k) use (&$result, &$resourcesAvailable) {
             if ($v['type'] == 'resource' && isset($result['game']['resources'][$k])) {
