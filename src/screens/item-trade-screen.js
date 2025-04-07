@@ -51,6 +51,7 @@ class ItemTradeScreen {
     document.querySelectorAll('#item-trade-screen .selected').forEach((d) => {
       d.classList.remove('selected');
     });
+    this.selection = [];
     const tween = new Tweening(this.game, document.querySelector(`#item-trade-screen`));
     this.show(gameData);
     setTimeout(() => {
@@ -64,8 +65,30 @@ class ItemTradeScreen {
           document.querySelector(`.character-${character2 ?? null}.item-${itemId2 ?? null}`),
           document.querySelector(`.character-${character1 ?? null}.item-${itemId2 ?? null}`),
         );
-      this.selection = [];
     }, 0);
+  }
+  getElem({ character, itemId }) {
+    if (character) {
+      if (itemId == null) {
+        return document.querySelector(`#item-trade-screen__${character.id} .items .empty`);
+      } else {
+        return document.querySelector(`#item-trade-screen__${character.id} .items .item-${itemId}`);
+      }
+    } else {
+      if (itemId == null) {
+        return document.querySelector(`#item-trade-screen__camp .items .empty`);
+      } else {
+        return document.querySelector(`#item-trade-screen__camp .items .item-${itemId}`);
+      }
+    }
+  }
+  showConfirm(gameData) {
+    document.querySelectorAll('#item-trade-screen .selected').forEach((d) => {
+      d.classList.remove('selected');
+    });
+    this.selection = [];
+    this.getElem(gameData.trade1).classList.add('selected');
+    this.getElem(gameData.trade2).classList.add('selected');
   }
   show(gameData) {
     this.itemSelected = null;
@@ -128,7 +151,7 @@ class ItemTradeScreen {
         });
         addClickListener(document.querySelector(`#item-trade-screen__${character.name} .character-image`), character.name, () => {
           this.game.tooltip.show();
-          renderImage(character.name, this.game.tooltip.renderByElement(), { scale: this.scale, pos: 'replace' });
+          renderImage(character.name, this.game.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
         });
       });
     }

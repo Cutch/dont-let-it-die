@@ -419,26 +419,28 @@ $charactersData = [
                         if ($myCount > 1) {
                             throw new BgaUserException($this->game->translate('Only 1 hindrance can be traded'));
                         }
-                        if ($card2) {
-                            $game->character->updateCharacterData($myCharId, function (&$char) use ($card1, $card2, $game) {
-                                if ($card1) {
-                                    $char['physicalHindrance'] = array_filter($char['physicalHindrance'], function ($d) use ($card1) {
-                                        return $card1['id'] != $d['id'];
-                                    });
-                                }
+                        $game->character->updateCharacterData($myCharId, function (&$char) use ($card1, $card2, $game) {
+                            if ($card1) {
+                                $char['physicalHindrance'] = array_filter($char['physicalHindrance'], function ($d) use ($card1) {
+                                    return $card1['id'] != $d['id'];
+                                });
+                            }
+                            if ($card2) {
                                 array_push($char['physicalHindrance'], $card2);
-                            });
-                        }
-                        if ($card1) {
-                            $game->character->updateCharacterData($otherCharId, function (&$char) use ($card1, $card2, $game) {
-                                if ($card2) {
-                                    $char['physicalHindrance'] = array_filter($char['physicalHindrance'], function ($d) use ($card2) {
-                                        return $card2['id'] != $d['id'];
-                                    });
-                                }
+                            }
+                        });
+
+                        $game->character->updateCharacterData($otherCharId, function (&$char) use ($card1, $card2, $game) {
+                            if ($card2) {
+                                $char['physicalHindrance'] = array_filter($char['physicalHindrance'], function ($d) use ($card2) {
+                                    return $card2['id'] != $d['id'];
+                                });
+                            }
+                            if ($card1) {
                                 array_push($char['physicalHindrance'], $card1);
-                            });
-                        }
+                            }
+                        });
+
                         // $game->character->updateAllCharacterData(function ($charData) use ($state) {
                         //     foreach ($state['characters'] as $i => $char) {
                         //         if ($charData['characterId'] == $char) {

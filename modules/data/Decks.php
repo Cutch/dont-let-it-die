@@ -717,7 +717,7 @@ $decksData = [
                     if (
                         sizeof(
                             array_filter($character['equipment'], function ($equipment) {
-                                return $equipment['weapon'];
+                                return $equipment['itemType'] == 'weapon';
                             })
                         )
                     ) {

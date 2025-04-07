@@ -509,7 +509,7 @@ $expansionData = [
             if ($card['id'] == $data['id']) {
                 $character = $game->character->getTurnCharacter();
                 $weapons = array_filter($character['equipment'], function ($item) {
-                    return $item['range'] > 1;
+                    return $item['itemType'] == 'weapon' && $item['range'] > 1;
                 });
                 // Only range 1 weapon can be equipped
                 if (sizeof($weapons) > 0) {

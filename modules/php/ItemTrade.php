@@ -148,7 +148,6 @@ class ItemTrade
                 'character2' => null,
             ]);
         } else {
-            $this->game->log($trade1, $trade2);
             if ($trade1['character']['player_id'] != $trade2['character']['player_id']) {
                 $this->game->gameData->set('tradeState', [
                     'trade1' => $trade1,
@@ -292,7 +291,13 @@ class ItemTrade
     }
     public function argWaitTradePhase($playerId)
     {
-        $result = [];
+        $state = $this->game->gameData->get('tradeState');
+        $trade1 = $state['trade1'];
+        $trade2 = $state['trade2'];
+        $result = [
+            'trade1' => $trade1,
+            'trade2' => $trade2,
+        ];
         return $result;
     }
     public function argTradePhase()

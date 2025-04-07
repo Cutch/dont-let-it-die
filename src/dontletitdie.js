@@ -805,6 +805,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'tradePhase':
           this.itemTradeScreen.show(args.args);
           break;
+        case 'confirmTradePhase':
+        case 'waitTradePhase':
+          this.itemTradeScreen.showConfirm(args.args);
+          break;
         // case 'nightDrawCard':
         // case 'drawCard':
         //   if (!args.args.resolving) {
@@ -1181,6 +1185,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             // No Cancel Button
             break;
           case 'dinnerPhase':
+          case 'dinnerPhasePrivate':
           case 'tradePhase':
           case 'postEncounter':
             this.statusBar.addActionButton(_('Done'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });

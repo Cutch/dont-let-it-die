@@ -1544,9 +1544,11 @@ class Game extends \Table
         while (true) {
             if ($this->character->isLastCharacter()) {
                 $this->gamestate->nextState('dinnerPhase');
+                $this->actions->clearDayEvent();
                 break;
             } else {
                 $this->character->activateNextCharacter();
+                $this->actions->clearDayEvent();
                 if ($this->character->getActiveHealth() == 0) {
                     $this->notify->all('playerTurn', clienttranslate('${character_name} is incapacitated'), []);
                 } else {
@@ -1557,9 +1559,8 @@ class Game extends \Table
             }
         }
     }
-    public function argDinnerPhase()
+    public function argDinnerPhase($playerId)
     {
-        $playerId = $this->getCurrentPlayer();
         $actions = array_map(function ($char) {
             return [
                 'action' => 'actEat',
@@ -1583,6 +1584,7 @@ class Game extends \Table
             foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
                 $this->giveExtraTime((int) $playerId);
             }
+            $this->gamestate->initializePrivateStateForAllActivePlayers();
         } else {
             $this->notify->all('playerTurn', clienttranslate('The tribe skipped dinner as there is nothing to eat'));
             $this->gamestate->nextState('nightPhase');

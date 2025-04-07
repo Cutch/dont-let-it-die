@@ -269,15 +269,24 @@ $machinestates = [
             'resolveEncounter' => 20,
         ],
     ],
-    29 => [
+    28 => [
         'name' => 'dinnerPhase',
         'description' => clienttranslate('Waiting for everyone to eat'),
         'descriptionmyturn' => clienttranslate('It\'s dinner time'),
         'type' => 'multipleactiveplayer',
         'action' => 'stDinnerPhase',
+        // 'args' => 'argDinnerPhase',
+        'possibleactions' => [],
+        'transitions' => ['nightPhase' => 30],
+        'initialprivate' => 29,
+    ],
+    29 => [
+        'name' => 'dinnerPhasePrivate',
+        'description' => clienttranslate('Waiting for everyone to eat'),
+        'descriptionmyturn' => clienttranslate('It\'s dinner time'),
+        'type' => 'private',
         'args' => 'argDinnerPhase',
         'possibleactions' => ['actEat', 'actDone'],
-        'transitions' => ['nightPhase' => 30],
     ],
     30 => [
         'name' => 'nightPhase',

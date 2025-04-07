@@ -100,6 +100,7 @@ $itemsData = [
                 'state' => ['interrupt'],
                 'interruptState' => ['morningPhase'],
                 'perDay' => 1,
+                'global' => true,
                 'onMorning' => function (Game $game, $skill, &$data) {
                     $game->actInterrupt->addSkillInterrupt($skill);
                 },
@@ -195,12 +196,10 @@ $itemsData = [
                     }
                 },
                 'requires' => function (Game $game, $skill) {
-                    // $char = $game->character->getCharacterData($skill['characterId']);
-                    return ///$char['isActive'] &&
-                        sizeof(
-                            array_filter($game->character->getAllCharacterData(false), function ($d) {
-                                return sizeof($d['physicalHindrance']) > 0;
-                            })
+                    return sizeof(
+                        array_filter($game->character->getAllCharacterData(false), function ($d) {
+                            return sizeof($d['physicalHindrance']) > 0;
+                        })
                         ) > 0;
                 },
             ],
