@@ -631,6 +631,17 @@ $decksData = [
         'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Everyone is injured');
             // Everyone take physical hindrance
+            foreach ($game->character->getAllCharacterIds() as $i => $char) {
+                $game->checkHindrance(true, $char);
+                // $card = $game->decks->pickCard('physical-hindrance');
+                // $game->character->addHindrance($char, $card);
+                // $game->gameData->set('state', [
+                //     'card' => $card,
+                //     'deck' => 'physical-hindrance',
+                //     'nextState' => $game->gamestate->state()['name'],
+                // ]);
+                // $game->gamestate->nextState('drawCard');
+            }
         },
     ],
     'night-event-8_1' => [

@@ -36,19 +36,13 @@ class Encounter
     {
         $validActions = $this->game->actions->getValidActions();
 
-        if (sizeof($validActions) == 0) {
-            $this->game->gamestate->nextState('getHindrance');
-        }
-    }
-    public function stGetHindrance()
-    {
         $encounterState = $this->game->gameData->get('encounterState');
 
         if ($encounterState['damageTaken'] > 0) {
-            if ($this->game->checkHindrance(true)) {
-                $this->game->gameData->set('encounterState', []);
-                $this->game->gamestate->nextState('playerTurn');
-            }
+            $this->game->checkHindrance(true);
+        }
+        if (sizeof($validActions) == 0) {
+            $this->game->gamestate->nextState('playerTurn');
         }
     }
     public function countDamageTaken($data)

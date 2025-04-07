@@ -160,11 +160,15 @@ class Game extends \Table
     {
         $this->notify->all('nightEvent', clienttranslate($message), $arg);
     }
-    public function checkHindrance($drawPhysical = true): bool
+    public function checkHindrance($drawPhysical = true, ?string $char = null): bool
     {
         $data = ['maxPhysicalHindrance' => 3, 'maxMentalHindrance' => 1, 'canDrawMentalHindrance' => true];
+        if (!$char) {
+            $char = $this->character->getSubmittingCharacter(true);
+        } else {
+            $char = $this->character->getCharacterData($char, true);
+        }
         $this->hooks->onMaxHindrance($data);
-        $char = $this->character->getSubmittingCharacter();
         $deckType = 'physical-hindrance';
         if (sizeof($char['physicalHindrance']) == $data['maxPhysicalHindrance']) {
             // Skip removal and hindrance draw if mental hindrance is maxed out
@@ -182,9 +186,7 @@ class Game extends \Table
         if ($deckType != 'mental-hindrance' || $data['canDrawMentalHindrance']) {
             $card = $this->decks->pickCard($deckType);
             if ($card) {
-                $this->character->addHindrance($this->character->getSubmittingCharacterId(), $card);
-                $this->gameData->set('state', ['card' => $card, 'deck' => $deckType]);
-                $this->gamestate->nextState('drawCard');
+                $this->character->addHindrance($char['character_name'], $card);
             } else {
                 return true;
             }
@@ -1269,10 +1271,6 @@ class Game extends \Table
     {
         $this->encounter->stPostEncounter();
     }
-    public function stGetHindrance()
-    {
-        $this->encounter->stGetHindrance();
-    }
     public function stResolveEncounter()
     {
         $this->encounter->stResolveEncounter();
@@ -1294,7 +1292,6 @@ class Game extends \Table
     }
     public function stDrawCard()
     {
-        $moveToDrawCardState = false;
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),
@@ -1351,10 +1348,9 @@ class Game extends \Table
                     ($card['deckType'] == 'physical-hindrance' || $card['deckType'] == 'mental-hindrance')
                 ) {
                     $card = $this->decks->pickCard($card['deckType']);
-                    $this->character->addHindrance($this->character->getSubmittingCharacterId(), $card);
-                    $this->hooks->onAcquireHindrance($card);
-                    $this->gameData->set('state', ['card' => $card, 'deck' => $card['deckType']]);
-                    $moveToDrawCardState = true;
+                    $this->checkHindrance(true, $this->character->getSubmittingCharacterId());
+                    // $this->character->addHindrance($this->character->getSubmittingCharacterId(), $card);
+                    $this->gamestate->nextState('playerTurn');
                 } elseif ($card['deckType'] == 'day-event') {
                     $this->gamestate->nextState('dayEvent');
                 } else {

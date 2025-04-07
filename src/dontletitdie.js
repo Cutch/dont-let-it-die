@@ -165,7 +165,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             .map((d) => `<span class="equipment-item equipment-${d.itemId}">${_(d.name)}</span>`)
             .join(', ') || 'None';
         playerSideContainer.querySelector(`.hindrance .value`).innerHTML =
-          hindrance.map((d) => `<span class="hindrance-item hindrance-${d.itemId}">${_(d.name)}</span>`).join(', ') || 'None';
+          hindrance.map((d) => `<span class="hindrance-item hindrance-${d.id}">${_(d.name)}</span>`).join(', ') || 'None';
         playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
         [...equipments, ...character.dayEvent, ...character.necklaces].forEach((d) => {
           addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), _(d.name), () => {
@@ -174,7 +174,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           });
         });
         hindrance.forEach((d) => {
-          addClickListener(playerSideContainer.querySelector(`.hindrance-${d.itemId}`), _(d.name), () => {
+          addClickListener(playerSideContainer.querySelector(`.hindrance-${d.id}`), _(d.name), () => {
             this.tooltip.show();
             renderImage(d.id, this.tooltip.renderByElement(), { scale: 1.5, pos: 'replace', rotate: d.rotate, centered: true });
           });

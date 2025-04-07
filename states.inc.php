@@ -159,7 +159,7 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stNextCharacter',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'dinnerPhase' => 29],
+        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'dinnerPhase' => 28],
     ],
     16 => [
         'name' => 'characterSelection',
@@ -206,15 +206,6 @@ $machinestates = [
         'action' => 'stPostEncounter',
         'args' => 'argPostEncounter',
         'possibleactions' => [],
-        'transitions' => ['playerTurn' => 10, 'getHindrance' => 25, 'drawCard' => 11],
-    ],
-    25 => [
-        'name' => 'getHindrance',
-        'description' => clienttranslate('Resolving Encounter'),
-        'descriptionmyturn' => clienttranslate('Resolving Encounter'),
-        'type' => 'activeplayer',
-        'action' => 'stGetHindrance',
-        'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => ['playerTurn' => 10, 'drawCard' => 11],
     ],
     22 => [
