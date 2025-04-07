@@ -528,6 +528,8 @@ $expansionData = [
         'deck' => 'physical-hindrance',
         'deckType' => 'physical-hindrance',
         'type' => 'deck',
+        'acquireSentence' => clienttranslate('has a'),
+        'dropSentence' => clienttranslate('no longer has a'),
         'name' => clienttranslate('Broken Arm'),
         'onAcquireHindrance' => function (Game $game, $card, &$data) {
             if ($card['id'] == $data['id']) {

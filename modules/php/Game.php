@@ -160,7 +160,7 @@ class Game extends \Table
     {
         $this->notify->all('nightEvent', clienttranslate($message), $arg);
     }
-    public function checkHindrance(): bool
+    public function checkHindrance($drawPhysical = true): bool
     {
         $data = ['maxPhysicalHindrance' => 3, 'maxMentalHindrance' => 1, 'canDrawMentalHindrance' => true];
         $this->hooks->onMaxHindrance($data);
@@ -175,6 +175,9 @@ class Game extends \Table
             foreach ($char['physicalHindrance'] as $i => $card) {
                 $this->character->removeHindrance($char['character_name'], $card);
             }
+        }
+        if ($deckType == 'physical-hindrance' && !$drawPhysical) {
+            return true;
         }
         if ($deckType != 'mental-hindrance' || $data['canDrawMentalHindrance']) {
             $card = $this->decks->pickCard($deckType);
@@ -1352,11 +1355,6 @@ class Game extends \Table
                     $this->hooks->onAcquireHindrance($card);
                     $this->gameData->set('state', ['card' => $card, 'deck' => $card['deckType']]);
                     $moveToDrawCardState = true;
-                    $this->activeCharacterEventLog('${acquireSentence} ${name}', [
-                        'acquireSentence' => $card['acquireSentence'],
-                        'name' => $card['name'],
-                        ...$card,
-                    ]);
                 } elseif ($card['deckType'] == 'day-event') {
                     $this->gamestate->nextState('dayEvent');
                 } else {
@@ -2135,6 +2133,7 @@ class Game extends \Table
 
         throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
     }
+    // TEST FUNCTIONS START HERE
     public function giveResources()
     {
         $this->globals->set('resources', [

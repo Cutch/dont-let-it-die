@@ -45,7 +45,7 @@ class Encounter
         $encounterState = $this->game->gameData->get('encounterState');
 
         if ($encounterState['damageTaken'] > 0) {
-            if ($this->game->checkHindrance()) {
+            if ($this->game->checkHindrance(true)) {
                 $this->game->gameData->set('encounterState', []);
                 $this->game->gamestate->nextState('playerTurn');
             }

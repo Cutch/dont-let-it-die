@@ -420,7 +420,7 @@ $charactersData = [
                             throw new BgaUserException($this->game->translate('Only 1 hindrance can be traded'));
                         }
                         if ($card2) {
-                            $game->character->updateCharacterData($myCharId, function ($char) use ($card1, $card2) {
+                            $game->character->updateCharacterData($myCharId, function (&$char) use ($card1, $card2, $game) {
                                 if ($card1) {
                                     $char['physicalHindrance'] = array_filter($char['physicalHindrance'], function ($d) use ($card1) {
                                         return $card1['id'] != $d['id'];
@@ -430,7 +430,7 @@ $charactersData = [
                             });
                         }
                         if ($card1) {
-                            $game->character->updateCharacterData($otherCharId, function ($char) use ($card1, $card2) {
+                            $game->character->updateCharacterData($otherCharId, function (&$char) use ($card1, $card2, $game) {
                                 if ($card2) {
                                     $char['physicalHindrance'] = array_filter($char['physicalHindrance'], function ($d) use ($card2) {
                                         return $card2['id'] != $d['id'];
@@ -462,7 +462,7 @@ $charactersData = [
                     if ($state && $state['id'] == $skill['id']) {
                         if ($data['nextState'] != false) {
                             // Check if have max physical hindrance
-                            $this->game->checkHindrance();
+                            $this->game->checkHindrance(false);
                         }
                     }
                 },
