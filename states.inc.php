@@ -142,7 +142,7 @@ $machinestates = [
         'type' => 'activeplayer',
         'args' => 'argDeckSelection',
         'possibleactions' => ['actSelectDeck', 'actSelectDeckCancel'],
-        'transitions' => ['playerTurn' => 10],
+        'transitions' => ['playerTurn' => 10, 'deckSelection' => 13],
     ],
     14 => [
         'name' => 'resourceSelection',

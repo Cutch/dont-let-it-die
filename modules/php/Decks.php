@@ -12,13 +12,13 @@ class Decks
     private array $decks;
     private array $cachedData = [];
     private static $decksNames = [
+        'explore',
         'harvest',
         'forage',
         'hunt',
         'gather',
         'day-event',
         'night-event',
-        'explore',
         'physical-hindrance',
         'mental-hindrance',
     ];

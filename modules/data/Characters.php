@@ -249,12 +249,12 @@ $charactersData = [
                         return ['spendActionCost' => false, 'notify' => false];
                     }
                 },
-                'onDeckSelection' => function (Game $game, $skill, $deckName) {
+                'onDeckSelection' => function (Game $game, $skill, $data) {
                     if ($game->gameData->get('state')['id'] == $skill['id']) {
-                        $game->decks->shuffleInDiscard($deckName, false);
+                        $game->decks->shuffleInDiscard($data['deckName'], false);
                         $game->actions->spendActionCost('actUseSkill', $skill['id']);
                         $game->activeCharacterEventLog('shuffled the ${deck} deck using their skill', [
-                            'deck' => $deckName,
+                            'deck' => $data['deckName'],
                         ]);
                     }
                 },
@@ -339,7 +339,6 @@ $charactersData = [
         'name' => 'Faye',
         'startsWith' => 'skull-shield',
         'slots' => ['weapon', 'tool'],
-        // TODO: Spend 2 to gain take a physical hindrance from another
         // If using an herb to clear a physical hindrance gain a health
         'onUseHerb' => function (Game $game, $char, &$data) {
             if ($char['isActive']) {
@@ -917,19 +916,19 @@ $charactersData = [
                     if ($char['isActive']) {
                         $game->gameData->set('state', ['id' => $skill['id']]);
                         $game->deckSelection(
-                            array_intersect($game->decks->getAllDeckNames(), ['harvest', 'forage', 'hunt', 'gather', 'explore'])
+                            array_intersect($game->decks->getAllDeckNames(), ['explore', 'gather', 'forage', 'harvest', 'hunt'])
                         );
                         return ['spendActionCost' => false, 'notify' => false];
                     }
                 },
-                'onDeckSelection' => function (Game $game, $skill, $deckName) {
+                'onDeckSelection' => function (Game $game, $skill, $data) {
                     if ($game->gameData->get('state')['id'] == $skill['id']) {
                         $game->actions->spendActionCost('actUseSkill', $skill['id']);
-                        $topCard = $game->decks->getDeck($deckName)->getCardOnTop('deck');
+                        $topCard = $game->decks->getDeck($data['deckName'])->getCardOnTop('deck');
                         $card = $game->decks->getCard($topCard['type_arg']);
-                        $game->cardDrawEvent($card, $deckName, ['partial' => true]);
+                        $game->cardDrawEvent($card, $data['deckName'], ['partial' => true]);
                         $game->activeCharacterEventLog('viewed the top card', [
-                            'deck' => $deckName,
+                            'deck' => $data['deckName'],
                         ]);
                     }
                 },
@@ -947,19 +946,76 @@ $charactersData = [
                     // TODO: Need to be able to place or move trap
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
-                        $game->gameData->set('state', ['id' => $skill['id']]);
-                        $game->deckSelection(
-                            array_intersect($game->decks->getAllDeckNames(), ['harvest', 'forage', 'hunt', 'gather', 'explore'])
+                        $tokens = $this->game->gameData->get('tokens') ?? [];
+                        $count = sizeof(
+                            array_filter(array_keys($tokens ?? []), function ($deckName) use ($tokens) {
+                                return in_array('trap', $tokens[$deckName]);
+                            })
                         );
+                        if ($count >= 2) {
+                            $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'move']);
+                            $game->deckSelection(
+                                array_filter(
+                                    array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
+                                    function ($deckName) use ($tokens) {
+                                        return array_key_exists($deckName, $tokens) && in_array('trap', $tokens[$deckName]);
+                                    }
+                                ),
+                                clienttranslate('Remove Token')
+                            );
+                        } else {
+                            $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'place']);
+                            $game->deckSelection(
+                                array_filter(
+                                    array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
+                                    function ($deckName) use ($tokens) {
+                                        return !array_key_exists($deckName, $tokens) || !in_array('trap', $tokens[$deckName]);
+                                    }
+                                )
+                            );
+                        }
                         return ['spendActionCost' => false, 'notify' => false];
                     }
                 },
-                'onDeckSelection' => function (Game $game, $skill, $deckName) {
-                    if ($game->gameData->get('state')['id'] == $skill['id']) {
+                'onDeckSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->gameData->get('state');
+                    if ($state['id'] == $skill['id']) {
                         $game->actions->spendActionCost('actUseSkill', $skill['id']);
-                        $game->activeCharacterEventLog('placed a trap on ${deck}', [
-                            'deck' => $deckName,
-                        ]);
+
+                        $tokens = $this->game->gameData->get('tokens') ?? [];
+                        if ($state['type'] == 'move') {
+                            $tokens[$data['deckName']] = array_values(
+                                array_filter($tokens[$data['deckName']], function ($token) {
+                                    return $token != 'trap';
+                                })
+                            );
+                            $this->game->gameData->set('tokens', $tokens);
+                            $game->activeCharacterEventLog('removed a trap from ${deck}', [
+                                'deck' => $data['deckName'],
+                            ]);
+                            $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'place', 'cancellable' => false]);
+                            $game->deckSelection(
+                                array_filter(
+                                    array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
+                                    function ($deckName) use ($tokens) {
+                                        return !array_key_exists($deckName, $tokens) || !in_array('trap', $tokens[$deckName]);
+                                    }
+                                ),
+                                null,
+                                false
+                            );
+                            $data['nextState'] = false;
+                        } else {
+                            if (!array_key_exists($data['deckName'], $tokens)) {
+                                $tokens[$data['deckName']] = [];
+                            }
+                            array_push($tokens[$data['deckName']], 'trap');
+                            $this->game->gameData->set('tokens', $tokens);
+
+                            $game->activeCharacterEventLog('placed a trap on ${deck}', [
+                                'deck' => $data['deckName'],
+                            ]);
+                        }
                     }
                 },
                 'requires' => function (Game $game, $skill) {

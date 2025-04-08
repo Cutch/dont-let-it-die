@@ -74,13 +74,11 @@ class Deck {
   }
   async drawCard(cardId, partial = false) {
     this.drawing.push([cardId, partial]);
-    console.log('drawCard', cardId, partial, this.drawing.length);
     if (this.drawing.length === 1) {
       await this._drawCard(...this.drawing[0]);
     }
   }
   async _drawCard(cardId, partial = false) {
-    console.log('_drawCard', cardId, this.partialDrawCard, partial);
     if (!this.partialDrawCard) {
       await this.partialDraw(cardId);
     }

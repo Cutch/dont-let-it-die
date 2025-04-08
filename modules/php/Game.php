@@ -195,12 +195,12 @@ class Game extends \Table
         }
         return false;
     }
-    public function deckSelection(?array $decks = null)
+    public function deckSelection(?array $decks = null, ?string $title = null, $cancellable = true)
     {
         if ($decks == null) {
             $decks = $this->decks->getAllDeckNames();
         }
-        $this->gameData->set('deckSelection', ['decks' => array_values($decks)]);
+        $this->gameData->set('deckSelection', ['decks' => array_values($decks), 'title' => $title, 'cancellable' => $cancellable]);
         $this->gamestate->nextState('deckSelection');
     }
     // $type = #, each, any
@@ -730,8 +730,14 @@ class Game extends \Table
         if (!$deckName) {
             throw new BgaUserException($this->translate('Select a Deck'));
         }
-        $this->hooks->onDeckSelection($deckName);
-        $this->gamestate->nextState('playerTurn');
+        $data = [
+            'deckName' => $deckName,
+            'nextState' => 'playerTurn',
+        ];
+        $this->hooks->onDeckSelection($data);
+        if ($data['nextState'] != false) {
+            $this->gamestate->nextState($data['nextState']);
+        }
     }
     public function actSelectDeckCancel(): void
     {
@@ -1171,7 +1177,11 @@ class Game extends \Table
     }
     public function argDeckSelection()
     {
-        $result = ['actions' => [], 'character_name' => $this->getCharacterHTML()];
+        $result = [
+            'actions' => [],
+            'deckSelection' => $this->gameData->get('deckSelection'),
+            'character_name' => $this->getCharacterHTML(),
+        ];
         $this->getGameData($result);
         $this->getDecks($result);
 
@@ -1889,11 +1899,12 @@ class Game extends \Table
         $result['game'] = $this->gameData->getAll();
         $result['game']['prevResources'] = $this->gameData->getPreviousResources();
         // Need to remove these otherwise the response is too big
-        unset($result['game']['encounterState']);
-        unset($result['game']['hindranceSelectionState']);
-        unset($result['game']['interruptState']);
-        unset($result['game']['actInterruptState']);
-        unset($result['game']['characterSelectionState']);
+        foreach (array_keys($result['game']) as $key) {
+            if (str_contains($key, 'State')) {
+                unset($result['game'][$key]);
+            }
+        }
+        unset($result['game']['state']);
         $resourcesAvailable = [];
         array_walk($this->data->tokens, function ($v, $k) use (&$result, &$resourcesAvailable) {
             if ($v['type'] == 'resource' && isset($result['game']['resources'][$k])) {

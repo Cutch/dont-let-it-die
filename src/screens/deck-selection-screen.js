@@ -27,7 +27,9 @@ class DeckSelectionScreen {
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="deck-selection-screen" class="dlid__container">
-            <div id="deck-selection-screen" class="dlid__container"><h3>${_('Select a Deck')}</h3><div class="decks"></div></div>
+            <div id="deck-selection-screen" class="dlid__container"><h3>${
+              gameData.game.deckSelection?.title ?? _('Select a Deck')
+            }</h3><div class="decks"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
       );

@@ -575,7 +575,7 @@ $itemsData = [
                 'onDraw' => function (Game $game, $skill, &$data) {
                     $deck = $data['deck'];
                     if (
-                        in_array($deck, ['forage', 'gather', 'harvest', 'hunt', 'explore']) &&
+                        in_array($deck, ['explore', 'forage', 'gather', 'harvest', 'hunt']) &&
                         getUsePerDay($skill['id'], $game) < 2 &&
                         !$game->actInterrupt->getState('actDraw')
                     ) {

@@ -520,11 +520,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     setupBoard: function (gameData) {
       this.firstPlayer = gameData.playerorder[0];
       const decks = [
+        { name: 'explore', expansion: 'hindrance' },
         { name: 'gather', expansion: 'base' },
         { name: 'forage', expansion: 'base' },
         { name: 'harvest', expansion: 'base' },
         { name: 'hunt', expansion: 'base' },
-        { name: 'explore', expansion: 'hindrance' },
       ].filter((d) => this.expansions.includes(d.expansion));
       // Main board
       document
@@ -648,7 +648,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       const eventDeckContainer = $('event-deck-container');
       decks.forEach(({ name: deck, scale }) => {
-        if (gameData.decks[deck])
+        if (gameData.decks[deck]) {
           if (!this.decks[deck]) {
             this.decks[deck] = new Deck(
               this,
@@ -658,10 +658,28 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               scale,
               'horizontal',
             );
-            if (gameData.decksDiscards[deck]?.name) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+            if (gameData.decksDiscards[deck]?.name) {
+              this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+            }
           } else {
             this.decks[deck].updateDeckCounts(gameData.decks[deck]);
           }
+          this.decks[deck].updateMarker(gameData.decks[deck]);
+        }
+      });
+
+      const drawDecks = [
+        { name: 'explore', expansion: 'hindrance' },
+        { name: 'gather', expansion: 'base' },
+        { name: 'forage', expansion: 'base' },
+        { name: 'harvest', expansion: 'base' },
+        { name: 'hunt', expansion: 'base' },
+      ].filter((d) => this.expansions.includes(d.expansion));
+
+      drawDecks.forEach(({ name: deck }) => {
+        if (this.decks[deck] && gameData.decks[deck]) {
+          this.decks[deck].updateMarker(gameData.decks[deck]);
+        }
       });
     },
     setup: function (gameData) {
@@ -1086,18 +1104,19 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             });
             break;
           case 'deckSelection':
-            this.statusBar.addActionButton(_('Select Deck'), () => {
+            this.statusBar.addActionButton(args.deckSelection?.title ?? _('Select Deck'), () => {
               this.bgaPerformAction('actSelectDeck', { deckName: this.deckSelectionScreen.getSelectedId() }).then(() =>
                 this.deckSelectionScreen.hide(),
               );
             });
-            this.statusBar.addActionButton(
-              _('Cancel'),
-              () => {
-                this.bgaPerformAction('actSelectDeckCancel').then(() => this.deckSelectionScreen.hide());
-              },
-              { color: 'secondary' },
-            );
+            if (args.deckSelection?.cancellable !== false)
+              this.statusBar.addActionButton(
+                _('Cancel'),
+                () => {
+                  this.bgaPerformAction('actSelectDeckCancel').then(() => this.deckSelectionScreen.hide());
+                },
+                { color: 'secondary' },
+              );
             break;
           case 'hindranceSelection':
             this.statusBar.addActionButton(args.hindranceSelection?.button ?? _('Remove Hindrance'), () => {
@@ -1105,13 +1124,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 this.hindranceSelectionScreen.hide(),
               );
             });
-            this.statusBar.addActionButton(
-              _('Cancel'),
-              () => {
-                this.bgaPerformAction('actSelectHindranceCancel').then(() => this.hindranceSelectionScreen.hide());
-              },
-              { color: 'secondary' },
-            );
+            if (args.hindranceSelection?.cancellable !== false)
+              this.statusBar.addActionButton(
+                _('Cancel'),
+                () => {
+                  this.bgaPerformAction('actSelectHindranceCancel').then(() => this.hindranceSelectionScreen.hide());
+                },
+                { color: 'secondary' },
+              );
             break;
           case 'characterSelection':
             this.statusBar.addActionButton(this.actionMappings.actSelectCharacter, () => {
@@ -1261,7 +1281,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.notificationWrapper(notification);
       console.log('notification_cardDrawn', notification);
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
-      return this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
+      await this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
+      this.decks[deck].updateMarker(notification.args.decks[notification.args.deck]);
     },
     notification_shuffle: async function (notification) {
       this.notificationWrapper(notification);
