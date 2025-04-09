@@ -1114,7 +1114,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         switch (stateName) {
           case 'startHindrance':
             this.statusBar.addActionButton(_('Done'), () => {
-              this.bgaPerformAction('actDone').then(() => this.upgradeSelectionScreen.hide());
+              this.bgaPerformAction('actDone');
             });
             break;
           case 'deckSelection':

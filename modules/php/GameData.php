@@ -48,6 +48,7 @@ class GameData
         'activateCharacters' => [],
         'actInterruptState' => [],
         'partials' => [],
+        'tokens' => [],
         'resources' => [
             'fireWood' => 0,
             'wood' => 0,
@@ -169,6 +170,10 @@ class GameData
         ];
         $this->game->hooks->onGetResourceMax($hookData);
         return $hookData['maxCount'];
+    }
+    public function getResourceLeft(string $name): int
+    {
+        return $this->getResource($name) - $this->getResourceMax($name);
     }
     public function getResources(...$names): array
     {

@@ -143,8 +143,7 @@ class Character
         $underlyingCharacterData = $this->game->data->characters[$characterData['id']];
         $characterData['maxStamina'] = $underlyingCharacterData['stamina'] + $characterData['modifiedMaxStamina'];
         $characterData['maxHealth'] = $underlyingCharacterData['health'] + $characterData['modifiedMaxHealth'];
-        $characterData['stamina'] = min($characterData['maxStamina'], $characterData['stamina']);
-        $characterData['health'] = min($characterData['maxHealth'], $characterData['health']);
+        $this->game->log($characterData);
 
         array_walk($underlyingCharacterData, function ($v, $k) use (&$characterData) {
             if (str_starts_with($k, 'on') || in_array($k, ['slots', 'skills'])) {
@@ -228,6 +227,8 @@ class Character
         if (!$_skipHooks) {
             $this->game->hooks->onGetCharacterData($characterData);
         }
+        $characterData['stamina'] = min($characterData['maxStamina'], $characterData['stamina']);
+        $characterData['health'] = min($characterData['maxHealth'], $characterData['health']);
         return $characterData;
     }
     public function getCharacterData($name, $_skipHooks = false): array
@@ -491,7 +492,7 @@ class Character
     {
         $prev = 0;
         $this->updateAllCharacterData(function (&$data) use ($staminaChange, &$prev) {
-            return $this->_adjustStamina($data, $staminaChange, $prev, $data['characterId']);
+            return $this->_adjustStamina($data, $staminaChange, $prev, $data['id']);
         });
     }
     public function adjustStamina(string $characterName, int $staminaChange): int
@@ -549,7 +550,7 @@ class Character
     {
         $prev = 0;
         $this->updateAllCharacterData(function (&$data) use ($healthChange, &$prev) {
-            return $this->_adjustHealth($data, $healthChange, $prev, $data['characterId']);
+            return $this->_adjustHealth($data, $healthChange, $prev, $data['id']);
         });
     }
     public function adjustHealth(string $characterName, int $healthChange): int

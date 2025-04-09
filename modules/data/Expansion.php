@@ -664,7 +664,7 @@ $expansionData = [
         'acquireSentence' => clienttranslate('is'),
         'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Paranoid'),
-        // Always eat
+        // TODO: Always eat
     ],
     'hindrance_1_5' => [
         'deck' => 'physical-hindrance',

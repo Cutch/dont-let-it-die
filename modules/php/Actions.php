@@ -172,6 +172,7 @@ class Actions
                 },
                 'selectable' => function (Game $game) {
                     $tokens = $game->getValidTokens();
+                    unset($tokens['stew']);
                     unset($tokens['trap']);
                     return $tokens;
                 },
