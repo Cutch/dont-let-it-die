@@ -39,7 +39,7 @@ class CraftScreen {
       elem.insertAdjacentHTML(
         'beforeend',
         `<div class="token-number-counter ${name}">
-            <div class="token ${name}"><div class="counter dot">${count()}</div></div>
+            <div class="token ${name}"><div class="counter dot dot--number">${count()}</div></div>
             <div>`,
       );
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1.5, pos: 'insert' });

@@ -1904,6 +1904,15 @@ class Game extends \Table
                 unset($result['game'][$key]);
             }
         }
+
+        $tokens = $this->gameData->get('tokens') ?? [];
+        $trapCount = sizeof(
+            array_filter(array_keys($tokens ?? []), function ($deck) use ($tokens) {
+                return in_array('trap', $tokens[$deck]);
+            })
+        );
+        $result['game']['resources']['trap'] += $trapCount;
+
         unset($result['game']['state']);
         $resourcesAvailable = [];
         array_walk($this->data->tokens, function ($v, $k) use (&$result, &$resourcesAvailable) {

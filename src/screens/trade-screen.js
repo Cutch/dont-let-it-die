@@ -102,7 +102,7 @@ class TradeScreen {
         'beforeend',
         `<div class="token-number-counter ${name}">
             <i class="fa fa-plus-circle fa-4x"></i>
-            <div class="token ${name}"><div class="counter dot">${count()}/${max()}</div></div>
+            <div class="token ${name}"><div class="counter dot dot--number">${count()}/${max()}</div></div>
             <i class="fa fa-minus-circle fa-4x"></i>
             <div>`,
       );

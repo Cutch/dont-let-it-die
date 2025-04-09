@@ -356,7 +356,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       }
       sharedElem.innerHTML = '';
       const resourcesForDisplay = this.getResourcesForDisplay(gameData);
-      resourcesForDisplay.forEach((name) => this.updateResource(name, sharedElem, gameData.game['resources'][name] ?? 0));
+      resourcesForDisplay
+        .filter((elem) => !elem.includes('trap'))
+        .forEach((name) => this.updateResource(name, sharedElem, gameData.game['resources'][name] ?? 0));
 
       // Available Resource Pool
       let availableElem = document.querySelector(`#discoverable-container .tokens`);
@@ -453,8 +455,17 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       // }
     },
     updateResource: function (name, elem, count, { warn = false } = {}) {
-      elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot">${count}</div></div>`);
-      if (warn) elem.insertAdjacentHTML('beforeend', `<div class="fa fa-fire warning dot"></div>`);
+      elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot dot--number">${count}</div></div>`);
+      if (warn) {
+        this.addHelpTooltip(
+          elem.querySelector(`.token.${name}`),
+          _(
+            'Warning, the morning phase will cause ${count} fire wood to be removed. If there is not enough fire wood the game is lost.',
+          ).replace('${count}', count),
+          'fa fa-fire dld-warning',
+          'white',
+        );
+      }
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
     },
     updateItems: function (gameData) {
@@ -506,7 +517,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     updateItem: function (name, elem, count) {
       elem.insertAdjacentHTML(
         'beforeend',
-        `<div class="token ${name}">${count != null ? `<div class="counter dot">${count}</div>` : ''}</div>`,
+        `<div class="token ${name}">${count != null ? `<div class="counter dot dot--number">${count}</div>` : ''}</div>`,
       );
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), name, () => {
@@ -627,7 +638,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
         trackContainer
           .querySelector(`.track-${gameData.trackDifficulty}`)
-          .insertAdjacentHTML('beforeend', `<div id="track-marker" class="marker"></div>`);
+          .insertAdjacentHTML('beforeend', `<div id="track-marker" class="marker"><i class="fa fa-sun-o dlid__sun"></i></div>`);
         trackContainer
           .querySelector(`.track-${gameData.trackDifficulty}`)
           .insertAdjacentHTML('beforeend', `<div id="fire-pit" class="fire-pit"><div class="fire-wood"></div></div>`);
@@ -678,6 +689,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       drawDecks.forEach(({ name: deck }) => {
         if (this.decks[deck] && gameData.decks[deck]) {
+          if (gameData.decksDiscards[deck]?.name) {
+            this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+          }
           this.decks[deck].updateMarker(gameData.decks[deck]);
         }
       });
@@ -1234,6 +1248,31 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         }
       }
     },
+
+    addHelpTooltip: function (node, text, iconCSS, background = 'white') {
+      // game.addTooltip(id, helpString, actionString);
+      if (!node.querySelector('.tooltip')) {
+        node.insertAdjacentHTML(
+          'beforeend',
+          `<div class="tooltip"><div class="dot"><i class="${iconCSS ?? 'fa fa-question'}"></i></div></div>`,
+        );
+
+        addClickListener(
+          node.querySelector('.tooltip'),
+          'Tooltip',
+          () => {
+            this.tooltip.show();
+            this.tooltip
+              .renderByElement()
+              .insertAdjacentHTML(
+                'beforeend',
+                `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${text}</span></div>`,
+              );
+          },
+          true,
+        );
+      }
+    },
     ///////////////////////////////////////////////////
     //// Reaction to cometD notifications
 
@@ -1282,7 +1321,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       console.log('notification_cardDrawn', notification);
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
       await this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
-      this.decks[deck].updateMarker(notification.args.decks[notification.args.deck]);
+      this.decks[notification.args.deck].updateMarker(notification.args.decks[notification.args.deck]);
     },
     notification_shuffle: async function (notification) {
       this.notificationWrapper(notification);

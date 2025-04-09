@@ -17,7 +17,7 @@ class Deck {
     renderImage(`${this.deck}-back`, this.div.querySelector(`.shuffle-2`), { scale: this.scale, pos: 'replace' });
     this.div
       .querySelector(`.${this.deck}-back`)
-      .insertAdjacentHTML('beforeend', `<div class="deck-counter dot counter">${this.countData.count}</div>`);
+      .insertAdjacentHTML('beforeend', `<div class="deck-counter dot dot--number counter">${this.countData.count}</div>`);
     this.drawing = [];
     this.partialDrawCard = null;
     this.topDiscard = null;
@@ -62,7 +62,7 @@ class Deck {
     }
     this.div
       .querySelector(`.flipped-card`)
-      .insertAdjacentHTML('beforeend', `<div class="discard-counter dot counter">${this.countData.discardCount}</div>`);
+      .insertAdjacentHTML('beforeend', `<div class="discard-counter dot dot--number counter">${this.countData.discardCount}</div>`);
     this.topDiscard = cardId;
   }
   updateMarker({ tokens }) {
@@ -70,6 +70,12 @@ class Deck {
     marker.innerHTML = '';
     tokens?.forEach((token) => {
       renderImage(token, marker, { scale: 2, pos: 'replace' });
+      if (token === 'trap') {
+        this.game.addHelpTooltip(
+          marker.querySelector(`.${token}`),
+          _('If rolling equal or greater than a Danger! cards life, trap it to remove it and this token from the game.'),
+        );
+      }
     });
   }
   async drawCard(cardId, partial = false) {

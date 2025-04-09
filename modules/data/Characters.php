@@ -410,13 +410,13 @@ $charactersData = [
                             }
                         }
                         if ($count < 1) {
-                            throw new BgaUserException($this->game->translate('1 hindrance must be taken/traded for'));
+                            throw new BgaUserException($game->translate('1 hindrance must be taken/traded for'));
                         }
                         if ($count > 1) {
-                            throw new BgaUserException($this->game->translate('Only 1 hindrance can be taken'));
+                            throw new BgaUserException($game->translate('Only 1 hindrance can be taken'));
                         }
                         if ($myCount > 1) {
-                            throw new BgaUserException($this->game->translate('Only 1 hindrance can be traded'));
+                            throw new BgaUserException($game->translate('Only 1 hindrance can be traded'));
                         }
                         $game->character->updateCharacterData($myCharId, function (&$char) use ($card1, $card2, $game) {
                             if ($card1) {
@@ -463,7 +463,7 @@ $charactersData = [
                     if ($state && $state['id'] == $skill['id']) {
                         if ($data['nextState'] != false) {
                             // Check if have max physical hindrance
-                            $this->game->checkHindrance(false);
+                            $game->checkHindrance(false);
                         }
                     }
                 },
@@ -874,12 +874,12 @@ $charactersData = [
                             foreach ($char['physicalHindrance'] as $i => $card) {
                                 if (in_array($card['id'], $cardIds)) {
                                     $count++;
-                                    $this->game->character->removeHindrance($char['characterId'], $card);
+                                    $game->character->removeHindrance($char['characterId'], $card);
                                 }
                             }
                         }
                         if ($count > 1) {
-                            throw new BgaUserException($this->game->translate('Only 1 hindrance can be removed'));
+                            throw new BgaUserException($game->translate('Only 1 hindrance can be removed'));
                         }
                         $game->actions->spendActionCost('actUseSkill', $skill['id']);
                         $data['nextState'] = 'playerTurn';
@@ -916,7 +916,7 @@ $charactersData = [
                     if ($char['isActive']) {
                         $game->gameData->set('state', ['id' => $skill['id']]);
                         $game->deckSelection(
-                            array_intersect($game->decks->getAllDeckNames(), ['explore', 'gather', 'forage', 'harvest', 'hunt'])
+                            array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames())
                         );
                         return ['spendActionCost' => false, 'notify' => false];
                     }
@@ -946,7 +946,7 @@ $charactersData = [
                     // TODO: Need to be able to place or move trap
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
-                        $tokens = $this->game->gameData->get('tokens') ?? [];
+                        $tokens = $game->gameData->get('tokens') ?? [];
                         $count = sizeof(
                             array_filter(array_keys($tokens ?? []), function ($deckName) use ($tokens) {
                                 return in_array('trap', $tokens[$deckName]);
@@ -982,14 +982,14 @@ $charactersData = [
                     if ($state['id'] == $skill['id']) {
                         $game->actions->spendActionCost('actUseSkill', $skill['id']);
 
-                        $tokens = $this->game->gameData->get('tokens') ?? [];
+                        $tokens = $game->gameData->get('tokens') ?? [];
                         if ($state['type'] == 'move') {
                             $tokens[$data['deckName']] = array_values(
                                 array_filter($tokens[$data['deckName']], function ($token) {
                                     return $token != 'trap';
                                 })
                             );
-                            $this->game->gameData->set('tokens', $tokens);
+                            $game->gameData->set('tokens', $tokens);
                             $game->activeCharacterEventLog('removed a trap from ${deck}', [
                                 'deck' => $data['deckName'],
                             ]);
@@ -1010,7 +1010,7 @@ $charactersData = [
                                 $tokens[$data['deckName']] = [];
                             }
                             array_push($tokens[$data['deckName']], 'trap');
-                            $this->game->gameData->set('tokens', $tokens);
+                            $game->gameData->set('tokens', $tokens);
 
                             $game->activeCharacterEventLog('placed a trap on ${deck}', [
                                 'deck' => $data['deckName'],
@@ -1020,7 +1020,61 @@ $charactersData = [
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return $char['isActive'];
+                    $maxCount = $game->gameData->getResourceMax('trap');
+                    return $char['isActive'] && $maxCount > 0;
+                },
+            ],
+            'skill3' => [
+                'type' => 'skill',
+                'name' => clienttranslate('Trap It'),
+                'state' => ['interrupt'],
+                'interruptState' => ['drawCard'],
+                'onResolveDrawPre' => function (Game $game, $skill, &$data) {
+                    $card = $data['card'];
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    $tokens = $game->gameData->get('tokens') ?? [];
+                    $count = sizeof(
+                        array_filter(array_keys($tokens ?? []), function ($deck) use ($tokens) {
+                            return in_array('trap', $tokens[$deck]);
+                        })
+                    );
+                    if ($char['isActive'] && $card['deckType'] == 'encounter' && $count > 0) {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+                'onUse' => function (Game $game, $skill) {
+                    return ['notify' => false];
+                },
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $game->decks->removeFromDeck($data['data']['deck'], $data['data']['card']['id']);
+                        $data['data']['discard'] = true;
+                        $tokens = $game->gameData->get('tokens') ?? [];
+                        $tokens[$data['data']['deck']] = array_values(
+                            array_filter($tokens[$data['data']['deck']], function ($token) {
+                                return $token != 'trap';
+                            })
+                        );
+                        $game->gameData->set('tokens', $tokens);
+                        $game->gameData->destroyResource('trap');
+                        $game->activeCharacterEventLog('removed a ${name} from the game', [
+                            ...$data['data']['card'],
+                            'deck' => str_replace('-', ' ', $data['data']['deck']),
+                        ]);
+                        $game->notify->all('updateGameData', '', [
+                            'gameData' => $game->getAllDatas(),
+                        ]);
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    $char = $game->character->getCharacterData($skill['characterId']);
+                    $tokens = $game->gameData->get('tokens') ?? [];
+                    $count = sizeof(
+                        array_filter(array_keys($tokens ?? []), function ($deck) use ($tokens) {
+                            return in_array('trap', $tokens[$deck]);
+                        })
+                    );
+                    return $char['isActive'] && $count > 0;
                 },
             ],
         ],

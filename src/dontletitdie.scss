@@ -31,6 +31,39 @@
     margin: 0;
     border-radius: 10px;
   }
+  .tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(-0.75rem) translateY(-0.5em);
+
+    .fa-question {
+      font-size: 16px;
+    }
+    .fa-fire {
+      font-size: 16px;
+    }
+    .dot {
+      position: unset;
+    }
+  }
+  .tooltip-box {
+    font-size: 20px;
+    padding: 1rem;
+    border-radius: 1rem;
+    min-width: 50vw;
+    max-width: 80vw;
+    background-color: #fff;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    > span {
+      margin-right: 1rem;
+    }
+    @media (min-width: 768px) {
+      max-width: 525px;
+    }
+  }
   .label {
     color: #000;
 
