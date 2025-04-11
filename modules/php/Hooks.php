@@ -146,7 +146,7 @@ class Hooks
     public function reconnectHooks(&$jsonData, $underlyingData)
     {
         array_walk($underlyingData, function ($v, $k) use (&$jsonData) {
-            if (str_starts_with($k, 'on')) {
+            if (str_starts_with($k, 'on') || str_starts_with($k, 'get')) {
                 $jsonData[$k] = $v;
             }
         });

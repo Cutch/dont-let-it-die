@@ -175,7 +175,7 @@ class ActInterrupt
         $data = $state[$functionName];
         return ['functionName' => $functionName, 'data' => $data];
     }
-    public function actInterrupt(string $skillId): void
+    public function actInterrupt(string $skillId, ?string $optionValue = null): void
     {
         $state = $this->getLatestInterruptState();
         $this->game->character->addExtraTime();
@@ -282,6 +282,14 @@ class ActInterrupt
         $data = $state['data'];
         $this->game->getAllPlayers($data);
         $this->game->log('argInterrupt', ['action' => 'argInterrupt', 'state' => $data]);
+
+        // if (array_key_exists('getSkillOptions', $skill)) {
+        //     $skill['getSkillOptions']($this->game, $skill, $skill);
+        // }
+        array_walk($data['skills'], function (&$skill) {
+            $this->game->hooks->reconnectHooks($skill, $this->game->character->getSkill($skill['id'])['skill']);
+        });
+
         return [
             ...$data,
             'character_name' => $this->game->getCharacterHTML(),

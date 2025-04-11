@@ -896,7 +896,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     //
     getActionSuffixHTML: function (action) {
       let suffix = '';
-      if (action['character'] != null && !action['global']) suffix += ` (${action['character']})`;
+      if (action['skillOption']) suffix += ` (${action['skillOption'].name})`;
+      else if (action['character'] != null && !action['global']) suffix += ` (${action['character']})`;
       else if (action['characterId'] != null && !action['global']) suffix += ` (${action['characterId']})`;
       if (action['stamina'] != null) suffix += ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
       if (action['health'] != null) suffix += ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
@@ -926,9 +927,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               if (['interrupt', 'postEncounter', 'dayEvent'].includes(stateName)) {
                 if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
                   return (actionId === 'actUseSkill' ? args.availableSkills : args.availableItemSkills)?.forEach((skill) => {
-                    const suffix = this.getActionSuffixHTML(skill);
-                    this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
-                      return this.bgaPerformAction(actionId, { skillId: skill.id });
+                    (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
+                      skill.skillOption = skillOption;
+                      const suffix = this.getActionSuffixHTML(skill);
+                      this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
+                        return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
+                      });
                     });
                   });
                 }
@@ -947,9 +951,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 } else if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
                   this.removeActionButtons();
                   Object.values(actionId === 'actUseSkill' ? args.availableSkills : args.availableItemSkills).forEach((skill) => {
-                    const suffix = this.getActionSuffixHTML(skill);
-                    this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
-                      return this.bgaPerformAction(actionId, { skillId: skill.id });
+                    (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
+                      skill.skillOption = skillOption;
+                      const suffix = this.getActionSuffixHTML(skill);
+                      this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
+                        return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
+                      });
                     });
                   });
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });

@@ -29,5 +29,14 @@
       gap: 1rem;
       flex-flow: row wrap;
     }
+    .upgrades-card {
+      position: relative;
+      .upgrade-placed {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        color: #00ff3a;
+      }
+    }
   }
 }

@@ -475,7 +475,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'onUse' => function (Game $game, $nightCard) {
-            // TODO discard item on item trade screen
+            // TODO destroy it forever from play on item trade screen
         },
     ],
     'night-event-7_13' => [

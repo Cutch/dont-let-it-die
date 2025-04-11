@@ -36,6 +36,11 @@ class UpgradeSelectionScreen {
     const selections = this.upgradeElem.querySelector(`.selections`);
     selections.innerHTML = '';
     const filled = Object.entries(gameData.upgrades).reduce((acc, [k, v]) => (v.replace ? { ...acc, [v.replace]: k } : acc), {});
+
+    Object.keys(gameData.upgrades).forEach((unlockId) => {
+      const discovery = document.querySelector(`#upgrades .items *[name="${unlockId}"] .upgrade-placed`);
+      if (discovery) discovery.style.display = gameData.upgrades[unlockId]?.replace ? '' : 'none';
+    });
     // List all open slots & render replaced spots
     gameData.selectableUpgrades.forEach((unlockId) => {
       const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockId];
@@ -106,13 +111,13 @@ class UpgradeSelectionScreen {
       this.cleanup = addPassiveListener('scroll', () => this.scroll());
     }
     // List all open slots
-    this.update(gameData);
     const itemsElem = document.querySelector(`#upgrades .items`);
     itemsElem.innerHTML = '';
     Object.keys(gameData.upgrades).forEach((unlockId) => {
       // Render the new discovery
       renderImage(unlockId, itemsElem, { scale: 1 });
       const discovery = itemsElem.querySelector(`*[name="${unlockId}"]`);
+      discovery.insertAdjacentHTML('beforeend', `<i class="fa fa-check-circle-o fa-2x upgrade-placed" aria-hidden="true"></i>`);
       addClickListener(discovery, 'Select', () => {
         if (this.upgradeSelected.from) {
           itemsElem.querySelector(`*[name="${this.upgradeSelected.from}"]`).style['outline'] = '';
@@ -126,6 +131,8 @@ class UpgradeSelectionScreen {
         this.sendSelection();
       });
     });
+
+    this.update(gameData);
 
     this.scroll();
   }

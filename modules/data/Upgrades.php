@@ -455,7 +455,7 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('Map Making'),
         'unlockCost' => 6,
-        // Todo shuffle a card from the discard
+        // TODO shuffle one card from any discard
         'skills' => [
             'skill1' => [
                 'type' => 'skill',

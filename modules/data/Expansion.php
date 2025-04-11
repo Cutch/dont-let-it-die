@@ -26,7 +26,6 @@ $expansionData = [
                 'state' => ['dayEvent'],
                 'onUse' => function (Game $game, $skill) {
                     $game->activeCharacterEventLog('obtained a ${item_name}', ['item_name' => clienttranslate('Wolf Pup')]);
-                    // TODO: Add to character, maybe a little icon
                     $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) use ($skill, $game) {
                         array_push($data['dayEvent'], $game->data->expansion[$skill['parentId']]);
                     });
@@ -75,7 +74,6 @@ $expansionData = [
                     $game->log('encounter', $data);
                     if ($data['encounterHealth'] <= $data['characterDamage']) {
                         $game->activeCharacterEventLog('obtained a ${item_name}', ['item_name' => clienttranslate('Shell Shield')]);
-                        // TODO: Add to character, maybe a little icon
                         $game->decks->removeFromDeck('day-event', $skill['parentId']);
                         $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) use (
                             $skill,

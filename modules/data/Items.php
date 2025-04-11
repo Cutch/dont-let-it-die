@@ -14,6 +14,12 @@ if (!function_exists('getUsePerDay')) {
         $dailyUseItems[$itemId] = array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] + 1 : 1;
         $game->gameData->set('dailyUseItems', $dailyUseItems);
     }
+    function subtractPerDay(string $itemId, $game)
+    {
+        $dailyUseItems = $game->gameData->get('dailyUseItems');
+        $dailyUseItems[$itemId] = array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] - 1 : 0;
+        $game->gameData->set('dailyUseItems', $dailyUseItems);
+    }
     function getUsePerForever(string $itemId, $game)
     {
         $foreverUseItems = $game->gameData->get('foreverUseItems');
@@ -104,45 +110,6 @@ $itemsData = [
                 'onMorning' => function (Game $game, $skill, &$data) {
                     $game->actInterrupt->addSkillInterrupt($skill);
                 },
-                // 'onUseSkill' => function (Game $game, $skill, &$data) {
-                //     if ($data['skillId'] == $skill['id']) {
-                //         $characters = $game->character->getAllCharacterData(true);
-                //         $charactersWithHindrances = array_values(
-                //             array_map(
-                //                 function ($character) {
-                //                     return $character['id'];
-                //                 },
-                //                 array_filter($characters, function ($character) {
-                //                     sizeof($character['physicalHindrance']) > 0;
-                //                 })
-                //             )
-                //         );
-                //         $game->gameData->set('characterSelectionState', [
-                //             'selectableCharacters' => $charactersWithHindrances,
-                //             'cancellable' => false,
-                //             'id' => $skill['id'],
-                //         ]);
-                //         $data['interrupt'] = true;
-                //         $game->gamestate->nextState('characterSelection');
-                //     }
-                // },
-                // 'onCharacterSelection' => function (Game $game, $skill, &$data) {
-                //     $state = $game->gameData->get('characterSelectionState');
-                //     if ($state && $state['id'] == $skill['id']) {
-                //         usePerDay($skill['id'], $game);
-                //         $data['nextState'] = false;
-                //     }
-                // },
-                // 'requires' => function (Game $game, $skill) {
-                //     $characters = $game->character->getAllCharacterData(true);
-                //     return getUsePerDay($skill['id'], $game) < 1 &&
-                //         sizeof(
-                //             array_filter($characters, function ($character) {
-                //                 return sizeof($character['physicalHindrance']) > 0;
-                //             })
-                //         ) > 0;
-                // },
-
                 'onUse' => function (Game $game, $skill, &$data) {
                     $game->hindranceSelection(
                         $skill['id'],

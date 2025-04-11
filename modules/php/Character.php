@@ -143,7 +143,6 @@ class Character
         $underlyingCharacterData = $this->game->data->characters[$characterData['id']];
         $characterData['maxStamina'] = $underlyingCharacterData['stamina'] + $characterData['modifiedMaxStamina'];
         $characterData['maxHealth'] = $underlyingCharacterData['health'] + $characterData['modifiedMaxHealth'];
-        $this->game->log($characterData);
 
         array_walk($underlyingCharacterData, function ($v, $k) use (&$characterData) {
             if (str_starts_with($k, 'on') || in_array($k, ['slots', 'skills'])) {
@@ -231,7 +230,7 @@ class Character
         $characterData['health'] = min($characterData['maxHealth'], $characterData['health']);
         return $characterData;
     }
-    public function getCharacterData($name, $_skipHooks = false): array
+    public function getCharacterData(string $name, $_skipHooks = false): array
     {
         if (array_key_exists($name, $this->cachedData)) {
             return $this->getCalculatedData($this->cachedData[$name], $_skipHooks);
