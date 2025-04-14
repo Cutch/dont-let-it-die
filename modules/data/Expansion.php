@@ -663,6 +663,59 @@ $expansionData = [
         'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Paranoid'),
         // TODO: Always eat
+        'onHandleEat' => function (Game $game, $card, &$data, ?string $preferType = null) {
+            $variables = $game->gameData->getResources();
+            $array = $game->actions->getActionSelectable('actEat');
+            $array = array_values(
+                array_filter(
+                    $array,
+                    function ($v) use ($variables) {
+                        if (array_key_exists($v['id'], $variables)) {
+                            return $v['actEat']['count'] <= $variables[$v['id']];
+                        }
+                    },
+                    ARRAY_FILTER_USE_BOTH
+                )
+            );
+            if ($preferType) {
+                $i = array_search(
+                    $preferType,
+                    array_map(function ($d) {
+                        return $d['id'];
+                    }, $array)
+                );
+                if ($i !== false && $i > 0) {
+                    $temp = $array[0];
+                    $array[0] = $array[$i];
+                    $array[$i] = $temp;
+                }
+            }
+            if (sizeof($array) > 0) {
+                foreach ($array as $v) {
+                    $hinderedCharacter = $game->character->getCharacterData($card['characterId'], true);
+                    if ($hinderedCharacter['health'] != $hinderedCharacter['maxHealth']) {
+                        $prevCharacterId = $game->character->getSubmittingCharacterId();
+                        $game->character->setSubmittingCharacterById($card['characterId']);
+                        $game->actEat($v['id']);
+                        $game->character->setSubmittingCharacterById($prevCharacterId);
+                    }
+                }
+            }
+        },
+        'onEatBefore' => function (Game $game, $card, &$data) {
+            if ($game->character->getSubmittingCharacterId() != $card['characterId']) {
+                $card['onHandleEat']($game, $card, $data, $data['type']);
+            }
+        },
+        'onCookAfter' => function (Game $game, $card, &$data) {
+            $card['onHandleEat']($game, $card, $data);
+        },
+        'onResolveDraw' => function (Game $game, $card, &$data) {
+            $card['onHandleEat']($game, $card, $data);
+        },
+        'onPlayerTurn' => function (Game $game, $card, &$data) {
+            $card['onHandleEat']($game, $card, $data);
+        },
     ],
     'hindrance_1_5' => [
         'deck' => 'physical-hindrance',

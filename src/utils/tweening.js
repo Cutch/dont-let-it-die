@@ -17,11 +17,13 @@ class Tweening {
       height,
     };
   }
-  addTween(elem1, elem2, image, scale, count = 1, time = 500) {
-    if (elem1 && elem2)
+  async addTween(elem1, elem2, image, scale, count = 1, time = 500) {
+    if (elem1 && elem2) {
       for (let i = 0; i < count; i++) {
         this.game.slideTemporaryObject(renderImage(image, null, { scale, pos: 'return' }), this.container, elem1, elem2, time, i * 300);
       }
+      await this.game.wait((count - 1) * 300 + time);
+    }
   }
   addDestroyTween(elem1, elem2, time = 500) {
     if (elem1 && elem2) this.game.slideToObjectAndDestroy(elem1, elem2, time);

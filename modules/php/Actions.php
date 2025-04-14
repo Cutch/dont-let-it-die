@@ -132,7 +132,7 @@ class Actions
                     $state = $game->gameData->get('hindranceSelectionState');
                     if ($state && $state['id'] == $action['id']) {
                         $count = 0;
-                        foreach ($state['characters'] as $i => $char) {
+                        foreach ($state['characters'] as $char) {
                             $cardIds = array_map(
                                 function ($d) {
                                     return $d['cardId'];
@@ -141,7 +141,7 @@ class Actions
                                     return $d['characterId'] == $char['characterId'];
                                 })
                             );
-                            foreach ($char['physicalHindrance'] as $i => $card) {
+                            foreach ($char['physicalHindrance'] as $card) {
                                 if (in_array($card['id'], $cardIds)) {
                                     $count++;
                                     $this->game->character->removeHindrance($char['characterId'], $card);
@@ -446,7 +446,9 @@ class Actions
         return array_values(
             array_filter($skills, function ($skill) {
                 $character = $this->game->character->getCharacterData(
-                    array_key_exists('characterId', $skill) ? $skill['characterId'] : $this->game->character->getTurnCharacterId()
+                    array_key_exists('characterId', $skill) && !array_key_exists('global', $skill)
+                        ? $skill['characterId']
+                        : $this->game->character->getTurnCharacterId()
                 );
                 $stamina = $character['stamina'];
                 $health = $character['health'];

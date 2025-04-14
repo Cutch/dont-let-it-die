@@ -37,7 +37,7 @@ class Character
         $this->game->giveExtraTime($this->getTurnCharacter()['player_id'], $extraTime);
     }
 
-    public function _updateCharacterData($name, $data)
+    public function _updateCharacterData(string $name, array $data)
     {
         // Update db
         for ($i = 0; $i < 3; $i++) {
@@ -82,7 +82,7 @@ class Character
         $values = implode(',', $values);
         $this->game::DbQuery("UPDATE `character` SET {$values} WHERE character_name = '$name'");
     }
-    public function updateCharacterData($name, $callback)
+    public function updateCharacterData(string $name, $callback)
     {
         // Pull from db if needed
         $data = $this->getCharacterData($name, false);
@@ -97,7 +97,7 @@ class Character
     {
         $turnOrder = $this->getAllCharacterIds();
         $hasUpdate = false;
-        foreach ($turnOrder as $i => $name) {
+        foreach ($turnOrder as $name) {
             // Pull from db if needed
             $data = $this->getCharacterData($name, false);
             if (!$callback($data)) {
@@ -116,14 +116,14 @@ class Character
         $turnOrder = $this->game->gameData->get('turnOrder');
         return array_values(array_filter($turnOrder));
     }
-    public function getAllCharacterData($_skipHooks = false): array
+    public function getAllCharacterData(bool $_skipHooks = false): array
     {
         $turnOrder = $this->getAllCharacterIds();
         return array_map(function ($char) use ($_skipHooks) {
             return $this->getCharacterData($char, $_skipHooks);
         }, $turnOrder);
     }
-    public function getAllCharacterDataForPlayer($playerId): array
+    public function getAllCharacterDataForPlayer(int $playerId): array
     {
         return array_values(
             array_filter($this->getAllCharacterData(), function ($char) use ($playerId) {
@@ -131,7 +131,7 @@ class Character
             })
         );
     }
-    public function getCalculatedData($characterData, $_skipHooks = false): array
+    public function getCalculatedData(array $characterData, bool $_skipHooks = false): array
     {
         extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
         $turnOrder = array_values(array_filter($turnOrder));
@@ -245,7 +245,7 @@ class Character
             return $characterData;
         }
     }
-    public function getItemValidations($itemId, array $character, $removingItemId = null)
+    public function getItemValidations(int $itemId, array $character, ?int $removingItemId = null)
     {
         $items = $this->game->gameData->getItems();
         $item = $items[$itemId];
@@ -294,7 +294,7 @@ class Character
             $data['equipment'] = $equipment;
         });
     }
-    public function setCharacterEquipment($characterName, $equipment): void
+    public function setCharacterEquipment(string $characterName, array $equipment): void
     {
         $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
             $data['equipment'] = $equipment;
@@ -333,11 +333,16 @@ class Character
     public function setSubmittingCharacter(?string $action, ?string $subAction = null): void
     {
         if ($action == 'actUseSkill') {
-            $this->submittingCharacter = $this->getSkill($subAction)['character']['id'];
-        } elseif ($action == 'actUseItem') {
-            $skill = $this->getSkill($subAction);
-            if ($skill && array_key_exists('character', $skill)) {
+            $skillData = $this->getSkill($subAction);
+            if ($skillData && !array_key_exists('global', $skillData['skill'])) {
                 $this->submittingCharacter = $this->getSkill($subAction)['character']['id'];
+            } else {
+                $this->submittingCharacter = null;
+            }
+        } elseif ($action == 'actUseItem') {
+            $skillData = $this->getSkill($subAction);
+            if ($skillData && array_key_exists('character', $skillData)) {
+                $this->submittingCharacter = $skillData['character']['id'];
             } else {
                 $this->submittingCharacter = null;
             }
@@ -345,7 +350,11 @@ class Character
             $this->submittingCharacter = null;
         }
     }
-    public function getSkill($skillId): ?array
+    public function setSubmittingCharacterById(string $characterId): void
+    {
+        $this->submittingCharacter = $characterId;
+    }
+    public function getSkill(string $skillId): ?array
     {
         $characters = $this->getAllCharacterData(true);
         $currentCharacter = $this->getTurnCharacter(true);
@@ -409,7 +418,7 @@ class Character
     {
         return $this->submittingCharacter ? $this->submittingCharacter : $this->getTurnCharacterId();
     }
-    public function getSubmittingCharacter($_skipHooks = false): array
+    public function getSubmittingCharacter(bool $_skipHooks = false): array
     {
         return $this->submittingCharacter
             ? $this->getCharacterData($this->submittingCharacter, $_skipHooks)
@@ -424,7 +433,7 @@ class Character
             return null;
         }
     }
-    public function getTurnCharacter($_skipHooks = false): array
+    public function getTurnCharacter(bool $_skipHooks = false): array
     {
         return $this->getCharacterData($this->getTurnCharacterId(), $_skipHooks);
     }

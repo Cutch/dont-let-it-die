@@ -396,7 +396,7 @@ $charactersData = [
                         $otherCharId = null;
                         $card1 = null;
                         $card2 = null;
-                        foreach ($state['characters'] as $i => $char) {
+                        foreach ($state['characters'] as $char) {
                             $cardIds = array_map(
                                 function ($d) {
                                     return $d['cardId'];
@@ -405,7 +405,7 @@ $charactersData = [
                                     return $d['characterId'] == $char['characterId'];
                                 })
                             );
-                            foreach ($char['physicalHindrance'] as $i => $card) {
+                            foreach ($char['physicalHindrance'] as $card) {
                                 if (in_array($card['id'], $cardIds)) {
                                     if ($char['characterId'] == $myCharId) {
                                         $card1 = $card;
@@ -450,9 +450,9 @@ $charactersData = [
                         });
 
                         // $game->character->updateAllCharacterData(function ($charData) use ($state) {
-                        //     foreach ($state['characters'] as $i => $char) {
+                        //     foreach ($state['characters'] as $char) {
                         //         if ($charData['characterId'] == $char) {
-                        //             foreach ($char['physicalHindrance'] as $i => $card) {
+                        //             foreach ($char['physicalHindrance'] as $card) {
                         //                 if ($char['characterId'] == $myCharId) {
                         //                     $myCount++;
                         //                 } else {
@@ -889,7 +889,7 @@ $charactersData = [
                     $state = $game->gameData->get('hindranceSelectionState');
                     if ($state && $state['id'] == $skill['id']) {
                         $count = 0;
-                        foreach ($state['characters'] as $i => $char) {
+                        foreach ($state['characters'] as $char) {
                             $cardIds = array_map(
                                 function ($d) {
                                     return $d['cardId'];
@@ -898,7 +898,7 @@ $charactersData = [
                                     return $d['characterId'] == $char['characterId'];
                                 })
                             );
-                            foreach ($char['physicalHindrance'] as $i => $card) {
+                            foreach ($char['physicalHindrance'] as $card) {
                                 if (in_array($card['id'], $cardIds)) {
                                     $count++;
                                     $game->character->removeHindrance($char['characterId'], $card);
@@ -1576,7 +1576,9 @@ $charactersData = [
                 'onEat' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
                     if ($char['isActive']) {
-                        $game->actInterrupt->addSkillInterrupt($skill);
+                        if (str_contains('-cooked', $data['type'])) {
+                            $game->actInterrupt->addSkillInterrupt($skill);
+                        }
                     }
                 },
                 'requires' => function (Game $game, $skill) {
@@ -1600,7 +1602,9 @@ $charactersData = [
                 'onEat' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
                     if ($char['isActive']) {
-                        $game->actInterrupt->addSkillInterrupt($skill);
+                        if (str_contains('-cooked', $data['type'])) {
+                            $game->actInterrupt->addSkillInterrupt($skill);
+                        }
                     }
                 },
                 'requires' => function (Game $game, $skill) {
@@ -1712,12 +1716,15 @@ $charactersData = [
                 'state' => ['playerTurn'],
                 'name' => str_replace('${name}', 'Tooth', clienttranslate('Pet ${name}')),
                 'stamina' => 2,
+                'global' => true,
                 'onUse' => function (Game $game, $skill) {
-                    $game->character->adjustActiveHealth(1);
+                    // $game->character->adjustStamina($game->character->getTurnCharacterId(), -2);
+                    $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
                     $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
                         'count' => 1,
                         'character_resource' => 'health',
                     ]);
+                    // return ['spendActionCost' => false];
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);

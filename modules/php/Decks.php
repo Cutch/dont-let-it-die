@@ -25,7 +25,7 @@ class Decks
     public function __construct(Game $game)
     {
         $this->game = $game;
-        foreach ($this->getAllDeckNames() as $i => $deck) {
+        foreach ($this->getAllDeckNames() as $deck) {
             $this->decks[$deck] = $this->game->initDeck(str_replace('-', '', $deck));
         }
         $type = 'explore';
@@ -64,7 +64,7 @@ class Decks
     }
     public function setup()
     {
-        foreach ($this->getAllDeckNames() as $i => $deck) {
+        foreach ($this->getAllDeckNames() as $deck) {
             $this->createDeck($deck);
         }
     }
@@ -107,7 +107,7 @@ class Decks
     public function getDecksData(): array
     {
         $result = ['decks' => [], 'decksDiscards' => []];
-        foreach ($this->getAllDeckNames() as $i => $deck) {
+        foreach ($this->getAllDeckNames() as $deck) {
             $deckData = null;
             $discardData = null;
             if (array_key_exists($deck, $this->cachedData)) {

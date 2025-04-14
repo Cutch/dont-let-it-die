@@ -631,7 +631,7 @@ $decksData = [
         'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('Everyone is injured');
             // Everyone take physical hindrance
-            foreach ($game->character->getAllCharacterIds() as $i => $char) {
+            foreach ($game->character->getAllCharacterIds() as $char) {
                 $game->checkHindrance(true, $char);
                 // $card = $game->decks->pickCard('physical-hindrance');
                 // $game->character->addHindrance($char, $card);
@@ -772,7 +772,7 @@ $decksData = [
         'expansion' => 'hindrance',
         'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('All items have disappeared');
-            foreach ($game->character->getAllCharacterData() as $i => $char) {
+            foreach ($game->character->getAllCharacterData() as $char) {
                 $game->character->unequipEquipment($char['character_name'], $char['equipment']);
             }
         },
@@ -873,7 +873,7 @@ $decksData = [
                     )
                 );
                 $count = 0;
-                foreach ($state['characters'] as $i => $char) {
+                foreach ($state['characters'] as $char) {
                     $cardIds = array_map(
                         function ($d) {
                             return $d['cardId'];
@@ -882,7 +882,7 @@ $decksData = [
                             return $d['characterId'] == $char['characterId'];
                         })
                     );
-                    foreach ($char['physicalHindrance'] as $i => $card) {
+                    foreach ($char['physicalHindrance'] as $card) {
                         if (in_array($card['id'], $cardIds)) {
                             $count++;
                             $this->game->character->removeHindrance($char['characterId'], $card);
@@ -961,7 +961,7 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'onUse' => function (Game $game, $nightCard) {
-            foreach ($game->decks->getAllDeckNames() as $i => $deck) {
+            foreach ($game->decks->getAllDeckNames() as $deck) {
                 $game->decks->shuffleInDiscard($deck, false);
             }
             $game->nightEventLog('All decks have been shuffled');

@@ -572,7 +572,7 @@ $upgradesData = [
                         $game->character->adjustHealth($char, 1);
 
                         $count = 0;
-                        foreach ($state['characters'] as $i => $char) {
+                        foreach ($state['characters'] as $char) {
                             $cardIds = array_map(
                                 function ($d) {
                                     return $d['cardId'];
@@ -581,7 +581,7 @@ $upgradesData = [
                                     return $d['characterId'] == $char['characterId'];
                                 })
                             );
-                            foreach ($char['physicalHindrance'] as $i => $card) {
+                            foreach ($char['physicalHindrance'] as $card) {
                                 if (in_array($card['id'], $cardIds)) {
                                     $count++;
                                     $this->game->character->removeHindrance($char['characterId'], $card);
@@ -604,8 +604,8 @@ $upgradesData = [
         'unlockCost' => 7,
         'onUse' => function (Game $game, $unlock) {
             $chars = $game->character->getAllCharacterData();
-            foreach ($chars as $i => $char) {
-                foreach ($char['mentalHindrance'] as $i => $card) {
+            foreach ($chars as $char) {
+                foreach ($char['mentalHindrance'] as $card) {
                     $this->game->character->removeHindrance($char['character_name'], $card);
                 }
             }

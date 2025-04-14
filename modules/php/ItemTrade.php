@@ -21,7 +21,7 @@ class ItemTrade
 
         $responseData = [...$this->tradeProcess($trade1, $trade2), 'trade1' => $trade1, 'trade2' => $trade2];
         $this->completeTrade($responseData);
-        foreach ($this->game->gamestate->getActivePlayerList() as $i => $playerId) {
+        foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
             $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
         }
         // $this->game->gamestate->nextPrivateState($trade1['character']['player_id'], 'tradePhaseActions');
@@ -33,7 +33,7 @@ class ItemTrade
         $trade1 = $state['trade1'];
         $trade2 = $state['trade2'];
 
-        foreach ($this->game->gamestate->getActivePlayerList() as $i => $playerId) {
+        foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
             $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
         }
         // $this->game->gamestate->nextPrivateState($trade1['character']['player_id'], 'tradePhaseActions');
@@ -161,7 +161,7 @@ class ItemTrade
                 } else {
                     $this->game->gamestate->nextPrivateState($toPlayerId, 'confirmTradePhase');
                 }
-                foreach ($this->game->gamestate->getActivePlayerList() as $i => $playerId) {
+                foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
                     // $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
                     if ($toPlayerId != $playerId) {
                         $this->game->gamestate->nextPrivateState($playerId, 'waitTradePhase');
@@ -319,7 +319,7 @@ class ItemTrade
             $this->game->gamestate->nextState('nextCharacter');
         } else {
             $this->game->gamestate->setAllPlayersMultiactive();
-            foreach ($this->game->gamestate->getActivePlayerList() as $key => $playerId) {
+            foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
                 $this->game->giveExtraTime((int) $playerId);
             }
             $this->game->gamestate->initializePrivateStateForAllActivePlayers();

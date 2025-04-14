@@ -61,6 +61,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.tooManyItemsScreen = new TooManyItemsScreen(this);
       this.upgradeSelectionScreen = new UpgradeSelectionScreen(this);
       this.weaponScreen = new WeaponScreen(this);
+      this.currentResources = { prevResources: {}, resources: {} };
       this.resourcesForDisplay = [
         'wood',
         'rock',
@@ -340,9 +341,18 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     disableClick: function (elem) {
       if (!elem.classList.contains('disabled')) elem.classList.add('disabled');
     },
-    updateResources: function (gameData) {
+    noForResourceChange: function (gameData, resourceName) {
+      const prevResources = gameData.game['prevResources'];
+      return (
+        this.currentResources['prevResources'][resourceName] == prevResources[resourceName] &&
+        this.currentResources['resources'][resourceName] == gameData.game['resources'][resourceName] &&
+        this.currentResources['prevResources'][resourceName + '-cooked'] == prevResources[resourceName + '-cooked'] &&
+        this.currentResources['resources'][resourceName + '-cooked'] == gameData.game['resources'][resourceName + '-cooked']
+      );
+    },
+    updateResources: async function (gameData) {
       if (!gameData || !gameData.resourcesAvailable || !gameData.game) return;
-
+      const promises = [];
       const firewoodElem = document.querySelector(`.fire-wood`);
 
       // Shared Resource Pool
@@ -380,50 +390,62 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       // });
       const prevResources = gameData.game['prevResources'];
       let skipWood = false;
-      if (prevResources['fireWood'] != null && prevResources['fireWood'] < gameData.game['resources']['fireWood']) {
-        // Wood to Firewood
-        this.tweening.addTween(
-          sharedElem.querySelector(`.token.wood`),
-          firewoodElem.querySelector(`.token.wood`),
-          'wood',
-          2,
-          gameData.game['resources']['fireWood'] - prevResources['fireWood'],
-        );
-        skipWood = true;
-      } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['resources']['fireWood']) {
-        // Firewood to Wood
-        this.tweening.addTween(
-          firewoodElem.querySelector(`.token.wood`),
-          availableElem.querySelector(`.token.wood`),
-          'wood',
-          2,
-          prevResources['fireWood'] - gameData.game['resources']['fireWood'],
-        );
+
+      if (!this.noForResourceChange(gameData, 'fireWood')) {
+        if (prevResources['fireWood'] != null && prevResources['fireWood'] < gameData.game['resources']['fireWood']) {
+          // Wood to Firewood
+          promises.push(
+            this.tweening.addTween(
+              sharedElem.querySelector(`.token.wood`),
+              firewoodElem.querySelector(`.token.wood`),
+              'wood',
+              2,
+              gameData.game['resources']['fireWood'] - prevResources['fireWood'],
+            ),
+          );
+          skipWood = true;
+        } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['resources']['fireWood']) {
+          // Firewood to Wood
+          promises.push(
+            this.tweening.addTween(
+              firewoodElem.querySelector(`.token.wood`),
+              availableElem.querySelector(`.token.wood`),
+              'wood',
+              2,
+              prevResources['fireWood'] - gameData.game['resources']['fireWood'],
+            ),
+          );
+        }
       }
       resourcesForDisplay.forEach((name) => {
         const rawName = name.replace('-cooked', '');
+        if (this.noForResourceChange(gameData, rawName)) return;
         if (
           prevResources[rawName] - 1 === gameData.game['resources'][rawName] &&
           prevResources[rawName + '-cooked'] + 1 === gameData.game['resources'][rawName + '-cooked']
         ) {
           if (rawName === name) {
             // Move resource to cooked resource
-            this.tweening.addTween(
-              sharedElem.querySelector(`.token.${name}`),
-              sharedElem.querySelector(`.token.${name + '-cooked'}`),
-              name + '-cooked',
-              2,
-              1,
+            promises.push(
+              this.tweening.addTween(
+                sharedElem.querySelector(`.token.${name}`),
+                sharedElem.querySelector(`.token.${name + '-cooked'}`),
+                name + '-cooked',
+                2,
+                1,
+              ),
             );
           }
         } else if (prevResources[name] != null && prevResources[name] < gameData.game['resources'][name]) {
           // Discard to Shared Resources
-          this.tweening.addTween(
-            availableElem.querySelector(`.token.${rawName}`),
-            sharedElem.querySelector(`.token.${name}`),
-            name,
-            2,
-            gameData.game['resources'][name] - prevResources[name],
+          promises.push(
+            this.tweening.addTween(
+              availableElem.querySelector(`.token.${rawName}`),
+              sharedElem.querySelector(`.token.${name}`),
+              name,
+              2,
+              gameData.game['resources'][name] - prevResources[name],
+            ),
           );
         } else if (
           prevResources[name] != null &&
@@ -432,15 +454,19 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           // prevResources[name + '-cooked'] > gameData.game['resources'][name]
         ) {
           // Shared Resources to Discard
-          this.tweening.addTween(
-            sharedElem.querySelector(`.token.${name}`),
-            availableElem.querySelector(`.token.${rawName}`),
-            name,
-            2,
-            prevResources[name] - gameData.game['resources'][name],
+          promises.push(
+            this.tweening.addTween(
+              sharedElem.querySelector(`.token.${name}`),
+              availableElem.querySelector(`.token.${rawName}`),
+              name,
+              2,
+              prevResources[name] - gameData.game['resources'][name],
+            ),
           );
         }
       });
+      this.currentResources['prevResources'] = prevResources;
+      this.currentResources['resources'] = gameData.game['resources'];
       // if (gameData.game.buildings.length > 0) {
       //   const div = document.querySelector(`#board-container .buildings`);
       //   if (div.childNodes.length == 0) {
@@ -453,6 +479,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       //     });
       //   }
       // }
+      await Promise.all(promises);
     },
     updateResource: function (name, elem, count, { warn = false } = {}) {
       elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot dot--number">${count}</div></div>`);
@@ -798,7 +825,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       const isActive = this.isCurrentPlayerActive();
 
       console.log('Entering state: ' + stateName, args);
-      this.updateResources(args.args);
+      // this.updateResources(args.args);
       switch (stateName) {
         case 'tooManyItems':
           if (isActive) this.tooManyItemsScreen.show(args.args);
@@ -909,11 +936,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           ` <i class="fa fa-circle-o-notch dlid__forever"></i> ` + _('${remaining} left').replace(/\$\{remaining\}/, action['perForever']);
       return suffix;
     },
-    onUpdateActionButtons: function (stateName, args) {
+    onUpdateActionButtons: async function (stateName, args) {
       const actions = args?.actions;
       // this.currentActions = actions;
       console.log('onUpdateActionButtons', args, actions, stateName);
-      this.updateResources(args);
+      await this.updateResources(args);
       const isActive = this.isCurrentPlayerActive();
       if (isActive && stateName && actions != null) {
         this.removeActionButtons();
@@ -944,7 +971,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   Object.values(args.availableUnlocks).forEach((unlock) => {
                     const suffix = this.getActionSuffixHTML(unlock);
                     this.statusBar.addActionButton(`${unlock.name}${suffix}`, () => {
-                      return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
+                      return this.bgaPerformAction(actionId, { knowledgeId: unlock.id }).then(() => this.removeActionButtons());
                     });
                   });
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
@@ -1310,57 +1337,61 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.notifqueue.setSynchronous('cardDrawn', 1000);
       this.notifqueue.setSynchronous('rollFireDie', 1000);
       this.notifqueue.setSynchronous('shuffle', 1500);
+      this.notifqueue.setSynchronous('tokenUsed', 300);
+      this.notifqueue.setSynchronous('updateGameData', 300);
     },
-    notificationWrapper: function (notification) {
+    notificationWrapper: async function (notification) {
       notification.args = notification.args ?? {};
       if (notification.args.gameData) {
         notification.args.gameData.gamestate = notification.args.gamestate;
       }
-      this.updateResources(notification.args.gameData);
+      await this.updateResources(notification.args.gameData);
     },
     notification_rollFireDie: async function (notification) {
-      this.notificationWrapper(notification);
+      await this.notificationWrapper(notification);
       console.log('notification_rollFireDie', notification);
       return this.dice.roll(notification.args.roll);
     },
     notification_cardDrawn: async function (notification) {
-      this.notificationWrapper(notification);
+      await this.notificationWrapper(notification);
       console.log('notification_cardDrawn', notification);
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
       await this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
       this.decks[notification.args.deck].updateMarker(notification.args.decks[notification.args.deck]);
     },
     notification_shuffle: async function (notification) {
-      this.notificationWrapper(notification);
+      await this.notificationWrapper(notification);
       console.log('notification_shuffle', notification);
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
       return this.decks[notification.args.deck].shuffle();
     },
-    notification_updateGameData: function (notification) {
-      this.notificationWrapper(notification);
+    notification_updateGameData: async function (notification) {
+      await this.notificationWrapper(notification);
       console.log('notification_updateGameData', notification);
       this.updatePlayers(notification.args.gameData);
       this.updateItems(notification.args.gameData);
       this.updateKnowledgeTree(notification.args.gameData);
-      if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
+      if (notification.args?.gamestate?.name)
+        await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
       if (notification.args?.gamestate?.name == 'tradePhase') this.itemTradeScreen.update(notification.args);
       if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
     },
 
-    notification_characterClicked: function (notification) {
-      this.notificationWrapper(notification);
+    notification_characterClicked: async function (notification) {
+      await this.notificationWrapper(notification);
       console.log('notification_characterClicked', notification);
       this.selectedCharacters = notification.args.gameData.characters;
       this.updateCharacterSelections(notification.args);
     },
 
-    notification_tokenUsed: function (notification) {
-      this.notificationWrapper(notification);
+    notification_tokenUsed: async function (notification) {
+      await this.notificationWrapper(notification);
       console.log('notification_tokenUsed', notification);
       this.updatePlayers(notification.args.gameData);
       this.updateItems(notification.args.gameData);
       this.updateKnowledgeTree(notification.args.gameData);
-      if (notification.args?.gamestate?.name) this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
+      if (notification.args?.gamestate?.name)
+        await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
     },
   });
 });

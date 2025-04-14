@@ -176,7 +176,7 @@ class Game extends \Table
                 return true;
             }
             $deckType = 'mental-hindrance';
-            foreach ($char['physicalHindrance'] as $i => $card) {
+            foreach ($char['physicalHindrance'] as $card) {
                 $this->character->removeHindrance($char['character_name'], $card);
             }
         }
@@ -390,6 +390,7 @@ class Game extends \Table
             'amount' => 1,
             'type' => $resourceType,
         ]);
+        $this->hooks->onCookAfter($data);
         $this->gameData->set('lastAction', 'actCook');
     }
     public function actRevive(?string $character, ?string $food): void
@@ -821,7 +822,7 @@ class Game extends \Table
             func_get_args(),
             [$this->hooks, 'onUseHerb'],
             function (Game $_this) {
-                $this->log('onUseHerb');
+                // $this->log('onUseHerb');
                 // $this->actions->validateCanRunAction('actUseHerb');
                 return ['herb' => 1];
             },
@@ -844,8 +845,9 @@ class Game extends \Table
             function (Game $_this) use ($resourceType) {
                 $this->actions->validateCanRunAction('actEat', null, $resourceType);
                 $tokenData = $this->data->tokens[$resourceType];
-                // $data = ['type' => $resourceType, ...$tokenData['actEat']];
-                return ['type' => $resourceType, ...$tokenData['actEat'], 'tokenName' => $tokenData['name']];
+                $data = ['type' => $resourceType, ...$tokenData['actEat'], 'tokenName' => $tokenData['name']];
+                $this->hooks->onEatBefore($data);
+                return $data;
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 if (array_key_exists('health', $data)) {
@@ -854,17 +856,21 @@ class Game extends \Table
                 if (array_key_exists('stamina', $data)) {
                     $this->character->adjustActiveStamina($data['stamina']);
                 }
-                $this->adjustResource($data['type'], -$data['count']);
-                $this->notify->all(
-                    'tokenUsed',
-                    clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health') .
-                        (array_key_exists('stamina', $data) ? clienttranslate(' and ${stamina} stamina') : ''),
-                    [
-                        'gameData' => $this->getAllDatas(),
-                        ...$data,
-                        'token_name' => $data['tokenName'],
-                    ]
-                );
+                $left = $this->adjustResource($data['type'], -$data['count'])['left'];
+                if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
+                    if ($left == 0) {
+                        $this->notify->all(
+                            'tokenUsed',
+                            clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health') .
+                                (array_key_exists('stamina', $data) ? clienttranslate(' and ${stamina} stamina') : ''),
+                            [
+                                'gameData' => $this->getAllDatas(),
+                                ...$data,
+                                'token_name' => $data['tokenName'],
+                            ]
+                        );
+                    }
+                }
             }
         );
 
@@ -1188,7 +1194,11 @@ class Game extends \Table
     }
     public function argCardSelection()
     {
-        $result = [...$this->gameData->get('cardSelectionState'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
+        $result = [
+            'cardSelection' => $this->gameData->get('cardSelectionState'),
+            'actions' => [],
+            'character_name' => $this->getCharacterHTML(),
+        ];
         $this->getGameData($result);
         return $result;
     }
@@ -1293,6 +1303,7 @@ class Game extends \Table
         $this->actions->clearDayEvent();
         // if (!$this->actInterrupt->checkForInterrupt()) {
         $char = $this->character->getTurnCharacter();
+        $this->hooks->onPlayerTurn($char);
         if ($char['isActive'] && $char['incapacitated']) {
             $this->activeCharacterEventLog('is incapacitated');
             $this->endTurn();
@@ -2254,10 +2265,13 @@ class Game extends \Table
             $data['stamina'] = $data['maxStamina'];
         });
     }
-    public function lowHealth()
+    public function lowHealth(?string $char = null)
     {
-        $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
-            $data['health'] = 2;
+        if (!$char) {
+            $char = $this->character->getSubmittingCharacter()['id'];
+        }
+        $this->character->updateCharacterData($char, function (&$data) {
+            $data['health'] = 1;
         });
     }
     public function maxCraftLevel()

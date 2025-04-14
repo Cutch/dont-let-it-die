@@ -109,14 +109,14 @@ class Hooks
         }
         // Pre
         if (!array_key_exists('suffix', $args) || $args['suffix'] == 'Pre') {
-            foreach ($hooks as $i => $object) {
+            foreach ($hooks as $object) {
                 if (array_key_exists($functionName . 'Pre', $object)) {
                     $object[$functionName . 'Pre']($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
                 }
             }
         }
         // Normal
-        foreach ($hooks as $i => $object) {
+        foreach ($hooks as $object) {
             if ($functionName == 'onUseHerb') {
                 $this->game->log('hooks', array_key_exists($functionName, $object), $object);
             }
@@ -126,7 +126,7 @@ class Hooks
         }
         // Post
         if (!array_key_exists('suffix', $args) || $args['suffix'] == 'Post') {
-            foreach ($hooks as $i => $object) {
+            foreach ($hooks as $object) {
                 if (array_key_exists($functionName . 'Post', $object)) {
                     $object[$functionName . 'Post']($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
                 }
@@ -222,6 +222,11 @@ class Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
+    function onEatBefore(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
     function onGetEatData(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
@@ -313,6 +318,11 @@ class Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
+    function onCookAfter(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
     function onIncapacitation(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
@@ -364,6 +374,11 @@ class Hooks
         return $data;
     }
     function onCharacterChoose(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onPlayerTurn(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;

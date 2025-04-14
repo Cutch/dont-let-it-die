@@ -48,7 +48,7 @@ class CardSelectionScreen {
       renderImage(cardName, elem.querySelector(`.token.${cardName}`), { scale: deckScaling[deckName] ?? 1, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${cardName}`), 'Card', () => selectCallback());
     };
-    gameData.cards.forEach(({ deck, id: card }) => {
+    gameData.cardSelection.cards.forEach(({ deck, id: card }) => {
       renderItem(card, deck, cardSelectionElem, () => {
         if (this.itemSelected) {
           document.querySelector(`#card-selection-screen .token.${this.itemSelected} .card`).style['outline'] = '';

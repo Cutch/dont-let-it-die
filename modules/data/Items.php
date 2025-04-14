@@ -139,7 +139,7 @@ $itemsData = [
                             throw new BgaUserException($this->game->translate('Only 1 character\'s hindrances can be selected'));
                         }
                         $count = 0;
-                        foreach ($state['characters'] as $i => $char) {
+                        foreach ($state['characters'] as $char) {
                             $cardIds = array_map(
                                 function ($d) {
                                     return $d['cardId'];
@@ -148,7 +148,7 @@ $itemsData = [
                                     return $d['characterId'] == $char['characterId'];
                                 })
                             );
-                            foreach ($char['physicalHindrance'] as $i => $card) {
+                            foreach ($char['physicalHindrance'] as $card) {
                                 if (in_array($card['id'], $cardIds)) {
                                     $count++;
                                     $this->game->character->removeHindrance($char['characterId'], $card);
