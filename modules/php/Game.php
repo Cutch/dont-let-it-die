@@ -826,12 +826,7 @@ class Game extends \Table
                 // $this->actions->validateCanRunAction('actUseHerb');
                 return ['herb' => 1];
             },
-            function (Game $_this, bool $finalizeInterrupt, $data) {
-                $this->adjustResource('herb', -$data['herb']);
-                $this->notify->all('tokenUsed', clienttranslate('${character_name} used a herb to cure their wounds'), [
-                    'gameData' => $this->getAllDatas(),
-                ]);
-            }
+            function (Game $_this, bool $finalizeInterrupt, $data) {}
         );
 
         $this->gameData->set('lastAction', 'actUseHerb');
@@ -1047,7 +1042,7 @@ class Game extends \Table
                 })
             ) == 0
         ) {
-            throw new BgaUserException($this->translate('You need tool to harvest'));
+            throw new BgaUserException($this->translate('You need a tool to harvest'));
         }
         if (
             sizeof(
@@ -1070,7 +1065,7 @@ class Game extends \Table
                 })
             ) == 0
         ) {
-            throw new BgaUserException($this->translate('You need weapon to hunt'));
+            throw new BgaUserException($this->translate('You need a weapon to hunt'));
         }
         $this->actDraw('hunt');
         $this->gameData->set('lastAction', 'actDrawHunt');

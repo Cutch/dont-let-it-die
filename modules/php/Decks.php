@@ -83,7 +83,7 @@ class Decks
                     'type' => $v['deck'],
                     'card_location' => 'deck',
                     'type_arg' => $k,
-                    'nbr' => $v['count'] ?? 1,
+                    'nbr' => 1,
                 ];
             },
             array_keys($filtered_cards),
@@ -103,6 +103,28 @@ class Decks
             $name = $card['name'];
         }
         return array_merge($this->game->data->decks[$id], ['id' => $id, 'name' => $name]);
+    }
+    public function listDeckDiscards(array $decks): array
+    {
+        $decksDiscards = [];
+        foreach ($decks as $deck) {
+            $sqlName = str_replace('-', '', $deck);
+            $discardData = array_map(
+                function ($data) {
+                    return $this->game->data->decks[$data['id']];
+                },
+                array_values(
+                    $this->game->getCollectionFromDb(
+                        "SELECT `card_type_arg` `id`
+                    FROM `$sqlName` a
+                    WHERE `card_location` = 'discard'"
+                    )
+                )
+            );
+
+            $decksDiscards = array_merge($decksDiscards, $discardData);
+        }
+        return $decksDiscards;
     }
     public function getDecksData(): array
     {
@@ -158,6 +180,23 @@ class Decks
         });
         if (sizeof($cards) > 0) {
             $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'hand');
+        } else {
+            throw new Exception('Missing card id');
+        }
+    }
+    public function shuffleInCard(string $deck, string $cardName): void
+    {
+        $cards = array_filter($this->getDeck($deck)->getCardsInLocation('discard'), function ($card) use ($cardName) {
+            return $card['type_arg'] == $cardName;
+        });
+        if (sizeof($cards) > 0) {
+            $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'deck');
+            $results = [
+                'deck' => $deck,
+                'deckName' => str_replace('-', ' ', $deck),
+            ];
+            $this->game->getDecks($results);
+            $this->game->notify->all('shuffle', '', $results);
         } else {
             throw new Exception('Missing card id');
         }

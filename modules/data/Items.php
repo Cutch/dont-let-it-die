@@ -558,7 +558,6 @@ $itemsData = [
                             $card2 = $game->decks->pickCard($deck);
                             $game->gameData->set('cardSelectionState', [
                                 'cards' => [$card1, $card2],
-                                'deck' => $deck,
                                 'cancellable' => false,
                                 'id' => $skill['id'],
                             ]);

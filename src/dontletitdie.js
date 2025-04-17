@@ -18,6 +18,17 @@
 define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], function (dojo, declare) {
   return declare('bgagame.dontletitdie', ebg.core.gamegui, {
     constructor: function () {
+      this.deckMapping = {
+        gather: _('Gather'),
+        forage: _('Forage'),
+        harvest: _('Harvest'),
+        hunt: _('Hunt'),
+        explore: _('Explore'),
+        'day-event': _('Day Event'),
+        'mental-hindrance': _('Mental Hindrance'),
+        'physical-hindrance': _('Physical Hindrance'),
+        'night-event': _('Night Event'),
+      };
       this.actionMappings = {
         actInvestigateFire: _('Investigate Fire'),
         actCraft: _('Craft'),
@@ -1366,7 +1377,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       await this.notificationWrapper(notification);
       console.log('notification_shuffle', notification);
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
-      return this.decks[notification.args.deck].shuffle();
+      return this.decks[notification.args.deck].shuffle(notification.args);
     },
     notification_updateGameData: async function (notification) {
       await this.notificationWrapper(notification);
@@ -1393,8 +1404,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updatePlayers(notification.args.gameData);
       this.updateItems(notification.args.gameData);
       this.updateKnowledgeTree(notification.args.gameData);
-      if (notification.args?.gamestate?.name)
-        await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
+      // if (notification.args?.gamestate?.name)
+      //   await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
     },
   });
 });

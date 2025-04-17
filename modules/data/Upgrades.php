@@ -463,46 +463,48 @@ $upgradesData = [
                 'state' => ['playerTurn'],
                 'stamina' => 2,
                 'global' => true,
-                // 'onUse' => function (Game $game, $skill, &$data) {
-                //     $char = $game->character->getTurnCharacterId();
-                //     array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames());
-                // },
-                // 'onUseSkill' => function (Game $game, $skill, &$data) {
-                //     if ($data['skillId'] == $skill['id']) {
-                //         $existingData = $game->actInterrupt->getState('actDraw');
-                //         if (array_key_exists('data', $existingData)) {
-                //             $deck = $existingData['data']['deck'];
-                //             $card1 = $existingData['data']['card'];
-                //             // $card2 = $game->decks->pickCard($deck);
-                //             $game->gameData->set('cardSelectionState', [
-                //                 'cards' => [$card1, $card2],
-                //                 'deck' => $deck,
-                //                 'cancellable' => false,
-                //                 'id' => $skill['id'],
-                //             ]);
-                //             // $data['interrupt'] = true;
-                //             $game->gamestate->nextState('cardSelection');
-                //         }
-                //     }
-                // },
-                // 'onCardSelection' => function (Game $game, $skill, &$data) {
-                //     $state = $game->gameData->get('cardSelectionState');
-                //     if ($state && $state['id'] == $skill['id']) {
-                //         usePerDay($skill['id'], $game);
-                //         $discardCard = array_values(
-                //             array_filter($state['cards'], function ($card) use ($data) {
-                //                 return $card['id'] != $data['cardId'];
-                //             })
-                //         )[0];
-                //         $game->cardDrawEvent($discardCard, $state['deck']);
-
-                //         $drawState = $game->actInterrupt->getState('actDraw');
-                //         $drawState['data']['card'] = $game->decks->getCard($data['cardId']);
-                //         $game->actInterrupt->setState('actDraw', $drawState);
-                //         $game->actInterrupt->actInterrupt($skill['id']);
-                //         $data['nextState'] = false;
-                //     }
-                // },
+                'onUse' => function (Game $game, $skill, &$data) {
+                    // $char = $game->character->getTurnCharacterId();
+                },
+                'onUseSkill' => function (Game $game, $skill, &$data) {
+                    if ($data['skillId'] == $skill['id']) {
+                        $decksDiscards = $game->decks->listDeckDiscards(
+                            array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames())
+                        );
+                        // $card2 = $game->decks->pickCard($deck);
+                        $game->gameData->set('cardSelectionState', [
+                            'cards' => $decksDiscards,
+                            'cancellable' => true,
+                            'id' => $skill['id'],
+                        ]);
+                        $data['interrupt'] = true;
+                        $game->gamestate->nextState('cardSelection');
+                        //         $existingData = $game->actInterrupt->getState('actDraw');
+                        //         if (array_key_exists('data', $existingData)) {
+                        //             $decksDiscards = $game->decks->listDeckDiscards();
+                        //             // $card2 = $game->decks->pickCard($deck);
+                        //             $game->gameData->set('cardSelectionState', [
+                        //                 'cards' => $decksDiscards,
+                        //                 'cancellable' => false,
+                        //                 'id' => $skill['id'],
+                        //             ]);
+                        // $data['interrupt'] = true;
+                        //             $game->gamestate->nextState('cardSelection');
+                        //         }
+                    }
+                },
+                'onCardSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->gameData->get('cardSelectionState');
+                    if ($state && $state['id'] == $skill['id']) {
+                        // $game->data->decks[$data['cardId']];
+                        $game->decks->shuffleInCard($game->data->decks[$data['cardId']]['deck'], $data['cardId']);
+                        // $discardCard = array_values(
+                        //     array_filter($state['cards'], function ($card) use ($data) {
+                        //         return $card['id'] != $data['cardId'];
+                        //     })
+                        // )[0];
+                    }
+                },
             ],
         ],
     ],

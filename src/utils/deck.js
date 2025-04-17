@@ -23,10 +23,10 @@ class Deck {
     this.topDiscard = null;
     this.setDiscard(this.topDiscard);
   }
-  async shuffle() {
+  async shuffle(gameData) {
     return new Promise((resolve) => {
       this.topDiscard = null;
-      this.setDiscard();
+      this.setDiscard(gameData.decksDiscards?.[gameData.deck]?.name);
       this.div.querySelector(`.shuffle-1`).classList.add('enable');
       this.div.querySelector(`.shuffle-2`).classList.add('enable');
       setTimeout(() => {

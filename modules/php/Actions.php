@@ -151,6 +151,10 @@ class Actions
                         if ($count > 1) {
                             throw new BgaUserException($this->game->translate('Only 1 hindrance can be removed'));
                         }
+                        $game->adjustResource('herb', -$data['herb']);
+                        $game->notify->all('tokenUsed', clienttranslate('${character_name} used a herb to cure their wounds'), [
+                            'gameData' => $game->getAllDatas(),
+                        ]);
                         $data['nextState'] = 'playerTurn';
                     }
                 },
