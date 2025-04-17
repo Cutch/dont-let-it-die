@@ -51,19 +51,28 @@ class Data
     public function getValidKnowledgeTree()
     {
         $data = $this->boards['knowledge-tree-' . $this->game->getDifficulty()]['track'];
-        $unlocks = $this->game->getUnlockedKnowledgeIds();
-        return array_map(
-            function ($data) {
-                $this->game->hooks->onGetUnlockCost($data);
-                return $data;
+        $unlocks = $this->game->getUnlockedKnowledgeIds(false);
+        $upgrades = $this->game->gameData->get('upgrades');
+        $mapping = [];
+        array_walk($upgrades, function ($v, $k) use (&$mapping) {
+            $mapping[$v['replace']] = $this->upgrades[$k];
+        });
+        $hasRequiredData = array_filter(
+            $data,
+            function ($v, $k) use ($unlocks) {
+                return !in_array($k, $unlocks) && (!array_key_exists('requires', $v) || $v['requires']($this->game, $v));
             },
-            array_filter(
-                $data,
-                function ($v, $k) use ($unlocks) {
-                    return !in_array($k, $unlocks) && (!array_key_exists('requires', $v) || $v['requires']($this->game, $v));
-                },
-                ARRAY_FILTER_USE_BOTH
-            )
+            ARRAY_FILTER_USE_BOTH
         );
+        array_walk($hasRequiredData, function ($v, $k) use ($mapping, &$hasRequiredData) {
+            if (array_key_exists($k, $mapping)) {
+                unset($hasRequiredData[$k]);
+                $hasRequiredData[$mapping[$k]['id']] = $mapping[$k];
+            }
+        });
+        return array_map(function ($data) {
+            $this->game->hooks->onGetUnlockCost($data);
+            return $data;
+        }, $hasRequiredData);
     }
 }

@@ -450,7 +450,7 @@ class Game extends \Table
 
         if (!array_key_exists($knowledgeId, $availableUnlocks)) {
             throw new BgaUserException($this->translate('Requirements not met for this unlock'));
-        } elseif (in_array($knowledgeId, $this->getUnlockedKnowledge())) {
+        } elseif (in_array($knowledgeId, $this->getUnlockedKnowledgeIds())) {
             throw new BgaUserException($this->translate('Already unlocked'));
         } elseif ($resourceCount < $availableUnlocks[$knowledgeId]['unlockCost']) {
             throw new BgaUserException($this->translate('Not enough knowledge points'));
@@ -2014,10 +2014,23 @@ class Game extends \Table
             return $this->data->knowledgeTree[$unlock];
         }, $unlocks);
     }
-    public function getUnlockedKnowledgeIds(): array
+    public function getUnlockedKnowledgeIds(bool $withReplacements = true): array
     {
         $unlocks = $this->gameData->get('unlocks');
-        return $unlocks;
+        if ($withReplacements) {
+            return $unlocks;
+        }
+        $upgrades = $this->gameData->get('upgrades');
+        $mapping = [];
+        array_walk($upgrades, function ($v, $k) use (&$mapping) {
+            $mapping[$k] = $v['replace'];
+        });
+        return array_map(function ($v) use ($mapping) {
+            if (array_key_exists($v, $mapping)) {
+                return $mapping[$v];
+            }
+            return $v;
+        }, $unlocks);
     }
     public function unlockKnowledge($knowledgeId): void
     {

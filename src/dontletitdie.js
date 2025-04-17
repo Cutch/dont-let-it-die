@@ -805,12 +805,15 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       knowledgeContainer.innerHTML = '';
       gameData.game.unlocks.forEach((unlockName) => {
+        if (gameData.game.upgrades[unlockName]) {
+          unlockName = gameData.game.upgrades[unlockName].replace;
+        }
         const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockName];
         knowledgeContainer.insertAdjacentHTML(
           'beforeend',
-          `<div id="knowledge-${unlockName}" class="fkp" style="top: ${y}px; left: ${x}px;"></div>`,
+          `<div id="knowledge-${unlockName}" class="fkp" style="top: ${y * 1.2}px; left: ${x * 1.2}px;"></div>`,
         );
-        renderImage(`fkp-unlocked`, $(`knowledge-${unlockName}`), { scale: 2 });
+        renderImage(`fkp-unlocked`, $(`knowledge-${unlockName}`), { scale: 1.5 });
       });
     },
     ///////////////////////////////////////////////////

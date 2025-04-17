@@ -561,40 +561,39 @@ $expansionData = [
                 // TODO
             }
         },
-        'skills' => [
-            // 'skill1' => [
-            //     'type' => 'skill',
-            //     'name' => clienttranslate('Sorry about that!'),
-            //     'state' => ['dayEvent'],
-            //     'onUse' => function (Game $game, $skill) {
-            //         $currentCharacter = $game->character->getTurnCharacterId();
-            //         $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use ($currentCharacter) {
-            //             return $character != $currentCharacter;
-            //         });
-            //         $game->gameData->set('characterSelectionState', [
-            //             'selectableCharacters' => array_values($characters),
-            //             'cancellable' => false,
-            //             'id' => $skill['id'],
-            //         ]);
-            //         $data['interrupt'] = true;
-            //         $game->gamestate->nextState('characterSelection');
-            //         return ['notify' => false, 'nextState' => false];
-            //     },
-            //     'onCharacterSelection' => function (Game $game, $skill, &$data) {
-            //         $state = $game->gameData->get('characterSelectionState');
-            //         $game->log('onCharacterSelection', $skill, $data, $state);
-            //         if ($state && $state['id'] == $skill['id']) {
-            //             $game->character->adjustHealth($data['characterId'], -1);
-            //             $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
-            //                 'count' => 1,
-            //                 'character_resource' => 'health',
-            //                 'character_name' => $data['characterId'],
-            //             ]);
-            //             $data['nextState'] = 'playerTurn';
-            //         }
-            //     },
-            // ],
-        ],
+        // 'skills' => [
+        //     'skill1' => [
+        //         'type' => 'skill',
+        //         'name' => clienttranslate('Berserk'),
+        //         'state' => ['playerTurn', 'nightPhase', 'morningPhase'],
+        //         'onUse' => function (Game $game, $skill) {
+        //             $currentCharacter = $game->character->getTurnCharacterId();
+        //             $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use ($currentCharacter) {
+        //                 return $character != $currentCharacter;
+        //             });
+        //             $game->gameData->set('characterSelectionState', [
+        //                 'selectableCharacters' => array_values($characters),
+        //                 'cancellable' => false,
+        //                 'id' => $skill['id'],
+        //             ]);
+        //             $data['interrupt'] = true;
+        //             $game->gamestate->nextState('characterSelection');
+        //             return ['notify' => false, 'nextState' => false];
+        //         },
+        //         'onCharacterSelection' => function (Game $game, $skill, &$data) {
+        //             $state = $game->gameData->get('characterSelectionState');
+        //             if ($state && $state['id'] == $skill['id']) {
+        //                 $game->character->adjustHealth($data['characterId'], -1);
+        //                 $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
+        //                     'count' => 1,
+        //                     'character_resource' => 'health',
+        //                     'character_name' => $data['characterId'],
+        //                 ]);
+        //                 $data['nextState'] = 'playerTurn';
+        //             }
+        //         },
+        //     ],
+        // ],
     ],
     'hindrance_1_11' => [
         'deck' => 'mental-hindrance',
@@ -662,7 +661,7 @@ $expansionData = [
         'acquireSentence' => clienttranslate('is'),
         'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Paranoid'),
-        // TODO: Always eat
+        // Always eat
         'onHandleEat' => function (Game $game, $card, &$data, ?string $preferType = null) {
             $variables = $game->gameData->getResources();
             $array = $game->actions->getActionSelectable('actEat');

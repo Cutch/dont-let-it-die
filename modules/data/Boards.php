@@ -22,7 +22,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-1', $unlocks);
                 },
             ],
@@ -30,7 +30,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-2', $unlocks);
                 },
             ],
@@ -38,7 +38,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-3', $unlocks) && in_array('crafting-1', $unlocks);
                 },
             ],
@@ -46,7 +46,7 @@ $boardsData = [
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-1', $unlocks);
                 },
             ],
@@ -54,7 +54,7 @@ $boardsData = [
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('cooking-1', $unlocks);
                 },
             ],
@@ -62,7 +62,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('cooking-1', $unlocks);
                 },
             ],
@@ -70,7 +70,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-1', $unlocks);
                 },
             ],
@@ -79,7 +79,7 @@ $boardsData = [
                 'unlockCost' => 15,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-2', $unlocks) && in_array('spices', $unlocks);
                 },
             ],
@@ -99,7 +99,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-1', $unlocks);
                 },
             ],
@@ -107,7 +107,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-2', $unlocks);
                 },
             ],
@@ -115,7 +115,7 @@ $boardsData = [
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-1', $unlocks);
                 },
             ],
@@ -123,7 +123,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('cooking-1', $unlocks);
                 },
             ],
@@ -131,7 +131,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('cooking-2', $unlocks);
                 },
             ],
@@ -139,7 +139,7 @@ $boardsData = [
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('cooking-1', $unlocks);
                 },
             ],
@@ -147,7 +147,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-1', $unlocks);
                 },
             ],
@@ -155,7 +155,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('forage-1', $unlocks);
                 },
             ],
@@ -163,7 +163,7 @@ $boardsData = [
                 'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('forage-2', $unlocks);
                 },
             ],
@@ -171,7 +171,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-1', $unlocks);
                 },
             ],
@@ -179,7 +179,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-2', $unlocks);
                 },
             ],
@@ -187,7 +187,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-2', $unlocks);
                 },
             ],
@@ -195,7 +195,7 @@ $boardsData = [
                 'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-3', $unlocks);
                 },
             ],
@@ -204,7 +204,7 @@ $boardsData = [
                 'unlockCost' => 15,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('resource-2', $unlocks) && in_array('hunt-1', $unlocks);
                 },
             ],
@@ -224,7 +224,7 @@ $boardsData = [
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-1', $unlocks);
                 },
             ],
@@ -232,7 +232,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('resource-1', $unlocks);
                 },
             ],
@@ -240,7 +240,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-2', $unlocks);
                 },
             ],
@@ -248,7 +248,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-3', $unlocks);
                 },
             ],
@@ -256,7 +256,7 @@ $boardsData = [
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-1', $unlocks);
                 },
             ],
@@ -264,7 +264,7 @@ $boardsData = [
                 'unlockCost' => 3,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('resource-1', $unlocks) && in_array('cooking-1', $unlocks);
                 },
             ],
@@ -272,7 +272,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-1', $unlocks);
                 },
             ],
@@ -280,7 +280,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('forage-1', $unlocks);
                 },
             ],
@@ -288,7 +288,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-2', $unlocks);
                 },
             ],
@@ -296,7 +296,7 @@ $boardsData = [
                 'unlockCost' => 4,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('forage-2', $unlocks);
                 },
             ],
@@ -304,7 +304,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('forage-2', $unlocks);
                 },
             ],
@@ -312,7 +312,7 @@ $boardsData = [
                 'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('cooking-2', $unlocks);
                 },
             ],
@@ -320,7 +320,7 @@ $boardsData = [
                 'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('forage-1', $unlocks);
                 },
             ],
@@ -329,7 +329,7 @@ $boardsData = [
                 'unlockCost' => 15,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('resource-2', $unlocks) && in_array('hunt-1', $unlocks);
                 },
             ],
@@ -349,7 +349,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-1', $unlocks);
                 },
             ],
@@ -357,7 +357,7 @@ $boardsData = [
                 'unlockCost' => 5,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-1', $unlocks);
                 },
             ],
@@ -365,7 +365,7 @@ $boardsData = [
                 'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('resource-1', $unlocks);
                 },
             ],
@@ -373,7 +373,7 @@ $boardsData = [
                 'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-2', $unlocks);
                 },
             ],
@@ -381,7 +381,7 @@ $boardsData = [
                 'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('relaxation', $unlocks);
                 },
             ],
@@ -389,7 +389,7 @@ $boardsData = [
                 'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-3', $unlocks);
                 },
             ],
@@ -397,7 +397,7 @@ $boardsData = [
                 'unlockCost' => 9,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('relaxation', $unlocks);
                 },
             ],
@@ -406,7 +406,7 @@ $boardsData = [
                 'unlockCost' => 6,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-1', $unlocks);
                 },
             ],
@@ -414,7 +414,7 @@ $boardsData = [
                 'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('cooking-1', $unlocks);
                 },
             ],
@@ -422,7 +422,7 @@ $boardsData = [
                 'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('warmth-2', $unlocks);
                 },
             ],
@@ -430,7 +430,7 @@ $boardsData = [
                 'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('cooking-2', $unlocks);
                 },
             ],
@@ -438,7 +438,7 @@ $boardsData = [
                 'unlockCost' => 7,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('crafting-2', $unlocks) && in_array('cooking-2', $unlocks);
                 },
             ],
@@ -446,7 +446,7 @@ $boardsData = [
                 'unlockCost' => 9,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('forage-1', $unlocks);
                 },
             ],
@@ -455,7 +455,7 @@ $boardsData = [
                 'unlockCost' => 20,
                 'type' => 'unlock',
                 'requires' => function (Game $game, $obj) {
-                    $unlocks = $game->getUnlockedKnowledgeIds();
+                    $unlocks = $game->getUnlockedKnowledgeIds(false);
                     return in_array('forage-2', $unlocks) && in_array('hunt-1', $unlocks);
                 },
             ],
