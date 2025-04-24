@@ -37,6 +37,9 @@ class Data
     }
     private function expansionFilter(array $data)
     {
+        if (array_key_exists('disabled', $data)) {
+            return false;
+        }
         if (!array_key_exists('expansion', $data)) {
             return true;
         }
@@ -44,6 +47,7 @@ class Data
     }
     public function __get($property)
     {
+        $this->game->log($property);
         if (property_exists($this, $property)) {
             return array_filter($this->$property, [$this, 'expansionFilter']);
         }

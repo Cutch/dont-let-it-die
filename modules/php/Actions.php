@@ -567,6 +567,11 @@ class Actions
     {
         $cost = $this->getActionCost($action, $subAction);
         $this->game->log('$cost', $cost);
+        $this->spendCost($cost);
+    }
+    public function spendCost(array $cost)
+    {
+        $this->game->hooks->onSpendActionCost($cost);
         if (array_key_exists('health', $cost)) {
             $this->game->character->adjustActiveHealth(-$cost['health']);
         }
@@ -579,6 +584,7 @@ class Actions
         $character = $this->game->character->getSubmittingCharacter();
 
         $cost = $this->getActionCost($action, $subAction);
+        $this->game->hooks->onSpendActionCost($cost);
         $stamina = $character['stamina'];
         $health = $character['health'];
         if (array_key_exists('stamina', $cost) && $stamina < $cost['stamina']) {

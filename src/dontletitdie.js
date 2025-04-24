@@ -18,17 +18,6 @@
 define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], function (dojo, declare) {
   return declare('bgagame.dontletitdie', ebg.core.gamegui, {
     constructor: function () {
-      this.deckMapping = {
-        gather: _('Gather'),
-        forage: _('Forage'),
-        harvest: _('Harvest'),
-        hunt: _('Hunt'),
-        explore: _('Explore'),
-        'day-event': _('Day Event'),
-        'mental-hindrance': _('Mental Hindrance'),
-        'physical-hindrance': _('Physical Hindrance'),
-        'night-event': _('Night Event'),
-      };
       this.actionMappings = {
         actInvestigateFire: _('Investigate Fire'),
         actCraft: _('Craft'),
@@ -72,7 +61,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.tooManyItemsScreen = new TooManyItemsScreen(this);
       this.upgradeSelectionScreen = new UpgradeSelectionScreen(this);
       this.weaponScreen = new WeaponScreen(this);
-      this.currentResources = { prevResources: {}, resources: {} };
+      this.currentResources = {};
       this.resourcesForDisplay = [
         'wood',
         'rock',
@@ -816,15 +805,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       knowledgeContainer.innerHTML = '';
       gameData.game.unlocks.forEach((unlockName) => {
-        if (gameData.game.upgrades[unlockName]) {
-          unlockName = gameData.game.upgrades[unlockName].replace;
-        }
         const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockName];
         knowledgeContainer.insertAdjacentHTML(
           'beforeend',
-          `<div id="knowledge-${unlockName}" class="fkp" style="top: ${y * 1.2}px; left: ${x * 1.2}px;"></div>`,
+          `<div id="knowledge-${unlockName}" class="fkp" style="top: ${y}px; left: ${x}px;"></div>`,
         );
-        renderImage(`fkp-unlocked`, $(`knowledge-${unlockName}`), { scale: 1.5 });
+        renderImage(`fkp-unlocked`, $(`knowledge-${unlockName}`), { scale: 2 });
       });
     },
     ///////////////////////////////////////////////////
@@ -985,7 +971,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   Object.values(args.availableUnlocks).forEach((unlock) => {
                     const suffix = this.getActionSuffixHTML(unlock);
                     this.statusBar.addActionButton(`${unlock.name}${suffix}`, () => {
-                      return this.bgaPerformAction(actionId, { knowledgeId: unlock.id }).then(() => this.removeActionButtons());
+                      return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
                     });
                   });
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
@@ -1334,25 +1320,35 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       
       */
     setupNotifications: function () {
-      dojo.subscribe('characterClicked', this, 'notification_characterClicked');
-      dojo.subscribe('updateGameData', this, 'notification_updateGameData');
-      // Example 1: standard notification handling
-      // dojo.subscribe( 'tokenUsed', this, "notification_tokenUsed" );
+      this.bgaSetupPromiseNotifications({
+        prefix: 'notif_', // default is 'notif_'
+        minDuration: 500,
+        minDurationNoText: 1,
+        logger: console.log, // show notif debug informations on console. Could be console.warn or any custom debug function (default null = no logs)
+        ignoreNotifications: ['updateAutoPlay'], // the notif_updateAutoPlay function will be ignored by bgaSetupPromiseNotifications. You'll need to subscribe to it manually
+        // onStart: (notifName, msg, args) => $('pagemaintitletext').innerHTML = `${_('Animation for:')} ${msg}`,
+        // onEnd: (notifName, msg, args) => $('pagemaintitletext').innerHTML = '',
+      });
 
-      // Example 2: standard notification handling + tell the user interface to wait
-      //            during 3 seconds after calling the method in order to let the players
-      //            see what is happening in the game.
+      // dojo.subscribe('characterClicked', this, 'notif_characterClicked');
+      // dojo.subscribe('updateGameData', this, 'notif_updateGameData');
+      // // Example 1: standard notification handling
+      // // dojo.subscribe( 'tokenUsed', this, "notif_tokenUsed" );
 
-      dojo.subscribe('activeCharacter', this, 'notification_tokenUsed');
-      dojo.subscribe('tokenUsed', this, 'notification_tokenUsed');
-      dojo.subscribe('shuffle', this, 'notification_shuffle');
-      dojo.subscribe('cardDrawn', this, 'notification_cardDrawn');
-      dojo.subscribe('rollFireDie', this, 'notification_rollFireDie');
-      this.notifqueue.setSynchronous('cardDrawn', 1000);
-      this.notifqueue.setSynchronous('rollFireDie', 1000);
-      this.notifqueue.setSynchronous('shuffle', 1500);
-      this.notifqueue.setSynchronous('tokenUsed', 300);
-      this.notifqueue.setSynchronous('updateGameData', 300);
+      // // Example 2: standard notification handling + tell the user interface to wait
+      // //            during 3 seconds after calling the method in order to let the players
+      // //            see what is happening in the game.
+
+      // dojo.subscribe('activeCharacter', this, 'notif_tokenUsed');
+      // dojo.subscribe('tokenUsed', this, 'notif_tokenUsed');
+      // dojo.subscribe('shuffle', this, 'notif_shuffle');
+      // dojo.subscribe('cardDrawn', this, 'notif_cardDrawn');
+      // dojo.subscribe('rollFireDie', this, 'notif_rollFireDie');
+      // this.notifqueue.setSynchronous('cardDrawn', 1000);
+      // this.notifqueue.setSynchronous('rollFireDie', 1000);
+      // this.notifqueue.setSynchronous('shuffle', 1500);
+      // this.notifqueue.setSynchronous('tokenUsed', 300);
+      // this.notifqueue.setSynchronous('updateGameData', 300);
     },
     notificationWrapper: async function (notification) {
       notification.args = notification.args ?? {};
@@ -1361,27 +1357,27 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       }
       await this.updateResources(notification.args.gameData);
     },
-    notification_rollFireDie: async function (notification) {
+    notif_rollFireDie: async function (notification) {
       await this.notificationWrapper(notification);
-      console.log('notification_rollFireDie', notification);
+      console.log('notif_rollFireDie', notification);
       return this.dice.roll(notification.args.roll);
     },
-    notification_cardDrawn: async function (notification) {
+    notif_cardDrawn: async function (notification) {
       await this.notificationWrapper(notification);
-      console.log('notification_cardDrawn', notification);
+      console.log('notif_cardDrawn', notification);
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
       await this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
       this.decks[notification.args.deck].updateMarker(notification.args.decks[notification.args.deck]);
     },
-    notification_shuffle: async function (notification) {
+    notif_shuffle: async function (notification) {
       await this.notificationWrapper(notification);
-      console.log('notification_shuffle', notification);
+      console.log('notif_shuffle', notification);
       this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
-      return this.decks[notification.args.deck].shuffle(notification.args);
+      return this.decks[notification.args.deck].shuffle();
     },
-    notification_updateGameData: async function (notification) {
+    notif_updateGameData: async function (notification) {
       await this.notificationWrapper(notification);
-      console.log('notification_updateGameData', notification);
+      console.log('notif_updateGameData', notification);
       this.updatePlayers(notification.args.gameData);
       this.updateItems(notification.args.gameData);
       this.updateKnowledgeTree(notification.args.gameData);
@@ -1391,21 +1387,21 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
     },
 
-    notification_characterClicked: async function (notification) {
+    notif_characterClicked: async function (notification) {
       await this.notificationWrapper(notification);
-      console.log('notification_characterClicked', notification);
+      console.log('notif_characterClicked', notification);
       this.selectedCharacters = notification.args.gameData.characters;
       this.updateCharacterSelections(notification.args);
     },
 
-    notification_tokenUsed: async function (notification) {
+    notif_tokenUsed: async function (notification) {
       await this.notificationWrapper(notification);
-      console.log('notification_tokenUsed', notification);
+      console.log('notif_tokenUsed', notification);
       this.updatePlayers(notification.args.gameData);
       this.updateItems(notification.args.gameData);
       this.updateKnowledgeTree(notification.args.gameData);
-      // if (notification.args?.gamestate?.name)
-      //   await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
+      if (notification.args?.gamestate?.name)
+        await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
     },
   });
 });

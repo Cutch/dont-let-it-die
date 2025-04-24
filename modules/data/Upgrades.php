@@ -242,6 +242,7 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('Recycling'),
         'unlockCost' => 4,
+        'disabled' => true,
         // TODO: Decrease item crafting cost after destroying it
     ],
     '16-A' => [

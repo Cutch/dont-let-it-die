@@ -66,7 +66,7 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionCount',
         'possibleactions' => ['actChooseCharacters', 'actCharacterClicked'],
-        'transitions' => ['start' => 10, 'startHindrance' => 3],
+        'transitions' => ['playerTurn' => 10, 'startHindrance' => 3],
         'action' => 'stSelectCharacter',
     ],
     3 => [
@@ -76,7 +76,7 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'args' => 'argStartHindrance',
         'possibleactions' => ['actMoveDiscovery', 'actDone'],
-        'transitions' => ['start' => 10],
+        'transitions' => ['playerTurn' => 10],
         'action' => 'stStartHindrance',
     ],
     10 => [
@@ -107,6 +107,7 @@ $machinestates = [
             'actRevive',
         ],
         'transitions' => [
+            'endGame' => 99,
             'drawCard' => 11,
             'tooManyItems' => 12,
             'deckSelection' => 13,
@@ -115,6 +116,7 @@ $machinestates = [
             'characterSelection' => 16,
             'hindranceSelection' => 18,
             'interrupt' => 22,
+            'cardSelection' => 17,
         ],
     ],
     11 => [
@@ -124,7 +126,14 @@ $machinestates = [
         'type' => 'game',
         'args' => 'argDrawCard',
         'action' => 'stDrawCard',
-        'transitions' => ['resolveEncounter' => 20, 'playerTurn' => 10, 'drawCard' => 11, 'interrupt' => 22, 'dayEvent' => 24],
+        'transitions' => [
+            'endGame' => 99,
+            'resolveEncounter' => 20,
+            'playerTurn' => 10,
+            'drawCard' => 11,
+            'interrupt' => 22,
+            'dayEvent' => 24,
+        ],
     ],
     12 => [
         'name' => 'tooManyItems',
@@ -159,7 +168,7 @@ $machinestates = [
         'type' => 'game',
         'action' => 'stNextCharacter',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'dinnerPhase' => 28],
+        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'dinnerPhase' => 27],
     ],
     16 => [
         'name' => 'characterSelection',
@@ -196,7 +205,7 @@ $machinestates = [
         'action' => 'stResolveEncounter',
         'args' => 'argResolveEncounter',
         'possibleactions' => ['actChooseResource', 'actUseItem'],
-        'transitions' => ['postEncounter' => 21, 'interrupt' => 22, 'whichWeapon' => 23],
+        'transitions' => ['endGame' => 99, 'postEncounter' => 21, 'interrupt' => 22, 'whichWeapon' => 23],
     ],
     21 => [
         'name' => 'postEncounter',
@@ -206,7 +215,7 @@ $machinestates = [
         'action' => 'stPostEncounter',
         'args' => 'argPostEncounter',
         'possibleactions' => [],
-        'transitions' => ['playerTurn' => 10, 'drawCard' => 11],
+        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'drawCard' => 11],
     ],
     22 => [
         'name' => 'interrupt',
@@ -217,6 +226,7 @@ $machinestates = [
         'args' => 'argInterrupt',
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => [
+            'endGame' => 99,
             'playerTurn' => 10,
             'drawCard' => 11,
             'resourceSelection' => 14,
@@ -249,6 +259,7 @@ $machinestates = [
         'args' => 'argDayEvent',
         'possibleactions' => ['actUseSkill', 'actUseItem'],
         'transitions' => [
+            'endGame' => 99,
             'playerTurn' => 10,
             'drawCard' => 11,
             'deckSelection' => 13,
@@ -347,7 +358,14 @@ $machinestates = [
         'possibleactions' => [],
         'transitions' => ['tradePhaseActions' => 61],
     ],
-
+    97 => [
+        'name' => 'postActionPhase',
+        'descriptionmyturn' => clienttranslate('Resolving'),
+        'type' => 'activePlayer',
+        'action' => 'stPostActionPhase',
+        'possibleactions' => ['actUseSkill', 'actUseItem'],
+        'transitions' => [],
+    ],
     // Final state.
     // Please do not modify (and do not overload action/args methods).
     98 => [
@@ -359,3 +377,6 @@ $machinestates = [
         'args' => 'argGameEnd',
     ],
 ];
+foreach ($machinestates as $key => $state) {
+    $machinestates[97]['transitions'][$key] = $state['name'];
+}

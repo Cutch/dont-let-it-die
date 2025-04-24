@@ -1167,7 +1167,7 @@ class Game extends \Table
             ) {
                 throw new BgaUserException($this->translate('All discoveries must replace an existing track discovery'));
             }
-            $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'start');
+            $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'playerTurn');
         }
     }
 
@@ -1304,6 +1304,30 @@ class Game extends \Table
             $this->endTurn();
         }
         // }
+    }
+    public function actPostActionPhase()
+    {
+        $currentState = $this->gamestate->state()['name'];
+        $this->gamestate->nextState('postActionPhase');
+    }
+    public function stPostActionPhase()
+    {
+        $interrupted = false;
+        $this->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->hooks, 'onPostActionPhase'],
+            function (Game $_this) use (&$interrupted) {
+                $interrupted = true;
+                return [];
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) use (&$interrupted) {
+                $interrupted = false;
+                $this->gamestate->nextState('morningPhase');
+            }
+        );
+        if ($interrupted) {
+        }
     }
     public function stDrawCard()
     {
@@ -1533,7 +1557,7 @@ class Game extends \Table
      */
     public function getGameProgression()
     {
-        // TODO: compute and return the game progression
+        // Compute and return the game progression
         extract($this->gameData->getAll('day', 'turnNo'));
         return (($day - 1) * 4 + ($turnNo ?? 0)) / (12 * 4);
     }

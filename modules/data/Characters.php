@@ -506,7 +506,6 @@ $charactersData = [
                     return $skill['characterId'] . $skill['id'];
                 },
                 'onUse' => function (Game $game, $skill) {
-                    $char = $game->character->getCharacterData($skill['characterId']);
                     usePerDay($skill['getPerDayKey']($game, $skill), $game);
                     $game->character->adjustActiveStamina(-2);
                     $game->character->adjustActiveHealth(2);
@@ -1768,7 +1767,18 @@ $charactersData = [
                 ]);
             }
         },
-        // TODO: Can spend health as if it was stamina
+        // TODO: Can spend health as if it was stamina (Needs testing)
+        'onSpendActionCost' => function (Game $game, $char, &$data) {
+            if ($char['id'] == $game->character->getSubmittingCharacterId()) {
+                if (array_key_exists('stamina', $data) && $data['stamina'] > 0) {
+                    $diff = $game->character->getActiveStamina() - $data['stamina'];
+                    if ($diff < 0) {
+                        $data['stamina'] += $diff;
+                        $data['health'] = (array_key_exists('health', $data) ? $data['health'] : 0) - $diff;
+                    }
+                }
+            }
+        },
     ],
     'Samp' => [
         'type' => 'character',
