@@ -30,7 +30,7 @@ class Decks
         }
         $type = 'explore';
         $filtered_cards = array_filter(
-            $this->game->data->decks,
+            $this->game->data->getDecks(),
             function ($v, $k) use ($type) {
                 return $v['type'] == 'deck' && $v['deck'] == $type;
             },
@@ -58,7 +58,7 @@ class Decks
     {
         return array_values(
             array_filter(self::$decksNames, function ($name) {
-                return array_key_exists($name . '-back', $this->game->data->decks);
+                return array_key_exists($name . '-back', $this->game->data->getDecks());
             })
         );
     }
@@ -71,7 +71,7 @@ class Decks
     protected function createDeck(string $type)
     {
         $filtered_cards = array_filter(
-            $this->game->data->decks,
+            $this->game->data->getDecks(),
             function ($v, $k) use ($type) {
                 return $v['type'] == 'deck' && $v['deck'] == $type;
             },
@@ -94,15 +94,15 @@ class Decks
     }
     public function getCard(string $id): array
     {
-        $card = $this->game->data->decks[$id];
+        $card = $this->game->data->getDecks()[$id];
         $name = '';
         if (array_key_exists('resourceType', $card)) {
-            $name = $this->game->data->tokens[$card['resourceType']]['name'];
+            $name = $this->game->data->getTokens()[$card['resourceType']]['name'];
         }
         if (array_key_exists('name', $card)) {
             $name = $card['name'];
         }
-        return array_merge($this->game->data->decks[$id], ['id' => $id, 'name' => $name]);
+        return array_merge($this->game->data->getDecks()[$id], ['id' => $id, 'name' => $name]);
     }
     public function listDeckDiscards(array $decks): array
     {
@@ -111,7 +111,7 @@ class Decks
             $sqlName = str_replace('-', '', $deck);
             $discardData = array_map(
                 function ($data) {
-                    return $this->game->data->decks[$data['id']];
+                    return $this->game->data->getDecks()[$data['id']];
                 },
                 array_values(
                     $this->game->getCollectionFromDb(
@@ -162,11 +162,13 @@ class Decks
     }
     public function addBackToDeck(string $deck, string $cardName): void
     {
-        $cards = array_filter($this->getDeck($deck)->getCardsInLocation('hand'), function ($card) use ($cardName) {
-            return $card['type_arg'] == $cardName;
-        });
+        $cards = array_values(
+            array_filter($this->getDeck($deck)->getCardsInLocation('hand'), function ($card) use ($cardName) {
+                return $card['type_arg'] == $cardName;
+            })
+        );
         if (sizeof($cards) > 0) {
-            $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'discard');
+            $this->getDeck($deck)->moveCard($cards[0]['id'], 'discard');
         } else {
             throw new Exception('Missing card id');
         }
@@ -175,22 +177,26 @@ class Decks
     {
         $cards = [...$this->getDeck($deck)->getCardsInLocation('discard'), ...$this->getDeck($deck)->getCardsInLocation('deck')];
         //swapCharacter(Yurt)
-        $cards = array_filter($cards, function ($card) use ($cardName) {
-            return $card['type_arg'] == $cardName;
-        });
+        $cards = array_values(
+            array_filter($cards, function ($card) use ($cardName) {
+                return $card['type_arg'] == $cardName;
+            })
+        );
         if (sizeof($cards) > 0) {
-            $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'hand');
+            $this->getDeck($deck)->moveCard($cards[0]['id'], 'hand');
         } else {
             throw new Exception('Missing card id');
         }
     }
     public function shuffleInCard(string $deck, string $cardName): void
     {
-        $cards = array_filter($this->getDeck($deck)->getCardsInLocation('discard'), function ($card) use ($cardName) {
-            return $card['type_arg'] == $cardName;
-        });
+        $cards = array_values(
+            array_filter($this->getDeck($deck)->getCardsInLocation('discard'), function ($card) use ($cardName) {
+                return $card['type_arg'] == $cardName;
+            })
+        );
         if (sizeof($cards) > 0) {
-            $this->getDeck($deck)->moveCard(array_values($cards)[0]['id'], 'deck');
+            $this->getDeck($deck)->moveCard($cards[0]['id'], 'deck');
             $results = [
                 'deck' => $deck,
                 'deckName' => str_replace('-', ' ', $deck),

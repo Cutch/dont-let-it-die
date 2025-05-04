@@ -230,9 +230,9 @@ $upgradesData = [
             if ($data['action'] == 'actCraft') {
                 array_push(
                     $data['selectable'],
-                    $game->data->items['gem-y-necklace'],
-                    $game->data->items['gem-b-necklace'],
-                    $game->data->items['gem-p-necklace']
+                    $game->data->getItems()['gem-y-necklace'],
+                    $game->data->getItems()['gem-b-necklace'],
+                    $game->data->getItems()['gem-p-necklace']
                 );
             }
         },
@@ -497,8 +497,8 @@ $upgradesData = [
                 'onCardSelection' => function (Game $game, $skill, &$data) {
                     $state = $game->gameData->get('cardSelectionState');
                     if ($state && $state['id'] == $skill['id']) {
-                        // $game->data->decks[$data['cardId']];
-                        $game->decks->shuffleInCard($game->data->decks[$data['cardId']]['deck'], $data['cardId']);
+                        // $game->data->getDecks()[$data['cardId']];
+                        $game->decks->shuffleInCard($game->data->getDecks()[$data['cardId']]['deck'], $data['cardId']);
                         // $discardCard = array_values(
                         //     array_filter($state['cards'], function ($card) use ($data) {
                         //         return $card['id'] != $data['cardId'];

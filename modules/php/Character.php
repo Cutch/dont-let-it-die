@@ -131,7 +131,7 @@ class Character
         $characterData['isActive'] = $isActive;
         $characterData['isFirst'] = array_key_exists(0, $turnOrder) && $turnOrder[0] == $characterName;
         $characterData['id'] = $characterName;
-        $underlyingCharacterData = $this->game->data->characters[$characterData['id']];
+        $underlyingCharacterData = $this->game->data->getCharacters()[$characterData['id']];
         $characterData['maxStamina'] = $underlyingCharacterData['stamina'] + $characterData['modifiedMaxStamina'];
         $characterData['maxHealth'] = $underlyingCharacterData['health'] + $characterData['modifiedMaxHealth'];
 
@@ -142,14 +142,14 @@ class Character
         });
         $itemsLookup = $this->game->gameData->getItems();
         $characterData['dayEvent'] = array_map(function ($itemId) {
-            return $this->game->data->expansion[$itemId];
+            return $this->game->data->getExpansion()[$itemId];
         }, array_filter(explode(',', $characterData['day_event'] ?? '')));
 
         $characterData['necklaces'] = array_map(function ($itemId) use ($itemsLookup, $characterName) {
             $itemName = $itemsLookup[$itemId];
             $skills = [];
-            if (array_key_exists('skills', $this->game->data->items[$itemName])) {
-                array_walk($this->game->data->items[$itemName]['skills'], function ($v, $k) use (
+            if (array_key_exists('skills', $this->game->data->getItems()[$itemName])) {
+                array_walk($this->game->data->getItems()[$itemName]['skills'], function ($v, $k) use (
                     $itemId,
                     $itemName,
                     $characterName,
@@ -164,7 +164,7 @@ class Character
                 });
             }
             return [
-                ...$this->game->data->items[$itemName],
+                ...$this->game->data->getItems()[$itemName],
                 'character_name' => $characterName,
                 'characterId' => $characterName,
                 'itemId' => $itemId,
@@ -173,7 +173,7 @@ class Character
         }, array_filter(explode(',', $characterData['necklace'] ?? '')));
 
         $hindrances = array_map(function ($itemId) use ($characterName) {
-            return [...$this->game->data->expansion[$itemId], 'character_name' => $characterName, 'characterId' => $characterName];
+            return [...$this->game->data->getExpansion()[$itemId], 'character_name' => $characterName, 'characterId' => $characterName];
         }, array_filter(explode(',', $characterData['hindrance'] ?? '')));
         $characterData['mentalHindrance'] = array_values(
             array_filter($hindrances, function ($hindrance) {
@@ -189,8 +189,8 @@ class Character
         $characterData['equipment'] = array_map(function ($itemId) use ($isActive, $characterName, $itemsLookup) {
             $itemName = $itemsLookup[$itemId];
             $skills = [];
-            if (array_key_exists('skills', $this->game->data->items[$itemName])) {
-                array_walk($this->game->data->items[$itemName]['skills'], function ($v, $k) use (
+            if (array_key_exists('skills', $this->game->data->getItems()[$itemName])) {
+                array_walk($this->game->data->getItems()[$itemName]['skills'], function ($v, $k) use (
                     $itemId,
                     $itemName,
                     $characterName,
@@ -208,7 +208,7 @@ class Character
             return [
                 'itemId' => $itemId,
                 'isActive' => $isActive,
-                ...$this->game->data->items[$itemName],
+                ...$this->game->data->getItems()[$itemName],
                 'skills' => $skills,
                 'character_name' => $characterName,
                 'characterId' => $characterName,
@@ -240,8 +240,8 @@ class Character
     {
         $items = $this->game->gameData->getItems();
         $item = $items[$itemId];
-        $itemName = $this->game->data->items[$item]['id'];
-        $itemType = $this->game->data->items[$item]['itemType'];
+        $itemName = $this->game->data->getItems()[$item]['id'];
+        $itemType = $this->game->data->getItems()[$item]['itemType'];
         $slotsAllowed = array_count_values($character['slots']);
         $equipment = array_values(
             array_filter($character['equipment'], function ($d) use ($removingItemId) {
@@ -365,14 +365,14 @@ class Character
         }
         $buildings = $this->game->gameData->get('buildings');
         foreach ($buildings as $k => $building) {
-            $data = $this->game->data->items[$building['name']];
+            $data = $this->game->data->getItems()[$building['name']];
             if (array_key_exists('skills', $data)) {
                 if (array_key_exists($skillId, $data['skills'])) {
                     return ['character' => $currentCharacter, 'skill' => $data['skills'][$skillId]];
                 }
             }
         }
-        foreach ($this->game->data->expansion as $k => $expansion) {
+        foreach ($this->game->data->getExpansion() as $k => $expansion) {
             if (array_key_exists('deckType', $expansion) && $expansion['deckType'] == 'day-event') {
                 if (array_key_exists('skills', $expansion)) {
                     if (array_key_exists($skillId, $expansion['skills'])) {
@@ -381,7 +381,7 @@ class Character
                 }
             }
         }
-        foreach ($this->game->data->knowledgeTree as $k => $knowledgeTree) {
+        foreach ($this->game->data->getKnowledgeTree() as $k => $knowledgeTree) {
             if (array_key_exists('skills', $knowledgeTree)) {
                 if (array_key_exists($skillId, $knowledgeTree['skills'])) {
                     return ['character' => $currentCharacter, 'skill' => $knowledgeTree['skills'][$skillId]];

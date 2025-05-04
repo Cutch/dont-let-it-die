@@ -860,7 +860,7 @@ $charactersData = [
         // Revive with 6 cooked berries
         'onGetActionSelectable' => function (Game $game, $char, &$data) {
             if ($data['action'] == 'actRevive') {
-                array_push($data['selectable'], [...$game->data->tokens['berry-cooked'], 'actRevive' => ['count' => 6]]);
+                array_push($data['selectable'], [...$game->data->getTokens()['berry-cooked'], 'actRevive' => ['count' => 6]]);
             }
         },
         'skills' => [

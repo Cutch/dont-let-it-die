@@ -251,7 +251,7 @@ class Actions
                     $buildings = $game->gameData->get('buildings');
                     return array_values(
                         array_filter(
-                            $game->data->items,
+                            $game->data->getItems(),
                             function ($v, $k) use ($craftingLevel, $craftedItems, $buildings, $game) {
                                 return $v['type'] == 'item' &&
                                     $v['craftingLevel'] <= $craftingLevel &&
@@ -636,7 +636,7 @@ class Actions
     {
         $activeDayCards = $this->game->gameData->get('activeDayCards');
         return array_map(function ($eventId) {
-            return $this->game->data->expansion[$eventId];
+            return $this->game->data->getExpansion()[$eventId];
         }, $activeDayCards);
     }
     public function addDayEvent(string $eventId)

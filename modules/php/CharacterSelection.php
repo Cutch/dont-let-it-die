@@ -51,7 +51,7 @@ class CharacterSelection
             $values = join(
                 ', ',
                 array_map(function ($char) use ($playerId) {
-                    extract($this->game->data->characters[$char]);
+                    extract($this->game->data->getCharacters()[$char]);
                     $char = $this->game::escapeStringForDB($char);
                     return "('$char', $playerId, $stamina, $health)";
                 }, array_filter($characters))
@@ -72,7 +72,7 @@ class CharacterSelection
         // Check for bad character name
         foreach ($characters as $index => $char) {
             if ($char) {
-                if (!array_key_exists($char, $this->game->data->characters)) {
+                if (!array_key_exists($char, $this->game->data->getCharacters())) {
                     throw new Exception('Bad value for character');
                 }
             }
@@ -139,7 +139,7 @@ class CharacterSelection
         $selectedCharactersArgs = [];
         $message = '${player_name} selected ';
         foreach ($selectedCharacters as $index => $value) {
-            $characterObject = $this->game->data->characters[$value];
+            $characterObject = $this->game->data->getCharacters()[$value];
             if (array_key_exists('startsWith', $characterObject)) {
                 $itemId = $this->game->gameData->createItem($characterObject['startsWith']);
                 $this->game->character->equipEquipment($value, [$itemId]);
@@ -180,7 +180,7 @@ class CharacterSelection
         // Remove player's previous selected
         $this->game::DbQuery('DELETE FROM `character` WHERE character_name = "' . $oldChar . '"');
         // Add player's current selected
-        $data = $this->game->data->characters[$character];
+        $data = $this->game->data->getCharacters()[$character];
         $health = $data['health'];
         $stamina = $data['stamina'];
         $char = $this->game::escapeStringForDB($character);

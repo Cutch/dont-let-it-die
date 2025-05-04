@@ -27,7 +27,7 @@ $expansionData = [
                 'onUse' => function (Game $game, $skill) {
                     $game->activeCharacterEventLog('obtained a ${item_name}', ['item_name' => clienttranslate('Wolf Pup')]);
                     $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) use ($skill, $game) {
-                        array_push($data['dayEvent'], $game->data->expansion[$skill['parentId']]);
+                        array_push($data['dayEvent'], $game->data->getExpansion()[$skill['parentId']]);
                     });
                     $game->decks->removeFromDeck('day-event', $skill['parentId']);
                     return ['notify' => false];
@@ -67,7 +67,7 @@ $expansionData = [
                 'state' => ['dayEvent', 'resolveEncounter'],
                 'health' => 1,
                 'onUse' => function (Game $game, $skill) {
-                    $game->gameData->set('state', ['card' => $game->data->expansion[$skill['parentId']], 'deck' => 'day-event']);
+                    $game->gameData->set('state', ['card' => $game->data->getExpansion()[$skill['parentId']], 'deck' => 'day-event']);
                     return ['notify' => false, 'nextState' => 'resolveEncounter'];
                 },
                 'onEncounterPost' => function (Game $game, $skill, &$data) {
@@ -79,7 +79,7 @@ $expansionData = [
                             $skill,
                             $game
                         ) {
-                            array_push($data['dayEvent'], $game->data->expansion[$skill['parentId']]);
+                            array_push($data['dayEvent'], $game->data->getExpansion()[$skill['parentId']]);
                         });
                     }
                 },

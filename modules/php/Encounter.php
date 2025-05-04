@@ -85,13 +85,13 @@ class Encounter
                 })
             );
             foreach ($bothWeapons as $k => $weapon) {
-                $itemObj = $this->game->data->items[$items[$weapon['itemId']]];
+                $itemObj = $this->game->data->getItems()[$items[$weapon['itemId']]];
                 if (!(!array_key_exists('requires', $itemObj) || $itemObj['requires']($this->game, $itemObj))) {
                     throw new BgaUserException($this->game->translate('A weapon is missing its requirements'));
                 }
             }
         } else {
-            $itemObj = $this->game->data->items[$items[$weaponId]];
+            $itemObj = $this->game->data->getItems()[$items[$weaponId]];
             if (!(!array_key_exists('requires', $itemObj) || $itemObj['requires']($this->game, $itemObj))) {
                 throw new BgaUserException($this->game->translate('A weapon is missing its requirements'));
             }
@@ -257,7 +257,7 @@ class Encounter
                 } else {
                     $items = $this->game->gameData->getItems();
                     foreach ($data['itemIds'] as $k => $itemId) {
-                        $itemObj = $this->game->data->items[$items[$itemId]];
+                        $itemObj = $this->game->data->getItems()[$items[$itemId]];
                         if (array_key_exists('onUse', $itemObj)) {
                             $itemObj['characterId'] = $this->game->character->getSubmittingCharacterId();
                             $itemObj['onUse']($this->game, $itemObj);

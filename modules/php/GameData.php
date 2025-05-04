@@ -28,6 +28,9 @@ class GameData
     private array $cachedGameData = [];
     private array $cachedGameItems = [];
     private static $defaults = [
+        'expansion' => 0,
+        'difficulty' => 0,
+        'trackDifficulty' => 0,
         'dailyUseItems' => [],
         'foreverUseItems' => [],
         'buildings' => [],
@@ -167,7 +170,7 @@ class GameData
         if ($resourceType == 'fireWood') {
             $resourceType = 'wood';
         }
-        $maxCount = $this->game->data->tokens[$resourceType]['count'];
+        $maxCount = $this->game->data->getTokens()[$resourceType]['count'];
         $data = $this->get('destroyedResources');
         $maxCount -= array_key_exists($resourceType, $data) ? $data[$resourceType] : 0;
         $hookData = [

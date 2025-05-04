@@ -65,12 +65,12 @@ class Game extends \Table
             'difficulty' => 101,
             'trackDifficulty' => 102,
         ]);
+        $this->gameData = new GameData($this);
         $this->actions = new Actions($this);
         $this->data = new Data($this);
         $this->decks = new Decks($this);
         $this->character = new Character($this);
         $this->characterSelection = new CharacterSelection($this);
-        $this->gameData = new GameData($this);
         $this->hooks = new Hooks($this);
         $this->encounter = new Encounter($this);
         $this->itemTrade = new ItemTrade($this);
@@ -93,7 +93,7 @@ class Game extends \Table
                 }
             }
             if (str_contains($message, '${resource_type}')) {
-                $args['resource_type'] = $this->data->tokens[$args['resource_type']]['name'];
+                $args['resource_type'] = $this->data->getTokens()[$args['resource_type']]['name'];
             }
             if (array_key_exists('character_resource', $args)) {
                 $args['character_resource'] = clienttranslate($args['character_resource']);
@@ -120,7 +120,7 @@ class Game extends \Table
             array_values(
                 array_map(
                     function ($k, $v) {
-                        return $v . ' ' . $this->data->tokens[$k]['name'];
+                        return $v . ' ' . $this->data->getTokens()[$k]['name'];
                     },
                     array_keys($cost),
                     $cost
@@ -250,9 +250,9 @@ class Game extends \Table
         $currentCount = (int) $this->gameData->getResource($resourceType);
         $maxCount = $this->gameData->getResourceMax($resourceType);
         $rawResourceType = str_replace('-cooked', '', $resourceType);
-        if (array_key_exists($resourceType . '-cooked', $this->data->tokens)) {
+        if (array_key_exists($resourceType . '-cooked', $this->data->getTokens())) {
             $maxCount -= (int) $this->gameData->getResource($resourceType . '-cooked');
-        } elseif ($rawResourceType != $resourceType && array_key_exists($rawResourceType, $this->data->tokens)) {
+        } elseif ($rawResourceType != $resourceType && array_key_exists($rawResourceType, $this->data->getTokens())) {
             $maxCount -= (int) $this->gameData->getResource($rawResourceType);
         }
         if ($resourceType == 'wood') {
@@ -328,7 +328,7 @@ class Game extends \Table
     public function actMoveDiscovery(string $upgradeId, string $upgradeReplaceId): void
     {
         $selectableUpgrades = array_keys(
-            array_filter($this->data->boards['knowledge-tree-' . $this->getDifficulty()]['track'], function ($v) {
+            array_filter($this->data->getBoards()['knowledge-tree-' . $this->getDifficulty()]['track'], function ($v) {
                 return !array_key_exists('upgradeType', $v);
             })
         );
@@ -457,12 +457,12 @@ class Game extends \Table
 
         $this->actions->spendActionCost('actSpendFKP');
         $this->unlockKnowledge($knowledgeId);
-        $knowledgeObj = $this->data->knowledgeTree[$knowledgeId];
+        $knowledgeObj = $this->data->getKnowledgeTree()[$knowledgeId];
         array_key_exists('onUse', $knowledgeObj) ? $knowledgeObj['onUse']($this, $knowledgeObj) : null;
         $this->hooks->onUnlock($knowledgeObj);
         $this->notify->all('notify', clienttranslate('${character_name} unlocked ${knowledge_name}'), [
             'knowledgeId' => $knowledgeId,
-            'knowledge_name' => $this->data->knowledgeTree[$knowledgeId]['name'],
+            'knowledge_name' => $this->data->getKnowledgeTree()[$knowledgeId]['name'],
         ]);
         $this->gameData->set('lastAction', 'actSpendFKP');
         $this->completeAction();
@@ -479,10 +479,10 @@ class Game extends \Table
                     throw new BgaUserException($_this->translate('Select an item'));
                 }
                 $_this->actions->validateCanRunAction('actCraft', $itemName);
-                if (!array_key_exists($itemName, $_this->data->items)) {
+                if (!array_key_exists($itemName, $_this->data->getItems())) {
                     throw new BgaUserException($_this->translate('Invalid Item'));
                 }
-                $itemType = $_this->data->items[$itemName]['itemType'];
+                $itemType = $_this->data->getItems()[$itemName]['itemType'];
                 $currentBuildings = $_this->gameData->get('buildings');
                 if ($itemType == 'building' && sizeof($currentBuildings) > 0) {
                     throw new BgaUserException($_this->translate('A building has already been crafted'));
@@ -494,7 +494,7 @@ class Game extends \Table
                 }
                 return [
                     'itemName' => $itemName,
-                    'item' => $_this->data->items[$itemName],
+                    'item' => $_this->data->getItems()[$itemName],
                     'itemType' => $itemType,
                 ];
             },
@@ -630,7 +630,7 @@ class Game extends \Table
         $items = $this->gameData->getItems();
 
         $this->notify->all('notify', clienttranslate('{item_name} destroyed'), [
-            'item_name' => $this->data->items[$items[$itemId]]['name'],
+            'item_name' => $this->data->getItems()[$items[$itemId]]['name'],
         ]);
     }
     public function actDestroyItem(int $itemId): void
@@ -807,7 +807,7 @@ class Game extends \Table
         foreach ($offered as $key => $value) {
             if ($value > 0) {
                 $this->adjustResource($key, -$value);
-                array_push($offeredStr, $this->data->tokens[$key]['name'] . "($value)");
+                array_push($offeredStr, $this->data->getTokens()[$key]['name'] . "($value)");
             }
         }
         foreach ($requested as $key => $value) {
@@ -819,7 +819,7 @@ class Game extends \Table
                     throw new BgaUserException($this->translate('You cannot trade for gems'));
                 }
                 $this->adjustResource($key, $value);
-                array_push($requestedStr, $this->data->tokens[$key]['name'] . "($value)");
+                array_push($requestedStr, $this->data->getTokens()[$key]['name'] . "($value)");
             }
         }
         // Finalize the trade hooks
@@ -857,7 +857,7 @@ class Game extends \Table
             [$this->hooks, 'onEat'],
             function (Game $_this) use ($resourceType) {
                 $this->actions->validateCanRunAction('actEat', null, $resourceType);
-                $tokenData = $this->data->tokens[$resourceType];
+                $tokenData = $this->data->getTokens()[$resourceType];
                 $data = ['type' => $resourceType, ...$tokenData['actEat'], 'tokenName' => $tokenData['name']];
                 $this->hooks->onEatBefore($data);
                 return $data;
@@ -1514,7 +1514,7 @@ class Game extends \Table
     public function argStartHindrance(): array
     {
         $selectableUpgrades = array_keys(
-            array_filter($this->data->boards['knowledge-tree-' . $this->getDifficulty()]['track'], function ($v) {
+            array_filter($this->data->getBoards()['knowledge-tree-' . $this->getDifficulty()]['track'], function ($v) {
                 return !array_key_exists('upgradeType', $v);
             })
         );
@@ -1541,7 +1541,7 @@ class Game extends \Table
         $result = [
             ...$this->getArgsData(),
             'character_name' => $this->getCharacterHTML(),
-            //'actions' => [],//array_values($this->data->expansion[$card['id']]['skills']),
+            //'actions' => [],//array_values($this->data->getExpansion()[$card['id']]['skills']),
             'actions' => [
                 [
                     'action' => 'actUseSkill',
@@ -1554,7 +1554,7 @@ class Game extends \Table
             ],
             // 'availableSkills' => array_values(
             //     $this->actions->wrapSkills(
-            //         array_filter($this->data->expansion[$card['id']]['skills'], function ($skill) {
+            //         array_filter($this->data->getExpansion()[$card['id']]['skills'], function ($skill) {
             //             return $skill['type'] == 'skill';
             //         }),
             //         'actUseSkill'
@@ -1562,7 +1562,7 @@ class Game extends \Table
             // ),
             // 'availableItemSkills' => array_values(
             //     $this->actions->wrapSkills(
-            //         array_filter($this->data->expansion[$card['id']]['skills'], function ($skill) {
+            //         array_filter($this->data->getExpansion()[$card['id']]['skills'], function ($skill) {
             //             return $skill['type'] == 'item-skill';
             //         }),
             //         'actUseItem'
@@ -1684,7 +1684,7 @@ class Game extends \Table
             $this->giveExtraTime((int) $playerId);
         }
         if ($this->isValidExpansion('hindrance')) {
-            $upgrades = array_keys($this->data->upgrades);
+            $upgrades = array_keys($this->data->getUpgrades());
             shuffle($upgrades);
             $count = 5;
             if ($this->getDifficulty() == 'easy') {
@@ -1724,7 +1724,7 @@ class Game extends \Table
         $eloMapping = [5, 10, 15, 25];
 
         $trackEloMapping = [10, 20];
-        $score = $eloMapping[$this->getGameStateValue('difficulty')] + $trackEloMapping[$this->getGameStateValue('trackDifficulty')];
+        $score = $eloMapping[$this->gameData->get('difficulty')] + $trackEloMapping[$this->gameData->get('trackDifficulty')];
         $this->DbQuery("UPDATE player SET player_score={$score} WHERE 1=1");
         $this->gamestate->nextState('endGame');
     }
@@ -1973,14 +1973,14 @@ class Game extends \Table
 
         $result['availableEquipmentWithCost'] = array_values(
             array_filter($availableEquipment, function ($itemName) {
-                $item = $this->data->items[$itemName];
+                $item = $this->data->getItems()[$itemName];
                 return $this->hasResourceCost($item['cost']);
             })
         );
     }
     public function getValidTokens(): array
     {
-        return array_filter($this->data->tokens, function ($v) {
+        return array_filter($this->data->getTokens(), function ($v) {
             return $v['type'] == 'resource' &&
                 (!array_key_exists('requires', $v) || $v['requires']($this, $v)) &&
                 (!array_key_exists('expansion', $v) || $this->isValidExpansion($v['expansion']));
@@ -2000,7 +2000,8 @@ class Game extends \Table
         $result['resources']['trap'] += $trapCount;
 
         $resourcesAvailable = [];
-        array_walk($this->data->tokens, function ($v, $k) use (&$result, &$resourcesAvailable) {
+        $tokensData = $this->data->getTokens();
+        array_walk($tokensData, function ($v, $k) use (&$result, &$resourcesAvailable) {
             if ($v['type'] == 'resource' && isset($result['resources'][$k])) {
                 if (
                     (!array_key_exists('requires', $v) || $v['requires']($this, $v)) &&
@@ -2043,7 +2044,7 @@ class Game extends \Table
     public function getExpansion()
     {
         $expansionMapping = self::$expansionList;
-        return $expansionMapping[$this->getGameStateValue('expansion')];
+        return $expansionMapping[$this->gameData->get('expansion')];
     }
     public function isValidExpansion(string $expansion)
     {
@@ -2062,7 +2063,7 @@ class Game extends \Table
             return [];
         }
         return array_map(function ($building) use ($characterId) {
-            $data = $this->data->items[$building['name']];
+            $data = $this->data->getItems()[$building['name']];
             if (array_key_exists('skills', $data)) {
                 array_walk($data['skills'], function (&$v, $k) use ($building, $characterId) {
                     $v['itemId'] = $building['itemId'];
@@ -2083,7 +2084,7 @@ class Game extends \Table
     {
         $activeNightCards = $this->getActiveNightCardIds();
         return array_map(function ($cardId) {
-            $card = $this->data->decks[$cardId];
+            $card = $this->data->getDecks()[$cardId];
             return $card;
         }, $activeNightCards);
     }
@@ -2099,7 +2100,7 @@ class Game extends \Table
     {
         $unlocks = $this->getUnlockedKnowledgeIds();
         return array_map(function ($unlock) {
-            return $this->data->knowledgeTree[$unlock];
+            return $this->data->getKnowledgeTree()[$unlock];
         }, $unlocks);
     }
     public function getUnlockedKnowledgeIds(bool $withReplacements = true): array
@@ -2129,12 +2130,12 @@ class Game extends \Table
     public function getDifficulty()
     {
         $difficultyMapping = ['easy', 'normal', 'normal+', 'hard'];
-        return $difficultyMapping[$this->getGameStateValue('difficulty')];
+        return $difficultyMapping[$this->gameData->get('difficulty')];
     }
     public function getTrackDifficulty()
     {
         $difficultyMapping = ['normal', 'hard'];
-        return $difficultyMapping[$this->getGameStateValue('trackDifficulty')];
+        return $difficultyMapping[$this->gameData->get('trackDifficulty')];
     }
     private array $changed = ['token' => false, 'player' => false, 'deck' => false];
     public function markChanged(string $type)
@@ -2172,7 +2173,7 @@ class Game extends \Table
             'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
                 return [
                     'id' => $id,
-                    'name' => $this->data->knowledgeTree[$id]['name'],
+                    'name' => $this->data->getKnowledgeTree()[$id]['name'],
                     'unlockCost' => $availableUnlocks[$id]['unlockCost'],
                 ];
             }, array_keys($availableUnlocks)),
@@ -2258,6 +2259,12 @@ class Game extends \Table
 
         $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         $this->reloadPlayersBasicInfos();
+
+        $this->gameData->set('expansion', $this->getGameStateValue('expansion'));
+        $this->gameData->set('difficulty', $this->getGameStateValue('difficulty'));
+        $this->gameData->set('trackDifficulty', $this->getGameStateValue('trackDifficulty'));
+
+        $this->decks = new Decks($this);
         $this->decks->setup();
 
         // Activate first player once everything has been initialized and ready.
@@ -2337,7 +2344,7 @@ class Game extends \Table
     }
     public function give($item)
     {
-        $itemType = $this->data->items[$item]['itemType'];
+        $itemType = $this->data->getItems()[$item]['itemType'];
         if ($itemType == 'building') {
             $currentBuildings = $this->gameData->get('buildings');
             $itemId = $this->gameData->createItem($item);
@@ -2371,7 +2378,7 @@ class Game extends \Table
 
     public function drawDayEvent()
     {
-        $this->gameData->set('state', ['card' => $this->data->decks['gather-7_15'], 'deck' => 'gather']);
+        $this->gameData->set('state', ['card' => $this->data->getDecks()['gather-7_15'], 'deck' => 'gather']);
         $this->gamestate->nextState('drawCard');
         $this->completeAction();
     }
@@ -2458,7 +2465,30 @@ class Game extends \Table
     }
     public function unlockAll()
     {
-        $this->gameData->set('unlocks', array_keys($this->data->knowledgeTree));
+        $data = $this->data->getBoards()['knowledge-tree-' . $this->getDifficulty()]['track'];
+        $unlocks = $this->getUnlockedKnowledgeIds(false);
+        $upgrades = $this->gameData->get('upgrades');
+        $mapping = [];
+        array_walk($upgrades, function ($v, $k) use (&$mapping) {
+            $mapping[$v['replace']] = $this->data->getUpgrades()[$k];
+        });
+        $notUnlocked = array_filter(
+            $data,
+            function ($v, $k) use ($unlocks) {
+                return !in_array($k, $unlocks);
+            },
+            ARRAY_FILTER_USE_BOTH
+        );
+        array_walk($notUnlocked, function ($v, $k) use ($mapping, &$notUnlocked) {
+            if (array_key_exists($k, $mapping)) {
+                unset($notUnlocked[$k]);
+                $notUnlocked[$mapping[$k]['id']] = $mapping[$k];
+            }
+        });
+
+        foreach (array_keys($notUnlocked) as $knowledgeId) {
+            $this->unlockKnowledge($knowledgeId);
+        }
     }
     public function swapCharacter(string $char)
     {

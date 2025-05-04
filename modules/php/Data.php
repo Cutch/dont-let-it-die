@@ -6,14 +6,14 @@ include dirname(__DIR__) . '/data/Utils.php';
 class Data
 {
     private Game $game;
-    public array $decks;
-    public array $characters;
-    public array $tokens;
-    public array $boards;
-    public array $knowledgeTree;
-    public array $items;
-    public array $upgrades;
-    public array $expansion;
+    private array $decks;
+    private array $characters;
+    private array $tokens;
+    private array $boards;
+    private array $knowledgeTree;
+    private array $items;
+    private array $upgrades;
+    private array $expansion;
 
     public function __construct(Game $game)
     {
@@ -45,12 +45,41 @@ class Data
         }
         return $this->game->isValidExpansion($data['expansion']);
     }
-    public function __get($property)
+    private function get($name)
     {
-        $this->game->log($property);
-        if (property_exists($this, $property)) {
-            return array_filter($this->$property, [$this, 'expansionFilter']);
-        }
+        return array_filter($this->$name, [$this, 'expansionFilter']);
+    }
+    public function getDecks()
+    {
+        return $this->get('decks');
+    }
+    public function getCharacters()
+    {
+        return $this->get('characters');
+    }
+    public function getExpansion()
+    {
+        return $this->get('expansion');
+    }
+    public function getTokens()
+    {
+        return $this->get('tokens');
+    }
+    public function getBoards()
+    {
+        return $this->get('boards');
+    }
+    public function getKnowledgeTree()
+    {
+        return $this->get('knowledgeTree');
+    }
+    public function getItems()
+    {
+        return $this->get('items');
+    }
+    public function getUpgrades()
+    {
+        return $this->get('upgrades');
     }
     public function getValidKnowledgeTree()
     {

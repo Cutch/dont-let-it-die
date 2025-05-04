@@ -12,7 +12,7 @@ if (!function_exists('rivalTribe')) {
             $left = $game->adjustResource('gem-p', $left)['left'];
             $left = $game->adjustResource('gem-b', $left)['left'];
         } else {
-            if (array_key_exists($resourceType . '-cooked', $game->data->tokens)) {
+            if (array_key_exists($resourceType . '-cooked', $game->data->getTokens())) {
                 $left = $game->adjustResource($resourceType . '-cooked', -$roll)['left'];
             }
             $game->adjustResource($resourceType, $left);
@@ -509,9 +509,11 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'onUse' => function (Game $game, $nightCard) {
-            $charactersWithStamina = array_filter($game->character->getAllCharacterData(), function ($data) {
-                return $data['stamina'] > 0;
-            });
+            $charactersWithStamina = array_values(
+                array_filter($game->character->getAllCharacterData(), function ($data) {
+                    return $data['stamina'] > 0;
+                })
+            );
             if (sizeof($charactersWithStamina) > 0) {
                 $game->nightEventLog('${character_name} had some extra stamina and saved the wood', [
                     'character_name' => $charactersWithStamina[0]['character_name'],
@@ -527,16 +529,8 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'onGetValidActions' => function (Game $game, $nightCard, &$data) {
-            $charactersWithStamina = array_filter($game->character->getAllCharacterData(), function ($data) {
-                return $data['stamina'] > 0;
-            });
-            if (sizeof($charactersWithStamina) > 0) {
-                $game->nightEventLog('${character_name} saved the wood', ['character_name' => $charactersWithStamina[0]['character_name']]);
-            } else {
-                $game->adjustResource('fireWood', -1);
-                $game->nightEventLog('1 firewood was lost');
-                $game->gameData->set('morningState', [...$game->gameData->get('morningState') ?? [], 'allowFireWoodAddition' => true]);
-            }
+            unset($data['actDrawHarvest']);
+            unset($data['actDrawHunt']);
         },
     ],
     'night-event-7_3' => [
@@ -743,9 +737,11 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'onUse' => function (Game $game, $nightCard) {
-            $charactersWithStamina = array_filter($game->character->getAllCharacterData(), function ($data) {
-                return $data['stamina'] >= 2;
-            });
+            $charactersWithStamina = array_values(
+                array_filter($game->character->getAllCharacterData(), function ($data) {
+                    return $data['stamina'] >= 2;
+                })
+            );
             if (sizeof($charactersWithStamina) > 0) {
                 $game->adjustResource('gem', 1);
                 $game->nightEventLog('${character_name} found one gem stone', [
@@ -804,7 +800,7 @@ $decksData = [
 
             $items = $game->gameData->getItems();
             $campEquipment = array_map(function ($d) use ($items) {
-                return ['type' => $this->game->data->items[$items[$d]]['itemType'], 'itemId' => $d];
+                return ['type' => $this->game->data->getItems()[$items[$d]]['itemType'], 'itemId' => $d];
             }, $game->gameData->get('campEquipment'));
             $tools = array_filter($campEquipment, function ($d) {
                 $d['type'] == 'tool';
