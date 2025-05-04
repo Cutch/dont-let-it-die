@@ -152,9 +152,7 @@ class Actions
                             throw new BgaUserException($this->game->translate('Only 1 hindrance can be removed'));
                         }
                         $game->adjustResource('herb', -$data['herb']);
-                        $game->notify->all('tokenUsed', clienttranslate('${character_name} used a herb to cure their wounds'), [
-                            'gameData' => $game->getAllDatas(),
-                        ]);
+                        $game->notify->all('notify', clienttranslate('${character_name} used a herb to cure their wounds'));
                         $data['nextState'] = 'playerTurn';
                     }
                 },
@@ -615,6 +613,7 @@ class Actions
             // Rock only needs 1 stamina, this is in the hindrance expansion
             $alwaysShowCraft = $this->game->isValidExpansion('hindrance') && $v['id'] == 'actCraft';
             // var_dump(json_encode([$v['id']]));
+            $this->game->hooks->onSpendActionCost($actionCost);
             return $this->checkRequirements($v) &&
                 (!array_key_exists('stamina', $actionCost) ||
                     $stamina >= ($alwaysShowCraft ? min($actionCost['stamina'], 1) : $actionCost['stamina'])) &&

@@ -633,14 +633,6 @@ $decksData = [
             // Everyone take physical hindrance
             foreach ($game->character->getAllCharacterIds() as $char) {
                 $game->checkHindrance(true, $char);
-                // $card = $game->decks->pickCard('physical-hindrance');
-                // $game->character->addHindrance($char, $card);
-                // $game->gameData->set('state', [
-                //     'card' => $card,
-                //     'deck' => 'physical-hindrance',
-                //     'nextState' => $game->gamestate->state()['name'],
-                // ]);
-                // $game->gamestate->nextState('drawCard');
             }
         },
     ],
@@ -809,6 +801,23 @@ $decksData = [
         'type' => 'deck',
         'onUse' => function (Game $game, $nightCard) {
             // Item selection, destroy 2 unequipped
+
+            $items = $game->gameData->getItems();
+            $campEquipment = array_map(function ($d) use ($items) {
+                return ['type' => $this->game->data->items[$items[$d]]['itemType'], 'itemId' => $d];
+            }, $game->gameData->get('campEquipment'));
+            $tools = array_filter($campEquipment, function ($d) {
+                $d['type'] == 'tool';
+            });
+            if (sizeof($tools)) {
+                $game->destroyItem($tools[random_int(0, sizeof($tools) - 1)]['itemId']);
+            }
+            $weapons = array_filter($campEquipment, function ($d) {
+                $d['type'] == 'weapon';
+            });
+            if (sizeof($weapons)) {
+                $game->destroyItem($weapons[random_int(0, sizeof($tools) - 1)]['itemId']);
+            }
         },
     ],
     'night-event-8_7' => [
@@ -816,7 +825,7 @@ $decksData = [
         'type' => 'deck',
         'expansion' => 'hindrance',
         'onUse' => function (Game $game, $nightCard) {
-            // Pick a deck used this turn and show the top 3 cards
+            // TODO: Pick a deck used this turn and show the top 3 cards
         },
     ],
     'night-event-8_8' => [

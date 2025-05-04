@@ -81,6 +81,7 @@ class Character
         }
         $values = implode(',', $values);
         $this->game::DbQuery("UPDATE `character` SET {$values} WHERE character_name = '$name'");
+        $this->game->markChanged('player');
     }
     public function updateCharacterData(string $name, $callback)
     {
@@ -88,27 +89,17 @@ class Character
         $data = $this->getCharacterData($name, false);
         if (!$callback($data)) {
             $this->_updateCharacterData($name, $data);
-            $this->game->notify->all('updateGameData', '', [
-                'gameData' => $this->game->getAllDatas(),
-            ]);
         }
     }
     public function updateAllCharacterData($callback)
     {
         $turnOrder = $this->getAllCharacterIds();
-        $hasUpdate = false;
         foreach ($turnOrder as $name) {
             // Pull from db if needed
             $data = $this->getCharacterData($name, false);
             if (!$callback($data)) {
-                $hasUpdate = true;
                 $this->_updateCharacterData($name, $data);
             }
-        }
-        if ($hasUpdate) {
-            $this->game->notify->all('updateGameData', '', [
-                'gameData' => $this->game->getAllDatas(),
-            ]);
         }
     }
     public function getAllCharacterIds(): array
@@ -476,6 +467,7 @@ class Character
         $this->game->gameData->set('turnOrder', $turnOrder);
         $this->game->gameData->set('turnNo', null);
         $this->game->log('turn order', $turnOrder);
+        $this->game->markChanged('player');
     }
 
     public function getActiveStamina(): int

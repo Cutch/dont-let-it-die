@@ -61,7 +61,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.tooManyItemsScreen = new TooManyItemsScreen(this);
       this.upgradeSelectionScreen = new UpgradeSelectionScreen(this);
       this.weaponScreen = new WeaponScreen(this);
-      this.currentResources = {};
+      this.currentResources = { prevResources: {}, resources: {} };
       this.resourcesForDisplay = [
         'wood',
         'rock',
@@ -86,7 +86,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       ];
     },
     getResourcesForDisplay: function (gameData) {
-      return this.resourcesForDisplay.filter((d) => d in gameData.game.resources);
+      return this.resourcesForDisplay.filter((d) => d in gameData.resources);
     },
 
     /*
@@ -103,7 +103,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       */
     updatePlayers: function (gameData) {
       // If character selection, keep removing characters
-      if (gameData.gamestate.name === 'characterSelect')
+      if (gameData.gamestate?.name === 'characterSelect')
         document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
 
       const scale = 3;
@@ -342,18 +342,17 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (!elem.classList.contains('disabled')) elem.classList.add('disabled');
     },
     noForResourceChange: function (gameData, resourceName) {
-      const prevResources = gameData.game['prevResources'];
+      const prevResources = gameData.prevResources;
       return (
         this.currentResources['prevResources'][resourceName] == prevResources[resourceName] &&
-        this.currentResources['resources'][resourceName] == gameData.game['resources'][resourceName] &&
+        this.currentResources['resources'][resourceName] == gameData.resources[resourceName] &&
         this.currentResources['prevResources'][resourceName + '-cooked'] == prevResources[resourceName + '-cooked'] &&
-        this.currentResources['resources'][resourceName + '-cooked'] == gameData.game['resources'][resourceName + '-cooked']
+        this.currentResources['resources'][resourceName + '-cooked'] == gameData.resources[resourceName + '-cooked']
       );
     },
     updateResources: async function (gameData) {
-      if (!gameData || !gameData.resourcesAvailable || !gameData.game) return;
+      if (!gameData || !gameData.resourcesAvailable) return;
       const promises = [];
-      const firewoodElem = document.querySelector(`.fire-wood`);
 
       // Shared Resource Pool
       let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
@@ -368,8 +367,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       const resourcesForDisplay = this.getResourcesForDisplay(gameData);
       resourcesForDisplay
         .filter((elem) => !elem.includes('trap'))
-        .forEach((name) => this.updateResource(name, sharedElem, gameData.game['resources'][name] ?? 0));
+        .forEach((name) => this.updateResource(name, sharedElem, gameData.resources[name] ?? 0));
 
+      const firewoodElem = document.querySelector(`#fire-pit .fire-wood`);
+      firewoodElem.innerHTML = '';
+      this.updateResource('wood', firewoodElem, gameData.resources['fireWood'] ?? 0, {
+        warn: (gameData.resources['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
+      });
       // Available Resource Pool
       let availableElem = document.querySelector(`#discoverable-container .tokens`);
       if (!availableElem) {
@@ -388,11 +392,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       // this.resourcesForDisplay.forEach((name) => {
       //   this.tweening.addTween(sharedElem.querySelector(`.token.${name}`), availableElem.querySelector(`.token.${name}`), name);
       // });
-      const prevResources = gameData.game['prevResources'];
+      const prevResources = gameData.prevResources;
       let skipWood = false;
 
       if (!this.noForResourceChange(gameData, 'fireWood')) {
-        if (prevResources['fireWood'] != null && prevResources['fireWood'] < gameData.game['resources']['fireWood']) {
+        if (prevResources['fireWood'] != null && prevResources['fireWood'] < gameData.resources['fireWood']) {
           // Wood to Firewood
           promises.push(
             this.tweening.addTween(
@@ -400,11 +404,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               firewoodElem.querySelector(`.token.wood`),
               'wood',
               2,
-              gameData.game['resources']['fireWood'] - prevResources['fireWood'],
+              gameData.resources['fireWood'] - prevResources['fireWood'],
             ),
           );
           skipWood = true;
-        } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.game['resources']['fireWood']) {
+        } else if (prevResources['fireWood'] != null && prevResources['fireWood'] > gameData.resources['fireWood']) {
           // Firewood to Wood
           promises.push(
             this.tweening.addTween(
@@ -412,7 +416,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               availableElem.querySelector(`.token.wood`),
               'wood',
               2,
-              prevResources['fireWood'] - gameData.game['resources']['fireWood'],
+              prevResources['fireWood'] - gameData.resources['fireWood'],
             ),
           );
         }
@@ -421,8 +425,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         const rawName = name.replace('-cooked', '');
         if (this.noForResourceChange(gameData, rawName)) return;
         if (
-          prevResources[rawName] - 1 === gameData.game['resources'][rawName] &&
-          prevResources[rawName + '-cooked'] + 1 === gameData.game['resources'][rawName + '-cooked']
+          prevResources[rawName] - 1 === gameData.resources[rawName] &&
+          prevResources[rawName + '-cooked'] + 1 === gameData.resources[rawName + '-cooked']
         ) {
           if (rawName === name) {
             // Move resource to cooked resource
@@ -436,7 +440,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               ),
             );
           }
-        } else if (prevResources[name] != null && prevResources[name] < gameData.game['resources'][name]) {
+        } else if (prevResources[name] != null && prevResources[name] < gameData.resources[name]) {
           // Discard to Shared Resources
           promises.push(
             this.tweening.addTween(
@@ -444,14 +448,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               sharedElem.querySelector(`.token.${name}`),
               name,
               2,
-              gameData.game['resources'][name] - prevResources[name],
+              gameData.resources[name] - prevResources[name],
             ),
           );
         } else if (
           prevResources[name] != null &&
-          prevResources[name] > gameData.game['resources'][name] &&
+          prevResources[name] > gameData.resources[name] &&
           (name !== 'wood' || !skipWood)
-          // prevResources[name + '-cooked'] > gameData.game['resources'][name]
+          // prevResources[name + '-cooked'] > gameData.resources[name]
         ) {
           // Shared Resources to Discard
           promises.push(
@@ -460,17 +464,17 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               availableElem.querySelector(`.token.${rawName}`),
               name,
               2,
-              prevResources[name] - gameData.game['resources'][name],
+              prevResources[name] - gameData.resources[name],
             ),
           );
         }
       });
       this.currentResources['prevResources'] = prevResources;
-      this.currentResources['resources'] = gameData.game['resources'];
-      // if (gameData.game.buildings.length > 0) {
+      this.currentResources['resources'] = gameData.resources;
+      // if (gameData.buildings.length > 0) {
       //   const div = document.querySelector(`#board-container .buildings`);
       //   if (div.childNodes.length == 0) {
-      //     gameData.game.buildings.forEach((building) => {
+      //     gameData.buildings.forEach((building) => {
       //       renderImage(building.name, div, { scale: 2, pos: 'append' });
       //       addClickListener(div, 'Buildings', () => {
       //         this.tooltip.show();
@@ -518,9 +522,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         buildingItems = document.querySelector(`#building-items-container .items`);
       }
       buildingItems.innerHTML = '';
-      $('building-items-container').style.display = gameData.game.buildings.length > 0 ? '' : 'none';
-      if (gameData.game.buildings.length > 0) {
-        gameData.game.buildings.forEach((building) => {
+      $('building-items-container').style.display = gameData.buildings.length > 0 ? '' : 'none';
+      if (gameData.buildings.length > 0) {
+        gameData.buildings.forEach((building) => {
           this.updateItem(building.name, buildingItems, null);
         });
       }
@@ -591,6 +595,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         }
       });
 
+      this.updateTrack(gameData);
       this.updateResources(gameData);
     },
     setupCharacterSelections: function (gameData) {
@@ -661,13 +666,13 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             .join('')}</div></div>`,
         );
         trackContainer = $('track-container');
-        renderImage(`track-${gameData.trackDifficulty}`, trackContainer, { scale: 2, pos: 'insert' });
+        renderImage(`track-${this.trackDifficulty}`, trackContainer, { scale: 2, pos: 'insert' });
 
         trackContainer
-          .querySelector(`.track-${gameData.trackDifficulty}`)
+          .querySelector(`.track-${this.trackDifficulty}`)
           .insertAdjacentHTML('beforeend', `<div id="track-marker" class="marker"><i class="fa fa-sun-o dlid__sun"></i></div>`);
         trackContainer
-          .querySelector(`.track-${gameData.trackDifficulty}`)
+          .querySelector(`.track-${this.trackDifficulty}`)
           .insertAdjacentHTML('beforeend', `<div id="fire-pit" class="fire-pit"><div class="fire-wood"></div></div>`);
         renderImage(`fire`, $('fire-pit'), { scale: 4, pos: 'insert' });
 
@@ -675,11 +680,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           this.bgaPerformAction(`actAddWood`);
         });
       }
-      const firewoodElem = document.querySelector(`#fire-pit .fire-wood`);
-      firewoodElem.innerHTML = '';
-      this.updateResource('wood', firewoodElem, gameData.game['resources']['fireWood'] ?? 0, {
-        warn: (gameData.game['resources']['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
-      });
+      // const firewoodElem = document.querySelector(`#fire-pit .fire-wood`);
+      // firewoodElem.innerHTML = '';
+      // this.updateResource('wood', firewoodElem, gameData.resources['fireWood'] ?? 0, {
+      //   warn: (gameData.resources['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
+      // });
 
       const marker = $('track-marker');
       marker.style.top = `${(gameData.game.day - 1) * 35 + 236}px`;
@@ -727,12 +732,16 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       $('game_play_area_wrap').classList.add('dlid');
       $('right-side').classList.add('dlid');
 
-      expansionI = gameData.expansionList.indexOf(gameData.expansion);
-      this.expansions = gameData.expansionList.slice(0, expansionI + 1);
+      this.expansionList = gameData.expansionList;
+      this.expansion = gameData.expansion;
+      expansionI = this.expansionList.indexOf(this.expansion);
+      this.expansions = this.expansionList.slice(0, expansionI + 1);
+      this.difficulty = gameData.difficulty;
+      this.trackDifficulty = gameData.trackDifficulty;
       this.data = Object.keys(allSprites).reduce((acc, k) => {
         const d = allSprites[k];
         d.options = d.options ?? {};
-        if (d.options.expansion && gameData.expansionList.indexOf(d.options.expansion) > expansionI) return acc;
+        if (d.options.expansion && this.expansionList.indexOf(d.options.expansion) > expansionI) return acc;
         return { ...acc, [k]: d };
       }, {});
 
@@ -746,7 +755,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       window.dice = this.dice;
       // this.dice.roll(5);
       // renderImage(`board`, playArea);
-      this.updateTrack(gameData);
       playArea.insertAdjacentHTML(
         'beforeend',
         `<div id="players-container" class="dlid__container"><div id="player-container-1" class="inner-container"></div><div id="player-container-2" class="inner-container"></div></div>`,
@@ -769,7 +777,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           'beforeend',
           `<div id="knowledge-container" class="dlid__container"><div class="board"><div class="selections"></div><div class="unlocked-tokens"></div></div></div>`,
         );
-        renderImage(`knowledge-tree-${gameData.difficulty}`, document.querySelector('#knowledge-container .board'), {
+        renderImage(`knowledge-tree-${this.difficulty}`, document.querySelector('#knowledge-container .board'), {
           pos: 'insert',
           scale: 1.25,
         });
@@ -783,7 +791,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         Object.keys(gameData.upgrades).forEach((unlockId) => {
           const unlockSpot = gameData.upgrades[unlockId].replace;
           if (unlockSpot) {
-            const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockSpot];
+            const { x, y } = allSprites[`knowledge-tree-${this.difficulty}`].upgrades[unlockSpot];
             selections.insertAdjacentHTML(
               'beforeend',
               `<div class="discovery-spot ${unlockSpot}" style="position: absolute;top: ${(y - 7) * 1.2}px; left: ${
@@ -805,7 +813,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
 
       knowledgeContainer.innerHTML = '';
       gameData.game.unlocks.forEach((unlockName) => {
-        const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockName];
+        const { x, y } = allSprites[`knowledge-tree-${this.difficulty}`].upgrades[unlockName];
         knowledgeContainer.insertAdjacentHTML(
           'beforeend',
           `<div id="knowledge-${unlockName}" class="fkp" style="top: ${y}px; left: ${x}px;"></div>`,
@@ -940,7 +948,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       const actions = args?.actions;
       // this.currentActions = actions;
       console.log('onUpdateActionButtons', args, actions, stateName);
-      await this.updateResources(args);
       const isActive = this.isCurrentPlayerActive();
       if (isActive && stateName && actions != null) {
         this.removeActionButtons();
@@ -965,6 +972,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 }
               }
               const suffix = this.getActionSuffixHTML(action);
+              console.log(action, `${this.actionMappings[actionId]}${suffix}`);
               return this.statusBar.addActionButton(`${this.actionMappings[actionId]}${suffix}`, () => {
                 if (actionId === 'actSpendFKP') {
                   this.removeActionButtons();
@@ -1320,42 +1328,55 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       
       */
     setupNotifications: function () {
-      this.bgaSetupPromiseNotifications({
-        prefix: 'notif_', // default is 'notif_'
-        minDuration: 500,
-        minDurationNoText: 1,
-        logger: console.log, // show notif debug informations on console. Could be console.warn or any custom debug function (default null = no logs)
-        ignoreNotifications: ['updateAutoPlay'], // the notif_updateAutoPlay function will be ignored by bgaSetupPromiseNotifications. You'll need to subscribe to it manually
-        // onStart: (notifName, msg, args) => $('pagemaintitletext').innerHTML = `${_('Animation for:')} ${msg}`,
-        // onEnd: (notifName, msg, args) => $('pagemaintitletext').innerHTML = '',
-      });
+      // this.bgaSetupPromiseNotifications({
+      //   prefix: 'notif_', // default is 'notif_'
+      //   minDuration: 500,
+      //   minDurationNoText: 1,
+      //   logger: console.log, // show notif debug informations on console. Could be console.warn or any custom debug function (default null = no logs)
+      //   ignoreNotifications: ['updateAutoPlay'], // the notif_updateAutoPlay function will be ignored by bgaSetupPromiseNotifications. You'll need to subscribe to it manually
+      //   // onStart: (notifName, msg, args) => $('pagemaintitletext').innerHTML = `${_('Animation for:')} ${msg}`,
+      //   // onEnd: (notifName, msg, args) => $('pagemaintitletext').innerHTML = '',
+      // });
 
-      // dojo.subscribe('characterClicked', this, 'notif_characterClicked');
-      // dojo.subscribe('updateGameData', this, 'notif_updateGameData');
-      // // Example 1: standard notification handling
-      // // dojo.subscribe( 'tokenUsed', this, "notif_tokenUsed" );
+      dojo.subscribe('characterClicked', this, 'notif_characterClicked');
+      dojo.subscribe('updateCharacterData', this, 'notif_updateCharacterData');
+      dojo.subscribe('updateGameData', this, 'notif_updateGameData');
+      dojo.subscribe('updateKnowledgeTree', this, 'notif_updateKnowledgeTree');
 
-      // // Example 2: standard notification handling + tell the user interface to wait
-      // //            during 3 seconds after calling the method in order to let the players
-      // //            see what is happening in the game.
+      // Example 1: standard notification handling
+      // dojo.subscribe( 'tokenUsed', this, "notif_tokenUsed" );
 
-      // dojo.subscribe('activeCharacter', this, 'notif_tokenUsed');
-      // dojo.subscribe('tokenUsed', this, 'notif_tokenUsed');
-      // dojo.subscribe('shuffle', this, 'notif_shuffle');
-      // dojo.subscribe('cardDrawn', this, 'notif_cardDrawn');
-      // dojo.subscribe('rollFireDie', this, 'notif_rollFireDie');
-      // this.notifqueue.setSynchronous('cardDrawn', 1000);
-      // this.notifqueue.setSynchronous('rollFireDie', 1000);
-      // this.notifqueue.setSynchronous('shuffle', 1500);
-      // this.notifqueue.setSynchronous('tokenUsed', 300);
-      // this.notifqueue.setSynchronous('updateGameData', 300);
+      // Example 2: standard notification handling + tell the user interface to wait
+      //            during 3 seconds after calling the method in order to let the players
+      //            see what is happening in the game.
+
+      dojo.subscribe('activeCharacter', this, 'notif_tokenUsed');
+      dojo.subscribe('tradeItem', this, 'notif_tradeItem');
+      dojo.subscribe('tokenUsed', this, 'notif_tokenUsed');
+      dojo.subscribe('shuffle', this, 'notif_shuffle');
+      dojo.subscribe('cardDrawn', this, 'notif_cardDrawn');
+      dojo.subscribe('rollFireDie', this, 'notif_rollFireDie');
+      this.notifqueue.setSynchronous('cardDrawn', 1000);
+      this.notifqueue.setSynchronous('rollFireDie', 1000);
+      this.notifqueue.setSynchronous('shuffle', 1500);
+      this.notifqueue.setSynchronous('tokenUsed', 300);
+      this.notifqueue.setSynchronous('updateGameData', 300);
     },
     notificationWrapper: async function (notification) {
       notification.args = notification.args ?? {};
-      if (notification.args.gameData) {
-        notification.args.gameData.gamestate = notification.args.gamestate;
+      const state = notification.gamestate ?? notification.args.gamestate;
+      if (notification.gameData) {
+        notification.gameData.gamestate = state;
       }
-      await this.updateResources(notification.args.gameData);
+      if (notification.args) {
+        notification.args.gamestate = state;
+      }
+      if (notification.args.gameData) {
+        notification.args.gameData.gamestate = state;
+      }
+      if (notification.gameData) {
+        notification.gameData.gamestate = state;
+      }
     },
     notif_rollFireDie: async function (notification) {
       await this.notificationWrapper(notification);
@@ -1381,9 +1402,16 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updatePlayers(notification.args.gameData);
       this.updateItems(notification.args.gameData);
       this.updateKnowledgeTree(notification.args.gameData);
-      if (notification.args?.gamestate?.name)
-        await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
-      if (notification.args?.gamestate?.name == 'tradePhase') this.itemTradeScreen.update(notification.args);
+      // if (notification.args?.gamestate?.name)
+      //   await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
+      // if (notification.args?.gamestate?.name == 'tradePhase') this.itemTradeScreen.update(notification.args);
+      if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
+    },
+    notif_updateKnowledgeTree: async function (notification) {
+      await this.notificationWrapper(notification);
+      console.log('notif_updateKnowledgeTree', notification);
+      this.updateItems(notification.args.gameData);
+      this.updateKnowledgeTree(notification.args.gameData);
       if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
     },
 
@@ -1393,15 +1421,19 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.selectedCharacters = notification.args.gameData.characters;
       this.updateCharacterSelections(notification.args);
     },
-
+    notif_tradeItem: async function (notification) {
+      this.itemTradeScreen.update(notification.args);
+    },
+    notif_updateCharacterData: async function (notification) {
+      await this.notificationWrapper(notification);
+      console.log('notif_updateCharacterData', notification);
+      this.updatePlayers(notification.args.gameData);
+      this.updateItems(notification.args.gameData);
+    },
     notif_tokenUsed: async function (notification) {
       await this.notificationWrapper(notification);
       console.log('notif_tokenUsed', notification);
-      this.updatePlayers(notification.args.gameData);
-      this.updateItems(notification.args.gameData);
-      this.updateKnowledgeTree(notification.args.gameData);
-      if (notification.args?.gamestate?.name)
-        await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
+      this.updateResources(notification.args.gameData);
     },
   });
 });

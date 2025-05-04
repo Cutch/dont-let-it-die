@@ -43,12 +43,12 @@ class CookScreen {
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1.5, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), this.game.data[name].options.name, () => selectCallback(count));
     };
-    Object.keys(gameData.game.resources).forEach((name) => {
-      if (name + '-cooked' in gameData.game.resources && gameData.game.resources[name])
+    Object.keys(gameData.resources).forEach((name) => {
+      if (name + '-cooked' in gameData.resources && gameData.resources[name])
         renderItem(
           name,
           tokenElem,
-          () => gameData.game.resources[name],
+          () => gameData.resources[name],
           (count) => {
             tokenElem.querySelector(`.token-number-counter.${name} .counter`).innerHTML = count();
             if (this.tokenSelected) {

@@ -43,7 +43,7 @@ class UpgradeSelectionScreen {
     });
     // List all open slots & render replaced spots
     gameData.selectableUpgrades.forEach((unlockId) => {
-      const { x, y } = allSprites[`knowledge-tree-${gameData.difficulty}`].upgrades[unlockId];
+      const { x, y } = allSprites[`knowledge-tree-${this.game.difficulty}`].upgrades[unlockId];
       selections.insertAdjacentHTML(
         'beforeend',
         `<div class="fkp-spot ${unlockId}" style="top: ${(y - 7) * 1.2}px; left: ${(x - 103) * 1.2}px;"></div>`,
@@ -100,7 +100,7 @@ class UpgradeSelectionScreen {
           </div>`,
       );
       upgradeElem = document.querySelector(`#upgrade-selection-screen .content`);
-      renderImage(`knowledge-tree-${gameData.difficulty}`, document.querySelector(`#upgrade-selection-screen .board`), {
+      renderImage(`knowledge-tree-${this.game.difficulty}`, document.querySelector(`#upgrade-selection-screen .board`), {
         pos: 'insert',
         scale: 1.25,
       });

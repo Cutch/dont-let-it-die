@@ -64,7 +64,7 @@ class CharacterSelection
         }
         // Notify Players
         $results = [];
-        $this->game->getAllCharacters($results);
+        $this->game->getAllPlayers($results);
         $this->game->notify->all('characterClicked', '', ['gameData' => $results]);
     }
     private function validateCharacterCount(bool $checkIfNotEnough, array $characters)
@@ -159,7 +159,7 @@ class CharacterSelection
 
         $this->setTurnOrder($playerId, $selectedCharacters);
         $results = ['player_id' => $playerId];
-        $this->game->getAllCharacters($results);
+        $this->game->getAllPlayers($results);
         // $this->game->initCharacters($playerId);
         $this->game->notify->all(
             'chooseCharacters',

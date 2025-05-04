@@ -43,8 +43,7 @@ class ReviveScreen {
     eatElem.innerHTML = '';
     characterElem.innerHTML = '';
     const renderResource = (food, elem, selectCallback) => {
-      const available =
-        (gameData.game.resources[food.id] ?? 0) + (food.id == 'meat-cooked' ? gameData.game.resources['fish-cooked'] ?? 0 : 0);
+      const available = (gameData.resources[food.id] ?? 0) + (food.id == 'meat-cooked' ? gameData.resources['fish-cooked'] ?? 0 : 0);
       const requires = food['count'];
       elem.insertAdjacentHTML(
         'beforeend',

@@ -120,7 +120,7 @@ class TradeScreen {
         name,
         tradeElem,
         () => this.resourceSelected[name],
-        () => gameData.game['resources'][name] ?? 0,
+        () => gameData.resources[name] ?? 0,
         (count, max) => {
           this.resourceSelected[name] = Math.min(max(), count() + 1);
           tradeElem.querySelector(`.token-number-counter.${name} .counter`).innerHTML = `${count()}/${max()}`;

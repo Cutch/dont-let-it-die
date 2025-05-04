@@ -1087,9 +1087,6 @@ $charactersData = [
                             ...$data['data']['card'],
                             'deck' => str_replace('-', ' ', $data['data']['deck']),
                         ]);
-                        $game->notify->all('updateGameData', '', [
-                            'gameData' => $game->getAllDatas(),
-                        ]);
                     }
                 },
                 'requires' => function (Game $game, $skill) {

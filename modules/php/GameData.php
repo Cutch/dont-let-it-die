@@ -134,10 +134,17 @@ class GameData
             ARRAY_FILTER_USE_KEY
         );
     }
+    public function setResources(array $resources): void
+    {
+        $this->cachedGameData['resources'] = [...$this->cachedGameData['resources'], $resources];
+        $this->game->globals->set('resources', $this->cachedGameData['resources']);
+        $this->game->markChanged('token');
+    }
     public function setResource(string $name, int $value): void
     {
         $this->cachedGameData['resources'][$name] = max($value, 0);
         $this->game->globals->set('resources', $this->cachedGameData['resources']);
+        $this->game->markChanged('token');
     }
     public function getResource(string $name): int
     {
@@ -149,8 +156,7 @@ class GameData
         $data[$resourceType] = (array_key_exists($resourceType, $data) ? $data[$resourceType] : 0) + $count;
         $this->set('destroyedResources', $data);
         $this->game->adjustResource($resourceType, 0);
-        $this->game->notify->all('tokenUsed', clienttranslate('${count} ${resource_type} removed from the game'), [
-            'gameData' => $this->game->getAllDatas(),
+        $this->game->notify->all('notify', clienttranslate('${count} ${resource_type} removed from the game'), [
             'count' => 1,
             'resource_type' => $resourceType,
         ]);

@@ -29,7 +29,7 @@ class Encounter
     }
     public function argPostEncounter()
     {
-        $result = [...$this->game->getAllDatas()];
+        $result = [...$this->game->getArgsData()];
         return $result;
     }
     public function stPostEncounter()
@@ -113,7 +113,7 @@ class Encounter
         $chooseWeapons = $this->game->gameData->get('chooseWeapons');
         $result = [
             'chooseWeapons' => $chooseWeapons,
-            ...$this->game->getAllDatas(),
+            ...$this->game->getArgsData(),
         ];
         return $result;
     }
@@ -300,7 +300,7 @@ class Encounter
     }
     public function argResolveEncounter()
     {
-        $result = [...$this->game->getAllDatas()];
+        $result = [...$this->game->getArgsData()];
         return $result;
     }
 }

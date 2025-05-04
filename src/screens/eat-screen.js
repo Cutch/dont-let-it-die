@@ -40,7 +40,7 @@ class EatScreen {
     }
     eatElem.innerHTML = '';
     const renderResource = (food, elem, selectCallback) => {
-      const available = gameData.game.resources[food['id']];
+      const available = gameData.resources[food['id']];
       const requires = food['count'];
       elem.insertAdjacentHTML(
         'beforeend',
@@ -64,7 +64,7 @@ class EatScreen {
       );
     };
     gameData.eatableFoods.forEach((food, i) => {
-      const available = gameData.game.resources[food['id']];
+      const available = gameData.resources[food['id']];
       const requires = food['count'];
       if (available > requires) {
         renderResource(food, eatElem, () => {

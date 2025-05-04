@@ -7,38 +7,38 @@ const techSprites = {
           y: 125,
         },
         'warmth-2': {
-          x: 511,
+          x: 338,
           y: 125,
         },
         'warmth-3': {
-          x: 661,
+          x: 538,
           y: 125,
         },
 
         'cooking-1': {
           x: 140,
-          y: 160,
+          y: 219,
         },
         'crafting-1': {
-          x: 511,
-          y: 222,
+          x: 338,
+          y: 219,
         },
         spices: {
-          x: 661,
-          y: 160,
+          x: 538,
+          y: 219,
         },
 
         'cooking-2': {
           x: 140,
-          y: 316,
+          y: 313,
         },
         'crafting-2': {
-          x: 511,
-          y: 316,
+          x: 338,
+          y: 313,
         },
         'fire-starter': {
-          x: 661,
-          y: 316,
+          x: 538,
+          y: 313,
         },
       },
       frame: {

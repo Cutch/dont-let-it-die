@@ -107,7 +107,7 @@ class ItemTrade
                 })
             );
             if ($itemId2) {
-                $result = $this->game->character->getItemValidations($itemId2, $trade1['character'], $itemId1);
+                $result = $this->game->character->getItemValidations((int) $itemId2, $trade1['character'], $itemId1);
                 $hasOpenSlots = $result['hasOpenSlots'];
                 $hasDuplicateTool = $result['hasDuplicateTool'];
 
@@ -136,16 +136,19 @@ class ItemTrade
             $this->game->log('campEquipment', $campEquipment);
             $this->game->gameData->set('campEquipment', $campEquipment);
 
+            $results = [];
             $items = $this->game->gameData->getItems();
-            $this->game->notify->all('updateGameData', clienttranslate('${character_name_1} traded an item with the camp'), [
+            $this->game->getAllPlayers($results);
+            $this->game->getItemData($results);
+            $this->game->notify->all('tradeItem', clienttranslate('${character_name_1} traded an item with the camp'), [
                 'character_name_1' => $this->game->getCharacterHTML($trade1['character']['id']),
-                'gameData' => $this->game->getAllDatas(),
                 'itemId1' => array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null,
                 'itemId2' => array_key_exists('itemId', $trade2) ? $trade2['itemId'] : null,
                 'itemName1' => array_key_exists('itemId', $trade1) ? $items[$trade1['itemId']] : null,
                 'itemName2' => array_key_exists('itemId', $trade2) ? $items[$trade2['itemId']] : null,
                 'character1' => $trade1['character']['id'],
                 'character2' => null,
+                'gameData' => $results,
             ]);
         } else {
             if ($trade1['character']['player_id'] != $trade2['character']['player_id']) {
@@ -194,7 +197,7 @@ class ItemTrade
             })
         );
         if ($itemId1) {
-            $result = $this->game->character->getItemValidations($itemId1, $trade2['character'], $itemId2);
+            $result = $this->game->character->getItemValidations((int) $itemId1, $trade2['character'], $itemId2);
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
             if ($trade2['character']['id'] == 'Sig') {
@@ -209,7 +212,7 @@ class ItemTrade
             array_push($characterItems2, $itemId1);
         }
         if ($itemId2) {
-            $result = $this->game->character->getItemValidations($itemId2, $trade1['character'], $itemId1);
+            $result = $this->game->character->getItemValidations((int) $itemId2, $trade1['character'], $itemId1);
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
 
@@ -240,17 +243,20 @@ class ItemTrade
             $this->game->character->setCharacterEquipment($trade1['character']['id'], array_values($characterItems1));
             $this->game->character->setCharacterEquipment($trade2['character']['id'], array_values($characterItems2));
 
+            $results = [];
             $items = $this->game->gameData->getItems();
-            $this->game->notify->all('updateGameData', clienttranslate('${character_name_1} traded an item to ${character_name_2}'), [
+            $this->game->getAllPlayers($results);
+            $this->game->getItemData($results);
+            $this->game->notify->all('tradeItem', clienttranslate('${character_name_1} traded an item to ${character_name_2}'), [
                 'character_name_1' => $this->game->getCharacterHTML($trade1['character']['id']),
                 'character_name_2' => $this->game->getCharacterHTML($trade2['character']['id']),
-                'gameData' => $this->game->getAllDatas(),
                 'itemId1' => array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null,
                 'itemId2' => array_key_exists('itemId', $trade2) ? $trade2['itemId'] : null,
                 'itemName1' => array_key_exists('itemId', $trade1) ? $items[$trade1['itemId']] : null,
                 'itemName2' => array_key_exists('itemId', $trade2) ? $items[$trade2['itemId']] : null,
                 'character1' => $trade1['character']['id'],
                 'character2' => $trade2['character']['id'],
+                'gameData' => $results,
             ]);
         }
     }
@@ -265,7 +271,6 @@ class ItemTrade
             ],
         ];
         // $result['character_name'] = $this->game->getCharacterHTML();
-        // $this->game->getAllCharacters($result);
         // $this->game->getAllPlayers($result);
         // $this->game->getDecks($result);
         // $this->game->getGameData($result);
@@ -306,10 +311,10 @@ class ItemTrade
             'actions' => [],
         ];
         $result['character_name'] = $this->game->getCharacterHTML();
-        $this->game->getAllCharacters($result);
         $this->game->getAllPlayers($result);
         $this->game->getDecks($result);
         $this->game->getGameData($result);
+        $this->game->getResources($result);
         $this->game->getItemData($result);
         return $result;
     }
