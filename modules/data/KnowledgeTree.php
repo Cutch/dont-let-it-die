@@ -7,21 +7,18 @@ $knowledgeTreeData = [
         'name' => clienttranslate('Warmth 1'),
         'onGetCharacterData' => function (Game $game, $item, &$data) {
             $data['maxStamina'] = clamp($data['maxStamina'] + 1, 0, 10);
-            $data['stamina'] = clamp($data['stamina'], 0, $data['maxStamina']);
         },
     ],
     'warmth-2' => [
         'name' => clienttranslate('Warmth 2'),
         'onGetCharacterData' => function (Game $game, $item, &$data) {
             $data['maxStamina'] = clamp($data['maxStamina'] + 1, 0, 10);
-            $data['stamina'] = clamp($data['stamina'], 0, $data['maxStamina']);
         },
     ],
     'warmth-3' => [
         'name' => clienttranslate('Warmth 3'),
         'onGetCharacterData' => function (Game $game, $item, &$data) {
             $data['maxStamina'] = clamp($data['maxStamina'] + 1, 0, 10);
-            $data['stamina'] = clamp($data['stamina'], 0, $data['maxStamina']);
         },
     ],
     'spices' => [
@@ -156,7 +153,9 @@ $knowledgeTreeData = [
         'name' => clienttranslate('Relaxation'),
         'onGetCharacterData' => function (Game $game, $item, &$data) {
             $data['maxHealth'] += 2;
-            $data['health'] = clamp($data['health'], 0, $data['maxHealth']);
+        },
+        'onUse' => function (Game $game, $obj) {
+            $game->character->adjustAllHealth(2);
         },
     ],
 ];

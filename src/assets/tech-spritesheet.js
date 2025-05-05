@@ -190,7 +190,7 @@ const techSprites = {
         },
       },
       frame: {
-        y: 1449,
+        y: 725,
         x: 1,
         w: 948,
         h: 722,
@@ -264,7 +264,7 @@ const techSprites = {
         },
       },
       frame: {
-        y: 725,
+        y: 1449,
         x: 1,
         w: 948,
         h: 722,

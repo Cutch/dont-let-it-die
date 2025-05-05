@@ -812,7 +812,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       }
 
       knowledgeContainer.innerHTML = '';
-      gameData.game.unlocks.forEach((unlockName) => {
+      gameData.unlocks.forEach((unlockName) => {
         const unlockSpot = gameData.upgrades[unlockName]?.replace ?? unlockName;
         const { x, y } = allSprites[`knowledge-tree-${this.difficulty}`].upgrades[unlockSpot];
         knowledgeContainer.insertAdjacentHTML(
@@ -821,6 +821,11 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         );
         renderImage(`fkp-unlocked`, $(`knowledge-${unlockSpot}`), { scale: 2 / 1.2 });
       });
+    },
+    updateGameDatas: function (gameData = {}) {
+      const clone = { ...gameData };
+      delete clone.gamestate;
+      Object.assign(this.gamedatas, clone);
     },
     ///////////////////////////////////////////////////
     //// Game & client states
@@ -831,6 +836,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     onEnteringState: function (stateName, args = {}) {
       args.args = args.args ?? {};
       args.args['gamestate'] = { name: stateName };
+      if (args.args.gameData) {
+        this.updateGameDatas(args.args.gameData);
+      }
       const isActive = this.isCurrentPlayerActive();
 
       console.log('Entering state: ' + stateName, args);
@@ -948,8 +956,8 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     onUpdateActionButtons: async function (stateName, args) {
       const actions = args?.actions;
       // this.currentActions = actions;
-      console.log('onUpdateActionButtons', args, actions, stateName);
       const isActive = this.isCurrentPlayerActive();
+      console.log('onUpdateActionButtons', isActive, args, actions, stateName);
       if (isActive && stateName && actions != null) {
         this.removeActionButtons();
 
@@ -961,23 +969,24 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               const actionId = action.action;
               if (['interrupt', 'postEncounter', 'dayEvent'].includes(stateName)) {
                 if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
-                  return (actionId === 'actUseSkill' ? args.availableSkills : args.availableItemSkills)?.forEach((skill) => {
-                    (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
-                      skill.skillOption = skillOption;
-                      const suffix = this.getActionSuffixHTML(skill);
-                      this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
-                        return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
+                  return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
+                    (skill) => {
+                      (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
+                        skill.skillOption = skillOption;
+                        const suffix = this.getActionSuffixHTML(skill);
+                        this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
+                          return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
+                        });
                       });
-                    });
-                  });
+                    },
+                  );
                 }
               }
               const suffix = this.getActionSuffixHTML(action);
-              console.log(action, `${this.actionMappings[actionId]}${suffix}`);
               return this.statusBar.addActionButton(`${this.actionMappings[actionId]}${suffix}`, () => {
                 if (actionId === 'actSpendFKP') {
                   this.removeActionButtons();
-                  Object.values(args.availableUnlocks).forEach((unlock) => {
+                  Object.values(this.gamedatas.availableUnlocks).forEach((unlock) => {
                     const suffix = this.getActionSuffixHTML(unlock);
                     this.statusBar.addActionButton(`${unlock.name}${suffix}`, () => {
                       return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
@@ -986,19 +995,21 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
                 } else if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
                   this.removeActionButtons();
-                  Object.values(actionId === 'actUseSkill' ? args.availableSkills : args.availableItemSkills).forEach((skill) => {
-                    (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
-                      skill.skillOption = skillOption;
-                      const suffix = this.getActionSuffixHTML(skill);
-                      this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
-                        return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
+                  Object.values(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills).forEach(
+                    (skill) => {
+                      (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
+                        skill.skillOption = skillOption;
+                        const suffix = this.getActionSuffixHTML(skill);
+                        this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
+                          return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
+                        });
                       });
-                    });
-                  });
+                    },
+                  );
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
                 } else if (actionId === 'actTrade') {
                   this.removeActionButtons();
-                  this.tradeScreen.show(args);
+                  this.tradeScreen.show(this.gamedatas);
                   this.statusBar.addActionButton(this.actionMappings.actTradeItem + `${suffix}`, () => {
                     if (!this.tradeScreen.hasError()) {
                       this.bgaPerformAction('actTrade', {
@@ -1029,7 +1040,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   // }
                 } else if (actionId === 'actCraft') {
                   this.removeActionButtons();
-                  this.craftScreen.show(args);
+                  this.craftScreen.show(this.gamedatas);
                   this.statusBar.addActionButton(this.actionMappings.actCraft + `${suffix}`, () => {
                     if (!this.craftScreen.hasError()) {
                       this.bgaPerformAction('actCraft', {
@@ -1051,7 +1062,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   );
                 } else if (actionId === 'actCook') {
                   this.removeActionButtons();
-                  this.cookScreen.show(args);
+                  this.cookScreen.show(this.gamedatas);
                   this.statusBar.addActionButton(this.actionMappings.actEat + `${suffix}`, () => {
                     if (!this.cookScreen.hasError()) {
                       this.bgaPerformAction('actCook', {
@@ -1073,7 +1084,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                   );
                 } else if (actionId === 'actRevive') {
                   this.removeActionButtons();
-                  this.reviveScreen.show(args);
+                  this.reviveScreen.show(this.gamedatas);
                   this.statusBar.addActionButton(this.actionMappings.actRevive + `${suffix}`, () => {
                     if (!this.reviveScreen.hasError()) {
                       const { characterSelected, foodSelected } = this.reviveScreen.getSelected();
@@ -1121,7 +1132,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 // }
                 else if (actionId === 'actEat') {
                   this.removeActionButtons();
-                  this.eatScreen.show(args);
+                  this.eatScreen.show(this.gamedatas);
                   this.statusBar.addActionButton(_('Eat') + `${suffix}`, () => {
                     if (!this.eatScreen.hasError()) {
                       this.bgaPerformAction('actEat', {
@@ -1141,7 +1152,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                     },
                     { color: 'secondary' },
                   );
-                } else if (actionId === 'actInvestigateFire' && args.activeCharacter === 'Cali') {
+                } else if (actionId === 'actInvestigateFire' && this.gamedatas.activeCharacter === 'Cali') {
                   this.removeActionButtons();
                   [0, 1, 2, 3].forEach((i) => {
                     this.statusBar.addActionButton(`${_('Guess')} ${i}`, () => {
@@ -1343,6 +1354,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       dojo.subscribe('updateCharacterData', this, 'notif_updateCharacterData');
       dojo.subscribe('updateGameData', this, 'notif_updateGameData');
       dojo.subscribe('updateKnowledgeTree', this, 'notif_updateKnowledgeTree');
+      dojo.subscribe('updateActionButtons', this, 'notif_updateActionButtons');
 
       // Example 1: standard notification handling
       // dojo.subscribe( 'tokenUsed', this, "notif_tokenUsed" );
@@ -1378,6 +1390,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (notification.gameData) {
         notification.gameData.gamestate = state;
       }
+      if (notification.args.gameData) {
+        this.updateGameDatas(notification.args.gameData);
+      }
     },
     notif_rollFireDie: async function (notification) {
       await this.notificationWrapper(notification);
@@ -1407,6 +1422,10 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       //   await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
       // if (notification.args?.gamestate?.name == 'tradePhase') this.itemTradeScreen.update(notification.args);
       if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
+    },
+    notif_updateActionButtons: async function (notification) {
+      await this.notificationWrapper(notification);
+      await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
     },
     notif_updateKnowledgeTree: async function (notification) {
       await this.notificationWrapper(notification);

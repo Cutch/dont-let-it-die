@@ -139,7 +139,7 @@ class GameData
     }
     public function setResources(array $resources): void
     {
-        $this->cachedGameData['resources'] = [...$this->cachedGameData['resources'], $resources];
+        $this->cachedGameData['resources'] = [...$this->cachedGameData['resources'], ...$resources];
         $this->game->globals->set('resources', $this->cachedGameData['resources']);
         $this->game->markChanged('token');
     }

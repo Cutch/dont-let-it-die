@@ -71,6 +71,8 @@ class Character
                     return $item['itemId'];
                 }, $data['necklaces'])
             ) ?? '';
+        $data['health'] = clamp($data['health'], 0, $data['maxHealth']);
+        $data['stamina'] = clamp($data['stamina'], 0, $data['maxStamina']);
         $values = [];
         foreach ($data as $key => $value) {
             if (in_array($key, self::$characterColumns)) {
@@ -217,8 +219,10 @@ class Character
         if (!$_skipHooks) {
             $this->game->hooks->onGetCharacterData($characterData);
         }
-        $characterData['stamina'] = min($characterData['maxStamina'], $characterData['stamina']);
-        $characterData['health'] = min($characterData['maxHealth'], $characterData['health']);
+        $characterData['maxStamina'] = clamp($characterData['maxStamina'], 0, 10);
+        $characterData['maxHealth'] = clamp($characterData['maxHealth'], 0, 10);
+        $characterData['health'] = clamp($characterData['health'], 0, $characterData['maxHealth']);
+        $characterData['stamina'] = clamp($characterData['stamina'], 0, $characterData['maxStamina']);
         return $characterData;
     }
     public function getCharacterData(string $name, $_skipHooks = false): array
@@ -226,14 +230,10 @@ class Character
         if (array_key_exists($name, $this->cachedData)) {
             return $this->getCalculatedData($this->cachedData[$name], $_skipHooks);
         } else {
-            $characterData = $this->getCalculatedData(
-                $this->game->getCollectionFromDb(
-                    "SELECT c.*, player_color FROM `character` c INNER JOIN `player` p ON p.player_id = c.player_id WHERE character_name = '$name'"
-                )[$name],
-                $_skipHooks
-            );
-            $this->cachedData[$name] = $characterData;
-            return $characterData;
+            $this->cachedData[$name] = $this->game->getCollectionFromDb(
+                "SELECT c.*, player_color FROM `character` c INNER JOIN `player` p ON p.player_id = c.player_id WHERE character_name = '$name'"
+            )[$name];
+            return $this->getCalculatedData($this->cachedData[$name], $_skipHooks);
         }
     }
     public function getItemValidations(int $itemId, array $character, ?int $removingItemId = null)
@@ -453,6 +453,7 @@ class Character
             $this->game->gamestate->changeActivePlayer($characterData['player_id']);
             $this->addExtraTime();
         }
+        $this->game->markChanged('player');
     }
     public function isLastCharacter()
     {
@@ -466,7 +467,6 @@ class Character
         array_push($turnOrder, $temp);
         $this->game->gameData->set('turnOrder', $turnOrder);
         $this->game->gameData->set('turnNo', null);
-        $this->game->log('turn order', $turnOrder);
         $this->game->markChanged('player');
     }
 

@@ -362,10 +362,7 @@ class Game extends \Table
             $upgrades[$upgradeId]['replace'] = $upgradeReplaceId;
         }
         $this->gameData->set('upgrades', $upgrades);
-        $result = [...$this->getArgsData(), 'selectableUpgrades' => $selectableUpgrades];
-        $this->notify->all('updateKnowledgeTree', '', [
-            'gameData' => $result,
-        ]);
+        $this->markChanged('knowledge');
         $this->completeAction();
     }
     public function actCook(string $resourceType): void
@@ -459,11 +456,11 @@ class Game extends \Table
         $this->unlockKnowledge($knowledgeId);
         $knowledgeObj = $this->data->getKnowledgeTree()[$knowledgeId];
         array_key_exists('onUse', $knowledgeObj) ? $knowledgeObj['onUse']($this, $knowledgeObj) : null;
-        $this->hooks->onUnlock($knowledgeObj);
         $this->notify->all('notify', clienttranslate('${character_name} unlocked ${knowledge_name}'), [
             'knowledgeId' => $knowledgeId,
             'knowledge_name' => $this->data->getKnowledgeTree()[$knowledgeId]['name'],
         ]);
+        $this->hooks->onUnlock($knowledgeObj);
         $this->gameData->set('lastAction', 'actSpendFKP');
         $this->completeAction();
     }
@@ -598,6 +595,7 @@ class Game extends \Table
         $this->log('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gamestate->nextState('playerTurn');
+        $this->markChanged('player');
         $this->completeAction();
     }
 
@@ -1705,7 +1703,13 @@ class Game extends \Table
     }
     public function stStartHindrance()
     {
-        $this->gamestate->setAllPlayersMultiactive();
+        $players = array_values(
+            array_filter($this->loadPlayersBasicInfos(), function ($d) {
+                return $d['player_no'] == 1;
+            })
+        );
+        $this->log($players);
+        $this->gamestate->setPlayersMultiactive([$players[0]['player_id']], 'playerTurn');
         foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
             $this->giveExtraTime((int) $playerId);
         }
@@ -1875,16 +1879,6 @@ class Game extends \Table
     {
         $result['characters'] = $this->character->getMarshallCharacters();
         $result['players'] = $this->getCollectionFromDb('SELECT `player_id` `id`, player_no FROM `player`');
-
-        // $characters = $this->gameData->getAllMultiActiveCharacter();
-        // $html = [];
-        // foreach ($characters as $k => $v) {
-        //     $color = $v['player_color'];
-        //     $playerName = $this->getPlayerNameById($v['player_id']);
-        //     $name = $v['character_name'];
-        //     array_push($html, "<!--PNS--><span class=\"playername\" style=\"color:#$color;\">$name ($playerName)</span><!--PNE-->");
-        // }
-        // $result['playersString'] = join(', ', $html);
     }
     public function getDecks(&$result): void
     {
@@ -2126,6 +2120,7 @@ class Game extends \Table
         $array = $this->gameData->get('unlocks');
         array_push($array, $knowledgeId);
         $this->gameData->set('unlocks', $array);
+        $this->markChanged('knowledge');
     }
     public function getDifficulty()
     {
@@ -2137,10 +2132,12 @@ class Game extends \Table
         $difficultyMapping = ['normal', 'hard'];
         return $difficultyMapping[$this->gameData->get('trackDifficulty')];
     }
-    private array $changed = ['token' => false, 'player' => false, 'deck' => false];
+    private array $changed = ['token' => false, 'player' => false, 'knowledge' => false, 'actions' => false];
     public function markChanged(string $type)
     {
-        $this->log('markChanged', $type);
+        if (!array_key_exists($type, $this->changed)) {
+            throw new Exception('Mark missing key ' . $type);
+        }
         $this->changed[$type] = true;
     }
     public function completeAction()
@@ -2155,11 +2152,38 @@ class Game extends \Table
         if ($this->changed['player']) {
             $result = [
                 'activeCharacter' => $this->character->getTurnCharacterId(),
+                'activePlayer' => $this->character->getTurnCharacterId(),
             ];
             $this->getAllPlayers($result);
             $this->getItemData($result);
 
             $this->notify->all('updateCharacterData', '', ['gameData' => $result]);
+        }
+        if ($this->changed['knowledge']) {
+            $availableUnlocks = $this->data->getValidKnowledgeTree();
+            $result = [
+                'upgrades' => $this->gameData->get('upgrades'),
+                'unlocks' => $this->gameData->get('unlocks'),
+                'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
+                    return [
+                        'id' => $id,
+                        'name' => $this->data->getKnowledgeTree()[$id]['name'],
+                        'unlockCost' => $availableUnlocks[$id]['unlockCost'],
+                    ];
+                }, array_keys($availableUnlocks)),
+            ];
+            $this->getItemData($result);
+            $this->notify->all('updateKnowledgeTree', '', ['gameData' => $result]);
+        }
+        if ($this->gamestate->state()['name'] != 'characterSelect') {
+            $availableUnlocks = $this->data->getValidKnowledgeTree();
+            $result = [
+                'tradeRatio' => $this->getTradeRatio(),
+                'actions' => array_values($this->actions->getValidActions()),
+                'availableSkills' => $this->actions->getAvailableSkills(),
+                'availableItemSkills' => $this->actions->getAvailableItemSkills(),
+            ];
+            $this->notify->all('updateActionButtons', '', ['gameData' => $result]);
         }
     }
 
@@ -2167,9 +2191,11 @@ class Game extends \Table
     {
         $availableUnlocks = $this->data->getValidKnowledgeTree();
         $result = [
+            'activeCharacter' => $this->character->getTurnCharacterId(),
             'fireWoodCost' => $this->getFirewoodCost(),
             'tradeRatio' => $this->getTradeRatio(),
             'upgrades' => $this->gameData->get('upgrades'),
+            'unlocks' => $this->gameData->get('unlocks'),
             'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
                 return [
                     'id' => $id,
@@ -2202,7 +2228,6 @@ class Game extends \Table
     public function getAllDatas(): array
     {
         $result = [
-            'activeCharacter' => $this->character->getTurnCharacterId(),
             'expansionList' => self::$expansionList,
             'expansion' => $this->getExpansion(),
             'difficulty' => $this->getDifficulty(),

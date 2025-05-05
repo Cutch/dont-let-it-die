@@ -28,6 +28,11 @@ if (!function_exists('addId')) {
                 });
                 $v['skills'] = $array;
             }
+            if (array_key_exists('track', $v)) {
+                array_walk($v['track'], function (&$v, $k) {
+                    $v['id'] = $k;
+                });
+            }
         });
 
         return $data;

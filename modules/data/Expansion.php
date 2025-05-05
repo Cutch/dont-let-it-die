@@ -869,7 +869,6 @@ $expansionData = [
         'onGetCharacterData' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                 $data['maxHealth'] = clamp($data['maxHealth'] - 1, 0, 10);
-                $data['health'] = clamp($data['health'], 0, $data['maxHealth']);
             }
         },
     ],
@@ -898,7 +897,6 @@ $expansionData = [
         'onGetCharacterData' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                 $data['maxStamina'] = clamp($data['maxStamina'] - 1, 0, 10);
-                $data['stamina'] = clamp($data['stamina'], 0, $data['maxStamina']);
             }
         },
     ],

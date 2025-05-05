@@ -324,6 +324,12 @@ $upgradesData = [
                     $left = $game->adjustResource('gem-y', $roll)['left'];
                     $left = $game->adjustResource('gem-p', $left)['left'];
                     $left = $game->adjustResource('gem-b', $left)['left'];
+                    if ($roll != $left) {
+                        $game->activeCharacterEventLog('received ${count} ${resource_type}', [
+                            'count' => $roll != $left,
+                            'resource_type' => 'gem-y',
+                        ]);
+                    }
                 } else {
                     $changed = $game->adjustResource($resourceType, $roll)['changed'];
                     if ($changed > 0) {
@@ -346,8 +352,6 @@ $upgradesData = [
         'onGetCharacterData' => function (Game $game, $unlock, &$data) {
             $data['maxHealth'] = clamp($data['maxHealth'] + 3, 0, 10);
             $data['maxStamina'] = clamp($data['maxStamina'] - 1, 0, 10);
-            $data['health'] = clamp($data['health'], 0, $data['maxHealth']);
-            $data['stamina'] = clamp($data['stamina'], 0, $data['maxStamina']);
         },
     ],
     '3-B' => [
@@ -358,8 +362,6 @@ $upgradesData = [
         'onGetCharacterData' => function (Game $game, $unlock, &$data) {
             $data['maxHealth'] = clamp($data['maxHealth'] - 1, 0, 10);
             $data['maxStamina'] = clamp($data['maxStamina'] + 2, 0, 10);
-            $data['health'] = clamp($data['health'], 0, $data['maxHealth']);
-            $data['stamina'] = clamp($data['stamina'], 0, $data['maxStamina']);
         },
     ],
     '4-A' => [

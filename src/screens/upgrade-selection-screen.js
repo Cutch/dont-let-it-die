@@ -85,9 +85,6 @@ class UpgradeSelectionScreen {
     this.upgradeSelected = {};
     let upgradeElem = document.querySelector(`#upgrade-selection-screen .content`);
     if (!upgradeElem) {
-      const resourcesForDisplay = this.game.getResourcesForDisplay(gameData);
-      this.resourceSelected = resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
-      this.resourceRequested = resourcesForDisplay.reduce((acc, name) => ({ ...acc, [name]: 0 }), {});
       this.game.selector.show('which-upgrade');
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',

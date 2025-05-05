@@ -1521,7 +1521,10 @@ $charactersData = [
             $data['count'] = 2;
         },
         'onGetUnlockCost' => function (Game $game, $unlock, &$data) {
-            $data['unlockCost'] -= 2;
+            $game->log($data);
+            if (str_contains($data['id'], 'crafting')) {
+                $data['unlockCost'] -= 2;
+            }
         },
         'skills' => [
             'skill1' => [
@@ -1530,11 +1533,12 @@ $charactersData = [
                 'state' => ['playerTurn'],
                 'stamina' => 1,
                 'onUse' => function (Game $game, $skill) {
+                    // TODO give one item
                     return ['notify' => false];
                 },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return !$char['isActive'];
+                    return $char['isActive'];
                 },
             ],
         ],
@@ -1732,8 +1736,8 @@ $charactersData = [
     'Sooha' => [
         'type' => 'character',
         'expansion' => 'death-valley',
-        'health' => '8',
-        'stamina' => '7',
+        'health' => '4',
+        'stamina' => '5',
         'name' => 'Sooha',
         'slots' => ['weapon', 'tool'],
         'onInvestigateFire' => function (Game $game, $char, &$data) {
@@ -1752,15 +1756,18 @@ $charactersData = [
         },
         'onGetCharacterData' => function (Game $game, $char, &$data) {
             if ($char['id'] == $data['id'] && in_array('relaxation', $game->getUnlockedKnowledgeIds())) {
+                // $game->log('onGetCharacterData', $data['maxHealth'], clamp($data['maxHealth'] + 2, 0, 10));
                 $data['maxHealth'] = clamp($data['maxHealth'] + 2, 0, 10);
             }
         },
         'onUnlock' => function (Game $game, $char, &$data) {
             if ($data['id'] == 'relaxation') {
+                // $game->log('relaxation', $data, $char);
                 $game->character->adjustHealth($char['id'], 10);
                 $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
                     'count' => clienttranslate('full'),
                     'character_resource' => 'health',
+                    'character_name' => $game->getCharacterHTML($char['character_name']),
                 ]);
             }
         },
@@ -1780,8 +1787,8 @@ $charactersData = [
     'Samp' => [
         'type' => 'character',
         'expansion' => 'death-valley',
-        'health' => '8',
-        'stamina' => '7',
+        'health' => '7',
+        'stamina' => '3',
         'name' => 'Samp',
         'slots' => ['weapon', 'tool'],
         'skills' => [
@@ -1826,8 +1833,8 @@ $charactersData = [
     'Yurt' => [
         'type' => 'character',
         'expansion' => 'death-valley',
-        'health' => '8',
-        'stamina' => '7',
+        'health' => '5',
+        'stamina' => '5',
         'name' => 'Yurt',
         'slots' => ['weapon', 'tool'],
         'onCraft' => function (Game $game, $char, &$data) {

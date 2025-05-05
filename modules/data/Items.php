@@ -427,7 +427,6 @@ $itemsData = [
         'onGetCharacterData' => function (Game $game, $item, &$data) {
             if ($data['character_name'] == $item['character_name']) {
                 $data['maxStamina'] = clamp($data['maxStamina'] - 1, 0, 10);
-                $data['stamina'] = clamp($data['stamina'], 0, $data['maxStamina']);
             }
         },
     ],
@@ -700,7 +699,6 @@ $itemsData = [
         'onGetCharacterData' => function (Game $game, $item, &$data) {
             if ($item['characterId'] == $data['id']) {
                 $data['maxHealth'] = clamp($data['maxHealth'] + 1, 0, 10);
-                $data['health'] = clamp($data['health'], 0, $data['maxHealth']);
             }
         },
         'onIncapacitation' => function (Game $game, $item, &$data) {
@@ -723,7 +721,6 @@ $itemsData = [
         'onGetCharacterData' => function (Game $game, $item, &$data) {
             if ($item['characterId'] == $data['id']) {
                 $data['maxHealth'] = clamp($data['maxHealth'] + 1, 0, 10);
-                $data['health'] = clamp($data['health'], 0, $data['maxHealth']);
             }
         },
         'onEncounterPre' => function (Game $game, $item, &$data) {
