@@ -254,7 +254,7 @@ $charactersData = [
                     if ($char['isActive']) {
                         // Shuffle it
                         $game->gameData->set('state', ['id' => $skill['id']]);
-                        $game->deckSelection();
+                        $game->selectionStates->initiateDeckSelection();
                         return ['spendActionCost' => false, 'notify' => false];
                     }
                 },
@@ -383,12 +383,12 @@ $charactersData = [
                         $characters[0] = $characters[$i];
                         $characters[$i] = $temp;
                     }
-                    $game->hindranceSelection($skill['id'], $characters, $skill['name']);
+                    $game->selectionStates->initiateHindranceSelection($skill['id'], $characters, $skill['name']);
                     $data['interrupt'] = true;
                     return ['notify' => false, 'nextState' => false, 'interrupt' => true, 'spendActionCost' => false];
                 },
                 'onHindranceSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('hindranceSelectionState');
+                    $state = $game->selectionStates->getState('hindranceSelection');
                     if ($state && $state['id'] == $skill['id']) {
                         $myCount = 0;
                         $count = 0;
@@ -468,7 +468,7 @@ $charactersData = [
                     }
                 },
                 'onHindranceSelectionAfter' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('hindranceSelectionState');
+                    $state = $game->selectionStates->getState('hindranceSelection');
                     if ($state && $state['id'] == $skill['id']) {
                         if ($data['nextState'] != false) {
                             // Check if have max physical hindrance
@@ -870,7 +870,7 @@ $charactersData = [
                 'state' => ['playerTurn'],
                 'stamina' => 3,
                 'onUse' => function (Game $game, $skill, &$data) {
-                    $game->hindranceSelection(
+                    $game->selectionStates->initiateHindranceSelection(
                         $skill['id'],
                         array_map(
                             function ($d) {
@@ -885,7 +885,7 @@ $charactersData = [
                     return ['notify' => false, 'nextState' => false, 'interrupt' => true, 'spendActionCost' => false];
                 },
                 'onHindranceSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('hindranceSelectionState');
+                    $state = $game->selectionStates->getState('hindranceSelection');
                     if ($state && $state['id'] == $skill['id']) {
                         $count = 0;
                         foreach ($state['characters'] as $char) {
@@ -941,7 +941,7 @@ $charactersData = [
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
                         $game->gameData->set('state', ['id' => $skill['id']]);
-                        $game->deckSelection(
+                        $game->selectionStates->initiateDeckSelection(
                             array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames())
                         );
                         return ['spendActionCost' => false, 'notify' => false];
@@ -980,7 +980,7 @@ $charactersData = [
                         );
                         if ($count >= 2) {
                             $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'move']);
-                            $game->deckSelection(
+                            $game->selectionStates->initiateDeckSelection(
                                 array_filter(
                                     array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
                                     function ($deckName) use ($tokens) {
@@ -991,7 +991,7 @@ $charactersData = [
                             );
                         } else {
                             $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'place']);
-                            $game->deckSelection(
+                            $game->selectionStates->initiateDeckSelection(
                                 array_filter(
                                     array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
                                     function ($deckName) use ($tokens) {
@@ -1020,7 +1020,7 @@ $charactersData = [
                                 'deck' => $data['deckName'],
                             ]);
                             $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'place', 'cancellable' => false]);
-                            $game->deckSelection(
+                            $game->selectionStates->initiateDeckSelection(
                                 array_filter(
                                     array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
                                     function ($deckName) use ($tokens) {
@@ -1533,9 +1533,31 @@ $charactersData = [
                 'state' => ['playerTurn'],
                 'stamina' => 1,
                 'onUse' => function (Game $game, $skill) {
-                    // TODO give one item
-                    return ['notify' => false];
+                    $currentCharacter = $game->character->getTurnCharacterId();
+                    $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use ($currentCharacter) {
+                        return $character != $currentCharacter;
+                    });
+
+                    $data['interrupt'] = true;
+
+                    $game->selectionStates->initiateState('tradeSelection', [
+                        'selectableCharacters' => array_values($characters),
+                        'cancellable' => false,
+                        'id' => $skill['id'],
+                    ]);
+                    return ['notify' => false, 'nextState' => false];
                 },
+                'onTradeSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->selectionStates->getState('tradeSelection');
+                    if ($state && $state['id'] == $skill['id']) {
+                        // TODO
+                        $data['nextState'] = 'playerTurn';
+                    }
+                },
+                // 'onUse' => function (Game $game, $skill) {
+                //     // TODO give one item
+                //     return ['notify' => false];
+                // },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
                     return $char['isActive'];
@@ -1839,17 +1861,15 @@ $charactersData = [
         'slots' => ['weapon', 'tool'],
         'onCraft' => function (Game $game, $char, &$data) {
             // Choose tribe member to gain 1hp or 1 stamina
-            $game->gameData->set('characterSelectionState', [
+            $data['interrupt'] = true;
+            $game->selectionStates->initiateState('characterSelection', [
                 'selectableCharacters' => $game->character->getAllCharacterIds(),
                 'cancellable' => false,
                 'id' => $char['id'] . 'craft',
             ]);
-            $data['interrupt'] = true;
-            $game->gamestate->nextState('characterSelection');
         },
         'onCharacterSelection' => function (Game $game, $char, &$data) {
-            $state = $game->gameData->get('characterSelectionState');
-            $game->log('characterSelectionState', $state, $char);
+            $state = $game->selectionStates->getState('characterSelection');
             if ($state && $state['id'] == $char['id'] . 'craft') {
                 $game->character->adjustHealth($data['characterId'], 1);
                 $game->character->adjustStamina($data['characterId'], 1);

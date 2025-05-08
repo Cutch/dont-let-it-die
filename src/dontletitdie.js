@@ -878,6 +878,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           this.updateKnowledgeTree(args.args);
           this.updateTrack(args.args);
           break;
+        case 'tradeSelect':
         case 'tradePhase':
           this.itemTradeScreen.show(args.args);
           break;
@@ -1181,7 +1182,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               this.statusBar.addActionButton(
                 _('Cancel'),
                 () => {
-                  this.bgaPerformAction('actSelectDeckCancel').then(() => this.deckSelectionScreen.hide());
+                  this.bgaPerformAction('actCancel').then(() => this.deckSelectionScreen.hide());
                 },
                 { color: 'secondary' },
               );
@@ -1196,7 +1197,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               this.statusBar.addActionButton(
                 _('Cancel'),
                 () => {
-                  this.bgaPerformAction('actSelectHindranceCancel').then(() => this.hindranceSelectionScreen.hide());
+                  this.bgaPerformAction('actCancel').then(() => this.hindranceSelectionScreen.hide());
                 },
                 { color: 'secondary' },
               );
@@ -1211,7 +1212,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               this.statusBar.addActionButton(
                 _('Cancel'),
                 () => {
-                  this.bgaPerformAction('actSelectCharacterCancel').then(() => this.selector.hide());
+                  this.bgaPerformAction('actCancel').then(() => this.selector.hide());
                 },
                 { color: 'secondary' },
               );
@@ -1226,7 +1227,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               this.statusBar.addActionButton(
                 _('Cancel'),
                 () => {
-                  this.bgaPerformAction('actSelectCardCancel').then(() => this.selector.hide());
+                  this.bgaPerformAction('actCancel').then(() => this.selector.hide());
                 },
                 { color: 'secondary' },
               );
@@ -1241,7 +1242,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               this.statusBar.addActionButton(
                 _('Cancel'),
                 () => {
-                  this.bgaPerformAction('actSelectResourceCancel').then(() => this.selector.hide());
+                  this.bgaPerformAction('actCancel').then(() => this.selector.hide());
                 },
                 { color: 'secondary' },
               );

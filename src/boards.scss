@@ -52,12 +52,13 @@
   position: relative;
 }
 .dot {
+  --size: 1.5em;
   border-radius: 50%;
   border: 1px solid black;
   background-color: white;
   position: absolute;
-  width: 1.5em;
-  height: 1.5em;
+  width: var(--size);
+  height: var(--size);
   color: black;
   display: flex;
   align-items: center;
@@ -69,7 +70,7 @@
   &--number {
     align-items: unset;
     vertical-align: middle;
-    line-height: calc(1.5em + 2px);
+    line-height: calc(var(--size) + 2px);
   }
 }
 .counter {

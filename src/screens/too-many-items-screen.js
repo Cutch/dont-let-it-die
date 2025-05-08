@@ -42,7 +42,7 @@ class TooManyItemsScreen {
         selectCallback,
       );
     };
-    gameData.items.forEach(({ itemId, name }) => {
+    gameData.selectionState.items.forEach(({ itemId, name }) => {
       renderItem(name, itemId, tmiElem, () => {
         if (this.itemSelected) {
           document.querySelector(`#too-many-items-screen .token.id${this.itemSelected} .card`).style['outline'] = '';

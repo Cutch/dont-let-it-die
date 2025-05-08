@@ -33,6 +33,7 @@ include_once dirname(__DIR__) . '/php/Actions.php';
 include_once dirname(__DIR__) . '/php/CharacterSelection.php';
 include_once dirname(__DIR__) . '/php/Character.php';
 include_once dirname(__DIR__) . '/php/GameData.php';
+include_once dirname(__DIR__) . '/php/SelectionStates.php';
 class Game extends \Table
 {
     public Character $character;
@@ -45,6 +46,7 @@ class Game extends \Table
     public Encounter $encounter;
     public ItemTrade $itemTrade;
     public ActInterrupt $actInterrupt;
+    public SelectionStates $selectionStates;
     public static array $expansionList = ['base', 'mini-expansion', 'hindrance', 'death-valley'];
     /**
      * Your global variables labels:
@@ -75,6 +77,7 @@ class Game extends \Table
         $this->encounter = new Encounter($this);
         $this->itemTrade = new ItemTrade($this);
         $this->actInterrupt = new ActInterrupt($this);
+        $this->selectionStates = new SelectionStates($this);
         // automatically complete notification args when needed
         $this->notify->addDecorator(function (string $message, array $args) {
             $args['gamestate'] = ['name' => $this->gamestate->state()['name']];
@@ -185,33 +188,6 @@ class Game extends \Table
             return true;
         }
         return false;
-    }
-    public function deckSelection(?array $decks = null, ?string $title = null, $cancellable = true)
-    {
-        if ($decks == null) {
-            $decks = $this->decks->getAllDeckNames();
-        }
-        $this->gameData->set('deckSelection', ['decks' => array_values($decks), 'title' => $title, 'cancellable' => $cancellable]);
-        $this->gamestate->nextState('deckSelection');
-    }
-    // $type = #, each, any
-    public function hindranceSelection(string $id, ?array $characters = null, ?string $button = null)
-    {
-        if ($characters == null) {
-            $characters = [$this->character->getTurnCharacterId()];
-        }
-        $characters = array_values(
-            array_map(
-                function ($d) {
-                    return ['physicalHindrance' => $d['physicalHindrance'], 'characterId' => $d['character_name']];
-                },
-                array_filter($this->character->getAllCharacterData(), function ($d) use ($characters) {
-                    return in_array($d['id'], $characters);
-                })
-            )
-        );
-        $this->gameData->set('hindranceSelectionState', ['id' => $id, 'characters' => $characters, 'button' => $button]);
-        $this->gamestate->nextState('hindranceSelection');
     }
     public function cardDrawEvent($card, $deck, $arg = [])
     {
@@ -539,11 +515,10 @@ class Game extends \Table
                                 }
                             })
                         );
-                        $_this->gameData->set('tooManyItemsState', [
+                        $_this->selectionStates->initiateState('tooManyItems', [
                             'itemType' => $itemType,
                             'items' => [...$existingItems, ['name' => $itemName, 'itemId' => $itemId]],
                         ]);
-                        $_this->gamestate->nextState('tooManyItems');
                     }
                 }
                 $this->hooks->onCraftAfter($data);
@@ -634,128 +609,6 @@ class Game extends \Table
     public function actDestroyItem(int $itemId): void
     {
         $this->destroyItem($itemId);
-        $this->completeAction();
-    }
-    public function actSelectCharacter(?string $characterId = null): void
-    {
-        if (!$characterId) {
-            throw new BgaUserException($this->translate('Select a Character'));
-        }
-        $data = [
-            'characterId' => $characterId,
-            'nextState' => 'playerTurn',
-        ];
-        $this->hooks->onCharacterSelection($data);
-        $this->gameData->set('characterSelectionState', null);
-        if ($data['nextState'] != false) {
-            $this->gamestate->nextState($data['nextState']);
-        }
-        $this->completeAction();
-    }
-    public function actSelectCharacterCancel(): void
-    {
-        if (!$this->actInterrupt->onInterruptCancel()) {
-            $this->gamestate->nextState('playerTurn');
-        }
-        $this->completeAction();
-    }
-    public function actSelectCard(?string $cardId = null): void
-    {
-        if (!$cardId) {
-            throw new BgaUserException($this->translate('Select a Card'));
-        }
-        $data = [
-            'cardId' => $cardId,
-            'nextState' => 'playerTurn',
-        ];
-        $this->hooks->onCardSelection($data);
-        if ($data['nextState'] != false) {
-            $this->gamestate->nextState($data['nextState']);
-        }
-        $this->completeAction();
-    }
-    public function actSelectCardCancel(): void
-    {
-        $state = $this->gameData->get('cardSelectionState');
-        if (array_key_exists('cancellable', $state) && !$state['cancellable']) {
-            throw new BgaUserException($this->translate('This action cannot be cancelled'));
-        }
-
-        if (!$this->actInterrupt->onInterruptCancel()) {
-            $this->gamestate->nextState('playerTurn');
-        }
-        $this->completeAction();
-    }
-    public function actSelectResource(?string $resourceType = null): void
-    {
-        // $this->character->addExtraTime();
-        if (!$resourceType) {
-            throw new BgaUserException($this->translate('Select a Resource'));
-        }
-        $data = [
-            'resourceType' => $resourceType,
-            'nextState' => 'playerTurn',
-        ];
-        $this->hooks->onResourceSelection($data);
-        if ($data['nextState'] != false) {
-            $this->gamestate->nextState($data['nextState']);
-        }
-        $this->completeAction();
-    }
-    public function actSelectResourceCancel(): void
-    {
-        if (!$this->actInterrupt->onInterruptCancel()) {
-            $this->gamestate->nextState('playerTurn');
-        }
-        $this->completeAction();
-    }
-    public function actSelectHindrance(#[JsonParam] array $data): void
-    {
-        if (sizeof($data) == 0) {
-            throw new BgaUserException($this->translate('Select a Hindrance'));
-        }
-        $data = [
-            'selections' => $data,
-            'nextState' => 'playerTurn',
-        ];
-        $this->hooks->onHindranceSelection($data);
-
-        if ($data['nextState'] != false) {
-            $this->gamestate->nextState($data['nextState']);
-        }
-        $this->hooks->onHindranceSelectionAfter($data);
-        $this->completeAction();
-    }
-    public function actSelectHindranceCancel(): void
-    {
-        $this->gameData->set('hindranceSelectionState', [...$this->gameData->get('hindranceSelectionState'), 'cancelled' => true]);
-        if (!$this->actInterrupt->onInterruptCancel()) {
-            $this->gamestate->nextState('playerTurn');
-        }
-        $this->completeAction();
-    }
-    public function actSelectDeck(?string $deckName = null): void
-    {
-        // $this->character->addExtraTime();
-        if (!$deckName) {
-            throw new BgaUserException($this->translate('Select a Deck'));
-        }
-        $data = [
-            'deckName' => $deckName,
-            'nextState' => 'playerTurn',
-        ];
-        $this->hooks->onDeckSelection($data);
-        if ($data['nextState'] != false) {
-            $this->gamestate->nextState($data['nextState']);
-        }
-        $this->completeAction();
-    }
-    public function actSelectDeckCancel(): void
-    {
-        // $this->character->addExtraTime();
-        if (!$this->actInterrupt->onInterruptCancel()) {
-            $this->gamestate->nextState('playerTurn');
-        }
         $this->completeAction();
     }
     public function actConfirmTradeItem(): void
@@ -1191,52 +1044,6 @@ class Game extends \Table
         $this->completeAction();
     }
 
-    public function argTooManyItems()
-    {
-        return [...$this->gameData->get('tooManyItemsState'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
-    }
-    public function argDeckSelection()
-    {
-        $result = [
-            'actions' => [],
-            'deckSelection' => $this->gameData->get('deckSelection'),
-            'character_name' => $this->getCharacterHTML(),
-        ];
-        $this->getGameData($result);
-        $this->getResources($result);
-        $this->getDecks($result);
-
-        return $result;
-    }
-    public function argCardSelection()
-    {
-        $result = [
-            'cardSelection' => $this->gameData->get('cardSelectionState'),
-            'actions' => [],
-            'character_name' => $this->getCharacterHTML(),
-        ];
-        $this->getGameData($result);
-        $this->getResources($result);
-        return $result;
-    }
-    public function argHindranceSelection()
-    {
-        $result = [
-            'hindranceSelection' => $this->gameData->get('hindranceSelectionState'),
-            'actions' => [],
-            'character_name' => $this->getCharacterHTML(),
-        ];
-        $this->getGameData($result);
-        $this->getResources($result);
-        return $result;
-    }
-    public function argCharacterSelection()
-    {
-        $result = [...$this->gameData->get('characterSelectionState'), 'actions' => [], 'character_name' => $this->getCharacterHTML()];
-        $this->getGameData($result);
-        $this->getResources($result);
-        return $result;
-    }
     public function argResourceSelection()
     {
         $resources = array_filter(
@@ -1319,6 +1126,34 @@ class Game extends \Table
     public function argResolveEncounter()
     {
         return $this->encounter->argResolveEncounter();
+    }
+    public function actCancel(): void
+    {
+        $this->selectionStates->actCancel();
+    }
+    public function argSelectionState(): void
+    {
+        $this->selectionStates->argSelectionState();
+    }
+    public function actSelectCharacter(): void
+    {
+        $this->selectionStates->actSelectCharacter();
+    }
+    public function actSelectResource(): void
+    {
+        $this->selectionStates->actSelectResource();
+    }
+    public function actSelectHindrance(#[JsonParam] array $data): void
+    {
+        $this->selectionStates->actSelectHindrance($data);
+    }
+    public function actSelectCard(): void
+    {
+        $this->selectionStates->actSelectCard();
+    }
+    public function actSelectDeck(): void
+    {
+        $this->selectionStates->actSelectDeck();
     }
     public function stPlayerTurn()
     {
@@ -2142,7 +1977,6 @@ class Game extends \Table
     }
     public function completeAction()
     {
-        $this->log('changed', $this->changed);
         if ($this->changed['token']) {
             $result = [];
             $this->getResources($result);
@@ -2160,6 +1994,11 @@ class Game extends \Table
             $this->notify->all('updateCharacterData', '', ['gameData' => $result]);
         }
         if ($this->changed['knowledge']) {
+            $selectableUpgrades = array_keys(
+                array_filter($this->data->getBoards()['knowledge-tree-' . $this->getDifficulty()]['track'], function ($v) {
+                    return !array_key_exists('upgradeType', $v);
+                })
+            );
             $availableUnlocks = $this->data->getValidKnowledgeTree();
             $result = [
                 'upgrades' => $this->gameData->get('upgrades'),
@@ -2171,8 +2010,12 @@ class Game extends \Table
                         'unlockCost' => $availableUnlocks[$id]['unlockCost'],
                     ];
                 }, array_keys($availableUnlocks)),
+                'selectableUpgrades' => $selectableUpgrades,
             ];
             $this->getItemData($result);
+
+            $result = [...$this->getArgsData(), 'selectableUpgrades' => $selectableUpgrades];
+
             $this->notify->all('updateKnowledgeTree', '', ['gameData' => $result]);
         }
         if ($this->gamestate->state()['name'] != 'characterSelect') {

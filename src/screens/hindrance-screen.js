@@ -38,7 +38,7 @@ class HindranceSelectionScreen {
       renderImage(id, document.querySelector(`#hindrance-screen .token.id${id}`), { scale: 2, pos: 'insert' });
       addClickListener(document.querySelector(`#hindrance-screen .token.id${id}`), this.game.data[id].options.name, selectCallback);
     };
-    gameData.hindranceSelection.characters.reverse().forEach((d) => {
+    gameData.selectionState.characters.reverse().forEach((d) => {
       document
         .querySelector(`#hindrance-screen .selections`)
         .insertAdjacentHTML(

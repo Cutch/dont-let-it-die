@@ -111,7 +111,7 @@ $itemsData = [
                     $game->actInterrupt->addSkillInterrupt($skill);
                 },
                 'onUse' => function (Game $game, $skill, &$data) {
-                    $game->hindranceSelection(
+                    $game->selectionStates->initiateHindranceSelection(
                         $skill['id'],
                         array_map(
                             function ($d) {
@@ -126,7 +126,7 @@ $itemsData = [
                     return ['notify' => false, 'nextState' => false, 'interrupt' => true, 'spendActionCost' => false];
                 },
                 'onHindranceSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('hindranceSelectionState');
+                    $state = $game->selectionStates->getState('hindranceSelection');
                     if ($state && $state['id'] == $skill['id']) {
                         $characterCount = sizeof(
                             array_unique(

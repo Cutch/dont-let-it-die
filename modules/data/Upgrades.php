@@ -377,20 +377,19 @@ $upgradesData = [
                     $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use ($currentCharacter) {
                         return $character != $currentCharacter;
                     });
-                    $game->gameData->set('characterSelectionState', [
+                    $game->selectionStates->initiateState('characterSelection', [
                         'selectableCharacters' => array_values($characters),
                         'cancellable' => false,
                         'id' => $unlock['id'],
                         'aboveMax' => $aboveMax,
                     ]);
-                    $game->gamestate->nextState('characterSelection');
                     // TODO: we dont know what this will interrupt
                     // ideally we should track the next state and then redirect back there after selection
                 }
             }
         },
         'onCharacterSelection' => function (Game $game, $unlock, &$data) {
-            $state = $game->gameData->get('characterSelectionState');
+            $state = $game->selectionStates->getState('characterSelection');
             if ($state && $state['id'] == $unlock['id']) {
                 $aboveMax = $state['aboveMax'];
                 $game->character->adjustHealth($data['characterId'], $aboveMax);
@@ -474,14 +473,13 @@ $upgradesData = [
                         $decksDiscards = $game->decks->listDeckDiscards(
                             array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames())
                         );
+                        $data['interrupt'] = true;
                         // $card2 = $game->decks->pickCard($deck);
-                        $game->gameData->set('cardSelectionState', [
+                        $game->selectionStates->initiateState('cardSelection', [
                             'cards' => $decksDiscards,
                             'cancellable' => true,
                             'id' => $skill['id'],
                         ]);
-                        $data['interrupt'] = true;
-                        $game->gamestate->nextState('cardSelection');
                         //         $existingData = $game->actInterrupt->getState('actDraw');
                         //         if (array_key_exists('data', $existingData)) {
                         //             $decksDiscards = $game->decks->listDeckDiscards();
@@ -497,7 +495,7 @@ $upgradesData = [
                     }
                 },
                 'onCardSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('cardSelectionState');
+                    $state = $game->selectionStates->getState('cardSelection');
                     if ($state && $state['id'] == $skill['id']) {
                         // $game->data->getDecks()[$data['cardId']];
                         $game->decks->shuffleInCard($game->data->getDecks()[$data['cardId']]['deck'], $data['cardId']);
@@ -558,7 +556,7 @@ $upgradesData = [
                 'onUse' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getTurnCharacterId();
                     if (getUsePerDay($char . 'rest', $game) < 1) {
-                        $game->hindranceSelection($skill['id']);
+                        $game->selectionStates->initiateHindranceSelection($skill['id']);
                     }
                 },
                 'requires' => function (Game $game, $skill) {
@@ -570,7 +568,7 @@ $upgradesData = [
                     return ['notify' => false, 'nextState' => false, 'interrupt' => true];
                 },
                 'onHindranceSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('hindranceSelectionState');
+                    $state = $game->selectionStates->getState('hindranceSelection');
                     $char = $game->character->getTurnCharacterId();
                     if ($state && $state['id'] == $skill['id']) {
                         usePerDay($char . 'rest', $game);

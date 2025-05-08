@@ -316,17 +316,16 @@ $expansionData = [
                         return $character != $currentCharacter;
                     });
 
-                    $game->gameData->set('characterSelectionState', [
+                    $data['interrupt'] = true;
+                    $game->selectionStates->initiateState('characterSelection', [
                         'selectableCharacters' => array_values($characters),
                         'cancellable' => false,
                         'id' => $skill['id'],
                     ]);
-                    $data['interrupt'] = true;
-                    $game->gamestate->nextState('characterSelection');
                     return ['notify' => false, 'nextState' => false];
                 },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('characterSelectionState');
+                    $state = $game->selectionStates->getState('characterSelection');
                     if ($state && $state['id'] == $skill['id']) {
                         $game->character->adjustHealth($data['characterId'], -1);
                         $game->activeCharacterEventLog('lost ${count} ${character_resource}', [
@@ -348,18 +347,16 @@ $expansionData = [
                     $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use ($currentCharacter) {
                         return $character != $currentCharacter;
                     });
-
-                    $game->gameData->set('characterSelectionState', [
+                    $data['interrupt'] = true;
+                    $game->selectionStates->initiateState('characterSelection', [
                         'selectableCharacters' => array_values($characters),
                         'cancellable' => false,
                         'id' => $skill['id'],
                     ]);
-                    $data['interrupt'] = true;
-                    $game->gamestate->nextState('characterSelection');
                     return ['notify' => false, 'nextState' => false];
                 },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('characterSelectionState');
+                    $state = $game->selectionStates->getState('characterSelection');
                     if ($state && $state['id'] == $skill['id']) {
                         $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
                         $game->character->adjustHealth($data['characterId'], 1);

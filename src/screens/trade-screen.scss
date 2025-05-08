@@ -5,8 +5,7 @@
   padding: 2rem 1rem;
   overflow: hidden;
   .dot {
-    width: 3em;
-    height: 3em;
+    --size: 3em;
   }
   .tokens {
     gap: 2em;

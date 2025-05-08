@@ -125,11 +125,11 @@ class Actions
                     return [];
                 },
                 'onUseHerbPre' => function (Game $game, $action, &$data) {
-                    $game->hindranceSelection($action['id']);
+                    $game->selectionStates->initiateHindranceSelection($action['id']);
                     return ['notify' => false, 'nextState' => false, 'interrupt' => true];
                 },
                 'onHindranceSelection' => function (Game $game, $action, &$data) {
-                    $state = $game->gameData->get('hindranceSelectionState');
+                    $state = $game->selectionStates->getState('hindranceSelection');
                     if ($state && $state['id'] == $action['id']) {
                         $count = 0;
                         foreach ($state['characters'] as $char) {

@@ -852,7 +852,7 @@ $decksData = [
         'onUse' => function (Game $game, $nightCard) {
             // Remove physical hindrance from each character
             // Skip morning phase damage
-            $game->hindranceSelection($nightCard['id']);
+            $game->selectionStates->initiateHindranceSelection($nightCard['id']);
             // $data['interrupt'] = true;
             return ['notify' => false, 'nextState' => false, 'interrupt' => true];
         },
@@ -863,7 +863,7 @@ $decksData = [
             $game->nightEventLog('No damage taken in the morning');
         },
         'onHindranceSelection' => function (Game $game, $nightCard, &$data) {
-            $state = $game->gameData->get('hindranceSelectionState');
+            $state = $game->selectionStates->getState('hindranceSelection');
             if ($state && $state['id'] == $nightCard['id']) {
                 $characterTotal = sizeof(
                     array_filter($game->character->getAllCharacterData(false), function ($d) {

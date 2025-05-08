@@ -43,7 +43,7 @@ class CharacterSelectionScreen {
       renderImage(cardName, elem.querySelector(`.token.${cardName}`), { scale: 1.5, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${cardName}`), cardName, () => selectCallback());
     };
-    gameData.selectableCharacters.forEach((character) => {
+    gameData.selectionState.selectableCharacters.forEach((character) => {
       renderItem(character, characterSelectionElem, () => {
         if (this.characterSelected) {
           document.querySelector(`#character-selection-screen .token.${this.characterSelected} .card`).style['outline'] = '';
