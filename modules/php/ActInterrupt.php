@@ -43,8 +43,14 @@ class ActInterrupt
                 'skills' => $this->activatableSkills,
                 'stateNumber' => sizeof($entireState) + 1,
             ];
-            $this->game->log($functionName, $data, $res, $interruptData);
+            $this->game->log($functionName, $data, $res, $interruptData, $interrupt);
             $this->activatableSkills = [];
+            // if($this->game->gamestate->state()['name'] != $currentState){
+            //     // If we moved to a selection screen, we will need to call the hook again after, and finalize the function
+
+            //     $this->setState($functionName, $interruptData);
+            // }
+            // else
             if (sizeof($interruptData['skills']) == 0 && !$interrupt) {
                 $this->game->log('exitHook', 'not interrupted', $currentState, 'noSkill');
                 // No skills can activate
@@ -52,7 +58,7 @@ class ActInterrupt
             } else {
                 $this->setState($functionName, $interruptData);
                 // Goto the skill screen
-                $this->game->gamestate->nextState('interrupt');
+                $this->game->nextState('interrupt');
             }
         } elseif (
             array_key_exists('cancelled', $existingData) &&
@@ -132,6 +138,12 @@ class ActInterrupt
                 return $skill['characterId'];
             }, $skills)
         );
+    }
+    public function addMoreSkillInterrupt($skill): void
+    {
+        $state = $this->getLatestInterruptState();
+        array_push($state['data']['skills'], $skill);
+        $this->setState($state['functionName'], $state['data']);
     }
     public function addSkillInterrupt($skill): void
     {
@@ -252,7 +264,7 @@ class ActInterrupt
             $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
         }
         if (sizeof($characterIds) > 0 && sizeof($this->game->gameData->getAllMultiActiveCharacter()) == 0 && !$changeState) {
-            $this->game->gamestate->nextState($data['currentState']);
+            $this->game->nextState($data['currentState']);
             $changeState = true;
         }
         if ($changeState) {
@@ -331,7 +343,7 @@ class ActInterrupt
         }
         $changeState = false;
         if (sizeof($characterIds) == 0) {
-            $this->game->gamestate->nextState($data['currentState']);
+            $this->game->nextState($data['currentState']);
             $changeState = true;
         }
 

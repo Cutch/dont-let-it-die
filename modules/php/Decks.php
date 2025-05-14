@@ -202,7 +202,7 @@ class Decks
                 'deckName' => str_replace('-', ' ', $deck),
             ];
             $this->game->getDecks($results);
-            $this->game->notify->all('shuffle', '', $results);
+            $this->game->notify('shuffle', '', $results);
         } else {
             throw new Exception('Missing card id');
         }
@@ -218,9 +218,9 @@ class Decks
         ];
         $this->game->getDecks($results);
         if ($notify) {
-            $this->game->notify->all('shuffle', clienttranslate('The ${deckName} deck is out of cards, shuffling'), $results);
+            $this->game->notify('shuffle', clienttranslate('The ${deckName} deck is out of cards, shuffling'), $results);
         } else {
-            $this->game->notify->all('shuffle', '', $results);
+            $this->game->notify('shuffle', '', $results);
         }
     }
     public function pickCard(string $deck): array

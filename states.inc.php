@@ -140,7 +140,7 @@ $machinestates = [
         'name' => 'tooManyItems',
         'description' => clienttranslate('${character_name} is selecting an item'),
         'descriptionmyturn' => clienttranslate('Selecting an item'),
-        'type' => 'activeplayer',
+        'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSendToCamp'],
         'transitions' => ['playerTurn' => 10],
@@ -149,7 +149,7 @@ $machinestates = [
         'name' => 'deckSelection',
         'description' => clienttranslate('${character_name} is selecting a deck'),
         'descriptionmyturn' => clienttranslate('Selecting a deck'),
-        'type' => 'activeplayer',
+        'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectDeck', 'actCancel'],
         'transitions' => ['playerTurn' => 10, 'deckSelection' => 13],
@@ -158,7 +158,7 @@ $machinestates = [
         'name' => 'resourceSelection',
         'description' => clienttranslate('${character_name} is selecting a resource'),
         'descriptionmyturn' => clienttranslate('Selecting a resource'),
-        'type' => 'activeplayer',
+        'type' => 'multipleactiveplayer',
         'args' => 'argResourceSelection',
         'possibleactions' => ['actSelectResource', 'actCancel'],
         'transitions' => ['playerTurn' => 10, 'interrupt' => 22],
@@ -175,7 +175,7 @@ $machinestates = [
         'name' => 'characterSelection',
         'description' => clienttranslate('${character_name} is selecting a character'),
         'descriptionmyturn' => clienttranslate('Selecting a character'),
-        'type' => 'activeplayer',
+        'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectCharacter', 'actCancel'],
         'transitions' => ['playerTurn' => 10, 'morningPhase' => 50, 'interrupt' => 22],
@@ -184,7 +184,7 @@ $machinestates = [
         'name' => 'cardSelection',
         'description' => clienttranslate('${character_name} is selecting a card'),
         'descriptionmyturn' => clienttranslate('Selecting a card'),
-        'type' => 'activeplayer',
+        'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectCard', 'actCancel'],
         'transitions' => ['playerTurn' => 10, 'morningPhase' => 50, 'interrupt' => 22],
@@ -193,7 +193,7 @@ $machinestates = [
         'name' => 'hindranceSelection',
         'description' => clienttranslate('${character_name} is selecting a hindrance'),
         'descriptionmyturn' => clienttranslate('Selecting a hindrance'),
-        'type' => 'activeplayer',
+        'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectHindrance', 'actCancel'],
         'transitions' => ['playerTurn' => 10, 'characterSelection' => 16, 'morningPhase' => 50, 'interrupt' => 22],
@@ -202,7 +202,7 @@ $machinestates = [
         'name' => 'tradeSelection',
         'description' => clienttranslate('${character_name} is selecting an item'),
         'descriptionmyturn' => clienttranslate('Selecting an item'),
-        'type' => 'activeplayer',
+        'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actTrade', 'actCancel'],
         'transitions' => ['playerTurn' => 10, 'interrupt' => 22],
@@ -289,7 +289,7 @@ $machinestates = [
         'action' => 'stDinnerPhase',
         // 'args' => 'argDinnerPhase',
         'possibleactions' => [],
-        'transitions' => ['dinnerPhasePost' => 28],
+        'transitions' => ['dinnerPhasePost' => 28, 'nightPhase' => 30],
         'initialprivate' => 29,
     ],
     28 => [
@@ -403,14 +403,14 @@ $machinestates = [
         'possibleactions' => [],
         'transitions' => ['tradePhaseActions' => 61],
     ],
-    97 => [
-        'name' => 'postActionPhase',
-        'descriptionmyturn' => clienttranslate('Resolving'),
-        'type' => 'activePlayer',
-        'action' => 'stPostActionPhase',
-        'possibleactions' => ['actUseSkill', 'actUseItem'],
-        'transitions' => [],
-    ],
+    // 97 => [
+    //     'name' => 'postActionPhase',
+    //     'descriptionmyturn' => clienttranslate('Resolving'),
+    //     'type' => 'activePlayer',
+    //     'action' => 'stPostActionPhase',
+    //     'possibleactions' => ['actUseSkill', 'actUseItem'],
+    //     'transitions' => [],
+    // ],
     // Final state.
     // Please do not modify (and do not overload action/args methods).
     98 => [
@@ -422,6 +422,6 @@ $machinestates = [
         'args' => 'argGameEnd',
     ],
 ];
-foreach ($machinestates as $key => $state) {
-    $machinestates[97]['transitions'][$key] = $state['name'];
-}
+// foreach ($machinestates as $key => $state) {
+//     $machinestates[97]['transitions'][$key] = $state['name'];
+// }

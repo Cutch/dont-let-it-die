@@ -116,11 +116,11 @@ class Character
             return $this->getCharacterData($char, $_skipHooks);
         }, $turnOrder);
     }
-    public function getAllCharacterDataForPlayer(int $playerId): array
+    public function getAllCharacterDataForPlayer(string|int $playerId): array
     {
         return array_values(
             array_filter($this->getAllCharacterData(), function ($char) use ($playerId) {
-                return $char['player_id'] == $playerId;
+                return (int) $char['player_id'] == (int) $playerId;
             })
         );
     }
@@ -340,6 +340,7 @@ class Character
         } elseif ($action == null) {
             $this->submittingCharacter = null;
         }
+        $this->game->log('submittingCharacter: ', $action, $subAction, $this->submittingCharacter);
     }
     public function setSubmittingCharacterById(string $characterId): void
     {

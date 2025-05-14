@@ -317,11 +317,14 @@ $expansionData = [
                     });
 
                     $data['interrupt'] = true;
-                    $game->selectionStates->initiateState('characterSelection', [
-                        'selectableCharacters' => array_values($characters),
-                        'cancellable' => false,
-                        'id' => $skill['id'],
-                    ]);
+                    $game->selectionStates->initiateState(
+                        'characterSelection',
+                        [
+                            'selectableCharacters' => array_values($characters),
+                            'id' => $skill['id'],
+                        ],
+                        false
+                    );
                     return ['notify' => false, 'nextState' => false];
                 },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
@@ -348,11 +351,14 @@ $expansionData = [
                         return $character != $currentCharacter;
                     });
                     $data['interrupt'] = true;
-                    $game->selectionStates->initiateState('characterSelection', [
-                        'selectableCharacters' => array_values($characters),
-                        'cancellable' => false,
-                        'id' => $skill['id'],
-                    ]);
+                    $game->selectionStates->initiateState(
+                        'characterSelection',
+                        [
+                            'selectableCharacters' => array_values($characters),
+                            'id' => $skill['id'],
+                        ],
+                        false
+                    );
                     return ['notify' => false, 'nextState' => false];
                 },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
@@ -574,7 +580,7 @@ $expansionData = [
         //                 'id' => $skill['id'],
         //             ]);
         //             $data['interrupt'] = true;
-        //             $game->gamestate->nextState('characterSelection');
+        //             $game->nextState('characterSelection');
         //             return ['notify' => false, 'nextState' => false];
         //         },
         //         'onCharacterSelection' => function (Game $game, $skill, &$data) {

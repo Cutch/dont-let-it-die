@@ -42,7 +42,7 @@ class Encounter
             $this->game->checkHindrance(true);
         }
         if (sizeof($validActions) == 0) {
-            $this->game->gamestate->nextState('playerTurn');
+            $this->game->nextState('playerTurn');
         }
     }
     public function countDamageTaken($data)
@@ -106,7 +106,7 @@ class Encounter
         }
         $this->game->gameData->set('chooseWeapons', [$selectedWeapon]);
 
-        $this->game->gamestate->nextState('resolveEncounter');
+        $this->game->nextState('resolveEncounter');
     }
     public function argWhichWeapon()
     {
@@ -184,7 +184,7 @@ class Encounter
                             array_push($choices, $noneChoice);
                         }
                         $_this->gameData->set('chooseWeapons', $choices);
-                        $_this->gamestate->nextState('whichWeapon');
+                        $_this->nextState('whichWeapon');
                         return;
                     }
                 } elseif (sizeof($weapons) >= 1) {
@@ -204,7 +204,7 @@ class Encounter
                             }, $weapons),
                             $noneChoice,
                         ]);
-                        $_this->gamestate->nextState('whichWeapon');
+                        $_this->nextState('whichWeapon');
                         return;
                     } elseif ($chooseWeapons) {
                         $weapon = $chooseWeapons[0];
@@ -294,7 +294,7 @@ class Encounter
                 }
                 $_this->gameData->set('chooseWeapons', null);
                 $_this->gameData->set('encounterState', $data);
-                $_this->gamestate->nextState('postEncounter');
+                $_this->nextState('postEncounter');
             }
         );
     }

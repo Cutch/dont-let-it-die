@@ -17,19 +17,30 @@ class SelectionStates
 
     public function actSelectCharacter(?string $characterId = null): void
     {
-        if (!$characterId) {
-            throw new BgaUserException($this->game->translate('Select a Character'));
-        }
-        $data = [
-            'characterId' => $characterId,
-            'nextState' => 'playerTurn',
-        ];
-        $this->game->hooks->onCharacterSelection($data);
-        $this->game->gameData->set('characterSelectionState', null);
-        if ($data['nextState'] != false) {
-            $this->game->gamestate->nextState($data['nextState']);
-        }
-        $this->game->completeAction();
+        $this->game->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->game->hooks, 'onCharacterSelection'],
+            function (Game $_this) use ($characterId) {
+                if (!$characterId) {
+                    throw new BgaUserException($_this->translate('Select a Character'));
+                }
+                $data = $_this->selectionStates->getState('characterSelection');
+                $data['selectedCharacterId'] = $characterId;
+                $_this->selectionStates->setState('characterSelection', $data);
+                return [
+                    'characterId' => $characterId,
+                    'nextState' => 'playerTurn',
+                ];
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                $_this->selectionStates->setState('characterSelection', null);
+                if ($data['nextState'] != false) {
+                    $_this->nextState($data['nextState']);
+                }
+                $_this->completeAction();
+            }
+        );
     }
     public function actSelectResource(?string $resourceType = null): void
     {
@@ -43,7 +54,7 @@ class SelectionStates
         ];
         $this->game->hooks->onResourceSelection($data);
         if ($data['nextState'] != false) {
-            $this->game->gamestate->nextState($data['nextState']);
+            $this->game->nextState($data['nextState']);
         }
         $this->game->completeAction();
     }
@@ -59,7 +70,7 @@ class SelectionStates
         $this->game->hooks->onHindranceSelection($data);
 
         if ($data['nextState'] != false) {
-            $this->game->gamestate->nextState($data['nextState']);
+            $this->game->nextState($data['nextState']);
         }
         $this->game->hooks->onHindranceSelectionAfter($data);
         $this->game->completeAction();
@@ -75,7 +86,7 @@ class SelectionStates
         ];
         $this->game->hooks->onCardSelection($data);
         if ($data['nextState'] != false) {
-            $this->game->gamestate->nextState($data['nextState']);
+            $this->game->nextState($data['nextState']);
         }
         $this->game->completeAction();
     }
@@ -91,7 +102,7 @@ class SelectionStates
         ];
         $this->game->hooks->onDeckSelection($data);
         if ($data['nextState'] != false) {
-            $this->game->gamestate->nextState($data['nextState']);
+            $this->game->nextState($data['nextState']);
         }
         $this->game->completeAction();
     }
@@ -106,7 +117,7 @@ class SelectionStates
         }
 
         if (!$this->game->actInterrupt->onInterruptCancel()) {
-            $this->game->gamestate->nextState('playerTurn');
+            $this->game->nextState('playerTurn');
         }
         $this->game->completeAction();
     }
@@ -128,7 +139,7 @@ class SelectionStates
         }
         return null;
     }
-    public function argSelectionState()
+    public function argSelectionState(): array
     {
         $stateName = $this->stateToStateNameMapping();
         $result = [
@@ -136,11 +147,13 @@ class SelectionStates
             'selectionState' => $this->game->gameData->get($stateName),
             'character_name' => $this->game->getCharacterHTML(),
         ];
+        $this->game->log($this->game->gamestate->state()['name'], $stateName, $result);
         $this->game->getGameData($result);
         $this->game->getResources($result);
         if ($stateName === 'deckSelectionState') {
             $this->game->getDecks($result);
         }
+        return $result;
     }
     public function actCancel(): void
     {
@@ -154,21 +167,32 @@ class SelectionStates
         $stateNameState = $this->stateToStateNameMapping($stateName);
         return $this->game->gameData->get($stateNameState);
     }
-    public function initiateState(string $stateName, array $state, bool $cancellable = true, ?string $characterId = null): void
+    public function setState(string $stateName, ?array $data): void
     {
+        $stateNameState = $this->stateToStateNameMapping($stateName);
+        $this->game->gameData->set($stateNameState, $data);
+    }
+    public function initiateState(
+        string $stateName,
+        array $state,
+        bool $cancellable = true,
+        ?string $title = null,
+        ?string $characterId = null
+    ): void {
         $stateNameState = $this->stateToStateNameMapping($stateName);
 
         $playerId = $this->game->getCurrentPlayer();
-        $newState = [...$state, 'cancellable' => $cancellable, 'currentPlayerId' => $playerId];
+        $newState = ['cancellable' => $cancellable, 'title' => $title, 'currentPlayerId' => $playerId, ...$state];
         if ($characterId) {
             $newPlayerId = $this->game->character->getCharacterData($characterId)['player_id'];
             if ($newPlayerId != $playerId) {
-                $this->game->gamestate->changeActivePlayer($newPlayerId);
+                $this->game->gamestate->setPlayersMultiactive([$newPlayerId], $stateName, true);
                 $newState['newPlayerId'] = $newPlayerId;
+                $this->game->giveExtraTime((int) $newPlayerId);
             }
         }
         $this->game->gameData->set($stateNameState, $newState);
-        $this->game->gamestate->nextState($stateName);
+        $this->game->nextState($stateName);
     }
     public function initiateDeckSelection(?array $decks = null, ?string $title = null, $cancellable = true)
     {
@@ -179,9 +203,9 @@ class SelectionStates
             'deckSelection',
             [
                 'decks' => array_values($decks),
-                'title' => $title,
             ],
-            $cancellable
+            $cancellable,
+            $title
         );
     }
     public function initiateHindranceSelection(string $id, ?array $characters = null, ?string $button = null)

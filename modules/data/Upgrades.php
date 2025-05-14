@@ -67,7 +67,7 @@ $upgradesData = [
                 usePerDay($char . $unlock['id'], $game);
                 $count = $game->adjustResource('fkp', 2)['changed'];
                 if ($count > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $unlock['name'],
                         'count' => $count,
                         'resource_type' => 'fkp',
@@ -110,7 +110,7 @@ $upgradesData = [
         'onEndTurn' => function (Game $game, $unlock, &$data) {
             if ($game->gameData->get('lastAction') == 'actInvestigateFire') {
                 if ($game->adjustResource('fkp', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $unlock['name'],
                         'count' => 1,
                         'resource_type' => 'fkp',
@@ -158,7 +158,7 @@ $upgradesData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'hide') {
                 if ($game->adjustResource('hide', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'count' => 1,
                         'resource_type' => $card['resourceType'],
@@ -176,7 +176,7 @@ $upgradesData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'bone') {
                 if ($game->adjustResource('bone', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'count' => 1,
                         'resource_type' => $card['resourceType'],
@@ -194,7 +194,7 @@ $upgradesData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'herb') {
                 if ($game->adjustResource('herb', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'count' => 1,
                         'resource_type' => $card['resourceType'],
@@ -212,7 +212,7 @@ $upgradesData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'dino-egg') {
                 if ($game->adjustResource('dino-egg', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'count' => 1,
                         'resource_type' => $card['resourceType'],
@@ -377,12 +377,15 @@ $upgradesData = [
                     $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use ($currentCharacter) {
                         return $character != $currentCharacter;
                     });
-                    $game->selectionStates->initiateState('characterSelection', [
-                        'selectableCharacters' => array_values($characters),
-                        'cancellable' => false,
-                        'id' => $unlock['id'],
-                        'aboveMax' => $aboveMax,
-                    ]);
+                    $game->selectionStates->initiateState(
+                        'characterSelection',
+                        [
+                            'selectableCharacters' => array_values($characters),
+                            'id' => $unlock['id'],
+                            'aboveMax' => $aboveMax,
+                        ],
+                        false
+                    );
                     // TODO: we dont know what this will interrupt
                     // ideally we should track the next state and then redirect back there after selection
                 }
@@ -475,11 +478,14 @@ $upgradesData = [
                         );
                         $data['interrupt'] = true;
                         // $card2 = $game->decks->pickCard($deck);
-                        $game->selectionStates->initiateState('cardSelection', [
-                            'cards' => $decksDiscards,
-                            'cancellable' => true,
-                            'id' => $skill['id'],
-                        ]);
+                        $game->selectionStates->initiateState(
+                            'cardSelection',
+                            [
+                                'cards' => $decksDiscards,
+                                'id' => $skill['id'],
+                            ],
+                            true
+                        );
                         //         $existingData = $game->actInterrupt->getState('actDraw');
                         //         if (array_key_exists('data', $existingData)) {
                         //             $decksDiscards = $game->decks->listDeckDiscards();
@@ -490,7 +496,7 @@ $upgradesData = [
                         //                 'id' => $skill['id'],
                         //             ]);
                         // $data['interrupt'] = true;
-                        //             $game->gamestate->nextState('cardSelection');
+                        //             $game->nextState('cardSelection');
                         //         }
                     }
                 },
@@ -534,7 +540,7 @@ $upgradesData = [
         'unlockCost' => 5,
         'onUse' => function (Game $game, $unlock) {
             $game->character->adjustAllHealth(10);
-            $this->notify->all('tree', clienttranslate('Everyone gained ${count} ${character_resource}'), [
+            $this->notify('tree', clienttranslate('Everyone gained ${count} ${character_resource}'), [
                 'count' => clienttranslate('full'),
                 'character_resource' => 'health',
             ]);

@@ -201,7 +201,7 @@ $itemsData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
                 $game->gameData->setResource('fiber', $game->gameData->getResource('fiber') + 1);
-                $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                $game->notify('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
                     'item_name' => $item['name'],
                     'resource_type' => $card['resourceType'],
                 ]);
@@ -222,7 +222,7 @@ $itemsData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
                 $game->gameData->setResource('berry', $game->gameData->getResource('berry') + 1);
-                $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                $game->notify('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
                     'item_name' => $item['name'],
                     'resource_type' => $card['resourceType'],
                 ]);
@@ -380,7 +380,7 @@ $itemsData = [
                 usePerDay($item['name'] . $char['id'] . 'investigateFire', $game);
 
                 if ($game->adjustResource('fkp', 1)['changed'] > 0) {
-                    $game->notify->all('usedItem', clienttranslate('The ${item_name} grants an extra fkp'), [
+                    $game->notify('usedItem', clienttranslate('The ${item_name} grants an extra fkp'), [
                         'item_name' => $item['name'],
                     ]);
                 }
@@ -406,7 +406,7 @@ $itemsData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
                 $game->gameData->setResource('wood', $game->gameData->getResource('wood') + 1);
-                $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                $game->notify('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
                     'item_name' => $item['name'],
                     'resource_type' => $card['resourceType'],
                 ]);
@@ -462,7 +462,7 @@ $itemsData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
                 $game->adjustResource('meat', 1);
-                $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                $game->notify('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
                     'item_name' => $item['name'],
                     'resource_type' => $card['resourceType'],
                 ]);
@@ -506,7 +506,7 @@ $itemsData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
                 $game->gameData->setResource('rock', $game->gameData->getResource('rock') + 1);
-                $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
+                $game->notify('usedItem', clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'), [
                     'item_name' => $item['name'],
                     'resource_type' => $card['resourceType'],
                 ]);
@@ -529,7 +529,7 @@ $itemsData = [
         'skills' => [
             'skill1' => [
                 'type' => 'item-skill',
-                'name' => clienttranslate('Draw 2 Pick 1 (') . clienttranslate('Planning Hut') . ')',
+                'name' => clienttranslate('Draw 2 Pick 1') . ' (' . clienttranslate('Planning Hut') . ')',
                 'state' => ['interrupt'],
                 'interruptState' => ['playerTurn'],
                 'perDay' => 2,
@@ -555,18 +555,16 @@ $itemsData = [
                             $deck = $existingData['data']['deck'];
                             $card1 = $existingData['data']['card'];
                             $card2 = $game->decks->pickCard($deck);
-                            $game->gameData->set('cardSelectionState', [
+                            $data['interrupt'] = true;
+                            $game->selectionStates->initiateState('cardSelection', [
                                 'cards' => [$card1, $card2],
-                                'cancellable' => false,
                                 'id' => $skill['id'],
                             ]);
-                            $data['interrupt'] = true;
-                            $game->gamestate->nextState('cardSelection');
                         }
                     }
                 },
                 'onCardSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->gameData->get('cardSelectionState');
+                    $state = $game->selectionStates->getState('cardSelection');
                     if ($state && $state['id'] == $skill['id']) {
                         usePerDay($skill['id'], $game);
                         $discardCard = array_values(
@@ -944,7 +942,7 @@ $itemsData = [
         ],
         'onUse' => function (Game $game, $item) {
             $game->character->unequipEquipment($item['characterId'], [$item['id']]);
-            $game->notify->all('usedItem', clienttranslate('${character_name} used ${item_name} and lost their ${item_name}'), [
+            $game->notify('usedItem', clienttranslate('${character_name} used ${item_name} and lost their ${item_name}'), [
                 'item_name' => $item['name'],
             ]);
         },

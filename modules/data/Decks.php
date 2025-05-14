@@ -643,7 +643,7 @@ $decksData = [
         'onNight' => function (Game $game, $nightCard, &$data) {
             if (in_array($nightCard['id'], $game->getActiveNightCardIds()) && $game->gameData->getResource('dino-egg') < 3) {
                 $game->character->adjustAllHealth(-1);
-                $this->notify->all('morningPhase', clienttranslate('Everyone lost ${count} ${character_resource}'), [
+                $this->notify('morningPhase', clienttranslate('Everyone lost ${count} ${character_resource}'), [
                     'count' => 1,
                     'character_resource' => 'health',
                 ]);

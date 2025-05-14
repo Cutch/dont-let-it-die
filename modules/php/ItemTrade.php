@@ -140,7 +140,7 @@ class ItemTrade
             $items = $this->game->gameData->getItems();
             $this->game->getAllPlayers($results);
             $this->game->getItemData($results);
-            $this->game->notify->all('tradeItem', clienttranslate('${character_name_1} traded an item with the camp'), [
+            $this->game->notify('tradeItem', clienttranslate('${character_name_1} traded an item with the camp'), [
                 'character_name_1' => $this->game->getCharacterHTML($trade1['character']['id']),
                 'itemId1' => array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null,
                 'itemId2' => array_key_exists('itemId', $trade2) ? $trade2['itemId'] : null,
@@ -247,7 +247,7 @@ class ItemTrade
             $items = $this->game->gameData->getItems();
             $this->game->getAllPlayers($results);
             $this->game->getItemData($results);
-            $this->game->notify->all('tradeItem', clienttranslate('${character_name_1} traded an item to ${character_name_2}'), [
+            $this->game->notify('tradeItem', clienttranslate('${character_name_1} traded an item to ${character_name_2}'), [
                 'character_name_1' => $this->game->getCharacterHTML($trade1['character']['id']),
                 'character_name_2' => $this->game->getCharacterHTML($trade2['character']['id']),
                 'itemId1' => array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null,
@@ -321,7 +321,7 @@ class ItemTrade
     public function stTradePhase()
     {
         if (sizeof($this->game->getCraftedItems()) == 0) {
-            $this->game->gamestate->nextState('nextCharacter');
+            $this->game->nextState('nextCharacter');
         } else {
             $this->game->gamestate->setAllPlayersMultiactive();
             foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {

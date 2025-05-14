@@ -27,7 +27,9 @@ class CardSelectionScreen {
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="card-selection-screen" class="dlid__container">
-            <div id="card-selection-screen" class="dlid__container"><h3>${_('Select a Card')}</h3><div class="cards"></div></div>
+            <div id="card-selection-screen" class="dlid__container"><h3>${_(
+              gameData.selectionState.title ?? 'Select a Card',
+            )}</h3><div class="cards"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
       );

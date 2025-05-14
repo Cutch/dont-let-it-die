@@ -955,21 +955,26 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       return suffix;
     },
     onUpdateActionButtons: async function (stateName, args) {
+      this.updateGameDatas(args);
       const actions = args?.actions;
       // this.currentActions = actions;
       const isActive = this.isCurrentPlayerActive();
-      console.log('onUpdateActionButtons', isActive, args, actions, stateName);
+      console.log('onUpdateActionButtons', isActive, args, actions, stateName, isActive && stateName && actions != null);
       if (isActive && stateName && actions != null) {
         this.removeActionButtons();
 
         // Add test action buttons in the action status bar, simulating a card click:
-        if (actions)
+        if (actions) {
+          console.log(actions);
           actions
             .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
             .forEach((action) => {
               const actionId = action.action;
-              if (['interrupt', 'postEncounter', 'dayEvent'].includes(stateName)) {
+
+              if (stateName !== 'playerTurn') {
+                console.log(stateName);
                 if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
+                  console.log(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills);
                   return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
                     (skill) => {
                       (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
@@ -1166,6 +1171,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 }
               });
             });
+        }
         switch (stateName) {
           case 'startHindrance':
             this.statusBar.addActionButton(_('Done'), () => {

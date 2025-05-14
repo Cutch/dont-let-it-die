@@ -152,7 +152,7 @@ class Actions
                             throw new BgaUserException($this->game->translate('Only 1 hindrance can be removed'));
                         }
                         $game->adjustResource('herb', -$data['herb']);
-                        $game->notify->all('notify', clienttranslate('${character_name} used a herb to cure their wounds'));
+                        $game->notify('notify', clienttranslate('${character_name} used a herb to cure their wounds'));
                         $data['nextState'] = 'playerTurn';
                     }
                 },

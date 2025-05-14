@@ -218,7 +218,6 @@ $charactersData = [
                     }
                 },
                 'onUse' => function (Game $game, $skill) {
-                    $char = $game->character->getCharacterData($skill['characterId']);
                     $turn_char = $game->character->getTurnCharacter();
                     usePerDay($skill['getPerDayKey']($game, $skill), $game);
                     $game->character->adjustStamina($turn_char['character_name'], 2);
@@ -575,7 +574,7 @@ $charactersData = [
                     $existingData = $game->actInterrupt->getState('actCraft');
                     if ($char['isActive'] && !$existingData) {
                         $game->gameData->set('state', ['id' => $skill['id'], ...$data, 'title' => clienttranslate('Item Costs')]);
-                        $game->gamestate->nextState('resourceSelection');
+                        $game->nextState('resourceSelection');
                         $data['interrupt'] = true;
                     }
                 },
@@ -1124,7 +1123,7 @@ $charactersData = [
                     $char = $game->character->getCharacterData($skill['characterId']);
                     if ($char['isActive']) {
                         $game->gameData->set('state', ['id' => $skill['id']]);
-                        $game->gamestate->nextState('resourceSelection');
+                        $game->nextState('resourceSelection');
                         return ['spendActionCost' => false, 'notify' => false];
                     }
                 },
@@ -1540,11 +1539,14 @@ $charactersData = [
 
                     $data['interrupt'] = true;
 
-                    $game->selectionStates->initiateState('tradeSelection', [
-                        'selectableCharacters' => array_values($characters),
-                        'cancellable' => false,
-                        'id' => $skill['id'],
-                    ]);
+                    $game->selectionStates->initiateState(
+                        'tradeSelection',
+                        [
+                            'selectableCharacters' => array_values($characters),
+                            'id' => $skill['id'],
+                        ],
+                        false
+                    );
                     return ['notify' => false, 'nextState' => false];
                 },
                 'onTradeSelection' => function (Game $game, $skill, &$data) {
@@ -1860,30 +1862,99 @@ $charactersData = [
         'name' => 'Yurt',
         'slots' => ['weapon', 'tool'],
         'onCraft' => function (Game $game, $char, &$data) {
-            // Choose tribe member to gain 1hp or 1 stamina
-            $data['interrupt'] = true;
-            $game->selectionStates->initiateState('characterSelection', [
-                'selectableCharacters' => $game->character->getAllCharacterIds(),
-                'cancellable' => false,
-                'id' => $char['id'] . 'craft',
-            ]);
+            // Choose tribe member to gain 1 hp or 1 stamina
+            // $data['interrupt'] = true;
+            $game->selectionStates->initiateState(
+                'characterSelection',
+                [
+                    'selectableCharacters' => $game->character->getAllCharacterIds(),
+                    'id' => $char['id'] . 'craft',
+                ],
+                false,
+                clienttranslate('Give Character 1 Health or Stamina'),
+                $char['id']
+            );
+            // $game->actInterrupt->addSkillInterrupt($skill);
+            // $char = $game->character->getCharacterData($skill['characterId']);
+            // $game->actInterrupt->addSkillInterrupt($char['skills']['Yurtskill2']);
         },
-        'onCharacterSelection' => function (Game $game, $char, &$data) {
-            $state = $game->selectionStates->getState('characterSelection');
-            if ($state && $state['id'] == $char['id'] . 'craft') {
-                $game->character->adjustHealth($data['characterId'], 1);
-                $game->character->adjustStamina($data['characterId'], 1);
-                $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
-                    'count' => 1,
-                    'character_resource' => 'health',
-                ]);
-                $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
-                    'count' => 1,
-                    'character_resource' => 'stamina',
-                ]);
-                $data['nextState'] = 'playerTurn';
-            }
-        },
+        'skills' => [
+            'skill1' => [
+                'type' => 'skill',
+                'state' => ['interrupt'],
+                'interruptState' => ['characterSelection'],
+                'name' => clienttranslate('Give 1 Health'),
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $game->character->setSubmittingCharacter('actUseSkill', $activatedSkill['id']);
+                        clearCharacterSkills($data['skills'], $skill['characterId']);
+                        $state = $game->selectionStates->getState('characterSelection');
+                        $game->character->adjustHealth($state['selectedCharacterId'], 1);
+                        $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
+                            'count' => 1,
+                            'character_resource' => 'health',
+                            'character_name' => $state['selectedCharacterId'],
+                        ]);
+                        $data['nextState'] = 'playerTurn';
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    return true;
+                },
+                // 'onCraft' => function (Game $game, $skill, &$data) {
+                // Choose tribe member to gain 1 hp or 1 stamina
+                // $data['interrupt'] = true;
+                // $game->selectionStates->initiateState(
+                //     'characterSelection',
+                //     [
+                //         'selectableCharacters' => $game->character->getAllCharacterIds(),
+                //         'id' => $skill['characterId'] . 'craft',
+                //     ],
+                //     false,
+                //     null,
+                //     $skill['characterId']
+                // );
+                // $game->actInterrupt->addSkillInterrupt($skill);
+                // $char = $game->character->getCharacterData($skill['characterId']);
+                // $game->actInterrupt->addSkillInterrupt($char['skills']['Yurtskill2']);
+                // },
+                'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->selectionStates->getState('characterSelection');
+                    if ($state && $state['id'] == $skill['characterId'] . 'craft') {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+            ],
+            'skill2' => [
+                'type' => 'skill',
+                'name' => clienttranslate('Give 1 Stamina'),
+                'state' => ['interrupt'],
+                'interruptState' => ['characterSelection'],
+                'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                    if ($skill['id'] == $activatedSkill['id']) {
+                        $game->character->setSubmittingCharacter('actUseSkill', $activatedSkill['id']);
+                        clearCharacterSkills($data['skills'], $skill['characterId']);
+                        $state = $game->selectionStates->getState('characterSelection');
+                        $game->character->adjustStamina($state['selectedCharacterId'], 1);
+                        $game->activeCharacterEventLog('gained ${count} ${character_resource}', [
+                            'count' => 1,
+                            'character_resource' => 'stamina',
+                            'character_name' => $state['selectedCharacterId'],
+                        ]);
+                        $data['nextState'] = 'playerTurn';
+                    }
+                },
+                'requires' => function (Game $game, $skill) {
+                    return true;
+                },
+                'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                    $state = $game->selectionStates->getState('characterSelection');
+                    if ($state && $state['id'] == $skill['characterId'] . 'craft') {
+                        $game->actInterrupt->addSkillInterrupt($skill);
+                    }
+                },
+            ],
+        ],
         'onGetActionCost' => function (Game $game, $char, &$data) {
             if ($data['action'] == 'actCraft') {
                 $data['stamina'] = max($data['stamina'] - 2, 0);

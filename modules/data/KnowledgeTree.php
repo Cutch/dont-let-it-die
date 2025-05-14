@@ -70,7 +70,7 @@ $knowledgeTreeData = [
     'fire-starter' => [
         'name' => clienttranslate('Fire Starter'),
         'onUse' => function (Game $game, $obj) {
-            $game->notify->all('tree', clienttranslate('The tribe has discovered how to make fire!'));
+            $game->notify('tree', clienttranslate('The tribe has discovered how to make fire!'));
             $game->win();
         },
     ],
@@ -80,7 +80,7 @@ $knowledgeTreeData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
                 if ($game->adjustResource('rock', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'count' => 1,
                         'resource_type' => $card['resourceType'],
@@ -95,7 +95,7 @@ $knowledgeTreeData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
                 if ($game->adjustResource('wood', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'count' => 1,
                         'resource_type' => $card['resourceType'],
@@ -110,7 +110,7 @@ $knowledgeTreeData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
                 if ($game->adjustResource('meat', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'count' => 1,
                         'resource_type' => $card['resourceType'],
@@ -125,7 +125,7 @@ $knowledgeTreeData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
                 if ($game->adjustResource('berry', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'count' => 1,
                         'resource_type' => $card['resourceType'],
@@ -140,7 +140,7 @@ $knowledgeTreeData = [
             $card = $data['card'];
             if ($card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
                 if ($game->adjustResource('fiber', 1)['changed'] > 0) {
-                    $game->notify->all('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                    $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                         'action_name' => $obj['name'],
                         'count' => 1,
                         'resource_type' => $card['resourceType'],
