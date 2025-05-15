@@ -56,6 +56,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.craftScreen = new CraftScreen(this);
       this.cookScreen = new CookScreen(this);
       this.eatScreen = new EatScreen(this);
+      this.itemsScreen = new ItemsScreen(this);
       this.reviveScreen = new ReviveScreen(this);
       this.tokenScreen = new TokenScreen(this);
       this.tooManyItemsScreen = new TooManyItemsScreen(this);
@@ -827,6 +828,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       delete clone.gamestate;
       Object.assign(this.gamedatas, clone);
     },
+    isActive: function () {
+      return this.getActivePlayers().includes(this.player_id.toString()) || this.isPlayerActive();
+    },
     ///////////////////////////////////////////////////
     //// Game & client states
 
@@ -839,13 +843,16 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (args.args.gameData) {
         this.updateGameDatas(args.args.gameData);
       }
-      const isActive = this.isCurrentPlayerActive();
+      const isActive = this.isActive();
 
-      console.log('Entering state: ' + stateName, args);
+      console.log('Entering state: ' + stateName, args, isActive, this.getActivePlayers(), gameui.isPlayerActive(), this.player_id);
       // this.updateResources(args.args);
       switch (stateName) {
         case 'tooManyItems':
           if (isActive) this.tooManyItemsScreen.show(args.args);
+          break;
+        case 'itemSelection':
+          if (isActive) this.itemsScreen.show(args.args);
           break;
         case 'startHindrance':
           this.upgradeSelectionScreen.show(args.args);
@@ -908,6 +915,9 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
         case 'deckSelection':
           this.deckSelectionScreen.hide();
           break;
+        case 'itemSelection':
+          this.deckSelectionScreen.hide();
+          break;
         case 'whichWeapon':
           this.weaponScreen.hide();
           break;
@@ -927,7 +937,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           this.tooManyItemsScreen.hide();
           break;
         case 'tradePhase':
-          this.itemTradeScreen.hide();
+          this.itemsScreen.hide();
           break;
         case 'characterSelect':
           dojo.style('character-selector', 'display', 'none');
@@ -958,23 +968,29 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       this.updateGameDatas(args);
       const actions = args?.actions;
       // this.currentActions = actions;
-      const isActive = this.isCurrentPlayerActive();
-      console.log('onUpdateActionButtons', isActive, args, actions, stateName, isActive && stateName && actions != null);
+      const isActive = this.isActive();
+      console.log(
+        'onUpdateActionButtons',
+        isActive,
+        this.getActivePlayers(),
+        gameui.isPlayerActive(),
+        this.player_id,
+        args,
+        actions,
+        stateName,
+      );
       if (isActive && stateName && actions != null) {
         this.removeActionButtons();
 
         // Add test action buttons in the action status bar, simulating a card click:
         if (actions) {
-          console.log(actions);
           actions
             .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
             .forEach((action) => {
               const actionId = action.action;
 
               if (stateName !== 'playerTurn') {
-                console.log(stateName);
                 if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
-                  console.log(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills);
                   return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
                     (skill) => {
                       (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
@@ -1184,14 +1200,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 this.deckSelectionScreen.hide(),
               );
             });
-            if (args.deckSelection?.cancellable !== false)
-              this.statusBar.addActionButton(
-                _('Cancel'),
-                () => {
-                  this.bgaPerformAction('actCancel').then(() => this.deckSelectionScreen.hide());
-                },
-                { color: 'secondary' },
-              );
             break;
           case 'hindranceSelection':
             this.statusBar.addActionButton(args.hindranceSelection?.button ?? _('Remove Hindrance'), () => {
@@ -1199,14 +1207,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 this.hindranceSelectionScreen.hide(),
               );
             });
-            if (args.hindranceSelection?.cancellable !== false)
-              this.statusBar.addActionButton(
-                _('Cancel'),
-                () => {
-                  this.bgaPerformAction('actCancel').then(() => this.hindranceSelectionScreen.hide());
-                },
-                { color: 'secondary' },
-              );
             break;
           case 'characterSelection':
             this.statusBar.addActionButton(this.actionMappings.actSelectCharacter, () => {
@@ -1214,14 +1214,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 this.characterSelectionScreen.hide(),
               );
             });
-            if (args.cancellable !== false)
-              this.statusBar.addActionButton(
-                _('Cancel'),
-                () => {
-                  this.bgaPerformAction('actCancel').then(() => this.selector.hide());
-                },
-                { color: 'secondary' },
-              );
             break;
           case 'cardSelection':
             this.statusBar.addActionButton(this.actionMappings.actSelectCard, () => {
@@ -1229,14 +1221,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 this.cardSelectionScreen.hide(),
               );
             });
-            if (args.cancellable !== false)
-              this.statusBar.addActionButton(
-                _('Cancel'),
-                () => {
-                  this.bgaPerformAction('actCancel').then(() => this.selector.hide());
-                },
-                { color: 'secondary' },
-              );
             break;
           case 'resourceSelection':
             this.statusBar.addActionButton(_('Select Resource'), () => {
@@ -1244,20 +1228,17 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
                 this.tokenScreen.hide(),
               );
             });
-            if (args.cancellable !== false)
-              this.statusBar.addActionButton(
-                _('Cancel'),
-                () => {
-                  this.bgaPerformAction('actCancel').then(() => this.selector.hide());
-                },
-                { color: 'secondary' },
-              );
             break;
           case 'tooManyItems':
             this.statusBar.addActionButton(_('Send To Camp'), () => {
               this.bgaPerformAction('actSendToCamp', { sendToCampId: this.tooManyItemsScreen.getSelectedId() }).then(() =>
                 this.tooManyItemsScreen.hide(),
               );
+            });
+            break;
+          case 'itemSelection':
+            this.statusBar.addActionButton(_('Select Item'), () => {
+              this.bgaPerformAction('actSelectItem', { itemId: this.itemsScreen.getSelectedId() }).then(() => this.itemsScreen.hide());
             });
             break;
           case 'whichWeapon':
@@ -1307,6 +1288,14 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             if (isActive) this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
             break;
         }
+        if (args.cancellable === true)
+          this.statusBar.addActionButton(
+            _('Cancel'),
+            () => {
+              this.bgaPerformAction('actCancel').then(() => this.selector.hide());
+            },
+            { color: 'secondary' },
+          );
       }
     },
 
@@ -1431,6 +1420,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
       if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
     },
     notif_updateActionButtons: async function (notification) {
+      console.log('notif_updateActionButtons', notification);
       await this.notificationWrapper(notification);
       await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
     },

@@ -323,6 +323,7 @@ $expansionData = [
                             'selectableCharacters' => array_values($characters),
                             'id' => $skill['id'],
                         ],
+                        $currentCharacter,
                         false
                     );
                     return ['notify' => false, 'nextState' => false];
@@ -357,6 +358,7 @@ $expansionData = [
                             'selectableCharacters' => array_values($characters),
                             'id' => $skill['id'],
                         ],
+                        $currentCharacter,
                         false
                     );
                     return ['notify' => false, 'nextState' => false];

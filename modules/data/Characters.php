@@ -1532,28 +1532,59 @@ $charactersData = [
                 'state' => ['playerTurn'],
                 'stamina' => 1,
                 'onUse' => function (Game $game, $skill) {
-                    $currentCharacter = $game->character->getTurnCharacterId();
+                    $currentCharacter = $game->character->getTurnCharacter();
                     $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use ($currentCharacter) {
-                        return $character != $currentCharacter;
+                        return $character != $currentCharacter['id'];
                     });
 
-                    $data['interrupt'] = true;
+                    // $data['interrupt'] = true;
+
+                    $items = array_map(function ($d) {
+                        return ['name' => $d['id'], 'itemId' => $d['itemId']];
+                    }, $currentCharacter['equipment']);
 
                     $game->selectionStates->initiateState(
-                        'tradeSelection',
+                        'itemSelection',
+                        [
+                            'items' => $items,
+                            'id' => $skill['id'],
+                        ],
+                        $currentCharacter['id'],
+                        false
+                    );
+                    $game->selectionStates->initiateState(
+                        'characterSelection',
                         [
                             'selectableCharacters' => array_values($characters),
                             'id' => $skill['id'],
                         ],
+                        $currentCharacter['id'],
                         false
                     );
                     return ['notify' => false, 'nextState' => false];
                 },
-                'onTradeSelection' => function (Game $game, $skill, &$data) {
-                    $state = $game->selectionStates->getState('tradeSelection');
-                    if ($state && $state['id'] == $skill['id']) {
-                        // TODO
-                        $data['nextState'] = 'playerTurn';
+                // 'onItemSelection' => function (Game $game, $skill, &$data) {
+                //     $itemSelectionState = $game->selectionStates->getState('itemSelection');
+                //     if ($itemSelectionState && $itemSelectionState['id'] == $skill['id']) {
+                //         $data['nextState'] = 'playerTurn';
+                //     }
+                // },
+                'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                    $characterSelectionState = $game->selectionStates->getState('characterSelection');
+                    $itemSelectionState = $game->selectionStates->getState('itemSelection');
+                    if ($characterSelectionState && $characterSelectionState['id'] == $skill['id']) {
+                        $characterId = $characterSelectionState['selectedCharacterId'];
+                        $itemId = $itemSelectionState['selectedItemId'];
+                        $game->character->unequipEquipment($skill['characterId'], [$itemId]);
+                        $game->character->equipEquipment($characterId, [$itemId]);
+
+                        $itemsLookup = $this->game->gameData->getItems();
+                        $itemName = $itemsLookup[$itemId];
+                        $game->notify('activeCharacter', clienttranslate('${character_name_1} gave ${item_name} to ${character_name_2}'), [
+                            'character_name_1' => $this->game->getCharacterHTML($skill['characterId']),
+                            'character_name_2' => $this->game->getCharacterHTML($characterId),
+                            'item_name' => $game->data->getItems()[$itemName]['name'],
+                        ]);
                     }
                 },
                 // 'onUse' => function (Game $game, $skill) {
@@ -1870,9 +1901,9 @@ $charactersData = [
                     'selectableCharacters' => $game->character->getAllCharacterIds(),
                     'id' => $char['id'] . 'craft',
                 ],
+                $char['id'],
                 false,
-                clienttranslate('Give Character 1 Health or Stamina'),
-                $char['id']
+                clienttranslate('Give Character 1 Health or Stamina')
             );
             // $game->actInterrupt->addSkillInterrupt($skill);
             // $char = $game->character->getCharacterData($skill['characterId']);
@@ -1910,9 +1941,9 @@ $charactersData = [
                 //         'selectableCharacters' => $game->character->getAllCharacterIds(),
                 //         'id' => $skill['characterId'] . 'craft',
                 //     ],
+                //     $skill['characterId'],
                 //     false,
-                //     null,
-                //     $skill['characterId']
+                //     null
                 // );
                 // $game->actInterrupt->addSkillInterrupt($skill);
                 // $char = $game->character->getCharacterData($skill['characterId']);

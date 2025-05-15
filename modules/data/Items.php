@@ -556,10 +556,14 @@ $itemsData = [
                             $card1 = $existingData['data']['card'];
                             $card2 = $game->decks->pickCard($deck);
                             $data['interrupt'] = true;
-                            $game->selectionStates->initiateState('cardSelection', [
-                                'cards' => [$card1, $card2],
-                                'id' => $skill['id'],
-                            ]);
+                            $game->selectionStates->initiateState(
+                                'cardSelection',
+                                [
+                                    'cards' => [$card1, $card2],
+                                    'id' => $skill['id'],
+                                ],
+                                $game->character->getTurnCharacterId()
+                            );
                         }
                     }
                 },

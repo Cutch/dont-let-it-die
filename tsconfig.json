@@ -35,6 +35,7 @@
       "src/screens/deck-selection-screen.js",
       "src/screens/eat-screen.js",
       "src/screens/hindrance-screen.js",
+      "src/screens/items-screen.js",
       "src/screens/item-trade-screen.js",
       "src/screens/revive-screen.js",
       "src/screens/token-screen.js",

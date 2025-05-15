@@ -384,6 +384,7 @@ $upgradesData = [
                             'id' => $unlock['id'],
                             'aboveMax' => $aboveMax,
                         ],
+                        $currentCharacter,
                         false
                     );
                     // TODO: we dont know what this will interrupt
@@ -484,6 +485,7 @@ $upgradesData = [
                                 'cards' => $decksDiscards,
                                 'id' => $skill['id'],
                             ],
+                            $game->character->getTurnCharacterId(),
                             true
                         );
                         //         $existingData = $game->actInterrupt->getState('actDraw');

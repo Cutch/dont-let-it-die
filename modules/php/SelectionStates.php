@@ -10,11 +10,19 @@ use Exception;
 class SelectionStates
 {
     private Game $game;
+    private bool $stateChanged = false;
     public function __construct(Game $game)
     {
         $this->game = $game;
     }
 
+    public function completeSelectionState(string|bool $nextState): void
+    {
+        if ($nextState) {
+            $this->game->nextState($nextState);
+        }
+        $this->initiatePendingState();
+    }
     public function actSelectCharacter(?string $characterId = null): void
     {
         $this->game->actInterrupt->interruptableFunction(
@@ -25,20 +33,19 @@ class SelectionStates
                 if (!$characterId) {
                     throw new BgaUserException($_this->translate('Select a Character'));
                 }
-                $data = $_this->selectionStates->getState('characterSelection');
-                $data['selectedCharacterId'] = $characterId;
-                $_this->selectionStates->setState('characterSelection', $data);
+                $stateData = $this->getState(null);
+                $stateData['selectedCharacterId'] = $characterId;
+                $this->setState(null, $stateData);
                 return [
                     'characterId' => $characterId,
                     'nextState' => 'playerTurn',
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
-                $_this->selectionStates->setState('characterSelection', null);
                 if ($data['nextState'] != false) {
                     $_this->nextState($data['nextState']);
                 }
-                $_this->completeAction();
+                $this->initiatePendingState();
             }
         );
     }
@@ -48,6 +55,9 @@ class SelectionStates
         if (!$resourceType) {
             throw new BgaUserException($this->game->translate('Select a Resource'));
         }
+        $stateData = $this->getState(null);
+        $stateData['selectedResourceType'] = $resourceType;
+        $this->setState(null, $stateData);
         $data = [
             'resourceType' => $resourceType,
             'nextState' => 'playerTurn',
@@ -56,13 +66,16 @@ class SelectionStates
         if ($data['nextState'] != false) {
             $this->game->nextState($data['nextState']);
         }
-        $this->game->completeAction();
+        $this->initiatePendingState();
     }
     public function actSelectHindrance(#[JsonParam] array $data): void
     {
         if (sizeof($data) == 0) {
             throw new BgaUserException($this->game->translate('Select a Hindrance'));
         }
+        $stateData = $this->getState(null);
+        $stateData['selections'] = $data;
+        $this->setState(null, $stateData);
         $data = [
             'selections' => $data,
             'nextState' => 'playerTurn',
@@ -73,13 +86,16 @@ class SelectionStates
             $this->game->nextState($data['nextState']);
         }
         $this->game->hooks->onHindranceSelectionAfter($data);
-        $this->game->completeAction();
+        $this->initiatePendingState();
     }
     public function actSelectCard(?string $cardId = null): void
     {
         if (!$cardId) {
             throw new BgaUserException($this->game->translate('Select a Card'));
         }
+        $stateData = $this->getState(null);
+        $stateData['selectedCardId'] = $cardId;
+        $this->setState(null, $stateData);
         $data = [
             'cardId' => $cardId,
             'nextState' => 'playerTurn',
@@ -88,7 +104,25 @@ class SelectionStates
         if ($data['nextState'] != false) {
             $this->game->nextState($data['nextState']);
         }
-        $this->game->completeAction();
+        $this->initiatePendingState();
+    }
+    public function actSelectItem(?string $itemId = null): void
+    {
+        if (!$itemId) {
+            throw new BgaUserException($this->game->translate('Select an item'));
+        }
+        $stateData = $this->getState(null);
+        $stateData['selectedItemId'] = $itemId;
+        $this->setState(null, $stateData);
+        $data = [
+            'itemId' => $itemId,
+            'nextState' => 'playerTurn',
+        ];
+        $this->game->hooks->onItemSelection($data);
+        if ($data['nextState'] != false) {
+            $this->game->nextState($data['nextState']);
+        }
+        $this->initiatePendingState();
     }
     public function actSelectDeck(?string $deckName = null): void
     {
@@ -96,6 +130,9 @@ class SelectionStates
         if (!$deckName) {
             throw new BgaUserException($this->game->translate('Select a Deck'));
         }
+        $stateData = $this->getState(null);
+        $stateData['selectedDeckName'] = $deckName;
+        $this->setState(null, $stateData);
         $data = [
             'deckName' => $deckName,
             'nextState' => 'playerTurn',
@@ -104,7 +141,7 @@ class SelectionStates
         if ($data['nextState'] != false) {
             $this->game->nextState($data['nextState']);
         }
-        $this->game->completeAction();
+        $this->initiatePendingState();
     }
     public function cancelState(?string $stateName): void
     {
@@ -119,7 +156,7 @@ class SelectionStates
         if (!$this->game->actInterrupt->onInterruptCancel()) {
             $this->game->nextState('playerTurn');
         }
-        $this->game->completeAction();
+        $this->initiatePendingState();
     }
     public function stateToStateNameMapping(?string $stateName = null): ?string
     {
@@ -134,8 +171,8 @@ class SelectionStates
             return 'deckSelectionState';
         } elseif ($stateName == 'tooManyItems') {
             return 'tooManyItemsState'; // Check
-        } elseif ($stateName == 'tradeSelection') {
-            return 'tradeSelectionState'; // Check
+        } elseif ($stateName == 'itemSelection') {
+            return 'itemSelectionState'; // Check
         }
         return null;
     }
@@ -159,40 +196,49 @@ class SelectionStates
     {
         $stateName = $this->stateToStateNameMapping();
         $this->cancelState($stateName);
-
-        $this->game->completeAction();
     }
-    public function getState(string $stateName): array
+    public function getState(?string $stateName): array
     {
         $stateNameState = $this->stateToStateNameMapping($stateName);
         return $this->game->gameData->get($stateNameState);
     }
-    public function setState(string $stateName, ?array $data): void
+    public function setState(?string $stateName, ?array $data): void
     {
         $stateNameState = $this->stateToStateNameMapping($stateName);
         $this->game->gameData->set($stateNameState, $data);
     }
+    public function initiatePendingState(): void
+    {
+        $pendingStates = $this->game->gameData->get('pendingStates') ?? [];
+        if (sizeof($pendingStates) > 0) {
+            $this->initiateState(...$pendingStates[0]);
+            array_shift($pendingStates);
+            $this->game->gameData->set('pendingStates', $pendingStates);
+        }
+        $this->game->completeAction();
+    }
     public function initiateState(
         string $stateName,
         array $state,
+        string $characterId,
         bool $cancellable = true,
-        ?string $title = null,
-        ?string $characterId = null
+        ?string $title = null
     ): void {
-        $stateNameState = $this->stateToStateNameMapping($stateName);
+        if ($this->stateChanged) {
+            $pendingStates = $this->game->gameData->get('pendingStates') ?? [];
+            array_push($pendingStates, func_get_args());
+            $this->game->gameData->set('pendingStates', $pendingStates);
+        } else {
+            $this->stateChanged = true;
+            $stateNameState = $this->stateToStateNameMapping($stateName);
 
-        $playerId = $this->game->getCurrentPlayer();
-        $newState = ['cancellable' => $cancellable, 'title' => $title, 'currentPlayerId' => $playerId, ...$state];
-        if ($characterId) {
-            $newPlayerId = $this->game->character->getCharacterData($characterId)['player_id'];
-            if ($newPlayerId != $playerId) {
-                $this->game->gamestate->setPlayersMultiactive([$newPlayerId], $stateName, true);
-                $newState['newPlayerId'] = $newPlayerId;
-                $this->game->giveExtraTime((int) $newPlayerId);
-            }
+            $playerId = $this->game->getCurrentPlayer();
+            $newState = ['cancellable' => $cancellable, 'title' => $title, 'currentPlayerId' => $playerId, ...$state];
+            $this->game->gameData->addMultiActiveCharacter($characterId, $stateName, true);
+
+            $this->game->gameData->set($stateNameState, $newState);
+            $this->game->nextState($stateName);
         }
-        $this->game->gameData->set($stateNameState, $newState);
-        $this->game->nextState($stateName);
     }
     public function initiateDeckSelection(?array $decks = null, ?string $title = null, $cancellable = true)
     {
@@ -204,6 +250,7 @@ class SelectionStates
             [
                 'decks' => array_values($decks),
             ],
+            $this->game->character->getTurnCharacterId(),
             $cancellable,
             $title
         );
@@ -223,6 +270,11 @@ class SelectionStates
                 })
             )
         );
-        $this->initiateState('hindranceSelection', ['id' => $id, 'characters' => $characters, 'button' => $button], false);
+        $this->initiateState(
+            'hindranceSelection',
+            ['id' => $id, 'characters' => $characters, 'button' => $button],
+            $this->game->character->getTurnCharacterId(),
+            false
+        );
     }
 }

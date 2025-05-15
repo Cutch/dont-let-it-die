@@ -526,10 +526,14 @@ class Game extends \Table
                                 }
                             })
                         );
-                        $_this->selectionStates->initiateState('tooManyItems', [
-                            'itemType' => $itemType,
-                            'items' => [...$existingItems, ['name' => $itemName, 'itemId' => $itemId]],
-                        ]);
+                        $_this->selectionStates->initiateState(
+                            'tooManyItems',
+                            [
+                                'itemType' => $itemType,
+                                'items' => [...$existingItems, ['name' => $itemName, 'itemId' => $itemId]],
+                            ],
+                            $character['id']
+                        );
                     }
                 }
                 $this->hooks->onCraftAfter($data);
@@ -547,7 +551,7 @@ class Game extends \Table
         if (!$sendToCampId) {
             throw new BgaUserException($this->translate('Select an item'));
         }
-        $items = $this->gameData->get('state')['items'];
+        $items = $this->selectionStates->getState($this->gamestate->state()['name'])['items'];
         if (
             !in_array(
                 $sendToCampId,
@@ -580,9 +584,8 @@ class Game extends \Table
         $campEquipment = $this->gameData->get('campEquipment');
         $this->log('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
-        $this->nextState('playerTurn');
         $this->markChanged('player');
-        $this->completeAction();
+        $this->selectionStates->completeSelectionState('playerTurn');
     }
 
     public function destroyItem(int $itemId): void
@@ -1163,6 +1166,10 @@ class Game extends \Table
     public function actSelectCard(?string $cardId = null): void
     {
         $this->selectionStates->actSelectCard($cardId);
+    }
+    public function actSelectItem(?string $itemId = null): void
+    {
+        $this->selectionStates->actSelectItem($itemId);
     }
     public function actSelectDeck(?string $deckName = null): void
     {
@@ -2066,6 +2073,7 @@ class Game extends \Table
         $availableUnlocks = $this->data->getValidKnowledgeTree();
         $result = [
             'activeCharacter' => $this->character->getTurnCharacterId(),
+            'activeCharacters' => $this->gameData->getAllMultiActiveCharacterIds(),
             'fireWoodCost' => $this->getFirewoodCost(),
             'tradeRatio' => $this->getTradeRatio(),
             'upgrades' => $this->gameData->get('upgrades'),

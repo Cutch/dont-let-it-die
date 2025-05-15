@@ -403,4 +403,9 @@ class Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
+    function onItemSelection(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
 }

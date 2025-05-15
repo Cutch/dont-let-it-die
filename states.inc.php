@@ -115,7 +115,7 @@ $machinestates = [
             'endTurn' => 15,
             'characterSelection' => 16,
             'hindranceSelection' => 18,
-            'tradeSelection' => 19,
+            'itemSelection' => 19,
             'interrupt' => 22,
             'cardSelection' => 17,
         ],
@@ -199,12 +199,12 @@ $machinestates = [
         'transitions' => ['playerTurn' => 10, 'characterSelection' => 16, 'morningPhase' => 50, 'interrupt' => 22],
     ],
     19 => [
-        'name' => 'tradeSelection',
+        'name' => 'itemSelection',
         'description' => clienttranslate('${character_name} is selecting an item'),
         'descriptionmyturn' => clienttranslate('Selecting an item'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
-        'possibleactions' => ['actTrade', 'actCancel'],
+        'possibleactions' => ['actSelectItem', 'actCancel'],
         'transitions' => ['playerTurn' => 10, 'interrupt' => 22],
     ],
     20 => [

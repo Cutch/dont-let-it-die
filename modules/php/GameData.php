@@ -33,6 +33,7 @@ class GameData
         'trackDifficulty' => 0,
         'dailyUseItems' => [],
         'foreverUseItems' => [],
+        'pendingStates' => [],
         'buildings' => [],
         'lastAction' => null,
         'state' => [],
@@ -197,9 +198,13 @@ class GameData
             ARRAY_FILTER_USE_KEY
         );
     }
+    public function getAllMultiActiveCharacterIds(): array
+    {
+        return $this->get('activateCharacters');
+    }
     public function getAllMultiActiveCharacter(): array
     {
-        $activateCharacters = $this->get('activateCharacters');
+        $activateCharacters = $this->getAllMultiActiveCharacterIds();
         return array_map(function ($c) {
             return $this->game->character->getCharacterData($c);
         }, $activateCharacters);
@@ -214,7 +219,7 @@ class GameData
     }
     public function addMultiActiveCharacter(string $characterId): bool
     {
-        $activateCharacters = $this->get('activateCharacters');
+        $activateCharacters = $this->getAllMultiActiveCharacterIds();
         if (!in_array($characterId, $activateCharacters)) {
             array_push($activateCharacters, $characterId);
             $this->game->giveExtraTime($this->game->character->getCharacterData($characterId)['player_id']);
@@ -234,7 +239,7 @@ class GameData
     }
     public function removeMultiActiveCharacter(string $characterId, string $state): bool
     {
-        $activateCharacters = $this->get('activateCharacters');
+        $activateCharacters = $this->getAllMultiActiveCharacterIds();
         if (in_array($characterId, $activateCharacters)) {
             $activateCharacters = array_diff($activateCharacters, [$characterId]);
         } else {
