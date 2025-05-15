@@ -265,6 +265,43 @@ class Character
             ) > 0;
         return ['hasOpenSlots' => $hasOpenSlots, 'hasDuplicateTool' => $hasDuplicateTool];
     }
+    public function equipAndValidateEquipment(string $characterId, int $itemId)
+    {
+        $character = $this->getCharacterData($characterId);
+        $itemsLookup = $this->game->gameData->getItems();
+        $itemName = $itemsLookup[$itemId];
+        $itemObj = $this->game->data->getItems()[$itemName];
+        $itemType = $itemObj['itemType'];
+
+        $result = $this->getItemValidations((int) $itemId, $character);
+        $hasOpenSlots = $result['hasOpenSlots'];
+        $hasDuplicateTool = $result['hasDuplicateTool'];
+        if ($hasOpenSlots && !$hasDuplicateTool) {
+            $this->equipEquipment($character['id'], [$itemId]);
+        } else {
+            $existingItems = array_map(
+                function ($d) {
+                    return ['name' => $d['id'], 'itemId' => $d['itemId']];
+                },
+                array_filter($character['equipment'], function ($d) use ($itemType, $hasDuplicateTool, $itemName) {
+                    if ($hasDuplicateTool) {
+                        return $d['id'] == $itemName;
+                    } else {
+                        return $d['itemType'] == $itemType;
+                    }
+                })
+            );
+            $this->game->selectionStates->initiateState(
+                'tooManyItems',
+                [
+                    'characterId' => $character['id'],
+                    'itemType' => $itemType,
+                    'items' => [...$existingItems, ['name' => $itemName, 'itemId' => $itemId]],
+                ],
+                $character['id']
+            );
+        }
+    }
     public function equipEquipment(string $characterName, array $items): void
     {
         $this->updateCharacterData($characterName, function (&$data) use ($items) {

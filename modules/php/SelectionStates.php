@@ -143,6 +143,49 @@ class SelectionStates
         }
         $this->initiatePendingState();
     }
+    public function actSendToCamp(?int $sendToCampId = null): void
+    {
+        // $this->character->addExtraTime();
+        if (!$sendToCampId) {
+            throw new BgaUserException($this->game->translate('Select an item'));
+        }
+        $state = $this->getState($this->game->gamestate->state()['name']);
+        $items = $state['items'];
+        if (
+            !in_array(
+                $sendToCampId,
+                array_map(function ($d) {
+                    return $d['itemId'];
+                }, $items)
+            )
+        ) {
+            throw new BgaUserException($this->game->translate('Invalid Item'));
+        }
+        $items = array_map(function ($d) {
+            return $d['itemId'];
+        }, $items);
+        $character = $this->game->character->getCharacterData($state['characterId']);
+        $characterItems = array_map(
+            function ($d) {
+                return $d['itemId'];
+            },
+            array_filter($character['equipment'], function ($d) use ($items) {
+                return !in_array($d['itemId'], $items);
+            })
+        );
+        $items = array_filter($items, function ($d) use ($sendToCampId) {
+            return $d != $sendToCampId;
+        });
+
+        $this->game->log('setCharacterEquipment', [...$characterItems, ...$items]);
+        $this->game->character->setCharacterEquipment($character['id'], [...$characterItems, ...$items]);
+
+        $campEquipment = $this->game->gameData->get('campEquipment');
+        $this->game->log('campEquipment', [...$campEquipment, $sendToCampId]);
+        $this->game->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
+        $this->game->markChanged('player');
+        $this->completeSelectionState('playerTurn');
+    }
     public function cancelState(?string $stateName): void
     {
         if ($stateName) {
@@ -173,6 +216,8 @@ class SelectionStates
             return 'tooManyItemsState'; // Check
         } elseif ($stateName == 'itemSelection') {
             return 'itemSelectionState'; // Check
+        } elseif ($stateName == 'resourceSelection') {
+            return 'resourceSelectionState';
         }
         return null;
     }
@@ -224,7 +269,7 @@ class SelectionStates
         bool $cancellable = true,
         ?string $title = null
     ): void {
-        if ($this->stateChanged) {
+        if ($this->stateChanged || $this->stateToStateNameMapping() != null) {
             $pendingStates = $this->game->gameData->get('pendingStates') ?? [];
             array_push($pendingStates, func_get_args());
             $this->game->gameData->set('pendingStates', $pendingStates);
@@ -234,7 +279,7 @@ class SelectionStates
 
             $playerId = $this->game->getCurrentPlayer();
             $newState = ['cancellable' => $cancellable, 'title' => $title, 'currentPlayerId' => $playerId, ...$state];
-            $this->game->gameData->addMultiActiveCharacter($characterId, $stateName, true);
+            $this->game->gameData->addMultiActiveCharacter($characterId, true);
 
             $this->game->gameData->set($stateNameState, $newState);
             $this->game->nextState($stateName);

@@ -507,34 +507,7 @@ class Game extends \Table
                 } else {
                     $itemId = $_this->gameData->createItem($itemName);
                     $character = $_this->character->getSubmittingCharacter();
-
-                    $result = $this->character->getItemValidations((int) $itemId, $character);
-                    $hasOpenSlots = $result['hasOpenSlots'];
-                    $hasDuplicateTool = $result['hasDuplicateTool'];
-                    if ($hasOpenSlots && !$hasDuplicateTool) {
-                        $_this->character->equipEquipment($character['id'], [$itemId]);
-                    } else {
-                        $existingItems = array_map(
-                            function ($d) {
-                                return ['name' => $d['id'], 'itemId' => $d['itemId']];
-                            },
-                            array_filter($character['equipment'], function ($d) use ($itemType, $hasDuplicateTool, $itemName) {
-                                if ($hasDuplicateTool) {
-                                    return $d['id'] == $itemName;
-                                } else {
-                                    return $d['itemType'] == $itemType;
-                                }
-                            })
-                        );
-                        $_this->selectionStates->initiateState(
-                            'tooManyItems',
-                            [
-                                'itemType' => $itemType,
-                                'items' => [...$existingItems, ['name' => $itemName, 'itemId' => $itemId]],
-                            ],
-                            $character['id']
-                        );
-                    }
+                    $this->character->equipAndValidateEquipment($character['id'], $itemId);
                 }
                 $this->hooks->onCraftAfter($data);
                 $_this->notify('notify', clienttranslate('${character_name} crafted a ${item_name}'), [
@@ -547,45 +520,7 @@ class Game extends \Table
     }
     public function actSendToCamp(?int $sendToCampId = null): void
     {
-        // $this->character->addExtraTime();
-        if (!$sendToCampId) {
-            throw new BgaUserException($this->translate('Select an item'));
-        }
-        $items = $this->selectionStates->getState($this->gamestate->state()['name'])['items'];
-        if (
-            !in_array(
-                $sendToCampId,
-                array_map(function ($d) {
-                    return $d['itemId'];
-                }, $items)
-            )
-        ) {
-            throw new BgaUserException($this->translate('Invalid Item'));
-        }
-        $items = array_map(function ($d) {
-            return $d['itemId'];
-        }, $items);
-        $character = $this->character->getSubmittingCharacter();
-        $characterItems = array_map(
-            function ($d) {
-                return $d['itemId'];
-            },
-            array_filter($character['equipment'], function ($d) use ($items) {
-                return !in_array($d['itemId'], $items);
-            })
-        );
-        $items = array_filter($items, function ($d) use ($sendToCampId) {
-            return $d != $sendToCampId;
-        });
-
-        $this->log('setCharacterEquipment', [...$characterItems, ...$items]);
-        $this->character->setCharacterEquipment($character['id'], [...$characterItems, ...$items]);
-
-        $campEquipment = $this->gameData->get('campEquipment');
-        $this->log('campEquipment', [...$campEquipment, $sendToCampId]);
-        $this->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
-        $this->markChanged('player');
-        $this->selectionStates->completeSelectionState('playerTurn');
+        $this->selectionStates->actSendToCamp($sendToCampId);
     }
 
     public function destroyItem(int $itemId): void

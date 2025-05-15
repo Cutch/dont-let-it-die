@@ -1537,8 +1537,6 @@ $charactersData = [
                         return $character != $currentCharacter['id'];
                     });
 
-                    // $data['interrupt'] = true;
-
                     $items = array_map(function ($d) {
                         return ['name' => $d['id'], 'itemId' => $d['itemId']];
                     }, $currentCharacter['equipment']);
@@ -1550,7 +1548,7 @@ $charactersData = [
                             'id' => $skill['id'],
                         ],
                         $currentCharacter['id'],
-                        false
+                        true
                     );
                     $game->selectionStates->initiateState(
                         'characterSelection',
@@ -1559,41 +1557,32 @@ $charactersData = [
                             'id' => $skill['id'],
                         ],
                         $currentCharacter['id'],
-                        false
+                        true
                     );
                     return ['notify' => false, 'nextState' => false];
                 },
-                // 'onItemSelection' => function (Game $game, $skill, &$data) {
-                //     $itemSelectionState = $game->selectionStates->getState('itemSelection');
-                //     if ($itemSelectionState && $itemSelectionState['id'] == $skill['id']) {
-                //         $data['nextState'] = 'playerTurn';
-                //     }
-                // },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
                     $characterSelectionState = $game->selectionStates->getState('characterSelection');
                     $itemSelectionState = $game->selectionStates->getState('itemSelection');
                     if ($characterSelectionState && $characterSelectionState['id'] == $skill['id']) {
                         $characterId = $characterSelectionState['selectedCharacterId'];
                         $itemId = $itemSelectionState['selectedItemId'];
-                        $game->character->unequipEquipment($skill['characterId'], [$itemId]);
-                        $game->character->equipEquipment($characterId, [$itemId]);
-
                         $itemsLookup = $this->game->gameData->getItems();
                         $itemName = $itemsLookup[$itemId];
+                        $game->character->unequipEquipment($skill['characterId'], [$itemId]);
+                        $itemObj = $game->data->getItems()[$itemName];
+
                         $game->notify('activeCharacter', clienttranslate('${character_name_1} gave ${item_name} to ${character_name_2}'), [
                             'character_name_1' => $this->game->getCharacterHTML($skill['characterId']),
                             'character_name_2' => $this->game->getCharacterHTML($characterId),
-                            'item_name' => $game->data->getItems()[$itemName]['name'],
+                            'item_name' => $itemObj['name'],
                         ]);
+                        $game->character->equipAndValidateEquipment($characterId, $itemId);
                     }
                 },
-                // 'onUse' => function (Game $game, $skill) {
-                //     // TODO give one item
-                //     return ['notify' => false];
-                // },
                 'requires' => function (Game $game, $skill) {
                     $char = $game->character->getCharacterData($skill['characterId']);
-                    return $char['isActive'];
+                    return $char['isActive'] && sizeof($char['equipment']) > 0;
                 },
             ],
         ],

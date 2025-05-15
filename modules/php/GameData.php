@@ -217,9 +217,14 @@ class GameData
             $this->addMultiActiveCharacter($id);
         }
     }
-    public function addMultiActiveCharacter(string $characterId): bool
+    public function addMultiActiveCharacter(string $characterId, bool $exclusive = false): bool
     {
         $activateCharacters = $this->getAllMultiActiveCharacterIds();
+        if ($exclusive) {
+            $activateCharacters = array_filter($activateCharacters, function ($d) use ($characterId) {
+                return $d == $characterId;
+            });
+        }
         if (!in_array($characterId, $activateCharacters)) {
             array_push($activateCharacters, $characterId);
             $this->game->giveExtraTime($this->game->character->getCharacterData($characterId)['player_id']);

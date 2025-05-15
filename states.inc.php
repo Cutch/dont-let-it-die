@@ -138,7 +138,7 @@ $machinestates = [
     ],
     12 => [
         'name' => 'tooManyItems',
-        'description' => clienttranslate('${character_name} is selecting an item'),
+        'description' => clienttranslate('Other characters are selecting an item'),
         'descriptionmyturn' => clienttranslate('Selecting an item'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
@@ -147,7 +147,7 @@ $machinestates = [
     ],
     13 => [
         'name' => 'deckSelection',
-        'description' => clienttranslate('${character_name} is selecting a deck'),
+        'description' => clienttranslate('Other characters are selecting a deck'),
         'descriptionmyturn' => clienttranslate('Selecting a deck'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
@@ -156,7 +156,7 @@ $machinestates = [
     ],
     14 => [
         'name' => 'resourceSelection',
-        'description' => clienttranslate('${character_name} is selecting a resource'),
+        'description' => clienttranslate('Other characters are selecting a resource'),
         'descriptionmyturn' => clienttranslate('Selecting a resource'),
         'type' => 'multipleactiveplayer',
         'args' => 'argResourceSelection',
@@ -173,7 +173,7 @@ $machinestates = [
     ],
     16 => [
         'name' => 'characterSelection',
-        'description' => clienttranslate('${character_name} is selecting a character'),
+        'description' => clienttranslate('Other characters are selecting a character'),
         'descriptionmyturn' => clienttranslate('Selecting a character'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
@@ -182,7 +182,7 @@ $machinestates = [
     ],
     17 => [
         'name' => 'cardSelection',
-        'description' => clienttranslate('${character_name} is selecting a card'),
+        'description' => clienttranslate('Other characters are selecting a card'),
         'descriptionmyturn' => clienttranslate('Selecting a card'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
@@ -191,7 +191,7 @@ $machinestates = [
     ],
     18 => [
         'name' => 'hindranceSelection',
-        'description' => clienttranslate('${character_name} is selecting a hindrance'),
+        'description' => clienttranslate('Other characters are selecting a hindrance'),
         'descriptionmyturn' => clienttranslate('Selecting a hindrance'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
@@ -200,7 +200,7 @@ $machinestates = [
     ],
     19 => [
         'name' => 'itemSelection',
-        'description' => clienttranslate('${character_name} is selecting an item'),
+        'description' => clienttranslate('Other characters are selecting an item'),
         'descriptionmyturn' => clienttranslate('Selecting an item'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
