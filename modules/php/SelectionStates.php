@@ -106,16 +106,18 @@ class SelectionStates
         }
         $this->initiatePendingState();
     }
-    public function actSelectItem(?string $itemId = null): void
+    public function actSelectItem(?string $itemId = null, ?string $characterId = null): void
     {
         if (!$itemId) {
             throw new BgaUserException($this->game->translate('Select an item'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedItemId'] = $itemId;
+        $stateData['selectedCharacterId'] = $characterId;
         $this->setState(null, $stateData);
         $data = [
             'itemId' => $itemId,
+            'characterId' => $characterId,
             'nextState' => 'playerTurn',
         ];
         $this->game->hooks->onItemSelection($data);

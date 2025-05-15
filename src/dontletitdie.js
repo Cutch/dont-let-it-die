@@ -1238,7 +1238,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             break;
           case 'itemSelection':
             this.statusBar.addActionButton(_('Select Item'), () => {
-              this.bgaPerformAction('actSelectItem', { itemId: this.itemsScreen.getSelectedId() }).then(() => this.itemsScreen.hide());
+              this.bgaPerformAction('actSelectItem', { ...this.itemsScreen.getSelection() }).then(() => this.itemsScreen.hide());
             });
             break;
           case 'whichWeapon':

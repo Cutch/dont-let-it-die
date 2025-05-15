@@ -475,7 +475,33 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'onUse' => function (Game $game, $nightCard) {
-            // TODO destroy it forever from play on item trade screen
+            $currentCharacter = $this->character->getTurnCharacter();
+            $items = array_merge(
+                ...array_map(function ($character) {
+                    return array_map(function ($d) use ($character) {
+                        return ['name' => $d['id'], 'itemId' => $d['itemId'], 'characterId' => $character['id']];
+                    }, $character['equipment']);
+                }, $this->character->getAllCharacterData())
+            );
+
+            $game->selectionStates->initiateState(
+                'itemSelection',
+                [
+                    'items' => $items,
+                    'id' => $nightCard['id'],
+                ],
+                $currentCharacter['id'],
+                true
+            );
+
+            return ['notify' => false, 'nextState' => false];
+        },
+        'onItemSelection' => function (Game $game, $skill, &$data) {
+            $itemSelectionState = $game->selectionStates->getState('itemSelection');
+            if ($itemSelectionState && $itemSelectionState['id'] == $skill['id']) {
+                $itemId = $itemSelectionState['selectedItemId'];
+                $game->destroyItem($itemId);
+            }
         },
     ],
     'night-event-7_13' => [

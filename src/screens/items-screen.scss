@@ -3,3 +3,9 @@
   overflow: hidden;
   padding: 1rem;
 }
+.token {
+  display: flex;
+  gap: 0.5rem;
+  flex-flow: column;
+  align-items: center;
+}
