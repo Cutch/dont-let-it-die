@@ -1248,6 +1248,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
               ),
             );
             break;
+          case 'tradePhase':
           case 'tradePhaseActions':
             this.statusBar.addActionButton(_('Pass'), () => this.bgaPerformAction('actTradeDone'), { color: 'secondary' });
             break;
@@ -1262,7 +1263,6 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
             break;
           case 'dinnerPhase':
           case 'dinnerPhasePrivate':
-          case 'tradePhase':
           case 'postEncounter':
             this.statusBar.addActionButton(_('Done'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
             break;
