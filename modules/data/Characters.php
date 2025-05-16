@@ -1563,8 +1563,8 @@ $charactersData = [
                 },
                 'onCharacterSelection' => function (Game $game, $skill, &$data) {
                     $characterSelectionState = $game->selectionStates->getState('characterSelection');
-                    $itemSelectionState = $game->selectionStates->getState('itemSelection');
                     if ($characterSelectionState && $characterSelectionState['id'] == $skill['id']) {
+                        $itemSelectionState = $game->selectionStates->getState('itemSelection');
                         $characterId = $characterSelectionState['selectedCharacterId'];
                         $itemId = $itemSelectionState['selectedItemId'];
                         $itemsLookup = $this->game->gameData->getItems();

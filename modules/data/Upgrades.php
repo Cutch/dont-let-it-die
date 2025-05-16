@@ -369,6 +369,7 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('Smoked Food'),
         'unlockCost' => 4,
+        'disabled' => true,
         'onAdjustHealth' => function (Game $game, $unlock, &$data) {
             if ($data['change']) {
                 $aboveMax = $data['health'] + $data['change'] - $data['maxHealth'];
@@ -632,7 +633,29 @@ $upgradesData = [
         'type' => 'deck',
         'name' => clienttranslate('Cooperation'),
         'unlockCost' => 5,
-        // TODO: On morning select the next character to go first
+        'onMorningAfter' => function (Game $game, $unlock, &$data) {
+            $data['nextState'] = false;
+
+            $game->selectionStates->initiateState(
+                'characterSelection',
+                [
+                    'selectableCharacters' => array_values(
+                        array_diff($game->character->getAllCharacterIds(), [$game->character->getFirstCharacter()])
+                    ),
+                    'id' => $unlock['id'],
+                ],
+                $game->character->getFirstCharacter(),
+                false
+            );
+        },
+        'onCharacterSelection' => function (Game $game, $unlock, &$data) {
+            $state = $game->selectionStates->getState('characterSelection');
+            if ($state && $state['id'] == $unlock['id']) {
+                $game->character->setFirstTurnOrder($state['selectedCharacterId']);
+                $data['nextState'] = 'tradePhase';
+            }
+        },
+        // TODO: On morning select the next character to go first, needs testing
     ],
     '8-B' => [
         'deck' => 'upgrade',

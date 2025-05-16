@@ -108,7 +108,7 @@ class Game extends \Table
     {
         $e = new \Exception();
         if ($this->getBgaEnvironment() == 'studio') {
-            $this->log('Transition to "' . $transition);
+            $this->log('Transition to \'' . $transition . '\'');
         }
         $this->gamestate->nextState($transition);
     }
@@ -1586,6 +1586,8 @@ class Game extends \Table
                     'stamina' => 0,
                     'skipMorningDamage' => [],
                     'woodNeeded' => $woodNeeded,
+                    'changeOrder' => true,
+                    'nextState' => 'tradePhase',
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
@@ -1623,25 +1625,29 @@ class Game extends \Table
                 }
                 $this->hooks->onMorningAfter($data);
                 $this->actions->resetTurnActions();
-                $this->character->rotateTurnOrder();
-                $this->nextState('morningPhasePost');
+                if ($data['changeOrder']) {
+                    $this->character->rotateTurnOrder();
+                }
+                if ($data['nextState'] != false) {
+                    $this->nextState('tradePhase');
+                }
             }
         );
     }
-    public function stMorningPhasePost()
-    {
-        $this->actInterrupt->interruptableFunction(
-            __FUNCTION__,
-            func_get_args(),
-            [$this->hooks, 'onMorningPost'],
-            function (Game $_this) {
-                return [];
-            },
-            function (Game $_this, bool $finalizeInterrupt, $data) {
-                $this->nextState('tradePhase');
-            }
-        );
-    }
+    // public function stMorningPhasePost()
+    // {
+    //     $this->actInterrupt->interruptableFunction(
+    //         __FUNCTION__,
+    //         func_get_args(),
+    //         [$this->hooks, 'onMorningPost'],
+    //         function (Game $_this) {
+    //             return [];
+    //         },
+    //         function (Game $_this, bool $finalizeInterrupt, $data) {
+    //             $this->nextState('tradePhase');
+    //         }
+    //     );
+    // }
     public function stTradePhase()
     {
         $this->itemTrade->stTradePhase();

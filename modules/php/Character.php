@@ -493,10 +493,25 @@ class Character
         }
         $this->game->markChanged('player');
     }
-    public function isLastCharacter()
+    public function getFirstCharacter(): string
+    {
+        $turnOrder = $this->game->gameData->get('turnOrder');
+        return $turnOrder[0];
+    }
+    public function isLastCharacter(): bool
     {
         extract($this->game->gameData->getAll('turnNo', 'turnOrder'));
         return sizeof($turnOrder) == ($turnNo ?? 0) + 1;
+    }
+    public function setFirstTurnOrder(string $characterId): void
+    {
+        $turnOrder = $this->game->gameData->get('turnOrder');
+        $i = array_search($characterId, $turnOrder);
+        $endArray = array_slice($turnOrder, 0, $i);
+        $startArray = array_slice($turnOrder, $i, sizeof($turnOrder) - $i);
+        $this->game->gameData->set('turnOrder', [...$startArray, ...$endArray]);
+        $this->game->gameData->set('turnNo', null);
+        $this->game->markChanged('player');
     }
     public function rotateTurnOrder(): void
     {

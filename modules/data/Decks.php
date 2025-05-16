@@ -846,6 +846,7 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'expansion' => 'hindrance',
+        'disabled' => true,
         'onUse' => function (Game $game, $nightCard) {
             // TODO: Pick a deck used this turn and show the top 3 cards
         },

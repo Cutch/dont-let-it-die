@@ -561,6 +561,7 @@ $expansionData = [
         'acquireSentence' => clienttranslate('is'),
         'dropSentence' => clienttranslate('is no longer'),
         'name' => clienttranslate('Berserk'),
+        'disabled' => true,
         'onAdjustHealth' => function (Game $game, $card, &$data) {
             if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                 // TODO
