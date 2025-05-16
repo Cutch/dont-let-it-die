@@ -2,7 +2,15 @@
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
-include dirname(__DIR__) . '/data/Utils.php';
+require_once dirname(__DIR__) . '/data/Utils.php';
+require_once dirname(__DIR__) . '/data/Boards.php';
+require_once dirname(__DIR__) . '/data/Characters.php';
+require_once dirname(__DIR__) . '/data/Decks.php';
+require_once dirname(__DIR__) . '/data/Expansion.php';
+require_once dirname(__DIR__) . '/data/KnowledgeTree.php';
+require_once dirname(__DIR__) . '/data/Items.php';
+require_once dirname(__DIR__) . '/data/Tokens.php';
+require_once dirname(__DIR__) . '/data/Upgrades.php';
 class Data
 {
     private Game $game;
@@ -17,15 +25,15 @@ class Data
 
     public function __construct(Game $game)
     {
+        $decksData = (new DecksData())->getData();
+        $expansionData = (new ExpansionData())->getData();
+        $charactersData = (new CharactersData())->getData();
+        $tokensData = (new TokensData())->getData();
+        $boardsData = (new BoardsData())->getData();
+        $knowledgeTreeData = (new KnowledgeTreeData())->getData();
+        $upgradesData = (new UpgradesData())->getData();
+        $itemsData = (new ItemsData())->getData();
         $this->game = $game;
-        include dirname(__DIR__) . '/data/Boards.php';
-        include dirname(__DIR__) . '/data/Characters.php';
-        include dirname(__DIR__) . '/data/Decks.php';
-        include dirname(__DIR__) . '/data/Expansion.php';
-        include dirname(__DIR__) . '/data/KnowledgeTree.php';
-        include dirname(__DIR__) . '/data/Items.php';
-        include dirname(__DIR__) . '/data/Tokens.php';
-        include dirname(__DIR__) . '/data/Upgrades.php';
         $this->decks = array_merge(addId($decksData), addId($expansionData));
         $this->characters = addId($charactersData);
         $this->expansion = addId($expansionData);

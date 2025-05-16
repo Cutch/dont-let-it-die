@@ -1,4 +1,5 @@
 <?php
+namespace Bga\Games\DontLetItDie;
 
 if (!function_exists('addId')) {
     function clamp($current, $min, $max)
