@@ -335,7 +335,7 @@ class UpgradesData
                             $left = $game->adjustResource('gem-p', $left)['left'];
                             $left = $game->adjustResource('gem-b', $left)['left'];
                             if ($roll != $left) {
-                                $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                     'count' => $roll != $left,
                                     'resource_type' => 'gem-y',
                                 ]);
@@ -343,7 +343,7 @@ class UpgradesData
                         } else {
                             $changed = $game->adjustResource($resourceType, $roll)['changed'];
                             if ($changed > 0) {
-                                $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                     'count' => $changed,
                                     'resource_type' => 'meat-cooked',
                                 ]);
@@ -410,7 +410,7 @@ class UpgradesData
                     if ($state && $state['id'] == $unlock['id']) {
                         $aboveMax = $state['aboveMax'];
                         $game->character->adjustHealth($data['characterId'], $aboveMax);
-                        $game->activeCharacterEventLog(clienttranslate('gained ${count} ${character_resource}'), [
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => $aboveMax,
                             'character_resource' => 'health',
                         ]);
@@ -459,10 +459,13 @@ class UpgradesData
                                     $game->gameData->getResource('meat-cooked')
                                 );
                                 if ($cooked['changed'] + $cooked2['changed'] > 0) {
-                                    $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
-                                        'count' => $cooked['changed'] + $cooked2['changed'],
-                                        'resource_type' => 'meat-cooked',
-                                    ]);
+                                    $game->activeCharacterEventLog(
+                                        clienttranslate('${character_name} received ${count} ${resource_type}'),
+                                        [
+                                            'count' => $cooked['changed'] + $cooked2['changed'],
+                                            'resource_type' => 'meat-cooked',
+                                        ]
+                                    );
                                 }
                             }
                         },
@@ -545,7 +548,7 @@ class UpgradesData
                 'onMorningAfter' => function (Game $game, $unlock) {
                     $count = $game->adjustResource('berry', 1)['changed'];
                     if ($count > 0) {
-                        $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                             'count' => 1,
                             'resource_type' => 'berry',
                         ]);

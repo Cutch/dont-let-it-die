@@ -299,7 +299,7 @@ class ItemsData
                                 $game->log('onInterrupt', $data);
                                 $data['data']['willTakeDamage'] = 0;
 
-                                $game->activeCharacterEventLog(clienttranslate('used ${item_name} to block the damage'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} used ${item_name} to block the damage'), [
                                     'item_name' => clienttranslate('Bone Armor'),
                                 ]);
                             }
@@ -325,7 +325,7 @@ class ItemsData
                 ],
                 'onNightDrawCard' => function (Game $game, $item, &$data) {
                     if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
-                        $game->activeCharacterEventLog(clienttranslate('Camp walls protect against the rival tribe'));
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} Camp walls protect against the rival tribe'));
                         $data['onUse'] = false;
                     }
                 },
@@ -366,7 +366,7 @@ class ItemsData
                                 $game->log('onInterrupt', $data);
                                 $data['data']['willTakeDamage'] = 0;
 
-                                $game->activeCharacterEventLog(clienttranslate('used ${item_name} to block the damage'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} used ${item_name} to block the damage'), [
                                     'item_name' => clienttranslate('Hide Armor'),
                                 ]);
                             }
@@ -564,7 +564,7 @@ class ItemsData
                 'skills' => [
                     'skill1' => [
                         'type' => 'item-skill',
-                        'name' => clienttranslate('Draw 2 Pick 1') . ' (' . clienttranslate('Planning Hut') . ')',
+                        'name' => clienttranslate('Draw 2 Pick 1 (Planning Hut)'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'perDay' => 2,
@@ -741,7 +741,7 @@ class ItemsData
                 'onIncapacitation' => function (Game $game, $item, &$data) {
                     $char = $game->character->getCharacterData($item['characterId'], true);
                     if ($char['isActive']) {
-                        $game->activeCharacterEventLog(clienttranslate('used their bandage to revive'));
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} used their bandage to revive'));
                         $game->destroyItem($item['itemId']);
                     }
                 },
@@ -789,7 +789,7 @@ class ItemsData
                 'onCook' => function (Game $game, $item, &$data) {
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && getUsePerDay($char['id'] . $item['itemId'], $game) % 2 == 0) {
-                        $game->activeCharacterEventLog(clienttranslate('another cook action can be used for free'));
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} another cook action can be used for free'));
                         usePerDay($char['id'] . $item['itemId'], $game);
                     }
                 },
@@ -1162,10 +1162,10 @@ class ItemsData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $char = $game->character->getCharacterData($skill['characterId']);
-                                $game->activeCharacterEventLog(clienttranslate('is re-rolling ${active_character_name}\'s fire die'), [
-                                    ...$char,
-                                    'active_character_name' => $game->character->getTurnCharacter()['character_name'],
-                                ]);
+                                $game->activeCharacterEventLog(
+                                    clienttranslate('${character_name} is re-rolling ${active_character_name}\'s fire die'),
+                                    [...$char, 'active_character_name' => $game->character->getTurnCharacter()['character_name']]
+                                );
                                 $data['data']['roll'] = $game->rollFireDie($skill['parentName'], $char['character_name']);
                                 usePerDay($char['id'] . 'gem-p-necklace', $game);
                             }

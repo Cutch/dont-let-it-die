@@ -335,7 +335,7 @@ class Character
         });
         $this->game->decks->removeFromDeck($card['deck'], $card['id']);
         $this->game->hooks->onAcquireHindrance($card);
-        $this->game->activeCharacterEventLog(clienttranslate('${acquireSentence} ${name}'), [
+        $this->game->activeCharacterEventLog(clienttranslate('${character_name} ${acquireSentence} ${name}'), [
             'acquireSentence' => $card['acquireSentence'],
             'name' => $card['name'],
             'character_name' => $this->game->getCharacterHTML($characterName),
@@ -351,7 +351,7 @@ class Character
                 }
             );
         });
-        $this->game->activeCharacterEventLog(clienttranslate('no longer ${dropSentence} ${cardName}'), [
+        $this->game->activeCharacterEventLog(clienttranslate('${character_name} no longer ${dropSentence} ${cardName}'), [
             'dropSentence' => $card['dropSentence'],
             'cardName' => $card['name'],
             'character_name' => $this->game->getCharacterHTML($characterName),
@@ -582,7 +582,7 @@ class Character
         $data['health'] = clamp($data['health'] + $hookData['change'], 0, $data['maxHealth']);
         $prev = $data['health'] - $prev;
         if ($data['health'] == 0 && !$data['incapacitated']) {
-            $this->game->activeCharacterEventLog(clienttranslate('is incapacitated'), [
+            $this->game->activeCharacterEventLog(clienttranslate('${character_name} is incapacitated'), [
                 'character_name' => $this->game->getCharacterHTML($characterName),
             ]);
             $data['incapacitated'] = true;

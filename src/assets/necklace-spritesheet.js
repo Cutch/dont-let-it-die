@@ -5,6 +5,7 @@ const necklaceSprites = {
         type: 'item',
         itemType: 'necklace',
         name: 'Blue Necklace',
+        text: ['+1 Max Health'],
       },
       frame: {
         x: 0,
@@ -19,6 +20,7 @@ const necklaceSprites = {
         type: 'item',
         itemType: 'necklace',
         name: 'Yellow Necklace',
+        text: ['+1 Max Stamina'],
       },
       frame: {
         x: 440,
@@ -33,6 +35,7 @@ const necklaceSprites = {
         type: 'item',
         itemType: 'necklace',
         name: 'Purple Necklace',
+        text: ['Once per day re-roll any Fire Die roll'],
       },
       frame: {
         x: 880,

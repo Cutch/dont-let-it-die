@@ -5,7 +5,6 @@ namespace Bga\Games\DontLetItDie;
 
 use BgaUserException;
 
-require_once dirname(__DIR__) . '/data/Utils.php';
 class Actions
 {
     private $actions;

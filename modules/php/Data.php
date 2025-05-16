@@ -2,15 +2,6 @@
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
-require_once dirname(__DIR__) . '/data/Utils.php';
-require_once dirname(__DIR__) . '/data/Boards.php';
-require_once dirname(__DIR__) . '/data/Characters.php';
-require_once dirname(__DIR__) . '/data/Decks.php';
-require_once dirname(__DIR__) . '/data/Expansion.php';
-require_once dirname(__DIR__) . '/data/KnowledgeTree.php';
-require_once dirname(__DIR__) . '/data/Items.php';
-require_once dirname(__DIR__) . '/data/Tokens.php';
-require_once dirname(__DIR__) . '/data/Upgrades.php';
 class Data
 {
     private Game $game;

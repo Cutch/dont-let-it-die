@@ -5,7 +5,6 @@ namespace Bga\Games\DontLetItDie;
 
 use Closure;
 
-require_once dirname(__DIR__) . '/data/Utils.php';
 class ActInterrupt
 {
     private Game $game;

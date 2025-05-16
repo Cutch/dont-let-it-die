@@ -35,7 +35,7 @@ class ExpansionData
                         'name' => clienttranslate('Tame the beast'),
                         'state' => ['dayEvent'],
                         'onUse' => function (Game $game, $skill) {
-                            $game->activeCharacterEventLog(clienttranslate('obtained a ${item_name}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} obtained a ${item_name}'), [
                                 'item_name' => clienttranslate('Wolf Pup'),
                             ]);
                             $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) use (
@@ -55,13 +55,13 @@ class ExpansionData
                         'stamina' => 2,
                         'onUse' => function (Game $game, $skill) {
                             if ($game->rollFireDie($skill['parentName'], $game->character->getTurnCharacterId()) == 0) {
-                                $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                     'count' => 1,
                                     'resource_type' => 'wood',
                                 ]);
                                 $game->adjustResource('wood', 1);
                             } else {
-                                $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                     'count' => 1,
                                     'resource_type' => 'rock',
                                 ]);
@@ -97,7 +97,7 @@ class ExpansionData
                         'onEncounterPost' => function (Game $game, $skill, &$data) {
                             $game->log('encounter', $data);
                             if ($data['encounterHealth'] <= $data['characterDamage']) {
-                                $game->activeCharacterEventLog(clienttranslate('obtained a ${item_name}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} obtained a ${item_name}'), [
                                     'item_name' => clienttranslate('Shell Shield'),
                                 ]);
                                 $game->decks->removeFromDeck('day-event', $skill['parentId']);
@@ -137,7 +137,7 @@ class ExpansionData
                                 $game->log('onInterrupt', $data);
                                 $data['data']['willTakeDamage'] = 0;
 
-                                $game->activeCharacterEventLog(clienttranslate('used ${item_name} to block the damage'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} used ${item_name} to block the damage'), [
                                     'item_name' => clienttranslate('Shell Shield'),
                                 ]);
                                 if (getUsePerForever($char['id'] . $skill['id'], $game) == 2) {
@@ -174,7 +174,7 @@ class ExpansionData
                         'stamina' => 1,
                         'onUse' => function (Game $game, $skill) {
                             $game->adjustResource('berry', 2);
-                            $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 2,
                                 'resource_type' => 'berry',
                             ]);
@@ -188,7 +188,7 @@ class ExpansionData
                         'health' => 1,
                         'onUse' => function (Game $game, $skill) {
                             $game->adjustResource('berry', 3);
-                            $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 5,
                                 'resource_type' => 'berry',
                             ]);
@@ -210,7 +210,7 @@ class ExpansionData
                         'stamina' => 3,
                         'onUse' => function (Game $game, $skill) {
                             $game->adjustResource('wood', 3);
-                            $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 3,
                                 'resource_type' => 'wood',
                             ]);
@@ -224,11 +224,11 @@ class ExpansionData
                         'health' => 1,
                         'onUse' => function (Game $game, $skill) {
                             $game->adjustResource('wood', 1);
-                            $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 1,
                                 'resource_type' => 'wood',
                             ]);
-                            $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 1,
                                 'character_resource' => 'health',
                             ]);
@@ -249,7 +249,7 @@ class ExpansionData
                         'state' => ['dayEvent'],
                         'health' => 2,
                         'onUse' => function (Game $game, $skill) {
-                            $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 2,
                                 'character_resource' => 'health',
                             ]);
@@ -272,16 +272,19 @@ class ExpansionData
                             if ($game->rollFireDie(clienttranslate('Day Event'), $game->character->getTurnCharacterId()) == 0) {
                                 usePerDay($skill['parentId'], $game);
                                 if (getUsePerDay($skill['parentId'], $game) == 3) {
-                                    $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
-                                        'count' => 3,
-                                        'resource_type' => 'meat',
-                                    ]);
+                                    $game->activeCharacterEventLog(
+                                        clienttranslate('${character_name} received ${count} ${resource_type}'),
+                                        [
+                                            'count' => 3,
+                                            'resource_type' => 'meat',
+                                        ]
+                                    );
                                     return ['notify' => false, 'nextState' => 'playerTurn'];
                                 } else {
-                                    $game->activeCharacterEventLog(clienttranslate('hit the beast'));
+                                    $game->activeCharacterEventLog(clienttranslate('${character_name} hit the beast'));
                                 }
                             } else {
-                                $game->activeCharacterEventLog(clienttranslate('missed the beast'));
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} missed the beast'));
                             }
                             return ['notify' => false, 'nextState' => false];
                         },
@@ -322,7 +325,7 @@ class ExpansionData
                         'state' => ['dayEvent'],
                         'onUse' => function (Game $game, $skill) {
                             $game->character->adjustActiveStamina(2);
-                            $game->activeCharacterEventLog(clienttranslate('gained ${count} ${character_resource}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                 'count' => 2,
                                 'character_resource' => 'stamina',
                             ]);
@@ -383,7 +386,7 @@ class ExpansionData
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['id']) {
                                 $game->character->adjustHealth($data['characterId'], -1);
-                                $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 1,
                                     'character_resource' => 'health',
                                     'character_name' => $data['characterId'],
@@ -420,11 +423,11 @@ class ExpansionData
                             if ($state && $state['id'] == $skill['id']) {
                                 $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
                                 $game->character->adjustHealth($data['characterId'], 1);
-                                $game->activeCharacterEventLog(clienttranslate('gained ${count} ${character_resource}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => 1,
                                     'character_resource' => 'health',
                                 ]);
-                                $game->activeCharacterEventLog(clienttranslate('gained ${count} ${character_resource}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => 1,
                                     'character_resource' => 'health',
                                     'character_name' => $data['characterId'],
@@ -448,12 +451,12 @@ class ExpansionData
                             $currentCharacter = $game->character->getTurnCharacterId();
                             if ($game->rollFireDie(clienttranslate('Day Event'), $currentCharacter) != 0) {
                                 $game->character->adjustHealth($currentCharacter, -1);
-                                $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 1,
                                     'character_resource' => 'health',
                                 ]);
                             } else {
-                                $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                     'count' => 3,
                                     'resource_type' => 'wood',
                                 ]);
@@ -475,16 +478,16 @@ class ExpansionData
                             ) {
                                 $game->adjustResource('bone', 2);
                                 $game->adjustResource('meat', 2);
-                                $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                     'count' => 2,
                                     'resource_type' => 'meat',
                                 ]);
-                                $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                     'count' => 2,
                                     'resource_type' => 'bone',
                                 ]);
                             } else {
-                                $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 2,
                                     'character_resource' => 'health',
                                 ]);
@@ -515,7 +518,7 @@ class ExpansionData
                         'state' => ['dayEvent'],
                         'health' => 1,
                         'onUse' => function (Game $game, $skill) {
-                            $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 1,
                                 'character_resource' => 'health',
                             ]);
@@ -540,7 +543,7 @@ class ExpansionData
                                 $game->character->adjustActiveStamina(-2);
                             } else {
                                 $game->adjustResource('meat', 2);
-                                $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                                $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                     'count' => 2,
                                     'resource_type' => 'meat',
                                 ]);
@@ -555,7 +558,7 @@ class ExpansionData
                         'onUse' => function (Game $game, $skill) {
                             $game->character->adjustActiveStamina(-1);
                             $game->adjustResource('berry', 2);
-                            $game->activeCharacterEventLog(clienttranslate('received ${count} ${resource_type}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 2,
                                 'resource_type' => 'berry',
                             ]);
@@ -585,7 +588,7 @@ class ExpansionData
                                     return $item['id'];
                                 }, $weapons)
                             );
-                            $game->activeCharacterEventLog(clienttranslate('sent their weapon to camp'));
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} sent their weapon to camp'));
                         }
                     }
                 },
@@ -611,7 +614,7 @@ class ExpansionData
                         );
                         if (sizeof($weaponIds) > 0) {
                             $game->character->unequipEquipment($game->character->getTurnCharacterId(), $weaponIds);
-                            $game->activeCharacterEventLog(clienttranslate('sent their weapon to camp'));
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} sent their weapon to camp'));
                         }
                     }
                 },
@@ -653,7 +656,7 @@ class ExpansionData
                 //             $state = $game->gameData->get('characterSelectionState');
                 //             if ($state && $state['id'] == $skill['id']) {
                 //                 $game->character->adjustHealth($data['characterId'], -1);
-                //                 $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                //                 $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                 //                     'count' => 1,
                 //                     'character_resource' => 'health',
                 //                     'character_name' => $data['characterId'],
@@ -675,9 +678,9 @@ class ExpansionData
                 'onResolveDraw' => function (Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         $data['discard'] = true;
-                        $game->activeCharacterEventLog(clienttranslate('ran from the encounter'));
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} ran from the encounter'));
                         $game->character->adjustActiveHealth(-1);
-                        $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                             'count' => 1,
                             'character_resource' => 'health',
                         ]);
@@ -714,7 +717,7 @@ class ExpansionData
                         $character = $game->character->getTurnCharacter();
                         if ($character['health'] % 2 == 1) {
                             $game->character->adjustActiveHealth(-1);
-                            $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 1,
                                 'character_resource' => 'health',
                             ]);
@@ -806,7 +809,7 @@ class ExpansionData
                         );
                         if (sizeof($toolIds) > 0) {
                             $game->character->unequipEquipment($game->character->getTurnCharacterId(), $toolIds);
-                            $game->activeCharacterEventLog(clienttranslate('sent their tool to camp'));
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} sent their tool to camp'));
                         }
                     }
                 },
@@ -840,7 +843,7 @@ class ExpansionData
                 },
                 'onInvestigateFire' => function (Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {
-                        $game->activeCharacterEventLog(clienttranslate('is dumb'));
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} is dumb'));
                         $data['roll'] -= 1;
                     }
                 },
@@ -859,7 +862,7 @@ class ExpansionData
                         in_array($data['deck'], ['gather', 'hunt', 'harvest', 'forage'])
                     ) {
                         if ($game->rollFireDie(clienttranslate('Day Event'), $game->character->getTurnCharacterId()) == 0) {
-                            $game->activeCharacterEventLog(clienttranslate('forgot what they were doing'));
+                            $game->activeCharacterEventLog(clienttranslate('${character_name} forgot what they were doing'));
                             $data['spendActionCost'] = true;
                             $data['cancel'] = true;
                         }
@@ -991,7 +994,7 @@ class ExpansionData
                         getUsePerDay($card['id'] . 'nauseous', $game) < 1
                     ) {
                         usePerDay($card['id'] . 'nauseous', $game);
-                        $game->activeCharacterEventLog(clienttranslate('feels nauseous'));
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} feels nauseous'));
                     }
                 },
             ],
@@ -1030,7 +1033,7 @@ class ExpansionData
                 'onMorning' => function (Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         $game->character->adjustActiveHealth(-1);
-                        $game->activeCharacterEventLog(clienttranslate('lost ${count} ${character_resource}'), [
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                             'count' => 1,
                             'character_resource' => 'health',
                         ]);
@@ -1047,7 +1050,7 @@ class ExpansionData
                 'name' => clienttranslate('Exhausted'),
                 'onMorningAfter' => function (Game $game, $card, &$data) {
                     $game->character->adjustStamina($game->character->getTurnCharacterId(), -2);
-                    $game->activeCharacterEventLog(clienttranslate('is exhausted'));
+                    $game->activeCharacterEventLog(clienttranslate('${character_name} is exhausted'));
                 },
             ],
             'hindrance_2_8' => [
@@ -1074,7 +1077,7 @@ class ExpansionData
                 'name' => clienttranslate('Concussion'),
                 'onInvestigateFire' => function (Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {
-                        $game->activeCharacterEventLog(clienttranslate('has a') . clienttranslate('Concussion'), []);
+                        $game->activeCharacterEventLog(clienttranslate('${character_name} has a') . clienttranslate('Concussion'), []);
                         $data['roll'] -= 1;
                     }
                 },

@@ -771,6 +771,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A rival tribe snuck into your camp and tried to steal your berries!',
+        effect: "Roll the Fire Die and remove that many fiber tokens from the group's supply.",
       },
       frame: {
         x: 1700,
@@ -784,6 +786,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A rival tribe snuck into your camp and tried to steal your berries!',
+        effect: "Roll the Fire Die and remove that many berry tokens from the group's supply.",
       },
       frame: {
         x: 0.5,
@@ -797,6 +801,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'The morale of the group is very high tonight and everyone sleeps soundly.',
+        effect: 'Skip taking 1 damage from the next morning phase.',
       },
       frame: {
         x: 155,
@@ -810,6 +816,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A terrible lightning storm has developed over the valley.',
+        effect:
+          'During the next day phase, whenever drawing a card, roll a Fire Die. If you roll a blank, take 1 damage from a lightning strike.',
       },
       frame: {
         x: 309.5,
@@ -823,6 +832,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: "The group notices that one of your tools was broken during the day's activities. It appears to be irreparable.",
+        effect: 'Pick 1 equipped tool from any character and remove it from play.',
       },
       frame: {
         x: 464,
@@ -836,6 +847,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'You awaken to a stampeding herd of mammoths as they charge through the camp.',
+        effect: "Each character rolls a Fire Die. On a blank, you don't react quickly enough and take 1 damage.",
       },
       frame: {
         x: 618.5,
@@ -849,6 +862,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A nearby volcano erupted overnight, filling the air with hot soot, making it difficult to breathe.',
+        effect: 'Everyone takes an additional 1 damage from the morning phase.',
       },
       frame: {
         x: 773,
@@ -862,6 +877,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A rainstorm came in overnight and the torrential downpour is threatening to ruin some of your firewood.',
+        effect:
+          'If any character has at least 1 stamina left over from the day phase, they are able to save the wood. Otherwise, remove 1 wood from the fire pit.',
       },
       frame: {
         x: 927.5,
@@ -875,6 +893,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A thick fog rolls into the valley, making it almost impossible to see.',
+        effect: 'You may not perform any Harvest or Hunt actions during the next day phase.',
       },
       frame: {
         x: 1082,
@@ -888,6 +908,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'There was something wrong with the food you ate today, and as a result, everyone has food poisoning.',
+        effect: 'Characters cannot gain extra stamina beyond starting values from any source tomorrow.',
       },
       frame: {
         x: 1236.5,
@@ -901,6 +923,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A rival tribe snuck into your camp and tried to steal your wood!',
+        effect: "Roll the Fire Die and remove that many wood tokens from the group's supply.",
       },
       frame: {
         x: 1391,
@@ -914,6 +938,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A rival tribe snuck into your camp and tried to steal your rocks!',
+        effect: "Roll the Fire Die and remove that many rock tokens from the group's supply.",
       },
       frame: {
         x: 1545.5,
@@ -927,6 +953,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A rival tribe snuck into your camp and tried to steal your meat!',
+        effect: "Roll the Fire Die and remove that many meat tokens from the group's supply.",
       },
       frame: {
         x: 1700,
@@ -940,6 +968,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          'One of your tribe members tossed a plant they foraged into the fire. The smoke from the herb now creeping over the camp appears to have healing properties.',
+        effect: 'Everyone heals 2 HP.',
       },
       frame: {
         x: 0.5,
@@ -953,6 +984,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'One of your tribe members found some spices during the day and taught everyone how to cook with them.',
+        effect: 'Eating during the day phase tomorrow heals for 1 extra.',
       },
       frame: {
         x: 155,
@@ -966,6 +999,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A nearby herd of beasts kept everyone awake all night with their screeching.',
+        effect: 'Start the next morning time phase with -3 stamina.',
       },
       frame: {
         x: 309.5,
@@ -992,6 +1027,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          'The smoke from the fire last night was thick, making it hard to see around camp. The tribe suffered injuries from tripping and running into unseen objects.',
+        effect: 'Each tribe member takes 1 Physical Impairment card.',
       },
       frame: {
         x: 618.5,
@@ -1005,6 +1043,10 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          "It seems some Dino's came down from the mountains last night and decided your camp was a great place to build their nest.",
+        effect:
+          "Take 2 Raw Dino Eggs. If you have less than 2 Raw Dino Eggs in your group's supply at the end of the next day phase each tribe member takes 1 Damage before drawing the next Night Event card.",
       },
       frame: {
         x: 773,
@@ -1018,6 +1060,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'High winds have caused the fire to flare up.',
+        effect: 'Each character can only perform 1 Investigate Fire action tomorrow, due to the increased heat.',
       },
       frame: {
         x: 927.5,
@@ -1031,6 +1075,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: "After eating an unknown mushroom today, everyone feels lightheaded and can't focus.",
+        effect: 'Skills that require stamina to activate cannot be used tomorrow.',
       },
       frame: {
         x: 1082,
@@ -1044,6 +1090,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'Upon checking some of the traps set the previous evening, you find a dead boar.',
+        effect: 'Group receives 2 meat.',
       },
       frame: {
         x: 1236.5,
@@ -1057,6 +1105,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A sudden cold wind sweeps into the valley, freezing everything it touches.',
+        effect: 'Everyone takes 1 damage and starts the morning with -2 stamina.',
       },
       frame: {
         x: 1391,
@@ -1070,6 +1120,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A group of starving boars has wandered into your camp.',
+        effect:
+          'If your group has any raw berry tokens, remove half of them. The boars eat their fill and move on. If you have no raw berry tokens, any member without a weapon takes 2 damage.',
       },
       frame: {
         x: 1545.5,
@@ -1083,6 +1136,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'It was a calm night.',
+        effect: 'Nothing eventful happened.',
       },
       frame: {
         x: 1700,
@@ -1096,6 +1151,10 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          'The sky lights up with a brilliant glow, followed shortly by a thundering boom. It looks like something fell from the sky!',
+        effect:
+          'If anyone has at least 1 Stamp Mark over from the Day Phase, they may venture out in search of the falling star and take 1 Gemstone token of any color.',
       },
       frame: {
         x: 0.5,
@@ -1109,6 +1168,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'The snowmelt from the local mountains flooded your camp last night and no-one can find their items this morning.',
+        effect: 'All Weapon and Tool items are un-equipped today and may be re-equipped during the next morning phase.',
       },
       frame: {
         x: 155,
@@ -1122,6 +1183,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          "Today was a painfully hot day, and everyone suffered awful sunburns. The fire's heat on your sunburned skin is unbearable.",
+        effect: 'The Investigate Fire action is not available tomorrow.',
       },
       frame: {
         x: 309.5,
@@ -1135,6 +1199,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A group of sabertooths are drawn to the smell of your camp.',
+        effect: 'If you have any raw meat, throw it out to draw them away. Otherwise, everyone takes 1 damage.',
       },
       frame: {
         x: 464,
@@ -1148,6 +1214,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          'The ground beneath everyone begins to tremble. Before anyone can even react, the ground opens up and swallows un-equipped items!',
+        effect: 'Remove 1 weapon and 1 tool that are currently equipped from play.',
       },
       frame: {
         x: 618.5,
@@ -1161,6 +1230,10 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          'Before sleeping for the night, everyone gathers around the fire and tells stories about their adventures during the day.',
+        effect:
+          'Pick a Resource deck that was used today, look at the top 3 cards then place them back on-top of the deck in their original order. Each character gets 1 FKP token.',
       },
       frame: {
         x: 773,
@@ -1174,6 +1247,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'Everyone stayed awake late last night, teaching each other what they had learned about the fire.',
+        effect: 'Each character gets 1 FKP token.',
       },
       frame: {
         x: 927.5,
@@ -1187,6 +1262,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'After unknowingly drinking contaminated water, your short-term memory seems a bit hazy.',
+        effect: 'All Fire Die rolls are reduced by 1 tomorrow as a result.',
       },
       frame: {
         x: 1082,
@@ -1200,6 +1277,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'The tribe slept in this morning to get some much-needed extra rest for their weary bones and muscles.',
+        effect: 'Remove 1 Physical Hindrance card from each tribe member and skip taking any damage from the morning phase.',
       },
       frame: {
         x: 1236.5,
@@ -1213,6 +1292,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          "The tribe awakens to the sight of completely snow-covered mountains. It wouldn't be safe to try to venture up the mountain paths.",
+        effect: 'You may not perform the Explore action today.',
       },
       frame: {
         x: 1391,
@@ -1226,6 +1308,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A bone-chilling frost has covered the valley as you slept, freezing the nearby berry bushes.',
+        effect:
+          'Remove the 2 Berry cards from the Forage deck. Shriveling Place 1 extra card by the Fire Pit. Once the forage deck runs out of cards, add the 2 Berry cards back into the Forage deck and discard this card.',
       },
       frame: {
         x: 1545.5,
@@ -1239,6 +1324,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          "A mudslide from a nearby mountain has made it very difficult to venture out of the camp. It's like trying to walk through quicksand.",
+        effect: 'Foraging, Gathering, Harvesting, Hunting, and Exploring cost 1 Stamina to perform during the Day Phase tomorrow.',
       },
       frame: {
         x: 1700,
@@ -1252,6 +1340,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          'The sweltering heat combined with the storm from last night has made the valley very, very muggy, which is causing lots of issues with your crafting materials.',
+        effect: 'You may not perform the Craft Item action today.',
       },
       frame: {
         x: 1854.5,
@@ -1265,6 +1356,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A rival tribe snuck into your camp and tried to steal your dino eggs!',
+        effect: "Roll the Fire Die and remove that many dino egg tokens from the group's supply.",
       },
       frame: {
         x: 1854.5,
@@ -1278,6 +1371,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          'Your tribe is awoken by a howling noise, even through the darkness you can see debris being tossed around in the sky by what looks to be a mountain of wind! You are able to take refuge in a nearby cave, but things are not where they were when you emerge in the morning.',
+        effect: 'Shuffle all discarded cards back into their respective resource decks.',
       },
       frame: {
         x: 1854.5,
@@ -1291,6 +1387,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'The warmth from the fire on this frigid night might attract a predator to your camp.',
+        effect:
+          'Draw 2 cards from the Hunt deck. If one or both of them are Danger! cards, pick the highest damage and deal that amount to 1 tribe member. Discard both cards.',
       },
       frame: {
         x: 1854.5,
@@ -1304,6 +1403,9 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description:
+          "The stream coming down the mountain has changed direction, the path you normally take to get to the Neighboring Tribe seem to have been washed out. You'll have to wait until the water recedes to pass.",
+        effect: 'You may not perform the Trade with Neighboring Tribe action today.',
       },
       frame: {
         x: 1854.5,
@@ -1317,6 +1419,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A rival tribe snuck into your camp and tried to steal your gems!',
+        effect: "Roll the Fire Die and remove that many gem tokens from the group's supply.",
       },
       frame: {
         x: 1854.5,
@@ -1330,6 +1434,8 @@ const decksSprites = {
       options: {
         type: 'card',
         deck: 'night-event',
+        description: 'A rival tribe snuck into your camp and tried to steal your medicinal herbs!',
+        effect: "Roll the Fire Die and remove that many medicinal herb tokens from the group's supply.",
       },
       frame: {
         x: 1854.5,

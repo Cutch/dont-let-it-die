@@ -248,12 +248,12 @@ class Encounter
                     $_this->character->adjustActiveStamina($data['stamina']);
                 }
                 if ($data['soothe']) {
-                    $_this->activeCharacterEventLog(clienttranslate('soothed a ${name}'), $data);
+                    $_this->activeCharacterEventLog(clienttranslate('${character_name} soothed a ${name}'), $data);
                     $deck = $_this->decks->getDeck($data['deck']);
                     $deck->insertCard($data['cardId'], 'deck', 0);
                     // TODO: Need to test
                 } elseif ($data['escape']) {
-                    $_this->activeCharacterEventLog(clienttranslate('escaped from a ${name}'), $data);
+                    $_this->activeCharacterEventLog(clienttranslate('${character_name} escaped from a ${name}'), $data);
                 } else {
                     $items = $this->game->gameData->getItems();
                     foreach ($data['itemIds'] as $k => $itemId) {
@@ -273,24 +273,28 @@ class Encounter
                             $_this->adjustResource('meat', $data['willReceiveMeat']);
                             if ($damageTaken > 0) {
                                 $_this->activeCharacterEventLog(
-                                    'defeated a ${name}, gained ${willReceiveMeat} meat and lost ${damageTaken} health',
+                                    '${character_name} defeated a ${name}, gained ${willReceiveMeat} meat and lost ${damageTaken} health',
                                     [...$data, 'damageTaken' => $damageTaken]
                                 );
                             } else {
-                                $_this->activeCharacterEventLog(clienttranslate('defeated a ${name} and gained ${willReceiveMeat} meat'), [
-                                    ...$data,
-                                ]);
+                                $_this->activeCharacterEventLog(
+                                    clienttranslate('${character_name} defeated a ${name} and gained ${willReceiveMeat} meat'),
+                                    [...$data]
+                                );
                             }
                         }
                     } else {
                         if ($damageTaken > 0) {
                             $_this->character->adjustActiveHealth(-$damageTaken);
-                            $_this->activeCharacterEventLog(clienttranslate('was attacked by a ${name} and lost ${damageTaken} health'), [
-                                ...$data,
-                                'damageTaken' => $damageTaken,
-                            ]);
+                            $_this->activeCharacterEventLog(
+                                clienttranslate('${character_name} was attacked by a ${name} and lost ${damageTaken} health'),
+                                [...$data, 'damageTaken' => $damageTaken]
+                            );
                         } else {
-                            $_this->activeCharacterEventLog(clienttranslate('was attacked by a ${name} but lost no health'), $data);
+                            $_this->activeCharacterEventLog(
+                                clienttranslate('${character_name} was attacked by a ${name} but lost no health'),
+                                $data
+                            );
                         }
                     }
                 }

@@ -10,6 +10,14 @@ const boardsSprites = {
       rotate: 90,
     },
     'track-normal': {
+      text: [
+        'Remove (Wood Count) from fire pit',
+        'Increase Day Count +1',
+        'Each character takes 1 Damage',
+        'Refresh up to max stamina',
+        'Trade items as desired',
+        'Pass first player token to the left',
+      ],
       frame: {
         x: 725,
         y: 1,
@@ -19,6 +27,14 @@ const boardsSprites = {
       rotate: 0,
     },
     'track-hard': {
+      text: [
+        'Remove (Wood Count) from fire pit',
+        'Increase Day Count +1',
+        'Each character takes 1 Damage',
+        'Refresh up to max stamina',
+        'Trade items as desired',
+        'Pass first player token to the left',
+      ],
       frame: {
         x: 1449,
         y: 1,
