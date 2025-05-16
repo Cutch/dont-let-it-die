@@ -38,14 +38,11 @@ class SelectionStates
                 $this->setState(null, $stateData);
                 return [
                     'characterId' => $characterId,
-                    'nextState' => 'playerTurn',
+                    'nextState' => $stateData['nextState'],
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
-                if ($data['nextState'] != false) {
-                    $_this->nextState($data['nextState']);
-                }
-                $this->initiatePendingState();
+                $this->completeSelectionState($data['nextState']);
             }
         );
     }
@@ -60,13 +57,10 @@ class SelectionStates
         $this->setState(null, $stateData);
         $data = [
             'resourceType' => $resourceType,
-            'nextState' => 'playerTurn',
+            'nextState' => $stateData['nextState'],
         ];
         $this->game->hooks->onResourceSelection($data);
-        if ($data['nextState'] != false) {
-            $this->game->nextState($data['nextState']);
-        }
-        $this->initiatePendingState();
+        $this->completeSelectionState($data['nextState']);
     }
     public function actSelectHindrance(#[JsonParam] array $data): void
     {
@@ -78,7 +72,7 @@ class SelectionStates
         $this->setState(null, $stateData);
         $data = [
             'selections' => $data,
-            'nextState' => 'playerTurn',
+            'nextState' => $stateData['nextState'],
         ];
         $this->game->hooks->onHindranceSelection($data);
 
@@ -98,13 +92,10 @@ class SelectionStates
         $this->setState(null, $stateData);
         $data = [
             'cardId' => $cardId,
-            'nextState' => 'playerTurn',
+            'nextState' => $stateData['nextState'],
         ];
         $this->game->hooks->onCardSelection($data);
-        if ($data['nextState'] != false) {
-            $this->game->nextState($data['nextState']);
-        }
-        $this->initiatePendingState();
+        $this->completeSelectionState($data['nextState']);
     }
     public function actSelectItem(?string $itemId = null, ?string $characterId = null): void
     {
@@ -118,13 +109,10 @@ class SelectionStates
         $data = [
             'itemId' => $itemId,
             'characterId' => $characterId,
-            'nextState' => 'playerTurn',
+            'nextState' => $stateData['nextState'],
         ];
         $this->game->hooks->onItemSelection($data);
-        if ($data['nextState'] != false) {
-            $this->game->nextState($data['nextState']);
-        }
-        $this->initiatePendingState();
+        $this->completeSelectionState($data['nextState']);
     }
     public function actSelectDeck(?string $deckName = null): void
     {
@@ -137,13 +125,10 @@ class SelectionStates
         $this->setState(null, $stateData);
         $data = [
             'deckName' => $deckName,
-            'nextState' => 'playerTurn',
+            'nextState' => $stateData['nextState'],
         ];
         $this->game->hooks->onDeckSelection($data);
-        if ($data['nextState'] != false) {
-            $this->game->nextState($data['nextState']);
-        }
-        $this->initiatePendingState();
+        $this->completeSelectionState($data['nextState']);
     }
     public function actSendToCamp(?int $sendToCampId = null): void
     {
@@ -269,6 +254,7 @@ class SelectionStates
         array $state,
         string $characterId,
         bool $cancellable = true,
+        string $nextState = 'playerTurn',
         ?string $title = null
     ): void {
         if ($this->stateChanged || $this->stateToStateNameMapping() != null) {

@@ -645,14 +645,14 @@ $upgradesData = [
                     'id' => $unlock['id'],
                 ],
                 $game->character->getFirstCharacter(),
-                false
+                false,
+                'tradePhase'
             );
         },
         'onCharacterSelection' => function (Game $game, $unlock, &$data) {
             $state = $game->selectionStates->getState('characterSelection');
             if ($state && $state['id'] == $unlock['id']) {
                 $game->character->setFirstTurnOrder($state['selectedCharacterId']);
-                $data['nextState'] = 'tradePhase';
             }
         },
         // TODO: On morning select the next character to go first, needs testing

@@ -191,11 +191,11 @@ class Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onNightPost(&$data, array $args = [])
-    {
-        $this->callHooks(__FUNCTION__, $args, $data);
-        return $data;
-    }
+    // function onNightPost(&$data, array $args = [])
+    // {
+    //     $this->callHooks(__FUNCTION__, $args, $data);
+    //     return $data;
+    // }
     function onNightDrawCard(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);

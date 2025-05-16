@@ -337,7 +337,6 @@ $expansionData = [
                             'character_resource' => 'health',
                             'character_name' => $data['characterId'],
                         ]);
-                        $data['nextState'] = 'playerTurn';
                     }
                 },
             ],
@@ -377,7 +376,6 @@ $expansionData = [
                             'character_resource' => 'health',
                             'character_name' => $data['characterId'],
                         ]);
-                        $data['nextState'] = 'playerTurn';
                     }
                 },
             ],

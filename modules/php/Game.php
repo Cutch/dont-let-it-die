@@ -1274,24 +1274,24 @@ class Game extends \Table
                     $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
                 }
 
-                $this->nextState('nightPhasePost');
-            }
-        );
-    }
-    public function stNightPhasePost()
-    {
-        $this->actInterrupt->interruptableFunction(
-            __FUNCTION__,
-            func_get_args(),
-            [$this->hooks, 'onNightPost'],
-            function (Game $_this) {
-                return [];
-            },
-            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $this->nextState('morningPhase');
             }
         );
     }
+    // public function stNightPhasePost()
+    // {
+    //     $this->actInterrupt->interruptableFunction(
+    //         __FUNCTION__,
+    //         func_get_args(),
+    //         [$this->hooks, 'onNightPost'],
+    //         function (Game $_this) {
+    //             return [];
+    //         },
+    //         function (Game $_this, bool $finalizeInterrupt, $data) {
+    //             $this->nextState('morningPhase');
+    //         }
+    //     );
+    // }
 
     public function argSelectionCount(): array
     {

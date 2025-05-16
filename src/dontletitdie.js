@@ -906,9 +906,12 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
     // onLeavingState: this method is called each time we are leaving a game state.
     //                 You can use this method to perform some user interface changes at this moment.
     //
-    onLeavingState: function (stateName) {
+    onLeavingState: async function (stateName) {
       console.log('Leaving state: ' + stateName);
       switch (stateName) {
+        case 'morningPhase':
+          await this.wait(500);
+          break;
         case 'startHindrance':
           this.upgradeSelectionScreen.hide();
           break;
@@ -937,7 +940,7 @@ define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter'], functi
           this.tooManyItemsScreen.hide();
           break;
         case 'tradePhase':
-          this.itemsScreen.hide();
+          this.itemTradeScreen.hide();
           break;
         case 'characterSelect':
           dojo.style('character-selector', 'display', 'none');

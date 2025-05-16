@@ -11,6 +11,7 @@ if (!function_exists('rivalTribe')) {
             $left = $game->adjustResource('gem-y', -$roll)['left'];
             $left = $game->adjustResource('gem-p', $left)['left'];
             $left = $game->adjustResource('gem-b', $left)['left'];
+            $resourceType = 'gem-y';
         } else {
             if (array_key_exists($resourceType . '-cooked', $game->data->getTokens())) {
                 $left = $game->adjustResource($resourceType . '-cooked', -$roll)['left'];
@@ -475,13 +476,13 @@ $decksData = [
         'deck' => 'night-event',
         'type' => 'deck',
         'onUse' => function (Game $game, $nightCard) {
-            $currentCharacter = $this->character->getTurnCharacter();
+            $currentCharacter = $game->character->getTurnCharacter();
             $items = array_merge(
                 ...array_map(function ($character) {
                     return array_map(function ($d) use ($character) {
                         return ['name' => $d['id'], 'itemId' => $d['itemId'], 'characterId' => $character['id']];
                     }, $character['equipment']);
-                }, $this->character->getAllCharacterData())
+                }, $game->character->getAllCharacterData())
             );
 
             $game->selectionStates->initiateState(
@@ -491,7 +492,8 @@ $decksData = [
                     'id' => $nightCard['id'],
                 ],
                 $currentCharacter['id'],
-                true
+                true,
+                $game->gamestate->state()['name']
             );
 
             return ['notify' => false, 'nextState' => false];
@@ -769,7 +771,9 @@ $decksData = [
                 })
             );
             if (sizeof($charactersWithStamina) > 0) {
-                $game->adjustResource('gem', 1);
+                $left = $game->adjustResource('gem-y', 1)['left'];
+                $left = $game->adjustResource('gem-p', $left)['left'];
+                $left = $game->adjustResource('gem-b', $left)['left'];
                 $game->nightEventLog('${character_name} found one gem stone', [
                     'character_name' => $charactersWithStamina[0]['character_name'],
                 ]);
@@ -787,11 +791,15 @@ $decksData = [
         'onUse' => function (Game $game, $nightCard) {
             $game->nightEventLog('All items have disappeared');
             foreach ($game->character->getAllCharacterData() as $char) {
-                $game->character->unequipEquipment($char['character_name'], $char['equipment']);
+                if (sizeof($char['equipment']) > 0) {
+                    $game->character->unequipEquipment(
+                        $char['character_name'],
+                        array_map(function ($item) {
+                            return $item['id'];
+                        }, $char['equipment'])
+                    );
+                }
             }
-        },
-        'onGetValidActions' => function (Game $game, $nightCard, &$data) {
-            unset($data['actItems']);
         },
     ],
     'night-event-8_4' => [
@@ -947,7 +955,7 @@ $decksData = [
             $game->nightEventLog('Berries can\'t be found until the forage deck runs out of cards');
             // Need to add a globally active card
             $game->decks->discardCards('forage', function ($data) {
-                return $data['resourceType'] == 'berry';
+                return array_key_exists('resourceType', $data) && $data['resourceType'] == 'berry';
             });
         },
     ],

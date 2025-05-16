@@ -96,7 +96,8 @@ class Decks
     {
         $card = $this->game->data->getDecks()[$id];
         $name = '';
-        if (array_key_exists('resourceType', $card)) {
+        $this->game->log($id, $card);
+        if (array_key_exists('resourceType', $card) && array_key_exists($card['resourceType'], $this->game->data->getTokens())) {
             $name = $this->game->data->getTokens()[$card['resourceType']]['name'];
         }
         if (array_key_exists('name', $card)) {
@@ -238,14 +239,15 @@ class Decks
     public function discardCards(string $deck, $callback): void
     {
         $deckCount = $this->getDeck($deck)->countCardsInLocation('deck');
-        $cards = $this->getDeck($deck)->getCardOnTop($deckCount, 'deck');
-
+        $cards = $this->getDeck($deck)->getCardsOnTop($deckCount, 'deck');
         $cards = array_filter($cards, function ($card) use ($callback) {
-            $callback($this->getCard($card['id']));
+            $this->game->log($this->getCard($card['type_arg']));
+            return $callback($this->getCard($card['type_arg']));
         });
-        array_walk(function ($card) use ($deck) {
+        array_walk($cards, function ($card) use ($deck) {
             $this->getDeck($deck)->insertCardOnExtremePosition($card['id'], 'discard', true);
-        }, $cards);
+        });
+        $this->game->log($cards);
         unset($this->cachedData[$deck]);
         if ($deckCount - sizeof($cards) == 0) {
             $this->shuffleInDiscard($deck);
