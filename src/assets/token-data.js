@@ -1,4 +1,4 @@
-const tokenSprites = {
+export default {
   sprites: {
     '1-token': {
       options: {

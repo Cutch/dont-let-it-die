@@ -1,7 +1,7 @@
-const itemsSprites = {
+export default {
   sprites: {
     'bow-and-arrow': {
-      options: { type: 'item', itemType: 'weapon', name: 'Bow And Arrow', damage: 3, range: 2, text: '' },
+      options: { type: 'item', itemType: 'weapon', text: [{ title: 'Bow And Arrow' }, 'Damage:' + 3, 'Range:' + 2] },
       frame: { x: 0, y: 0, w: 438, h: 438 },
       rotate: 0,
     },
@@ -16,22 +16,26 @@ const itemsSprites = {
       rotate: 0,
     },
     'bone-club': {
-      options: { type: 'item', itemType: 'weapon', name: 'Bone Club', damage: 3, range: 1, text: '' },
+      options: { type: 'item', itemType: 'weapon', text: [{ title: 'Bone Club' }, 'Damage:' + 3, 'Range:' + 1] },
       frame: { x: 876, y: 0, w: 438, h: 438 },
       rotate: 0,
     },
     'bone-scythe': {
-      options: { type: 'item', itemType: 'weapon', name: 'Bone Scythe', text: 'Take 1 Fiber when you draw a Fiber Card' },
+      options: { type: 'item', itemType: 'weapon', text: [{ title: 'Bone Scythe' }, 'Take 1 Fiber when you draw a Fiber Card'] },
       frame: { x: 1314, y: 0, w: 438, h: 438 },
       rotate: 0,
     },
     bag: {
-      options: { type: 'item', itemType: 'tool', name: 'Bag', text: 'Take 1 Berry when you draw a Berry Card' },
+      options: { type: 'item', itemType: 'tool', text: [{ title: 'Bag' }, 'Take 1 Berry when you draw a Berry Card'] },
       frame: { x: 1752, y: 0, w: 438, h: 438 },
       rotate: 0,
     },
     'bone-armor': {
-      options: { type: 'item', itemType: 'tool', name: 'Bone Armor', text: 'Ignore all damage from a Danger! Card, twice per day' },
+      options: {
+        type: 'item',
+        itemType: 'tool',
+        text: [{ title: 'Bone Armor' }, 'Ignore all damage from a Danger! Card, twice per day'],
+      },
       frame: { x: 2190, y: 0, w: 438, h: 438 },
       rotate: 0,
     },
@@ -47,7 +51,7 @@ const itemsSprites = {
     },
     fire: { options: { type: 'game-piece', name: 'Fire' }, frame: { x: 439, y: 439, w: 438, h: 438 }, rotate: 0 },
     'hide-armor': {
-      options: { type: 'item', itemType: 'tool', name: 'Hide Armor', text: 'Ignore all damage from a Danger! Card, once per day' },
+      options: { type: 'item', itemType: 'tool', text: [{ title: 'Hide Armor' }, 'Ignore all damage from a Danger! Card, once per day'] },
       frame: { x: 876, y: 439, w: 438, h: 438 },
       rotate: 0,
     },
@@ -63,33 +67,37 @@ const itemsSprites = {
     },
     skull: { options: { type: 'game-piece', name: 'Skull' }, frame: { x: 1756, y: 439, w: 434, h: 438 }, rotate: 0 },
     hatchet: {
-      options: { type: 'item', itemType: 'tool', name: 'Hatchet', text: 'Take 1 wood when you draw a Wood Card' },
+      options: { type: 'item', itemType: 'tool', text: [{ title: 'Hatchet' }, 'Take 1 wood when you draw a Wood Card'] },
       frame: { x: 2190, y: 439, w: 438, h: 438 },
       rotate: 0,
     },
     club: {
-      options: { type: 'item', itemType: 'weapon', name: 'Club', damage: 1, range: 1, text: '-1 max stamina' },
+      options: { type: 'item', itemType: 'weapon', text: [{ title: 'Club' }, 'Damage:' + 1, 'Range:' + 1, '-1 max stamina'] },
       frame: { x: 0, y: 880, w: 438, h: 438 },
       rotate: 0,
     },
     'cooking-hut': {
-      options: { type: 'item', itemType: 'building', name: 'Cooking Hut', text: 'Gain an additional +2 HP when eating food' },
+      options: { type: 'item', itemType: 'building', text: [{ title: 'Cooking Hut' }, 'Gain an additional +2 HP when eating food'] },
       frame: { x: 439, y: 880, w: 438, h: 438 },
       rotate: 0,
     },
     'carving-knife': {
-      options: { type: 'item', itemType: 'tool', name: 'Carving Knife', text: 'Take 1 raw meat when you draw a Meat Card' },
+      options: { type: 'item', itemType: 'tool', text: [{ title: 'Carving Knife' }, 'Take 1 raw meat when you draw a Meat Card'] },
       frame: { x: 876, y: 880, w: 438, h: 438 },
       rotate: 0,
     },
     'item-back': { options: { type: 'back', name: 'Item Back' }, frame: { x: 1314, y: 880, w: 438, h: 438 }, rotate: 0 },
     'sling-shot': {
-      options: { type: 'item', itemType: 'weapon', name: 'Sling Shot', damage: 3, range: 2, text: 'Must discard 1 stone each use' },
+      options: {
+        type: 'item',
+        itemType: 'weapon',
+        text: [{ title: 'Sling Shot' }, 'Damage:' + 3, 'Range:' + 2, 'Must discard 1 stone each use'],
+      },
       frame: { x: 1752, y: 880, w: 438, h: 438 },
       rotate: 0,
     },
     'pick-axe': {
-      options: { type: 'item', itemType: 'tool', name: 'Pick Axe', text: 'Take 1 stone when you draw a Rock Card' },
+      options: { type: 'item', itemType: 'tool', text: [{ title: 'Pick Axe' }, 'Take 1 stone when you draw a Rock Card'] },
       frame: { x: 2190, y: 880, w: 438, h: 438 },
       rotate: 0,
     },
@@ -104,12 +112,12 @@ const itemsSprites = {
       rotate: 0,
     },
     spear: {
-      options: { type: 'item', itemType: 'weapon', name: 'Spear', damage: 2, range: 2, text: '' },
+      options: { type: 'item', itemType: 'weapon', text: [{ title: 'Spear' }, 'Damage:' + 2, 'Range:' + 2] },
       frame: { x: 439, y: 1320, w: 438, h: 438 },
       rotate: 0,
     },
     'sharp-stick': {
-      options: { type: 'item', itemType: 'weapon', name: 'Sharp Stick', damage: 1, range: 1, text: '' },
+      options: { type: 'item', itemType: 'weapon', text: [{ title: 'Sharp Stick' }, 'Damage:' + 1, 'Range:' + 1] },
       frame: { x: 876, y: 1320, w: 438, h: 438 },
       rotate: 0,
     },
@@ -124,12 +132,16 @@ const itemsSprites = {
       rotate: 0,
     },
     'rock-knife': {
-      options: { type: 'item', itemType: 'weapon', name: 'Rock Knife', damage: 2, range: 1, text: '' },
+      options: { type: 'item', itemType: 'weapon', text: [{ title: 'Rock Knife' }, 'Damage:' + 2, 'Range:' + 1] },
       frame: { x: 1752, y: 1320, w: 438, h: 438 },
       rotate: 0,
     },
     'stone-hammer': {
-      options: { type: 'item', itemType: 'tool', name: 'Stone Hammer', text: 'Crafting cost reduced by 2 for the equipped character' },
+      options: {
+        type: 'item',
+        itemType: 'tool',
+        text: [{ title: 'Stone Hammer' }, 'Crafting cost reduced by 2 for the equipped character'],
+      },
       frame: { x: 2190, y: 1320, w: 438, h: 438 },
       rotate: 0,
     },
@@ -203,10 +215,12 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
-        name: 'Whip',
-        damage: 2,
-        range: 1,
-        text: 'After killing a Danger! card, pick any tribe member to heal 1 and shuffle the Danger! card back into its deck',
+        text: [
+          { title: 'Whip' },
+          'Damage:' + 2,
+          'Range:' + 1,
+          'After killing a Danger! card, pick any tribe member to heal 1 and shuffle the Danger! card back into its deck',
+        ],
       },
       frame: { x: 439, y: 2200, w: 438, h: 438 },
       rotate: 0,
@@ -215,10 +229,10 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
-        name: 'Fire Stick',
-        damage: 'X',
-        range: 1,
         text: [
+          { title: 'Fire Stick' },
+          'Damage:' + 'X',
+          'Range:' + 1,
           "Roll the Fire Die before fighting a Danger!~ card, this roll value is the Fire Stick's damage",
           'You may spend up to 3 FKP tokens to increase X by 1 per FXP for 1 combat',
         ],
@@ -230,10 +244,13 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
-        name: 'Rock',
-        damage: 1,
-        range: 2,
-        text: ['Crafting this item only costs 1 stamina', 'After use, discard item back to the craft-able items area'],
+        text: [
+          { title: 'Rock' },
+          'Damage:' + 1,
+          'Range:' + 2,
+          'Crafting this item only costs 1 stamina',
+          'After use, discard item back to the craft-able items area',
+        ],
       },
       frame: { x: 1314, y: 2200, w: 438, h: 438 },
       rotate: 0,
@@ -242,10 +259,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
-        name: 'Bola',
-        damage: 2,
-        range: 2,
-        text: 'After use, spend 2 stamina to keep, or discard to craft-able items area',
+        text: [{ title: 'Bola' }, 'Damage:' + 2, 'Range:' + 2, 'After use, spend 2 stamina to keep, or discard to craft-able items area'],
       },
       frame: { x: 1752, y: 2200, w: 438, h: 438 },
       rotate: 0,
@@ -254,10 +268,7 @@ const itemsSprites = {
       options: {
         type: 'item',
         itemType: 'weapon',
-        name: 'Boomerang',
-        damage: 2,
-        range: 2,
-        text: 'Once per day, reduce the life of any attacking Danger! card by 1',
+        text: [{ title: 'Boomerang' }, 'Damage:' + 2, 'Range:' + 2, 'Once per day, reduce the life of any attacking Danger! card by 1'],
       },
       frame: { x: 2190, y: 2200, w: 438, h: 438 },
       rotate: 0,

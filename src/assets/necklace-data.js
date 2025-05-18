@@ -1,11 +1,10 @@
-const necklaceSprites = {
+export default {
   sprites: {
     'gem-b-necklace': {
       options: {
         type: 'item',
         itemType: 'necklace',
-        name: 'Blue Necklace',
-        text: ['+1 Max Health'],
+        text: [{ title: 'Blue Necklace' }, '+1 Max Health'],
       },
       frame: {
         x: 0,
@@ -19,8 +18,7 @@ const necklaceSprites = {
       options: {
         type: 'item',
         itemType: 'necklace',
-        name: 'Yellow Necklace',
-        text: ['+1 Max Stamina'],
+        text: [{ title: 'Yellow Necklace' }, '+1 Max Stamina'],
       },
       frame: {
         x: 440,
@@ -34,8 +32,7 @@ const necklaceSprites = {
       options: {
         type: 'item',
         itemType: 'necklace',
-        name: 'Purple Necklace',
-        text: ['Once per day re-roll any Fire Die roll'],
+        text: [{ title: 'Purple Necklace' }, 'Once per day re-roll any Fire Die roll'],
       },
       frame: {
         x: 880,

@@ -1,4 +1,4 @@
-const addClickListener = function (elem, name, callback, addPadding = false) {
+export const addClickListener = function (elem, name, callback, addPadding = false) {
   elem.tabIndex = '0';
   const click = (e) => {
     if (!elem.classList.contains('disabled')) {

@@ -1,4 +1,5 @@
-class Deck {
+import allSprites from '../assets';
+export class Deck {
   constructor(game, deck, countData, div, scale = 4, style = 'vertical') {
     this.game = game;
     this.countData = countData;

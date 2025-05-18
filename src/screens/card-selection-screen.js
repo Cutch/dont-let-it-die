@@ -1,4 +1,5 @@
-class CardSelectionScreen {
+import '../utils/index';
+export class CardSelectionScreen {
   constructor(game) {
     this.game = game;
   }

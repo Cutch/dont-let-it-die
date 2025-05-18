@@ -1,4 +1,6 @@
-class ReviveScreen {
+import allSprites from '../assets';
+import '../utils/index';
+export class ReviveScreen {
   constructor(game) {
     this.game = game;
   }

@@ -1,4 +1,5 @@
-const getSpriteSize = (name, scale = 2) => {
+import allSprites from '../assets';
+export const getSpriteSize = (name, scale = 2) => {
   const {
     frame: { w, h },
     rotate,
@@ -6,7 +7,7 @@ const getSpriteSize = (name, scale = 2) => {
   if (rotate) return { width: h / scale, height: w / scale };
   else return { width: w / scale, height: h / scale };
 };
-const renderImage = (
+export const renderImage = (
   name,
   div = null,
   { scale = 2, pos = 'append', card = true, css: extraCss = '', overridePos = null, rotate: rotateAPI = 0, centered = false } = {},

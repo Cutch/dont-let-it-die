@@ -1,4 +1,4 @@
-const boardsSprites = {
+export default {
   sprites: {
     'character-board': {
       frame: {

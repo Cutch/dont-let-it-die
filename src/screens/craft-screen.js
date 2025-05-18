@@ -1,4 +1,5 @@
-class CraftScreen {
+import '../utils/index';
+export class CraftScreen {
   constructor(game) {
     this.game = game;
   }

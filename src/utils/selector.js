@@ -1,4 +1,4 @@
-class Selector {
+export class Selector {
   constructor(gamePlayAreaElem) {
     gamePlayAreaElem.insertAdjacentHTML('beforeend', `<div id="selector-overlay"></div>`);
     this.selectorElem = $('selector-overlay');

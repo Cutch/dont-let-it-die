@@ -1,4 +1,5 @@
-class WeaponScreen {
+import '../utils/index';
+export class WeaponScreen {
   constructor(game) {
     this.game = game;
   }

@@ -1,4 +1,5 @@
-class HindranceSelectionScreen {
+import '../utils/index';
+export class HindranceSelectionScreen {
   constructor(game) {
     this.game = game;
   }

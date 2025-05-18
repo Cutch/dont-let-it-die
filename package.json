@@ -2,6 +2,7 @@
   "name": "dont-let-it-die",
   "version": "1.0.0",
   "main": "dontletitdie.js",
+  "type": "module",
   "scripts": {
     "start": "npm run watch",
     "build:ts": "tsc",

@@ -1,4 +1,6 @@
-class DeckSelectionScreen {
+import allSprites from '../assets';
+import '../utils/index';
+export class DeckSelectionScreen {
   constructor(game) {
     this.game = game;
   }

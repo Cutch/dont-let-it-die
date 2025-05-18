@@ -1,4 +1,5 @@
-class TradeScreen {
+import '../utils/index';
+export class TradeScreen {
   constructor(game) {
     this.game = game;
     this.updateFunctions = [];

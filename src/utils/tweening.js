@@ -1,4 +1,4 @@
-class Tweening {
+export class Tweening {
   constructor(game, container) {
     this.game = game;
     this.container = container;

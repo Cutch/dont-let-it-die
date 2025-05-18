@@ -1,4 +1,5 @@
-class TooManyItemsScreen {
+import '../utils/index';
+export class TooManyItemsScreen {
   constructor(game) {
     this.game = game;
   }

@@ -1,4 +1,4 @@
-class Tooltip {
+export class Tooltip {
   constructor(gamePlayAreaElem) {
     gamePlayAreaElem.insertAdjacentHTML(
       'beforeend',

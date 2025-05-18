@@ -1,4 +1,4 @@
-const techSprites = {
+export default {
   sprites: {
     'knowledge-tree-easy': {
       upgrades: {

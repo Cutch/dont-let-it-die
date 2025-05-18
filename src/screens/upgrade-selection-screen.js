@@ -1,4 +1,6 @@
-class UpgradeSelectionScreen {
+import allSprites from '../assets';
+import '../utils/index';
+export class UpgradeSelectionScreen {
   constructor(game) {
     this.game = game;
   }

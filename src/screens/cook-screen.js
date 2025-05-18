@@ -1,4 +1,5 @@
-class CookScreen {
+import '../utils/index';
+export class CookScreen {
   constructor(game) {
     this.game = game;
   }

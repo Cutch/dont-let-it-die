@@ -1,5 +1,5 @@
 const sideNames = ['one', 'two', 'three', 'four', 'five', 'six'];
-class Dice {
+export class Dice {
   constructor(div) {
     this.div = div;
     this.queue = [];

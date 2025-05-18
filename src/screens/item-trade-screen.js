@@ -1,4 +1,6 @@
-class ItemTradeScreen {
+import allSprites from '../assets';
+import '../utils/index';
+export class ItemTradeScreen {
   constructor(game) {
     this.game = game;
     this.selection = [];

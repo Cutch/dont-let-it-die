@@ -26,14 +26,14 @@ try {
 
 const passiveEvent = passiveEventSupported ? { capture: false, passive: true } : false;
 
-const addPassiveListener = (type, callback) => {
+export const addPassiveListener = (type, callback) => {
   window.addEventListener(type, callback, passiveEvent);
   return () => {
     window.removeEventListener(type, callback, passiveEvent);
   };
 };
 
-const scrollArrow = (content, arrowElem) => {
+export const scrollArrow = (content, arrowElem) => {
   const { y, height } = content.getBoundingClientRect();
   arrowElem.style['top'] = `calc(${Math.max(
     0,

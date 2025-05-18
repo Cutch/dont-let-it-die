@@ -1,4 +1,4 @@
-const charactersSprites = {
+export default {
   sprites: {
     Gronk: {
       options: {

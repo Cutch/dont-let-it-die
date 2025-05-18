@@ -87,10 +87,7 @@ class GameData
     }
     public function reload(): void
     {
-        $this->cachedGameData = $this->game->globals->getAll();
-        if (sizeof($this->cachedGameData) == 0) {
-            $this->cachedGameData = self::$defaults;
-        }
+        $this->cachedGameData = [...self::$defaults, ...$this->game->globals->getAll()];
         if (!$this->resourcesBeforeTransaction && array_key_exists('resources', $this->cachedGameData)) {
             $this->resourcesBeforeTransaction = $this->cachedGameData['resources'];
         }

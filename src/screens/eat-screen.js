@@ -1,4 +1,6 @@
-class EatScreen {
+import allSprites from '../assets';
+import '../utils/index';
+export class EatScreen {
   constructor(game) {
     this.game = game;
   }

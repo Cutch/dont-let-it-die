@@ -1,4 +1,4 @@
-const expansionSprites = {
+export default {
   sprites: {
     'day-event-back': {
       options: {

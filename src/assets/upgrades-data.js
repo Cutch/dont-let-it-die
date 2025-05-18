@@ -1,11 +1,9 @@
-const upgradesSprites = {
+export default {
   sprites: {
     '1-A': {
       options: {
         type: 'upgrade',
-        name: 'Charcoal Writing',
-        cost: 6,
-        description: 'After this is unlocked, future Discoveries cost 1 less to unlock',
+        text: [{ title: 'Charcoal Writing' }, { title: 'Cost: ' + 6 }, 'After this is unlocked, future Discoveries cost 1 less to unlock'],
       },
       frame: {
         x: 0,
@@ -17,9 +15,7 @@ const upgradesSprites = {
     '1-B': {
       options: {
         type: 'upgrade',
-        name: 'Tracking',
-        cost: 5,
-        description: 'Killing a Danger! card gives +1 meat',
+        text: [{ title: 'Tracking' }, { title: 'Cost: ' + 5 }, 'Killing a Danger! card gives +1 meat'],
       },
       frame: {
         x: 276,
@@ -46,9 +42,11 @@ const upgradesSprites = {
     '10-B': {
       options: {
         type: 'upgrade',
-        name: 'Fire Stoking',
-        cost: 8,
-        description: 'Once per day, if you added at least 1 Wood token to the fire pit, take 2 FKP tokens',
+        text: [
+          { title: 'Fire Stoking' },
+          { title: 'Cost: ' + 8 },
+          'Once per day, if you added at least 1 Wood token to the fire pit, take 2 FKP tokens',
+        ],
       },
       frame: {
         x: 0,
@@ -60,9 +58,7 @@ const upgradesSprites = {
     '11-A': {
       options: {
         type: 'upgrade',
-        name: 'Haggle',
-        cost: 4,
-        description: 'Once per day, you may trade at 2:1 instead of 3:1',
+        text: [{ title: 'Haggle' }, { title: 'Cost: ' + 4 }, 'Once per day, you may trade at 2:1 instead of 3:1'],
       },
       frame: {
         x: 276,
@@ -74,9 +70,7 @@ const upgradesSprites = {
     '11-B': {
       options: {
         type: 'upgrade',
-        name: 'Trade Routes',
-        cost: 5,
-        description: 'Trading costs 0 stamina',
+        text: [{ title: 'Trade Routes' }, { title: 'Cost: ' + 5 }, 'Trading costs 0 stamina'],
       },
       frame: {
         x: 552,
@@ -88,9 +82,11 @@ const upgradesSprites = {
     '12-A': {
       options: {
         type: 'upgrade',
-        name: 'Planning',
-        cost: 6,
-        description: 'When using the Investigate Fire action as the last action of a turn, gain 1 FKP',
+        text: [
+          { title: 'Planning' },
+          { title: 'Cost: ' + 6 },
+          'When using the Investigate Fire action as the last action of a turn, gain 1 FKP',
+        ],
       },
       frame: {
         x: 0,
@@ -102,9 +98,11 @@ const upgradesSprites = {
     '12-B': {
       options: {
         type: 'upgrade',
-        name: 'Focus',
-        cost: 6,
-        description: 'Once per day, take 2x your Investigate Fire action roll. Use this BEFORE you roll',
+        text: [
+          { title: 'Focus' },
+          { title: 'Cost: ' + 6 },
+          'Once per day, take 2x your Investigate Fire action roll. Use this BEFORE you roll',
+        ],
       },
       frame: {
         x: 276,
@@ -116,9 +114,7 @@ const upgradesSprites = {
     '13-A': {
       options: {
         type: 'upgrade',
-        name: 'Bone Efficiency',
-        cost: 4,
-        description: 'Take +1 Bone when drawing a Bone card',
+        text: [{ title: 'Bone Efficiency' }, { title: 'Cost: ' + 4 }, 'Take +1 Bone when drawing a Bone card'],
       },
       frame: {
         x: 552,
@@ -130,9 +126,7 @@ const upgradesSprites = {
     '13-B': {
       options: {
         type: 'upgrade',
-        name: 'Hide Efficiency',
-        cost: 4,
-        description: 'Take +1 Hide when drawing a Hide card',
+        text: [{ title: 'Hide Efficiency' }, { title: 'Cost: ' + 4 }, 'Take +1 Hide when drawing a Hide card'],
       },
       frame: {
         x: 0,
@@ -144,9 +138,11 @@ const upgradesSprites = {
     '14-A': {
       options: {
         type: 'upgrade',
-        name: 'Medicinal Herb Efficiency',
-        cost: 5,
-        description: 'Take +1 Medicinal Herb when drawing a Medicinal Herb card',
+        text: [
+          { title: 'Medicinal Herb Efficiency' },
+          { title: 'Cost: ' + 5 },
+          'Take +1 Medicinal Herb when drawing a Medicinal Herb card',
+        ],
       },
       frame: {
         x: 276,
@@ -158,9 +154,7 @@ const upgradesSprites = {
     '14-B': {
       options: {
         type: 'upgrade',
-        name: 'Dino Egg Efficiency',
-        cost: 5,
-        description: 'Take +1 Dino Egg when drawing a Dino Egg card',
+        text: [{ title: 'Dino Egg Efficiency' }, { title: 'Cost: ' + 5 }, 'Take +1 Dino Egg when drawing a Dino Egg card'],
       },
       frame: {
         x: 552,
@@ -172,9 +166,11 @@ const upgradesSprites = {
     '15-A': {
       options: {
         type: 'upgrade',
-        name: 'Jewelry',
-        cost: 5,
-        description: 'Once per day, use a Craft action and spend 1 Gemstone and 1 Fiber to craft a Necklace. See rulebook for details',
+        text: [
+          { title: 'Jewelry' },
+          { title: 'Cost: ' + 5 },
+          'Once per day, use a Craft action and spend 1 Gemstone and 1 Fiber to craft a Necklace. See rulebook for details',
+        ],
       },
       frame: {
         x: 0,
@@ -231,9 +227,11 @@ const upgradesSprites = {
     '2-A': {
       options: {
         type: 'upgrade',
-        name: 'Smoke Cover',
-        cost: 4,
-        description: 'Roll 2 times, pick the lowest value for all Rival Tribe Night Event cards',
+        text: [
+          { title: 'Smoke Cover' },
+          { title: 'Cost: ' + 4 },
+          'Roll 2 times, pick the lowest value for all Rival Tribe Night Event cards',
+        ],
       },
       frame: {
         x: 276,
@@ -245,9 +243,11 @@ const upgradesSprites = {
     '2-B': {
       options: {
         type: 'upgrade',
-        name: 'Revenge',
-        cost: 8,
-        description: 'When drawing a Rival Tribe Night Event, gain your roll in resources instead of losing them',
+        text: [
+          { title: 'Revenge' },
+          { title: 'Cost: ' + 8 },
+          'When drawing a Rival Tribe Night Event, gain your roll in resources instead of losing them',
+        ],
       },
       frame: {
         x: 552,
@@ -287,9 +287,7 @@ const upgradesSprites = {
     '4-A': {
       options: {
         type: 'upgrade',
-        name: 'Smoked Food',
-        cost: 4,
-        description: 'Eating Food: Excess healing over max HP may be given to a tribe member',
+        text: [{ title: 'Smoked Food' }, { title: 'Cost: ' + 4 }, 'Eating Food: Excess healing over max HP may be given to a tribe member'],
       },
       frame: {
         x: 552,
@@ -301,9 +299,7 @@ const upgradesSprites = {
     '4-B': {
       options: {
         type: 'upgrade',
-        name: 'First Aid',
-        cost: 6,
-        description: 'You only need to eat 1 Cooked Meat instead of 3 to revive after death',
+        text: [{ title: 'First Aid' }, { title: 'Cost: ' + 6 }, 'You only need to eat 1 Cooked Meat instead of 3 to revive after death'],
       },
       frame: {
         x: 0,
@@ -315,9 +311,11 @@ const upgradesSprites = {
     '5-A': {
       options: {
         type: 'upgrade',
-        name: 'Controlled Burn',
-        cost: 6,
-        description: 'Once per day, spend 2 FKP to take 3 Cooked Meat and remove 1 Fiber from the game',
+        text: [
+          { title: 'Controlled Burn' },
+          { title: 'Cost: ' + 6 },
+          'Once per day, spend 2 FKP to take 3 Cooked Meat and remove 1 Fiber from the game',
+        ],
       },
       frame: {
         x: 276,
@@ -329,9 +327,11 @@ const upgradesSprites = {
     '5-B': {
       options: {
         type: 'upgrade',
-        name: 'Map Making',
-        cost: 6,
-        description: 'Spend 2 Stamina, pick a card from a discard pile, shuffle it back into its resource deck',
+        text: [
+          { title: 'Map Making' },
+          { title: 'Cost: ' + 6 },
+          'Spend 2 Stamina, pick a card from a discard pile, shuffle it back into its resource deck',
+        ],
       },
       frame: {
         x: 552,
@@ -344,9 +344,11 @@ const upgradesSprites = {
       options: {
         type: 'upgrade',
 
-        name: 'Berry Farming',
-        cost: 5,
-        description: 'Remove 1 Berry token from the game. Each time you get a Berry token at the start of every day phase',
+        text: [
+          { title: 'Berry Farming' },
+          { title: 'Cost: ' + 5 },
+          'Remove 1 Berry token from the game. Each time you get a Berry token at the start of every day phase',
+        ],
       },
       frame: {
         x: 828,
@@ -358,9 +360,11 @@ const upgradesSprites = {
     '6-B': {
       options: {
         type: 'upgrade',
-        name: 'Meditation',
-        cost: 5,
-        description: 'All tribe members instantly heal back up to their Max HP when this is unlocked',
+        text: [
+          { title: 'Meditation' },
+          { title: 'Cost: ' + 5 },
+          'All tribe members instantly heal back up to their Max HP when this is unlocked',
+        ],
       },
       frame: {
         x: 828,
@@ -372,9 +376,11 @@ const upgradesSprites = {
     '7-A': {
       options: {
         type: 'upgrade',
-        name: 'Rest',
-        cost: 5,
-        description: 'Once per day, spend 4 stamina to heal yourself for 1 hp and remove a Physical Hindrance card',
+        text: [
+          { title: 'Rest' },
+          { title: 'Cost: ' + 5 },
+          'Once per day, spend 4 stamina to heal yourself for 1 hp and remove a Physical Hindrance card',
+        ],
       },
       frame: {
         x: 828,
@@ -401,9 +407,11 @@ const upgradesSprites = {
     '8-A': {
       options: {
         type: 'upgrade',
-        name: 'Cooperation',
-        cost: 5,
-        description: 'You may pass the First Player token to any other character instead of to the left',
+        text: [
+          { title: 'Cooperation' },
+          { title: 'Cost: ' + 5 },
+          'You may pass the First Player token to any other character instead of to the left',
+        ],
       },
       frame: {
         x: 828,
@@ -415,9 +423,7 @@ const upgradesSprites = {
     '8-B': {
       options: {
         type: 'upgrade',
-        name: 'Resourceful',
-        cost: 4,
-        description: 'When you draw a Nothing card, gain 1 Stamina',
+        text: [{ title: 'Resourceful' }, { title: 'Cost: ' + 4 }, 'When you draw a Nothing card, gain 1 Stamina'],
       },
       frame: {
         x: 828,
@@ -429,9 +435,7 @@ const upgradesSprites = {
     '9-A': {
       options: {
         type: 'upgrade',
-        name: 'Torches',
-        cost: 6,
-        description: 'Danger! cards deal 1 less damage when you fail to kill them',
+        text: [{ title: 'Torches' }, { title: 'Cost: ' + 6 }, 'Danger! cards deal 1 less damage when you fail to kill them'],
       },
       frame: {
         x: 828,
@@ -443,9 +447,7 @@ const upgradesSprites = {
     '9-B': {
       options: {
         type: 'upgrade',
-        name: 'Tempering',
-        cost: 7,
-        description: 'Weapons have +1 damage against Danger! cards',
+        text: [{ title: 'Tempering' }, { title: 'Cost: ' + 7 }, 'Weapons have +1 damage against Danger! cards'],
       },
       frame: {
         x: 828,

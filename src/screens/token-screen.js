@@ -1,4 +1,5 @@
-class TokenScreen {
+import '../utils/index';
+export class TokenScreen {
   constructor(game) {
     this.game = game;
   }
