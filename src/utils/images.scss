@@ -4,6 +4,10 @@
 .card {
   border-radius: 10px;
   border: 1px solid #000;
+  &.skull {
+    border: none;
+    border-radius: 0;
+  }
 }
 .card-rotator {
   /* margin: 0 auto 1em; */
@@ -43,4 +47,22 @@
 }
 .upgrades-card {
   background-image: url(img/upgrades-spritesheet.png);
+}
+
+.tooltip-text {
+  background-color: rgba($color: #fff, $alpha: 0.8);
+  font-size: 1.5rem;
+  padding: 1rem;
+  width: 400px;
+  border-radius: 10px;
+  .tooltip-line:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+}
+.tooltip-image-and-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-flow: column;
 }

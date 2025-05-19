@@ -11,6 +11,8 @@ export class Tooltip {
     );
     this.tooltipElem = $('tooltip-overlay');
     this.tooltipBody = document.querySelector('#tooltip-overlay .body');
+    this.isScrolling = false;
+
     this.hide();
 
     addClickListener(document.querySelector('#tooltip-overlay .close'), 'Close', this.handleClick);
@@ -23,18 +25,34 @@ export class Tooltip {
   handleClick = (e) => {
     this.hide();
   };
+  handleClickOutside = (e) => {
+    if (!this.isScrolling) this.hide();
+  };
+  scroll = (e) => {
+    this.isScrolling = true;
+    clearTimeout(this.scrollTimeout);
+
+    this.scrollTimeout = setTimeout(() => {
+      this.isScrolling = false;
+      console.log('set', this.isScrolling);
+    }, 500); // Adjust the timeout duration as needed
+  };
   show() {
     this.tooltipElem.style.display = '';
+    document.body.style.overflow = 'hidden';
     setTimeout(() => {
-      document.addEventListener('click', this.handleClick);
+      document.addEventListener('click', this.handleClickOutside);
       document.addEventListener('keydown', this.handleEscapeKey);
+      this.tooltipElem.addEventListener('scroll', this.scroll);
     }, 0);
   }
   hide() {
-    document.removeEventListener('click', this.handleClick);
+    document.removeEventListener('click', this.handleClickOutside);
     document.removeEventListener('keydown', this.handleEscapeKey);
+    this.tooltipElem.removeEventListener('scroll', this.scroll);
     this.tooltipElem.style.display = 'none';
     this.tooltipBody.innerHTML = '';
+    document.body.style.overflow = '';
   }
   renderByHTML(html) {
     this.tooltipBody.innerHTML = html;

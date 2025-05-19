@@ -2209,7 +2209,12 @@ class Game extends \Table
     public function give($item)
     {
         $itemType = $this->data->getItems()[$item]['itemType'];
-        if ($itemType == 'building') {
+        if ($itemType == 'necklace') {
+            $itemId = $this->gameData->createItem($item);
+            $this->character->updateCharacterData($this->character->getSubmittingCharacterId(), function (&$data) use ($itemId) {
+                array_push($data['necklaces'], ['itemId' => $itemId]);
+            });
+        } elseif ($itemType == 'building') {
             $currentBuildings = $this->gameData->get('buildings');
             $itemId = $this->gameData->createItem($item);
             array_push($currentBuildings, ['name' => $item, 'itemId' => $itemId]);

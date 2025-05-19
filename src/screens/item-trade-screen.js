@@ -153,7 +153,7 @@ export class ItemTradeScreen {
         });
         addClickListener(document.querySelector(`#item-trade-screen__${character.name} .character-image`), character.name, () => {
           this.game.tooltip.show();
-          renderImage(character.name, this.game.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+          renderImage(character.name, this.game.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
         });
       });
     }

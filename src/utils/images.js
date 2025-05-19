@@ -7,11 +7,24 @@ export const getSpriteSize = (name, scale = 2) => {
   if (rotate) return { width: h / scale, height: w / scale };
   else return { width: w / scale, height: h / scale };
 };
+const scaleLookups = { 'tooltip-character': 2, 'tooltip-item': 2, 'tooltip-hindrance': 2, 'tooltip-unlock': 0.75 };
 export const renderImage = (
   name,
   div = null,
-  { scale = 2, pos = 'append', card = true, css: extraCss = '', overridePos = null, rotate: rotateAPI = 0, centered = false } = {},
+  {
+    type = '',
+    scale = 2,
+    pos = 'append',
+    card = true,
+    css: extraCss = '',
+    overridePos = null,
+    rotate: rotateAPI = 0,
+    centered = false,
+    withText = false,
+    textOnly = false,
+  } = {},
 ) => {
+  if (scaleLookups[type]) scale = scaleLookups[type];
   // example of adding a div for each player
   if (!allSprites[name]) throw new Error(`Missing image ${name}`);
   const {
@@ -21,8 +34,9 @@ export const renderImage = (
     },
     frame: { x, y, w, h },
     rotate,
+    options: { text },
   } = allSprites[name];
-  let html;
+  let html = '';
   let scaledX = Math.round(x / scale);
   let scaledY = Math.round(y / scale);
   let scaledWidth = Math.round(w / scale);
@@ -35,21 +49,27 @@ export const renderImage = (
     scaledWidth = scaledWidth * Math.abs(overridePos.w - overridePos.x);
     scaledHeight = scaledHeight * Math.abs(overridePos.h - overridePos.y);
   }
-  if (rotate || rotateAPI)
-    html = `<div class="card-rotator" style="transform: rotate(${rotate || rotateAPI}deg) ${
-      centered ? ';transform-origin: center;' : `translate(${scaledWidth + 3}px, ${-scaledHeight / 2}px);transform-origin:top;`
-    }height: ${scaledWidth}px;width: ${scaledHeight}px;">
+  if (!textOnly) {
+    if (rotate || rotateAPI)
+      html = `<div class="tooltip-image-and-text"><div class="card-rotator" style="transform: rotate(${rotate || rotateAPI}deg) ${
+        centered ? ';transform-origin: center;' : `translate(${scaledWidth + 3}px, ${-scaledHeight / 2}px);transform-origin:top;`
+      }height: ${scaledWidth}px;width: ${scaledHeight}px;">
     <div name="${name}-${rotate || rotateAPI}" class="image card ${css} ${extraCss} ${
       card ? 'card' : ''
     } ${name}" style="background-size: ${scaledSpriteWidth}px ${scaledSpriteHeight}px;background-position: -${scaledX}px -${scaledY}px;width: ${scaledWidth}px;height: ${
       scaledHeight - 1
     }px;"></div>
     </div>`;
-  else
-    html = `<div name="${name}" class="image ${css} ${extraCss} ${
-      card ? 'card' : ''
-    } ${name}" style="background-size: ${scaledSpriteWidth}px ${scaledSpriteHeight}px;background-position: -${scaledX}px -${scaledY}px;width: ${scaledWidth}px;height: ${scaledHeight}px;"></div>`;
-
+    else
+      html = `<div class="tooltip-image-and-text"><div name="${name}" class="image ${css} ${extraCss} ${
+        card ? 'card' : ''
+      } ${name}" style="background-size: ${scaledSpriteWidth}px ${scaledSpriteHeight}px;background-position: -${scaledX}px -${scaledY}px;width: ${scaledWidth}px;height: ${scaledHeight}px;"></div>`;
+  }
+  if (withText || textOnly) {
+    html += `<div class="tooltip-text">${text.map((d) => (d.title ? `<div class="tooltip-line"><b class="tooltip-title">${d.title}</b></div>` : `<div class="tooltip-line">${d}</div>`)).join('')}</div>`;
+  } else {
+    html += '</div>';
+  }
   if (pos === 'replace') div.innerHTML = html;
   else if (pos === 'return') return html;
   else if (pos === 'insert') div.insertAdjacentHTML('afterbegin', html);

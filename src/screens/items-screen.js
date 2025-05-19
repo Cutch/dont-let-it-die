@@ -28,7 +28,7 @@ export class ItemsScreen {
     });
     addClickListener(container.querySelector(`.character-image`), characterId, () => {
       this.game.tooltip.show();
-      renderImage(characterId, this.game.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+      renderImage(characterId, this.game.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
     });
   }
   show(gameData) {

@@ -166,7 +166,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         playerSideContainer = $(characterSideId);
         addClickListener(playerSideContainer.querySelector(`.character-name`), character.name, () => {
           this.tooltip.show();
-          renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+          renderImage(character.name, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
         });
         renderImage(character.name, playerSideContainer.querySelector(`.character-image`), {
           scale: 3,
@@ -179,7 +179,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         });
         addClickListener(playerSideContainer.querySelector(`.character-image`), character.name, () => {
           this.tooltip.show();
-          renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+          renderImage(character.name, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
         });
       }
       playerSideContainer.querySelector(`.health .value`).innerHTML = `${character.health ?? 0}/${character.maxHealth ?? 0}`;
@@ -194,13 +194,25 @@ declare('bgagame.dontletitdie', Gamegui, {
       [...equipments, ...character.dayEvent, ...character.necklaces].forEach((d) => {
         addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), _(d.name), () => {
           this.tooltip.show();
-          renderImage(d.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace', rotate: d.rotate, centered: true });
+          renderImage(d.id, this.tooltip.renderByElement(), {
+            withText: true,
+            type: 'tooltip-item',
+            pos: 'replace',
+            rotate: d.rotate,
+            centered: true,
+          });
         });
       });
       hindrance.forEach((d) => {
         addClickListener(playerSideContainer.querySelector(`.hindrance-${d.id}`), _(d.name), () => {
           this.tooltip.show();
-          renderImage(d.id, this.tooltip.renderByElement(), { scale: 1.5, pos: 'replace', rotate: d.rotate, centered: true });
+          renderImage(d.id, this.tooltip.renderByElement(), {
+            withText: true,
+            type: 'tooltip-hindrance',
+            pos: 'replace',
+            rotate: d.rotate,
+            centered: true,
+          });
         });
       });
 
@@ -249,7 +261,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         renderImage(character.name, characterElem, { scale, pos: 'replace' });
         addClickListener(characterElem, character.name, () => {
           this.tooltip.show();
-          renderImage(character.name, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+          renderImage(character.name, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
         });
         const coverElem = document.createElement('div');
         characterElem.appendChild(coverElem);
@@ -281,7 +293,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           });
           addClickListener(document.querySelector(`#player-${character.name} > .${weapon.itemType}`), _(weapon.name), () => {
             this.tooltip.show();
-            renderImage(weapon.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+            renderImage(weapon.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-item', pos: 'replace' });
           });
         }
 
@@ -294,7 +306,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           });
           addClickListener(document.querySelector(`#player-${character.name} > .${tool.itemType}`), _(tool.name), () => {
             this.tooltip.show();
-            renderImage(tool.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+            renderImage(tool.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-item', pos: 'replace' });
           });
         }
         const item3 = equipments.find((d) => !renderedItems.includes(d));
@@ -313,7 +325,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         //   });
         //   addClickListener(document.querySelector(`#player-${character.name} > .slot3`), item3.name, () => {
         //     this.tooltip.show();
-        //     renderImage(item3.id, this.tooltip.renderByElement(), { scale: 1, pos: 'replace' });
+        //     renderImage(item3.id, this.tooltip.renderByElement(), {withText: true,  type: 'tooltip-item', pos: 'replace' });
         //   });
         // }
         const extraEquipmentElem = extraContainerButtons.querySelector(`.card-extra-equipment`);
@@ -322,10 +334,17 @@ declare('bgagame.dontletitdie', Gamegui, {
         addClickListener(extraEquipmentElem, _('Extra Equipment'), () => {
           this.tooltip.show();
           if (item3)
-            renderImage(item3.id, this.tooltip.renderByElement(), { scale: 1, pos: 'append', rotate: item3.rotate, centered: true });
+            renderImage(item3.id, this.tooltip.renderByElement(), {
+              withText: true,
+              type: 'tooltip-item',
+              pos: 'append',
+              rotate: item3.rotate,
+              centered: true,
+            });
           [...character.dayEvent, ...character.necklaces].forEach((dayEvent) => {
             renderImage(dayEvent.id, this.tooltip.renderByElement(), {
-              scale: 1,
+              withText: true,
+              type: 'tooltip-item',
               pos: 'append',
               rotate: dayEvent.rotate,
               centered: true,
@@ -339,10 +358,10 @@ declare('bgagame.dontletitdie', Gamegui, {
         addClickListener(hindranceElem, _('Hindrance'), () => {
           this.tooltip.show();
           character.physicalHindrance.forEach((hindrance) => {
-            renderImage(hindrance.id, this.tooltip.renderByElement(), { scale: 1.5, pos: 'append' });
+            renderImage(hindrance.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-hindrance', pos: 'append' });
           });
           character.mentalHindrance.forEach((hindrance) => {
-            renderImage(hindrance.id, this.tooltip.renderByElement(), { scale: 1.5, pos: 'append' });
+            renderImage(hindrance.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-hindrance', pos: 'append' });
           });
         });
         const displayContainer = !hindranceElem.style['display'] || !extraEquipmentElem.style['display'];
@@ -499,7 +518,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     //       renderImage(building.name, div, { scale: 2, pos: 'append' });
     //       addClickListener(div, 'Buildings', () => {
     //         this.tooltip.show();
-    //         renderImage(building.name, this.tooltip.renderByElement(), { scale: 0.5, pos: 'replace' });
+    //         renderImage(building.name, this.tooltip.renderByElement(), {withText: true,  scale: 0.5, pos: 'replace' });
     //       });
     //     });
     //   }
@@ -574,10 +593,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
     addClickListener(elem.querySelector(`.token.${name}`), name, () => {
       this.tooltip.show();
-      renderImage(name, this.tooltip.renderByElement(), {
-        pos: 'insert',
-        scale: 1,
-      });
+      renderImage(name, this.tooltip.renderByElement(), { withText: true, pos: 'insert', type: 'tooltip-item' });
     });
   },
   setupBoard: function (gameData) {
@@ -777,8 +793,6 @@ declare('bgagame.dontletitdie', Gamegui, {
     // Setting up player boards
     this.updateKnowledgeTree(gameData);
     this.updateItems(gameData);
-    playArea.insertAdjacentHTML('beforeend', `<div id="instructions-container" class="dlid__container"></div>`);
-    renderImage(`instructions`, $('instructions-container'));
 
     // Setup game notifications to handle (see "setupNotifications" method below)
     this.setupNotifications();
@@ -816,10 +830,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           renderImage(unlockId, elem, { scale: 1.7 / 1.2 });
           addClickListener(document.querySelector(`#knowledge-container *[name="${unlockId}"]`), 'Unlocks', () => {
             this.tooltip.show();
-            renderImage(unlockId, this.tooltip.renderByElement(), {
-              pos: 'insert',
-              scale: 0.75,
-            });
+            renderImage(unlockId, this.tooltip.renderByElement(), { withText: true, pos: 'insert', type: 'tooltip-unlock' });
           });
         }
       });

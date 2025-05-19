@@ -60,7 +60,11 @@ export class Deck {
           rotate,
         } = allSprites[cardId];
 
-        renderImage(cardId, this.game.tooltip.renderByElement(), { scale: (rotate ? h : w) < 300 ? 0.5 : 1, pos: 'replace' });
+        renderImage(cardId, this.game.tooltip.renderByElement(), {
+          withText: true,
+          scale: (rotate ? h : w) < 300 ? 0.5 : 1,
+          pos: 'replace',
+        });
       });
     }
     this.div

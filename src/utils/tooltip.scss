@@ -1,6 +1,6 @@
 #tooltip-overlay {
   position: fixed;
-  top: 0;
+  top: 0px;
   bottom: 0;
   left: 0;
   right: 0;
@@ -10,19 +10,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: auto;
   .inner {
     position: relative;
+    margin-top: 60px;
   }
   .body {
     display: flex;
     gap: 1rem;
     flex-flow: wrap;
+    align-items: flex-start;
+    justify-content: center;
   }
   .close {
-    position: absolute;
-    top: -1.5rem;
-    right: -1.5rem;
-
     border-radius: 50%;
     border: 1px solid black;
     background-color: white;
@@ -32,5 +32,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: auto auto 1rem;
+    // position: absolute;
+    // top: -1.5rem;
+    // right: -1.5rem;
   }
 }
