@@ -2028,12 +2028,27 @@ class Game extends \Table
     public function getArgsData(): array
     {
         $availableUnlocks = $this->data->getValidKnowledgeTree();
+
+        $allUnlocks = $this->data->getBoards()['knowledge-tree-' . $this->getDifficulty()]['track'];
+        $upgrades = $this->gameData->get('upgrades');
+        $mapping = [];
+        array_walk($upgrades, function ($v, $k) use (&$mapping) {
+            $mapping[$v['replace']] = $this->data->getUpgrades()[$k];
+        });
+        array_walk($allUnlocks, function ($v, $k) use ($mapping, &$allUnlocks) {
+            if (array_key_exists($k, $mapping)) {
+                unset($allUnlocks[$k]);
+                $allUnlocks[$mapping[$k]['id']] = $mapping[$k];
+            }
+        });
+
         $result = [
             'activeCharacter' => $this->character->getTurnCharacterId(),
             'activeCharacters' => $this->gameData->getAllMultiActiveCharacterIds(),
             'fireWoodCost' => $this->getFirewoodCost(),
             'tradeRatio' => $this->getTradeRatio(),
             'upgrades' => $this->gameData->get('upgrades'),
+            'allUnlocks' => array_keys($allUnlocks),
             'unlocks' => $this->gameData->get('unlocks'),
             'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
                 return [

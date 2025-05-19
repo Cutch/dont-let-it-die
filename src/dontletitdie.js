@@ -846,6 +846,21 @@ declare('bgagame.dontletitdie', Gamegui, {
       );
       renderImage(`fkp-unlocked`, $(`knowledge-${unlockSpot}`), { scale: 2 / 1.2 });
     });
+
+    gameData.allUnlocks.forEach((unlockId) => {
+      if (gameData.upgrades[unlockId]) return;
+      const { x, y } = allSprites[`knowledge-tree-${this.difficulty}`].upgrades[unlockId];
+      selections.insertAdjacentHTML(
+        'beforeend',
+        `<div class="fkp-spot ${unlockId}" style="top: ${(y - 7) * 1.2}px; left: ${(x - 103) * 1.2}px;"></div>`,
+      );
+      const elem = selections.querySelector(`.fkp-spot.${unlockId}`);
+
+      addClickListener(elem, 'Select', () => {
+        this.tooltip.show();
+        renderImage(unlockId, this.tooltip.renderByElement(), { textOnly: true, pos: 'insert', type: 'tooltip-unlock' });
+      });
+    });
   },
   updateGameDatas: function (gameData = {}) {
     const clone = { ...gameData };

@@ -27,29 +27,29 @@ export const renderImage = (
   if (scaleLookups[type]) scale = scaleLookups[type];
   // example of adding a div for each player
   if (!allSprites[name]) throw new Error(`Missing image ${name}`);
-  const {
-    meta: {
-      css = '',
-      size: { w: spriteWidth, h: spriteHeight },
-    },
-    frame: { x, y, w, h },
-    rotate,
-    options: { text },
-  } = allSprites[name];
+  const text = allSprites[name]?.options?.text;
   let html = '';
-  let scaledX = Math.round(x / scale);
-  let scaledY = Math.round(y / scale);
-  let scaledWidth = Math.round(w / scale);
-  let scaledHeight = Math.round(h / scale);
-  const scaledSpriteWidth = Math.ceil(spriteWidth / scale);
-  const scaledSpriteHeight = Math.ceil(spriteHeight / scale);
-  if (overridePos) {
-    scaledX = scaledX + scaledWidth * overridePos.x;
-    scaledY = scaledY + scaledHeight * overridePos.y;
-    scaledWidth = scaledWidth * Math.abs(overridePos.w - overridePos.x);
-    scaledHeight = scaledHeight * Math.abs(overridePos.h - overridePos.y);
-  }
   if (!textOnly) {
+    const {
+      meta: {
+        css = '',
+        size: { w: spriteWidth, h: spriteHeight },
+      },
+      frame: { x, y, w, h },
+      rotate,
+    } = allSprites[name];
+    let scaledX = Math.round(x / scale);
+    let scaledY = Math.round(y / scale);
+    let scaledWidth = Math.round(w / scale);
+    let scaledHeight = Math.round(h / scale);
+    const scaledSpriteWidth = Math.ceil(spriteWidth / scale);
+    const scaledSpriteHeight = Math.ceil(spriteHeight / scale);
+    if (overridePos) {
+      scaledX = scaledX + scaledWidth * overridePos.x;
+      scaledY = scaledY + scaledHeight * overridePos.y;
+      scaledWidth = scaledWidth * Math.abs(overridePos.w - overridePos.x);
+      scaledHeight = scaledHeight * Math.abs(overridePos.h - overridePos.y);
+    }
     if (rotate || rotateAPI)
       html = `<div class="tooltip-image-and-text"><div class="card-rotator" style="transform: rotate(${rotate || rotateAPI}deg) ${
         centered ? ';transform-origin: center;' : `translate(${scaledWidth + 3}px, ${-scaledHeight / 2}px);transform-origin:top;`
