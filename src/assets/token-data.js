@@ -1,154 +1,10 @@
 export default {
   getData: () => ({
     sprites: {
-      '1-token': {
-        options: {
-          type: 'token',
-          name: '1 Token',
-        },
-        frame: {
-          x: 0,
-          y: 0,
-          w: 111,
-          h: 111,
-        },
-      },
-      '1-unlocked': {
-        options: {
-          type: 'token',
-          name: '1 Unlocked',
-        },
-        frame: {
-          x: 113,
-          y: 0,
-          w: 111,
-          h: 111,
-        },
-      },
-      '2-token': {
-        options: {
-          type: 'token',
-          name: '2 Token',
-        },
-        frame: {
-          x: 226,
-          y: 0,
-          w: 111,
-          h: 111,
-        },
-      },
-      '2-unlocked': {
-        options: {
-          type: 'token',
-          name: '2 Unlocked',
-        },
-        frame: {
-          x: 339,
-          y: 0,
-          w: 111,
-          h: 111,
-        },
-      },
-      '3-token': {
-        options: {
-          type: 'token',
-          name: '3 Token',
-        },
-        frame: {
-          x: 452,
-          y: 0,
-          w: 111,
-          h: 111,
-        },
-      },
-      '3-unlocked': {
-        options: {
-          type: 'token',
-          name: '3 Unlocked',
-        },
-        frame: {
-          x: 0,
-          y: 113,
-          w: 111,
-          h: 111,
-        },
-      },
-      '4-token': {
-        options: {
-          type: 'token',
-          name: '4 Token',
-        },
-        frame: {
-          x: 113,
-          y: 113,
-          w: 111,
-          h: 111,
-        },
-      },
-      '4-unlocked': {
-        options: {
-          type: 'token',
-          name: '4 Unlocked',
-        },
-        frame: {
-          x: 226,
-          y: 113,
-          w: 111,
-          h: 111,
-        },
-      },
-      '5-token': {
-        options: {
-          type: 'token',
-          name: '5 Token',
-        },
-        frame: {
-          x: 339,
-          y: 113,
-          w: 111,
-          h: 111,
-        },
-      },
-      '5-unlocked': {
-        options: {
-          type: 'token',
-          name: '5 Unlocked',
-        },
-        frame: {
-          x: 452,
-          y: 113,
-          w: 111,
-          h: 111,
-        },
-      },
-      '6-token': {
-        options: {
-          type: 'token',
-          name: '6 Token',
-        },
-        frame: {
-          x: 0,
-          y: 226,
-          w: 111,
-          h: 111,
-        },
-      },
-      '6-unlocked': {
-        options: {
-          type: 'token',
-          name: '6 Unlocked',
-        },
-        frame: {
-          x: 113,
-          y: 226,
-          w: 111,
-          h: 111,
-        },
-      },
       berry: {
         options: {
           type: 'resource',
-          name: 'Berry',
+          name: _('Berry'),
         },
         frame: {
           x: 226,
@@ -160,7 +16,7 @@ export default {
       'berry-cooked': {
         options: {
           type: 'resource',
-          name: 'Berry Cooked',
+          name: _('Berry Cooked'),
         },
         frame: {
           x: 339,
@@ -172,7 +28,7 @@ export default {
       bone: {
         options: {
           type: 'resource',
-          name: 'Bone',
+          name: _('Bone'),
         },
         frame: {
           x: 452,
@@ -184,7 +40,7 @@ export default {
       'dino-egg': {
         options: {
           type: 'resource',
-          name: 'Dino Egg',
+          name: _('Dino Egg'),
         },
         frame: {
           x: 0,
@@ -196,7 +52,7 @@ export default {
       'dino-egg-cooked': {
         options: {
           type: 'resource',
-          name: 'Dino Egg Cooked',
+          name: _('Dino Egg Cooked'),
         },
         frame: {
           x: 113,
@@ -208,7 +64,7 @@ export default {
       fish: {
         options: {
           type: 'resource',
-          name: 'Fish',
+          name: _('Fish'),
         },
         frame: {
           x: 226,
@@ -220,7 +76,7 @@ export default {
       'fish-cooked': {
         options: {
           type: 'resource',
-          name: 'Fish Cooked',
+          name: _('Fish Cooked'),
         },
         frame: {
           x: 339,
@@ -232,7 +88,7 @@ export default {
       fkp: {
         options: {
           type: 'resource',
-          name: 'Fkp',
+          name: _('Fire Knowledge Point'),
         },
         frame: {
           x: 452,
@@ -244,7 +100,7 @@ export default {
       'fkp-unlocked': {
         options: {
           type: 'resource',
-          name: 'Fkp Unlocked',
+          name: _('Unlocked Fire Knowledge Point'),
         },
         frame: {
           x: 0,
@@ -256,7 +112,7 @@ export default {
       'gem-b': {
         options: {
           type: 'resource',
-          name: 'Gem 1',
+          name: _('Gem'),
         },
         frame: {
           x: 113,
@@ -268,7 +124,7 @@ export default {
       'gem-p': {
         options: {
           type: 'resource',
-          name: 'Gem 2',
+          name: _('Gem'),
         },
         frame: {
           x: 226,
@@ -280,7 +136,7 @@ export default {
       'gem-y': {
         options: {
           type: 'resource',
-          name: 'Gem 3',
+          name: _('Gem'),
         },
         frame: {
           x: 339,
@@ -292,7 +148,7 @@ export default {
       fiber: {
         options: {
           type: 'resource',
-          name: 'Fiber',
+          name: _('Fiber'),
         },
         frame: {
           x: 452,
@@ -304,7 +160,7 @@ export default {
       hide: {
         options: {
           type: 'resource',
-          name: 'Hide',
+          name: _('Hide'),
         },
         frame: {
           x: 565,
@@ -316,7 +172,7 @@ export default {
       'meat-cooked': {
         options: {
           type: 'resource',
-          name: 'Meat Cooked',
+          name: _('Meat Cooked'),
         },
         frame: {
           x: 565,
@@ -328,7 +184,7 @@ export default {
       herb: {
         options: {
           type: 'resource',
-          name: 'Herb',
+          name: _('Herb'),
         },
         frame: {
           x: 565,
@@ -340,7 +196,7 @@ export default {
       meat: {
         options: {
           type: 'resource',
-          name: 'Meat',
+          name: _('Meat'),
         },
         frame: {
           x: 565,
@@ -352,7 +208,7 @@ export default {
       rock: {
         options: {
           type: 'resource',
-          name: 'Rock',
+          name: _('Rock'),
         },
         frame: {
           x: 565,
@@ -364,7 +220,7 @@ export default {
       stew: {
         options: {
           type: 'resource',
-          name: 'Stew',
+          name: _('Stew'),
         },
         frame: {
           x: 0,
@@ -376,7 +232,7 @@ export default {
       trap: {
         options: {
           type: 'resource',
-          name: 'Trap',
+          name: _('Trap'),
         },
         frame: {
           x: 113,
@@ -388,7 +244,7 @@ export default {
       wood: {
         options: {
           type: 'resource',
-          name: 'Wood',
+          name: _('Wood'),
         },
         frame: {
           x: 226,

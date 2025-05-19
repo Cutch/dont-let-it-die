@@ -266,7 +266,13 @@ class SelectionStates
             $stateNameState = $this->stateToStateNameMapping($stateName);
 
             $playerId = $this->game->getCurrentPlayer();
-            $newState = ['cancellable' => $cancellable, 'title' => $title, 'currentPlayerId' => $playerId, ...$state];
+            $newState = [
+                'cancellable' => $cancellable,
+                'title' => $title,
+                'currentPlayerId' => $playerId,
+                'nextState' => $nextState,
+                ...$state,
+            ];
             $this->game->gameData->addMultiActiveCharacter($characterId, true);
 
             $this->game->gameData->set($stateNameState, $newState);

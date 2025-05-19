@@ -35,7 +35,7 @@ import { TokenScreen } from './screens/token-screen';
 import { TooManyItemsScreen } from './screens/too-many-items-screen';
 import { UpgradeSelectionScreen } from './screens/upgrade-selection-screen';
 import { WeaponScreen } from './screens/weapon-screen';
-import { addClickListener, Deck, Dice, renderImage, Selector, Tooltip, Tweening } from './utils/index';
+import { addClickListener, Deck, Dice, renderImage, renderText, Selector, Tooltip, Tweening } from './utils/index';
 
 declare('bgagame.dontletitdie', Gamegui, {
   constructor: function () {
@@ -187,9 +187,9 @@ declare('bgagame.dontletitdie', Gamegui, {
       playerSideContainer.querySelector(`.equipment .value`).innerHTML =
         [...equipments, ...character.dayEvent, ...character.necklaces]
           .map((d) => `<span class="equipment-item equipment-${d.itemId}">${_(d.name)}</span>`)
-          .join(', ') || 'None';
+          .join(', ') || _('None');
       playerSideContainer.querySelector(`.hindrance .value`).innerHTML =
-        hindrance.map((d) => `<span class="hindrance-item hindrance-${d.id}">${_(d.name)}</span>`).join(', ') || 'None';
+        hindrance.map((d) => `<span class="hindrance-item hindrance-${d.id}">${_(d.name)}</span>`).join(', ') || _('None');
       playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
       [...equipments, ...character.dayEvent, ...character.necklaces].forEach((d) => {
         addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), _(d.name), () => {
@@ -528,14 +528,14 @@ declare('bgagame.dontletitdie', Gamegui, {
   updateResource: function (name, elem, count, { warn = false } = {}) {
     elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot dot--number">${count}</div></div>`);
     if (warn) {
-      this.addHelpTooltip(
-        elem.querySelector(`.token.${name}`),
-        _(
+      this.addHelpTooltip({
+        node: elem.querySelector(`.token.${name}`),
+        text: _(
           'Warning, the morning phase will cause ${count} fire wood to be removed. If there is not enough fire wood the game is lost.',
         ).replace('${count}', count),
-        'fa fa-fire dld-warning',
-        'white',
-      );
+        iconCSS: 'fa fa-fire dld-warning',
+        background: 'white',
+      });
     }
     renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
   },
@@ -582,18 +582,21 @@ declare('bgagame.dontletitdie', Gamegui, {
     const keys = Object.keys(gameData.availableEquipment);
     keys.forEach((name) => this.updateItem(name, availableElem, gameData.availableEquipment?.[name] ?? 0));
     if (keys.length === 0) {
-      availableElem.innerHTML = `<b>${_('None Available')}</b>`;
+      availableElem.innerHTML = `<b>${_('None')}</b>`;
     }
   },
   updateItem: function (name, elem, count) {
-    elem.insertAdjacentHTML(
-      'beforeend',
-      `<div class="token ${name}">${count != null ? `<div class="counter dot dot--number">${count}</div>` : ''}</div>`,
-    );
+    elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"></div>`);
     renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
+    if (count != null)
+      elem.querySelector(`.token.${name} .image`).insertAdjacentHTML('beforeend', `<div class="counter dot dot--number">${count}</div>`);
     addClickListener(elem.querySelector(`.token.${name}`), name, () => {
       this.tooltip.show();
       renderImage(name, this.tooltip.renderByElement(), { withText: true, pos: 'insert', type: 'tooltip-item' });
+      this.tooltip
+        .renderByElement()
+        .querySelector(`.image`)
+        .insertAdjacentHTML('beforeend', `<div class="counter dot dot--number">${count}</div>`);
     });
   },
   setupBoard: function (gameData) {
@@ -708,6 +711,14 @@ declare('bgagame.dontletitdie', Gamegui, {
       trackContainer
         .querySelector(`.track-${this.trackDifficulty}`)
         .insertAdjacentHTML('beforeend', `<div id="track-marker" class="marker"><i class="fa fa-sun-o dlid__sun"></i></div>`);
+      trackContainer.querySelector(`.track-${this.trackDifficulty}`).insertAdjacentHTML('beforeend', `<div class="marker"></div>`);
+
+      this.addHelpTooltip({
+        node: trackContainer.querySelector(`.track-${this.trackDifficulty}`),
+        tooltipText: `track-${this.trackDifficulty}`,
+        background: 'white',
+      });
+
       trackContainer
         .querySelector(`.track-${this.trackDifficulty}`)
         .insertAdjacentHTML('beforeend', `<div id="fire-pit" class="fire-pit"><div class="fire-wood"></div></div>`);
@@ -993,7 +1004,7 @@ declare('bgagame.dontletitdie', Gamegui, {
   //
   getActionSuffixHTML: function (action) {
     let suffix = '';
-    if (action['skillOption']) suffix += ` (${action['skillOption'].name})`;
+    if (action['skillOption']) suffix += ` (${_(action['skillOption'].name)})`;
     else if (action['character'] != null && !action['global']) suffix += ` (${action['character']})`;
     else if (action['characterId'] != null && !action['global']) suffix += ` (${action['characterId']})`;
     if (action['stamina'] != null) suffix += ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
@@ -1038,7 +1049,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                     (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
                       skill.skillOption = skillOption;
                       const suffix = this.getActionSuffixHTML(skill);
-                      this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
+                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
                         return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
                       });
                     });
@@ -1052,7 +1063,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                 this.removeActionButtons();
                 Object.values(this.gamedatas.availableUnlocks).forEach((unlock) => {
                   const suffix = this.getActionSuffixHTML(unlock);
-                  this.statusBar.addActionButton(`${unlock.name}${suffix}`, () => {
+                  this.statusBar.addActionButton(`${_(unlock.name)}${suffix}`, () => {
                     return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
                   });
                 });
@@ -1064,7 +1075,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                     (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
                       skill.skillOption = skillOption;
                       const suffix = this.getActionSuffixHTML(skill);
-                      this.statusBar.addActionButton(`${skill.name}${suffix}`, () => {
+                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
                         return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
                       });
                     });
@@ -1237,18 +1248,21 @@ declare('bgagame.dontletitdie', Gamegui, {
           });
           break;
         case 'deckSelection':
-          this.statusBar.addActionButton(args.deckSelection?.title ?? _('Select Deck'), () => {
+          this.statusBar.addActionButton(args.deckSelection?.title ? _(args.deckSelection.title) : _('Select Deck'), () => {
             this.bgaPerformAction('actSelectDeck', { deckName: this.deckSelectionScreen.getSelectedId() }).then(() =>
               this.deckSelectionScreen.hide(),
             );
           });
           break;
         case 'hindranceSelection':
-          this.statusBar.addActionButton(args.hindranceSelection?.button ?? _('Remove Hindrance'), () => {
-            this.bgaPerformAction('actSelectHindrance', { data: JSON.stringify(this.hindranceSelectionScreen.getSelected()) }).then(() =>
-              this.hindranceSelectionScreen.hide(),
-            );
-          });
+          this.statusBar.addActionButton(
+            args.hindranceSelection?.button ? _(args.hindranceSelection.button) : _('Remove Hindrance'),
+            () => {
+              this.bgaPerformAction('actSelectHindrance', { data: JSON.stringify(this.hindranceSelectionScreen.getSelected()) }).then(() =>
+                this.hindranceSelectionScreen.hide(),
+              );
+            },
+          );
           break;
         case 'characterSelection':
           this.statusBar.addActionButton(this.getActionMappings().actSelectCharacter, () => {
@@ -1317,12 +1331,15 @@ declare('bgagame.dontletitdie', Gamegui, {
           } else if (playerCount === 4) {
             this.selectCharacterCount = 1;
           }
-          if (this.selectCharacterCount == 1)
-            this.statusBar.addActionButton(_('Confirm 1 character'), () => this.bgaPerformAction('actChooseCharacters'));
-          else
-            this.statusBar.addActionButton(_('Confirm ${x} characters').replace('${x}', this.selectCharacterCount), () =>
-              this.bgaPerformAction('actChooseCharacters'),
-            );
+          this.statusBar.addActionButton(_('Confirm ${x} character(s)').replace('${x}', this.selectCharacterCount), () =>
+            this.bgaPerformAction('actChooseCharacters'),
+          );
+          break;
+        case 'playerTurn':
+          if (isActive) {
+            this.statusBar.addActionButton(_('Undo'), () => this.bgaPerformAction('actUndo'), { color: 'secondary' });
+            this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
+          }
           break;
         default:
           if (isActive) this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
@@ -1339,7 +1356,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     }
   },
 
-  addHelpTooltip: function (node, text, iconCSS, background = 'white') {
+  addHelpTooltip: function ({ node, text = '', tooltipText = '', iconCSS, background = 'white' }) {
     // game.addTooltip(id, helpString, actionString);
     if (!node.querySelector('.tooltip')) {
       node.insertAdjacentHTML(
@@ -1356,7 +1373,7 @@ declare('bgagame.dontletitdie', Gamegui, {
             .renderByElement()
             .insertAdjacentHTML(
               'beforeend',
-              `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${text}</span></div>`,
+              `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${tooltipText ? renderText({ name: tooltipText }) : text}</span></div>`,
             );
         },
         true,

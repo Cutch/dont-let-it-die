@@ -412,7 +412,7 @@ class UpgradesData
                         $game->character->adjustHealth($data['characterId'], $aboveMax);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => $aboveMax,
-                            'character_resource' => 'health',
+                            'character_resource' => clienttranslate('Health'),
                         ]);
                     }
                 },
@@ -564,7 +564,7 @@ class UpgradesData
                     $game->character->adjustAllHealth(10);
                     $game->notify('tree', clienttranslate('Everyone gained ${count} ${character_resource}'), [
                         'count' => clienttranslate('full'),
-                        'character_resource' => 'health',
+                        'character_resource' => clienttranslate('Health'),
                     ]);
                 },
             ],

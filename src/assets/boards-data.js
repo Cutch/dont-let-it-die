@@ -11,14 +11,17 @@ export default {
         rotate: 90,
       },
       'track-normal': {
-        text: [
-          _('Remove (Wood Count) from fire pit'),
-          _('Increase Day Count +1'),
-          _('Each character takes 1 Damage'),
-          _('Refresh up to max stamina'),
-          _('Trade items as desired'),
-          _('Pass first player token to the left'),
-        ],
+        options: {
+          text: [
+            { title: _('Morning Phase') },
+            _('Remove (Wood Count) from fire pit'),
+            _('Increase Day Count +1'),
+            _('Each character takes 1 Damage'),
+            _('Refresh up to max stamina'),
+            _('Trade items as desired'),
+            _('Pass first player token to the left'),
+          ],
+        },
         frame: {
           x: 725,
           y: 1,
@@ -28,14 +31,17 @@ export default {
         rotate: 0,
       },
       'track-hard': {
-        text: [
-          _('Remove (Wood Count) from fire pit'),
-          _('Increase Day Count +1'),
-          _('Each character takes 1 Damage'),
-          _('Refresh up to max stamina'),
-          _('Trade items as desired'),
-          _('Pass first player token to the left'),
-        ],
+        options: {
+          text: [
+            { title: _('Morning Phase') },
+            _('Remove (Wood Count) from fire pit'),
+            _('Increase Day Count +1'),
+            _('Each character takes 1 Damage'),
+            _('Refresh up to max stamina'),
+            _('Trade items as desired'),
+            _('Pass first player token to the left'),
+          ],
+        },
         frame: {
           x: 1449,
           y: 1,

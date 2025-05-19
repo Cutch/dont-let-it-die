@@ -48,9 +48,9 @@ class CharactersData
                                 ),
                                 [
                                     'count_1' => 2,
-                                    'character_resource_1' => 'stamina',
+                                    'character_resource_1' => clienttranslate('Stamina'),
                                     'count_2' => 2,
-                                    'character_resource_2' => 'health',
+                                    'character_resource_2' => clienttranslate('Health'),
                                 ]
                             );
                             return ['notify' => false];
@@ -68,7 +68,7 @@ class CharactersData
                         $data['stamina'] += 2;
                         $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => 2,
-                            'character_resource' => 'stamina',
+                            'character_resource' => clienttranslate('Stamina'),
                         ]);
                     }
                 },
@@ -361,7 +361,7 @@ class CharactersData
                         $game->character->adjustHealth($char['id'], 1);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => 1,
-                            'character_resource' => 'health',
+                            'character_resource' => clienttranslate('Health'),
                         ]);
                     }
                 },
@@ -520,9 +520,9 @@ class CharactersData
                                 clienttranslate('gained ${count_1} ${character_resource_1}, lost ${count_2} ${character_resource_2}'),
                                 [
                                     'count_1' => 2,
-                                    'character_resource_1' => 'health',
+                                    'character_resource_1' => clienttranslate('Health'),
                                     'count_2' => 2,
-                                    'character_resource_2' => 'stamina',
+                                    'character_resource_2' => clienttranslate('Stamina'),
                                 ]
                             );
                             return ['notify' => false];
@@ -966,6 +966,7 @@ class CharactersData
                         },
                         'onDeckSelection' => function (Game $game, $skill, $data) {
                             if ($game->gameData->get('state')['id'] == $skill['id']) {
+                                $game->markRandomness();
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                 $topCard = $game->decks->getDeck($data['deckName'])->getCardOnTop('deck');
                                 $card = $game->decks->getCard($topCard['type_arg']);
@@ -1181,7 +1182,7 @@ class CharactersData
                                 $game->character->getActiveStamina(2);
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => 2,
-                                    'character_resource' => 'stamina',
+                                    'character_resource' => clienttranslate('Stamina'),
                                 ]);
                             } else {
                                 $game->adjustResource('fkp', 1);
@@ -1290,7 +1291,7 @@ class CharactersData
                         if ($game->character->adjustActiveHealth(1) == 1) {
                             $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                 'count' => 1,
-                                'character_resource' => 'health',
+                                'character_resource' => clienttranslate('Health'),
                             ]);
                         }
                     }
@@ -1512,7 +1513,7 @@ class CharactersData
                                 $game->character->adjustHealth($skill['characterId'], $damageTaken);
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 1,
-                                    'character_resource' => 'health',
+                                    'character_resource' => clienttranslate('Health'),
                                     'character_name' => 'Vog',
                                 ]);
                                 $interruptState['willTakeDamage'] = 0;
@@ -1801,7 +1802,7 @@ class CharactersData
                             $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                 'count' => 1,
-                                'character_resource' => 'health',
+                                'character_resource' => clienttranslate('Health'),
                             ]);
                             // return ['spendActionCost' => false];
                         },
@@ -1824,7 +1825,7 @@ class CharactersData
                         $game->character->adjustActiveHealth(-1);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                             'count' => 1,
-                            'character_resource' => 'health',
+                            'character_resource' => clienttranslate('Health'),
                         ]);
                         $game->adjustResource('fkp', 2);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
@@ -1845,7 +1846,7 @@ class CharactersData
                         $game->character->adjustHealth($char['id'], 10);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => clienttranslate('full'),
-                            'character_resource' => 'health',
+                            'character_resource' => clienttranslate('Health'),
                             'character_name' => $game->getCharacterHTML($char['character_name']),
                         ]);
                     }
@@ -1900,7 +1901,7 @@ class CharactersData
                         $data['stamina'] += 1;
                         $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => 1,
-                            'character_resource' => 'stamina',
+                            'character_resource' => clienttranslate('Stamina'),
                         ]);
                     }
                 },
@@ -1950,7 +1951,7 @@ class CharactersData
                                 $game->character->adjustHealth($state['selectedCharacterId'], 1);
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => 1,
-                                    'character_resource' => 'health',
+                                    'character_resource' => clienttranslate('Health'),
                                     'character_name' => $state['selectedCharacterId'],
                                 ]);
                                 $data['nextState'] = 'playerTurn';
@@ -1996,7 +1997,7 @@ class CharactersData
                                 $game->character->adjustStamina($state['selectedCharacterId'], 1);
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => 1,
-                                    'character_resource' => 'stamina',
+                                    'character_resource' => clienttranslate('Stamina'),
                                     'character_name' => $state['selectedCharacterId'],
                                 ]);
                                 $data['nextState'] = 'playerTurn';

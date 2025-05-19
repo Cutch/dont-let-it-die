@@ -633,7 +633,7 @@ class DecksData
                     $game->character->adjustAllHealth(2);
                     $game->nightEventLog(clienttranslate('Everyone gained ${count} ${character_resource}'), [
                         'count' => 2,
-                        'character_resource' => 'health',
+                        'character_resource' => clienttranslate('Health'),
                     ]);
                 },
             ],
@@ -694,7 +694,7 @@ class DecksData
                         $game->character->adjustAllHealth(-1);
                         $game->notify('morningPhase', clienttranslate('Everyone lost ${count} ${character_resource}'), [
                             'count' => 1,
-                            'character_resource' => 'health',
+                            'character_resource' => clienttranslate('Health'),
                         ]);
                     }
                 },

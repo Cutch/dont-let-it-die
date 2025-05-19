@@ -45,8 +45,8 @@ export class WeaponScreen {
             <div class="line"><span class="label">${_('Damage')}: </span><span class="value">${weapon.damage}</span></div>
             <div class="line"><span class="label">${_('Range')}: </span><span class="value">${weapon.range}</span></div>
             <div style="display: ${weapon.useCostString ? '' : 'none'}" class="line"><span class="label">${_(
-          'Cost',
-        )}: </span><span class="value">${weapon.useCostString}</span></div>
+              'Cost',
+            )}: </span><span class="value">${weapon.useCostString}</span></div>
             <div class="margin"></div>
         <div>`,
       );

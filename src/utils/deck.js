@@ -62,7 +62,7 @@ export class Deck {
 
         renderImage(cardId, this.game.tooltip.renderByElement(), {
           withText: true,
-          scale: (rotate ? h : w) < 300 ? 0.5 : 1,
+          scale: (rotate ? h : w) < 300 ? 1 : 2,
           pos: 'replace',
         });
       });
@@ -78,10 +78,10 @@ export class Deck {
     tokens?.forEach((token) => {
       renderImage(token, marker, { scale: 2, pos: 'replace' });
       if (token === 'trap') {
-        this.game.addHelpTooltip(
-          marker.querySelector(`.${token}`),
-          _('If rolling equal or greater than a Danger! cards life, trap it to remove it and this token from the game.'),
-        );
+        this.game.addHelpTooltip({
+          node: marker.querySelector(`.${token}`),
+          text: _('If rolling equal or greater than a Danger! cards life, trap it to remove it and this token from the game.'),
+        });
       }
     });
   }

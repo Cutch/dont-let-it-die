@@ -5,6 +5,11 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Physical Hindrance'),
+            },
+          ],
         },
         frame: {
           x: 0.5,
@@ -18,6 +23,13 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Pterodactyl'),
+            },
+            _('Health') + ': ' + 3,
+            _('Damage') + ': ' + 4,
+          ],
         },
         frame: {
           x: 155,
@@ -31,6 +43,12 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Herb'),
+            },
+            _('Count') + ': ' + 3,
+          ],
         },
         frame: {
           x: 309.5,
@@ -44,6 +62,13 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Bat'),
+            },
+            _('Health') + ': ' + 1,
+            _('Damage') + ': ' + 2,
+          ],
         },
         frame: {
           x: 464,
@@ -57,6 +82,12 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Gem'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 618.5,
@@ -70,6 +101,12 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Gem'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 773,
@@ -83,6 +120,12 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Gem'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 927.5,
@@ -96,6 +139,12 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Dino Egg'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1082,
@@ -109,6 +158,13 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Bear'),
+            },
+            _('Health') + ': ' + 2,
+            _('Damage') + ': ' + 3,
+          ],
         },
         frame: {
           x: 1236.5,
@@ -122,6 +178,13 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Boar'),
+            },
+            _('Health') + ': ' + 2,
+            _('Damage') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1391,
@@ -135,6 +198,13 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Carnivorous Plant'),
+            },
+            _('Health') + ': ' + 2,
+            _('Damage') + ': ' + 3,
+          ],
         },
         frame: {
           x: 1545.5,
@@ -148,6 +218,13 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Dino'),
+            },
+            _('Health') + ': ' + 2,
+            _('Damage') + ': ' + 3,
+          ],
         },
         frame: {
           x: 1700,
@@ -161,6 +238,12 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Herb'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 0.5,
@@ -174,6 +257,12 @@ export default {
         options: {
           type: 'card',
           deck: 'explore',
+          text: [
+            {
+              title: _('Dino Egg'),
+            },
+            _('Count') + ': ' + 3,
+          ],
         },
         frame: {
           x: 155,
@@ -200,6 +289,11 @@ export default {
         options: {
           type: 'card',
           deck: 'forage',
+          text: [
+            {
+              title: _('Physical Hindrance'),
+            },
+          ],
         },
         frame: {
           x: 464,
@@ -213,6 +307,11 @@ export default {
         options: {
           type: 'card',
           deck: 'forage',
+          text: [
+            {
+              title: _('Nothing'),
+            },
+          ],
         },
         frame: {
           x: 618.5,
@@ -226,6 +325,13 @@ export default {
         options: {
           type: 'card',
           deck: 'forage',
+          text: [
+            {
+              title: _('Beast'),
+            },
+            _('Health') + ': ' + 1,
+            _('Damage') + ': ' + 1,
+          ],
         },
         frame: {
           x: 773,
@@ -239,6 +345,12 @@ export default {
         options: {
           type: 'card',
           deck: 'forage',
+          text: [
+            {
+              title: _('Berry'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 927.5,
@@ -252,6 +364,12 @@ export default {
         options: {
           type: 'card',
           deck: 'forage',
+          text: [
+            {
+              title: _('Berry'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1082,
@@ -265,6 +383,12 @@ export default {
         options: {
           type: 'card',
           deck: 'forage',
+          text: [
+            {
+              title: _('Berry'),
+            },
+            _('Count') + ': ' + 3,
+          ],
         },
         frame: {
           x: 1236.5,
@@ -278,6 +402,13 @@ export default {
         options: {
           type: 'card',
           deck: 'forage',
+          text: [
+            {
+              title: _('Sabertooth'),
+            },
+            _('Health') + ': ' + 1,
+            _('Damage') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1391,
@@ -291,6 +422,12 @@ export default {
         options: {
           type: 'card',
           deck: 'forage',
+          text: [
+            {
+              title: _('Fiber'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 1545.5,
@@ -304,6 +441,12 @@ export default {
         options: {
           type: 'card',
           deck: 'forage',
+          text: [
+            {
+              title: _('Fiber'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1700,
@@ -330,6 +473,13 @@ export default {
         options: {
           type: 'card',
           deck: 'gather',
+          text: [
+            {
+              title: _('Sabertooth'),
+            },
+            _('Health') + ': ' + 1,
+            _('Damage') + ': ' + 2,
+          ],
         },
         frame: {
           x: 155,
@@ -343,6 +493,12 @@ export default {
         options: {
           type: 'card',
           deck: 'gather',
+          text: [
+            {
+              title: _('Wood'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 309.5,
@@ -356,6 +512,13 @@ export default {
         options: {
           type: 'card',
           deck: 'gather',
+          text: [
+            {
+              title: _('Beast'),
+            },
+            _('Health') + ': ' + 1,
+            _('Damage') + ': ' + 1,
+          ],
         },
         frame: {
           x: 464,
@@ -369,6 +532,13 @@ export default {
         options: {
           type: 'card',
           deck: 'gather',
+          text: [
+            {
+              title: _('Boar'),
+            },
+            _('Health') + ': ' + 2,
+            _('Damage') + ': ' + 2,
+          ],
         },
         frame: {
           x: 618.5,
@@ -382,6 +552,11 @@ export default {
         options: {
           type: 'card',
           deck: 'gather',
+          text: [
+            {
+              title: _('Physical Hindrance'),
+            },
+          ],
         },
         frame: {
           x: 773,
@@ -395,6 +570,11 @@ export default {
         options: {
           type: 'card',
           deck: 'gather',
+          text: [
+            {
+              title: _('Nothing'),
+            },
+          ],
         },
         frame: {
           x: 927.5,
@@ -408,6 +588,12 @@ export default {
         options: {
           type: 'card',
           deck: 'gather',
+          text: [
+            {
+              title: _('Wood'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1082,
@@ -421,6 +607,12 @@ export default {
         options: {
           type: 'card',
           deck: 'gather',
+          text: [
+            {
+              title: _('Rock'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 1236.5,
@@ -434,6 +626,12 @@ export default {
         options: {
           type: 'card',
           deck: 'gather',
+          text: [
+            {
+              title: _('Rock'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1391,
@@ -460,6 +658,13 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Sabertooth'),
+            },
+            _('Health') + ': ' + 1,
+            _('Damage') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1700,
@@ -473,6 +678,12 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Wood'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 0.5,
@@ -486,6 +697,13 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Beast'),
+            },
+            _('Health') + ': ' + 1,
+            _('Damage') + ': ' + 1,
+          ],
         },
         frame: {
           x: 155,
@@ -499,6 +717,13 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Boar'),
+            },
+            _('Health') + ': ' + 2,
+            _('Damage') + ': ' + 2,
+          ],
         },
         frame: {
           x: 309.5,
@@ -512,6 +737,11 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Physical Hindrance'),
+            },
+          ],
         },
         frame: {
           x: 464,
@@ -525,6 +755,11 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Nothing'),
+            },
+          ],
         },
         frame: {
           x: 618.5,
@@ -538,6 +773,12 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Wood'),
+            },
+            _('Count') + ': ' + 3,
+          ],
         },
         frame: {
           x: 773,
@@ -551,6 +792,12 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Wood'),
+            },
+            _('Count') + ': ' + 4,
+          ],
         },
         frame: {
           x: 927.5,
@@ -564,6 +811,12 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Rock'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1082,
@@ -577,6 +830,12 @@ export default {
         options: {
           type: 'card',
           deck: 'harvest',
+          text: [
+            {
+              title: _('Rock'),
+            },
+            _('Count') + ': ' + 3,
+          ],
         },
         frame: {
           x: 1236.5,
@@ -603,6 +862,12 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Hide'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1545.5,
@@ -616,6 +881,13 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Mammoth'),
+            },
+            _('Health') + ': ' + 3,
+            _('Damage') + ': ' + 3,
+          ],
         },
         frame: {
           x: 1700,
@@ -629,6 +901,13 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Bear'),
+            },
+            _('Health') + ': ' + 2,
+            _('Damage') + ': ' + 3,
+          ],
         },
         frame: {
           x: 0.5,
@@ -642,6 +921,13 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Beast'),
+            },
+            _('Health') + ': ' + 1,
+            _('Damage') + ': ' + 1,
+          ],
         },
         frame: {
           x: 155,
@@ -655,6 +941,13 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Boar'),
+            },
+            _('Health') + ': ' + 2,
+            _('Damage') + ': ' + 2,
+          ],
         },
         frame: {
           x: 309.5,
@@ -668,6 +961,12 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Bone'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 464,
@@ -681,6 +980,12 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Meat'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 618.5,
@@ -694,6 +999,12 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Meat'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 773,
@@ -707,6 +1018,12 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Meat'),
+            },
+            _('Count') + ': ' + 3,
+          ],
         },
         frame: {
           x: 927.5,
@@ -720,6 +1037,13 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Sabertooth'),
+            },
+            _('Health') + ': ' + 1,
+            _('Damage') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1082,
@@ -733,6 +1057,12 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Bone'),
+            },
+            _('Count') + ': ' + 2,
+          ],
         },
         frame: {
           x: 1236.5,
@@ -746,6 +1076,12 @@ export default {
         options: {
           type: 'card',
           deck: 'hunt',
+          text: [
+            {
+              title: _('Hide'),
+            },
+            _('Count') + ': ' + 1,
+          ],
         },
         frame: {
           x: 1391,

@@ -80,7 +80,7 @@ export default {
             _('You found a berry bush full of plump, ripe berries. The problem is, that Boar over there thinks he found it first...'),
             { title: _('Yoink!') },
             _('Spend 1 Stamina, you grab a handful of berries and high tail it back to camp. Take 2 Berries.'),
-            { title: _("(We'll see about that.)") },
+            { title: _("We'll see about that") },
             _("You show that Boar who's boss, only taking minor wounds. It'll think twice next time. Take 5 Berries and 1 Damage."),
           ],
         },
@@ -180,7 +180,7 @@ export default {
             _(
               'A shadowy blob bursts from the bushes! Your fist flies through the air before you can even think. Pick a character other than yourself. They take 1 Damage.',
             ),
-            { title: _("(Let's think about this...)") },
+            { title: _("Let's think about this...") },
             _(
               "Spend 2 Stamina, you take a step back and grunt. 'Ugh!' one of your tribe members peeks their head up from the bushes. Both of you laugh and gorge yourselves with berries. You and another character of your choice heal 1 Damage each.",
             ),

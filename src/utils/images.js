@@ -8,6 +8,12 @@ export const getSpriteSize = (name, scale = 2) => {
   else return { width: w / scale, height: h / scale };
 };
 const scaleLookups = { 'tooltip-character': 2, 'tooltip-item': 2, 'tooltip-hindrance': 2, 'tooltip-unlock': 0.75 };
+export const renderText = ({ name }) => {
+  const text = getAllData()[name]?.options?.text;
+  return text
+    ? `<div class="tooltip-text">${text.map((d) => (d.title ? `<div class="tooltip-line"><b class="tooltip-title">${d.title}</b></div>` : `<div class="tooltip-line">${d}</div>`)).join('')}</div>`
+    : '';
+};
 export const renderImage = (
   name,
   div = null,
@@ -27,7 +33,6 @@ export const renderImage = (
   if (scaleLookups[type]) scale = scaleLookups[type];
   // example of adding a div for each player
   if (!getAllData()[name]) throw new Error(`Missing image ${name}`);
-  const text = getAllData()[name]?.options?.text;
   let html = '';
   if (!textOnly) {
     const {
@@ -54,19 +59,20 @@ export const renderImage = (
       html = `<div class="tooltip-image-and-text"><div class="card-rotator" style="transform: rotate(${rotate || rotateAPI}deg) ${
         centered ? ';transform-origin: center;' : `translate(${scaledWidth + 3}px, ${-scaledHeight / 2}px);transform-origin:top;`
       }height: ${scaledWidth}px;width: ${scaledHeight}px;">
-    <div name="${name}-${rotate || rotateAPI}" class="image card ${css} ${extraCss} ${
+    <div name="${name}-${rotate || rotateAPI}" data-scale="${scale}" class="image card ${css} ${extraCss} ${
       card ? 'card' : ''
     } ${name}" style="background-size: ${scaledSpriteWidth}px ${scaledSpriteHeight}px;background-position: -${scaledX}px -${scaledY}px;width: ${scaledWidth}px;height: ${
       scaledHeight - 1
     }px;"></div>
     </div>`;
     else
-      html = `<div class="tooltip-image-and-text"><div name="${name}" class="image ${css} ${extraCss} ${
+      html = `<div class="tooltip-image-and-text"><div name="${name}" data-scale="${scale}" class="image ${css} ${extraCss} ${
         card ? 'card' : ''
       } ${name}" style="background-size: ${scaledSpriteWidth}px ${scaledSpriteHeight}px;background-position: -${scaledX}px -${scaledY}px;width: ${scaledWidth}px;height: ${scaledHeight}px;"></div>`;
   }
   if (withText || textOnly) {
-    html += `<div class="tooltip-text">${text.map((d) => (d.title ? `<div class="tooltip-line"><b class="tooltip-title">${d.title}</b></div>` : `<div class="tooltip-line">${d}</div>`)).join('')}</div>`;
+    html += renderText({ name });
+    html += '</div>';
   } else {
     html += '</div>';
   }

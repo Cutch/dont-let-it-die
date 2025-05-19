@@ -107,9 +107,6 @@ class Game extends \Table
             if (str_contains($message, '${resource_type}')) {
                 $args['resource_type'] = $this->data->getTokens()[$args['resource_type']]['name'];
             }
-            if (array_key_exists('character_resource', $args)) {
-                $args['character_resource'] = clienttranslate($args['character_resource']);
-            }
             return $args;
         });
     }
@@ -1628,7 +1625,7 @@ class Game extends \Table
                 if ($health != 0) {
                     $this->notify('morningPhase', clienttranslate('Everyone lost ${amount} ${character_resource}'), [
                         'amount' => -$health,
-                        'character_resource' => 'health',
+                        'character_resource' => clienttranslate('Health'),
                     ]);
                 }
 

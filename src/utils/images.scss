@@ -1,5 +1,6 @@
 .image {
   background-repeat: repeat;
+  position: relative;
 }
 .card {
   border-radius: 10px;
@@ -51,12 +52,12 @@
 
 .tooltip-text {
   background-color: rgba($color: #fff, $alpha: 0.8);
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   padding: 1rem;
-  width: 400px;
+  width: 350px;
   border-radius: 10px;
   .tooltip-line:not(:last-child) {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 }
 .tooltip-image-and-text {

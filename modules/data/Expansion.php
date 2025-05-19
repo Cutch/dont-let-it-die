@@ -230,7 +230,7 @@ class ExpansionData
                             ]);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 1,
-                                'character_resource' => 'health',
+                                'character_resource' => clienttranslate('Health'),
                             ]);
                             return ['notify' => false];
                         },
@@ -251,7 +251,7 @@ class ExpansionData
                         'onUse' => function (Game $game, $skill) {
                             $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 2,
-                                'character_resource' => 'health',
+                                'character_resource' => clienttranslate('Health'),
                             ]);
                             return ['notify' => false];
                         },
@@ -327,7 +327,7 @@ class ExpansionData
                             $game->character->adjustActiveStamina(2);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                 'count' => 2,
-                                'character_resource' => 'stamina',
+                                'character_resource' => clienttranslate('Stamina'),
                             ]);
                             return ['notify' => false];
                         },
@@ -375,6 +375,7 @@ class ExpansionData
                                 'characterSelection',
                                 [
                                     'selectableCharacters' => array_values($characters),
+                                    'title' => 'Punch a Character',
                                     'id' => $skill['id'],
                                 ],
                                 $currentCharacter,
@@ -388,7 +389,7 @@ class ExpansionData
                                 $game->character->adjustHealth($data['characterId'], -1);
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 1,
-                                    'character_resource' => 'health',
+                                    'character_resource' => clienttranslate('Health'),
                                     'character_name' => $data['characterId'],
                                 ]);
                             }
@@ -425,11 +426,11 @@ class ExpansionData
                                 $game->character->adjustHealth($data['characterId'], 1);
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => 1,
-                                    'character_resource' => 'health',
+                                    'character_resource' => clienttranslate('Health'),
                                 ]);
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => 1,
-                                    'character_resource' => 'health',
+                                    'character_resource' => clienttranslate('Health'),
                                     'character_name' => $data['characterId'],
                                 ]);
                             }
@@ -453,7 +454,7 @@ class ExpansionData
                                 $game->character->adjustHealth($currentCharacter, -1);
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 1,
-                                    'character_resource' => 'health',
+                                    'character_resource' => clienttranslate('Health'),
                                 ]);
                             } else {
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
@@ -489,7 +490,7 @@ class ExpansionData
                             } else {
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 2,
-                                    'character_resource' => 'health',
+                                    'character_resource' => clienttranslate('Health'),
                                 ]);
                             }
                             return ['notify' => false];
@@ -520,7 +521,7 @@ class ExpansionData
                         'onUse' => function (Game $game, $skill) {
                             $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 1,
-                                'character_resource' => 'health',
+                                'character_resource' => clienttranslate('Health'),
                             ]);
                             return ['notify' => false];
                         },
@@ -658,7 +659,7 @@ class ExpansionData
                 //                 $game->character->adjustHealth($data['characterId'], -1);
                 //                 $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                 //                     'count' => 1,
-                //                     'character_resource' => 'health',
+                //                     'character_resource' => clienttranslate('Health'),
                 //                     'character_name' => $data['characterId'],
                 //                 ]);
                 //                 $data['nextState'] = 'playerTurn';
@@ -682,7 +683,7 @@ class ExpansionData
                         $game->character->adjustActiveHealth(-1);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                             'count' => 1,
-                            'character_resource' => 'health',
+                            'character_resource' => clienttranslate('Health'),
                         ]);
                     }
                 },
@@ -719,7 +720,7 @@ class ExpansionData
                             $game->character->adjustActiveHealth(-1);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 1,
-                                'character_resource' => 'health',
+                                'character_resource' => clienttranslate('Health'),
                             ]);
                         }
                     }
@@ -1035,7 +1036,7 @@ class ExpansionData
                         $game->character->adjustActiveHealth(-1);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                             'count' => 1,
-                            'character_resource' => 'health',
+                            'character_resource' => clienttranslate('Health'),
                         ]);
                     }
                 },

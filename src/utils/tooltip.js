@@ -22,19 +22,18 @@ export class Tooltip {
       this.hide();
     }
   };
-  handleClick = (e) => {
+  handleClick = () => {
     this.hide();
   };
-  handleClickOutside = (e) => {
+  handleClickOutside = () => {
     if (!this.isScrolling) this.hide();
   };
-  scroll = (e) => {
+  scroll = () => {
     this.isScrolling = true;
     clearTimeout(this.scrollTimeout);
 
     this.scrollTimeout = setTimeout(() => {
       this.isScrolling = false;
-      console.log('set', this.isScrolling);
     }, 500); // Adjust the timeout duration as needed
   };
   show() {
