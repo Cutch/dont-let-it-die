@@ -1,3 +1,5 @@
+import { renderImage } from './images';
+
 export class Tweening {
   constructor(game, container) {
     this.game = game;

@@ -1,5 +1,5 @@
 import allSprites from '../assets';
-import '../utils/index';
+import { addClickListener, addPassiveListener, renderImage, scrollArrow } from '../utils/index';
 export class ReviveScreen {
   constructor(game) {
     this.game = game;

@@ -1,4 +1,6 @@
 import allSprites from '../assets';
+import { addClickListener } from './clickable';
+import { getSpriteSize, renderImage } from './images';
 export class Deck {
   constructor(game, deck, countData, div, scale = 4, style = 'vertical') {
     this.game = game;

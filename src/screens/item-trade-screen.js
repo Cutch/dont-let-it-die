@@ -1,5 +1,5 @@
 import allSprites from '../assets';
-import '../utils/index';
+import { addClickListener, addPassiveListener, renderImage, scrollArrow, Tweening } from '../utils/index';
 export class ItemTradeScreen {
   constructor(game) {
     this.game = game;

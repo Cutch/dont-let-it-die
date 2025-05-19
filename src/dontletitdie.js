@@ -14,11 +14,11 @@
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
  */
-import 'dojo'; // Loads the dojo object using dojoConfig if needed
-import 'dojo/_base/declare'; // Add 'declare' to dojo if needed
-import 'ebg/core/gamegui'; // Loads Gamegui class onto ebg.core.gamegui if needed
+/// <amd-module name="bgagame/dontletitdie"/>
+import dojo from 'dojo'; // Loads the dojo object using dojoConfig if needed
+import declare from 'dojo/_base/declare'; // Add 'declare' to dojo if needed
+import Gamegui from 'ebg/core/gamegui'; // Loads Gamegui class onto ebg.core.gamegui if needed
 import 'ebg/counter'; // Loads Counter class onto ebg.counter if needed
-import './utils/index';
 import allSprites from './assets';
 import { CardSelectionScreen } from './screens/card-selection-screen';
 import { CharacterSelectionScreen } from './screens/character-selection-screen';
@@ -35,31 +35,10 @@ import { TokenScreen } from './screens/token-screen';
 import { TooManyItemsScreen } from './screens/too-many-items-screen';
 import { UpgradeSelectionScreen } from './screens/upgrade-selection-screen';
 import { WeaponScreen } from './screens/weapon-screen';
+import { addClickListener, Deck, Dice, renderImage, Selector, Tooltip, Tweening } from './utils/index';
 
-declare('bgagame.dontletitdie', ebg.core.gamegui, {
+declare('bgagame.dontletitdie', Gamegui, {
   constructor: function () {
-    this.actionMappings = {
-      actInvestigateFire: _('Investigate Fire'),
-      actCraft: _('Craft'),
-      actDrawGather: _('Gather'),
-      actDrawForage: _('Forage'),
-      actDrawHarvest: _('Harvest'),
-      actDrawHunt: _('Hunt'),
-      actDrawExplore: _('Explore'),
-      actSpendFKP: _('Spend FKP'),
-      actAddWood: _('Add Wood'),
-      actRevive: _('Revive'),
-      actEat: _('Eat'),
-      actCook: _('Cook'),
-      actUseHerb: _('Use Herb'),
-      actTrade: _('Trade Resources'),
-      actUseSkill: _('Use Skill'),
-      actUseItem: _('Use Item'),
-      actTradeItem: _('Trade'),
-      actConfirmTradeItem: _('Confirm Trade'),
-      actSelectCharacter: _('Select Character'),
-      actSelectCard: _('Select Card'),
-    };
     // Used For character selection
     this.selectedCharacters = [];
     this.mySelectedCharacters = [];
@@ -105,6 +84,30 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
       'gem-b',
       'gem-p',
     ];
+  },
+  getActionMappings() {
+    return {
+      actInvestigateFire: _('Investigate Fire'),
+      actCraft: _('Craft'),
+      actDrawGather: _('Gather'),
+      actDrawForage: _('Forage'),
+      actDrawHarvest: _('Harvest'),
+      actDrawHunt: _('Hunt'),
+      actDrawExplore: _('Explore'),
+      actSpendFKP: _('Spend FKP'),
+      actAddWood: _('Add Wood'),
+      actRevive: _('Revive'),
+      actEat: _('Eat'),
+      actCook: _('Cook'),
+      actUseHerb: _('Use Herb'),
+      actTrade: _('Trade Resources'),
+      actUseSkill: _('Use Skill'),
+      actUseItem: _('Use Item'),
+      actTradeItem: _('Trade'),
+      actConfirmTradeItem: _('Confirm Trade'),
+      actSelectCharacter: _('Select Character'),
+      actSelectCard: _('Select Card'),
+    };
   },
   getResourcesForDisplay: function (gameData) {
     return this.resourcesForDisplay.filter((d) => d in gameData.resources);
@@ -745,7 +748,7 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
 
     this.expansionList = gameData.expansionList;
     this.expansion = gameData.expansion;
-    expansionI = this.expansionList.indexOf(this.expansion);
+    const expansionI = this.expansionList.indexOf(this.expansion);
     this.expansions = this.expansionList.slice(0, expansionI + 1);
     this.difficulty = gameData.difficulty;
     this.trackDifficulty = gameData.trackDifficulty;
@@ -1018,7 +1021,7 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
               }
             }
             const suffix = this.getActionSuffixHTML(action);
-            return this.statusBar.addActionButton(`${this.actionMappings[actionId]}${suffix}`, () => {
+            return this.statusBar.addActionButton(`${this.getActionMappings()[actionId]}${suffix}`, () => {
               if (actionId === 'actSpendFKP') {
                 this.removeActionButtons();
                 Object.values(this.gamedatas.availableUnlocks).forEach((unlock) => {
@@ -1045,7 +1048,7 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
               } else if (actionId === 'actTrade') {
                 this.removeActionButtons();
                 this.tradeScreen.show(this.gamedatas);
-                this.statusBar.addActionButton(this.actionMappings.actTradeItem + `${suffix}`, () => {
+                this.statusBar.addActionButton(this.getActionMappings().actTradeItem + `${suffix}`, () => {
                   if (!this.tradeScreen.hasError()) {
                     this.bgaPerformAction('actTrade', {
                       data: JSON.stringify({
@@ -1076,7 +1079,7 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
               } else if (actionId === 'actCraft') {
                 this.removeActionButtons();
                 this.craftScreen.show(this.gamedatas);
-                this.statusBar.addActionButton(this.actionMappings.actCraft + `${suffix}`, () => {
+                this.statusBar.addActionButton(this.getActionMappings().actCraft + `${suffix}`, () => {
                   if (!this.craftScreen.hasError()) {
                     this.bgaPerformAction('actCraft', {
                       itemName: this.craftScreen.getSelectedId(),
@@ -1098,7 +1101,7 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
               } else if (actionId === 'actCook') {
                 this.removeActionButtons();
                 this.cookScreen.show(this.gamedatas);
-                this.statusBar.addActionButton(this.actionMappings.actEat + `${suffix}`, () => {
+                this.statusBar.addActionButton(this.getActionMappings().actEat + `${suffix}`, () => {
                   if (!this.cookScreen.hasError()) {
                     this.bgaPerformAction('actCook', {
                       resourceType: this.cookScreen.getSelectedId(),
@@ -1120,7 +1123,7 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
               } else if (actionId === 'actRevive') {
                 this.removeActionButtons();
                 this.reviveScreen.show(this.gamedatas);
-                this.statusBar.addActionButton(this.actionMappings.actRevive + `${suffix}`, () => {
+                this.statusBar.addActionButton(this.getActionMappings().actRevive + `${suffix}`, () => {
                   if (!this.reviveScreen.hasError()) {
                     const { characterSelected, foodSelected } = this.reviveScreen.getSelected();
                     this.bgaPerformAction('actRevive', {
@@ -1145,7 +1148,7 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
               // else if (actionId === 'actUseHerb') {
               //   this.removeActionButtons();
               //   this.eatScreen.show(args);
-              //   this.statusBar.addActionButton(this.actionMappings.actUseHerb + `${suffix}`, () => {
+              //   this.statusBar.addActionButton(this.getActionMappings().actUseHerb + `${suffix}`, () => {
               //     if (!this.eatScreen.hasError()) {
               //       this.bgaPerformAction('actEat', {
               //         resourceType: this.eatScreen.getSelectedId(),
@@ -1222,14 +1225,14 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
           });
           break;
         case 'characterSelection':
-          this.statusBar.addActionButton(this.actionMappings.actSelectCharacter, () => {
+          this.statusBar.addActionButton(this.getActionMappings().actSelectCharacter, () => {
             this.bgaPerformAction('actSelectCharacter', { characterId: this.characterSelectionScreen.getSelectedId() }).then(() =>
               this.characterSelectionScreen.hide(),
             );
           });
           break;
         case 'cardSelection':
-          this.statusBar.addActionButton(this.actionMappings.actSelectCard, () => {
+          this.statusBar.addActionButton(this.getActionMappings().actSelectCard, () => {
             this.bgaPerformAction('actSelectCard', { cardId: this.cardSelectionScreen.getSelectedId() }).then(() =>
               this.cardSelectionScreen.hide(),
             );
@@ -1280,7 +1283,7 @@ declare('bgagame.dontletitdie', ebg.core.gamegui, {
         case 'characterSelect':
           const playerCount = Object.keys(args.players).length;
           if (playerCount === 3) {
-            this.selectCharacterCount = gamegui.player_id == this.firstPlayer ? 2 : 1;
+            this.selectCharacterCount = gameui.player_id == this.firstPlayer ? 2 : 1;
           } else if (playerCount === 1) {
             this.selectCharacterCount = 4;
           } else if (playerCount === 2) {

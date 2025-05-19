@@ -1,5 +1,6 @@
 import allSprites from '../assets';
-import '../utils/index';
+import { addClickListener, addPassiveListener, renderImage, scrollArrow } from '../utils/index';
+
 export class DeckSelectionScreen {
   constructor(game) {
     this.game = game;

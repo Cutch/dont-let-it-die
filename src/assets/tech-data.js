@@ -1,4 +1,22 @@
 export default {
+  text: {
+    'warmth-1': { text: [{ title: 'Warmth 1' }, '+1 Max Stamina'] },
+    'warmth-2': { text: [{ title: 'Warmth 2' }, '+1 Max Stamina'] },
+    'warmth-3': { text: [{ title: 'Warmth 3' }, '+1 Max Stamina'] },
+    'cooking-1': { text: [{ title: 'Coking 1' }, 'Unlocks Cooked Berries'] },
+    'cooking-2': { text: [{ title: 'Coking 2' }, 'Unlocks Cooked Meat'] },
+    'crafting-1': { text: [{ title: 'Crafting 1' }, 'Allows crafting all items marked with a yellow circle'] },
+    'crafting-2': { text: [{ title: 'Crafting 2' }, 'Allows crafting all items marked with a blue circle'] },
+    'crafting-3': { text: [{ title: 'Crafting 3' }, 'Allows crafting all items marked with a red circle'] },
+    spices: { text: [{ title: 'Spices' }, 'Eating food grants +1 HP'] },
+    relaxation: { text: [{ title: 'Relaxation' }, '+2 Max HP, instantly heal +2 HP when unlocked'] },
+    'forage-1': { text: [{ title: 'Forage 1' }, '+1 berries when you draw berries'] },
+    'forage-2': { text: [{ title: 'Forage 2' }, '+1 fiber when you draw fiber'] },
+    'resource-1': { text: [{ title: 'Resource 1' }, '+1 rock when you draw rocks'] },
+    'resource-2': { text: [{ title: 'Resource 2' }, '+1 wood when you draw wood'] },
+    'hunt-1': { text: [{ title: 'Hunt 1' }, '+1 meat when you draw meat'] },
+    'fire-starter': { text: [{ title: 'Fire Starter' }, 'WIN!'] },
+  },
   sprites: {
     'knowledge-tree-easy': {
       upgrades: {

@@ -1,4 +1,5 @@
-import '../utils/index';
+import { addClickListener, addPassiveListener, renderImage, scrollArrow } from '../utils/index';
+
 export class CardSelectionScreen {
   constructor(game) {
     this.game = game;

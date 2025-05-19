@@ -1,4 +1,4 @@
-import '../utils/index';
+import { addClickListener, addPassiveListener, renderImage, scrollArrow } from '../utils/index';
 export class WeaponScreen {
   constructor(game) {
     this.game = game;

@@ -6,7 +6,7 @@ import items from './items-data';
 import necklace from './necklace-data';
 import tech from './tech-data';
 import token from './token-data';
-import upgrades from './token-data';
+import upgrades from './upgrades-data';
 export default [boards, characters, decks, expansion, items, necklace, tech, token, upgrades].reduce((acc, { sprites, meta }) => {
   Object.keys(sprites).forEach((k) => ((sprites[k].meta = meta), (sprites[k].id = k)));
   return {

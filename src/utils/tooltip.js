@@ -1,3 +1,5 @@
+import { addClickListener } from './clickable';
+
 export class Tooltip {
   constructor(gamePlayAreaElem) {
     gamePlayAreaElem.insertAdjacentHTML(
