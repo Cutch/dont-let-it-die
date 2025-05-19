@@ -9,6 +9,11 @@
     "uploadOnSave": true,
     "ignore": [
         ".vscode",
+        ".prettierrc",
+        "eslint.config.js",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json",
         ".git",
         ".gitignore",
         ".DS_Store",
