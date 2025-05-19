@@ -19,7 +19,7 @@ import dojo from 'dojo'; // Loads the dojo object using dojoConfig if needed
 import declare from 'dojo/_base/declare'; // Add 'declare' to dojo if needed
 import Gamegui from 'ebg/core/gamegui'; // Loads Gamegui class onto ebg.core.gamegui if needed
 import 'ebg/counter'; // Loads Counter class onto ebg.counter if needed
-import allSprites from './assets';
+import { getAllData } from './assets';
 import { CardSelectionScreen } from './screens/card-selection-screen';
 import { CharacterSelectionScreen } from './screens/character-selection-screen';
 import { DeckSelectionScreen } from './screens/deck-selection-screen';
@@ -768,8 +768,8 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.expansions = this.expansionList.slice(0, expansionI + 1);
     this.difficulty = gameData.difficulty;
     this.trackDifficulty = gameData.trackDifficulty;
-    this.data = Object.keys(allSprites).reduce((acc, k) => {
-      const d = allSprites[k];
+    this.data = Object.keys(getAllData()).reduce((acc, k) => {
+      const d = getAllData()[k];
       d.options = d.options ?? {};
       if (d.options.expansion && this.expansionList.indexOf(d.options.expansion) > expansionI) return acc;
       return { ...acc, [k]: d };
@@ -819,7 +819,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       Object.keys(gameData.upgrades).forEach((unlockId) => {
         const unlockSpot = gameData.upgrades[unlockId].replace;
         if (unlockSpot) {
-          const { x, y } = allSprites[`knowledge-tree-${this.difficulty}`].upgrades[unlockSpot];
+          const { x, y } = getAllData()[`knowledge-tree-${this.difficulty}`].upgrades[unlockSpot];
           selections.insertAdjacentHTML(
             'beforeend',
             `<div class="discovery-spot ${unlockSpot}" style="position: absolute;top: ${(y - 7) * 1.2}px; left: ${
@@ -839,7 +839,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     knowledgeContainer.innerHTML = '';
     gameData.unlocks.forEach((unlockName) => {
       const unlockSpot = gameData.upgrades[unlockName]?.replace ?? unlockName;
-      const { x, y } = allSprites[`knowledge-tree-${this.difficulty}`].upgrades[unlockSpot];
+      const { x, y } = getAllData()[`knowledge-tree-${this.difficulty}`].upgrades[unlockSpot];
       knowledgeContainer.insertAdjacentHTML(
         'beforeend',
         `<div id="knowledge-${unlockSpot}" class="fkp" style="top: ${y * 1.2}px; left: ${x * 1.2}px;"></div>`,
@@ -849,7 +849,7 @@ declare('bgagame.dontletitdie', Gamegui, {
 
     gameData.allUnlocks.forEach((unlockId) => {
       if (gameData.upgrades[unlockId]) return;
-      const { x, y } = allSprites[`knowledge-tree-${this.difficulty}`].upgrades[unlockId];
+      const { x, y } = getAllData()[`knowledge-tree-${this.difficulty}`].upgrades[unlockId];
       selections.insertAdjacentHTML(
         'beforeend',
         `<div class="fkp-spot ${unlockId}" style="top: ${(y - 7) * 1.2}px; left: ${(x - 103) * 1.2}px;"></div>`,

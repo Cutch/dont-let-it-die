@@ -1,4 +1,4 @@
-import allSprites from '../assets';
+import { getAllData } from '../assets';
 import { addClickListener, addPassiveListener, renderImage, scrollArrow } from '../utils/index';
 export class UpgradeSelectionScreen {
   constructor(game) {
@@ -45,7 +45,7 @@ export class UpgradeSelectionScreen {
     });
     // List all open slots & render replaced spots
     gameData.selectableUpgrades.forEach((unlockId) => {
-      const { x, y } = allSprites[`knowledge-tree-${this.game.difficulty}`].upgrades[unlockId];
+      const { x, y } = getAllData()[`knowledge-tree-${this.game.difficulty}`].upgrades[unlockId];
       selections.insertAdjacentHTML(
         'beforeend',
         `<div class="fkp-spot ${unlockId}" style="top: ${(y - 7) * 1.2}px; left: ${(x - 103) * 1.2}px;"></div>`,

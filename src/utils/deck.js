@@ -1,4 +1,4 @@
-import allSprites from '../assets';
+import { getAllData } from '../assets';
 import { addClickListener } from './clickable';
 import { getSpriteSize, renderImage } from './images';
 export class Deck {
@@ -58,7 +58,7 @@ export class Deck {
         const {
           frame: { w, h },
           rotate,
-        } = allSprites[cardId];
+        } = getAllData()[cardId];
 
         renderImage(cardId, this.game.tooltip.renderByElement(), {
           withText: true,

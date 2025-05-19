@@ -1,1551 +1,1553 @@
 export default {
-  sprites: {
-    'explore-7_0': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 0.5,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_1': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 155,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_10': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 309.5,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_11': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 464,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_12': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 618.5,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_13': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 773,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_14': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 927.5,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_15': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 1082,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_4': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 1236.5,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_5': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 1391,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_6': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 1545.5,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_7': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 1700,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_8': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 0.5,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-7_9': {
-      options: {
-        type: 'card',
-        deck: 'explore',
-      },
-      frame: {
-        x: 155,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'explore-back': {
-      options: {
-        deck: 'explore',
-        type: 'back',
-      },
-      frame: {
-        x: 309.5,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-7_10': {
-      options: {
-        type: 'card',
-        deck: 'forage',
-      },
-      frame: {
-        x: 464,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-7_11': {
-      options: {
-        type: 'card',
-        deck: 'forage',
-      },
-      frame: {
-        x: 618.5,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-7_12': {
-      options: {
-        type: 'card',
-        deck: 'forage',
-      },
-      frame: {
-        x: 773,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-7_13': {
-      options: {
-        type: 'card',
-        deck: 'forage',
-      },
-      frame: {
-        x: 927.5,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-7_14': {
-      options: {
-        type: 'card',
-        deck: 'forage',
-      },
-      frame: {
-        x: 1082,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-7_15': {
-      options: {
-        type: 'card',
-        deck: 'forage',
-      },
-      frame: {
-        x: 1236.5,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-7_4': {
-      options: {
-        type: 'card',
-        deck: 'forage',
-      },
-      frame: {
-        x: 1391,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-7_8': {
-      options: {
-        type: 'card',
-        deck: 'forage',
-      },
-      frame: {
-        x: 1545.5,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-7_9': {
-      options: {
-        type: 'card',
-        deck: 'forage',
-      },
-      frame: {
-        x: 1700,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'forage-back': {
-      options: {
-        deck: 'forage',
-        type: 'back',
-      },
-      frame: {
-        x: 0.5,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-7_10': {
-      options: {
-        type: 'card',
-        deck: 'gather',
-      },
-      frame: {
-        x: 155,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-7_11': {
-      options: {
-        type: 'card',
-        deck: 'gather',
-      },
-      frame: {
-        x: 309.5,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-7_12': {
-      options: {
-        type: 'card',
-        deck: 'gather',
-      },
-      frame: {
-        x: 464,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-7_13': {
-      options: {
-        type: 'card',
-        deck: 'gather',
-      },
-      frame: {
-        x: 618.5,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-7_14': {
-      options: {
-        type: 'card',
-        deck: 'gather',
-      },
-      frame: {
-        x: 773,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-7_15': {
-      options: {
-        type: 'card',
-        deck: 'gather',
-      },
-      frame: {
-        x: 927.5,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-7_4': {
-      options: {
-        type: 'card',
-        deck: 'gather',
-      },
-      frame: {
-        x: 1082,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-7_8': {
-      options: {
-        type: 'card',
-        deck: 'gather',
-      },
-      frame: {
-        x: 1236.5,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-7_9': {
-      options: {
-        type: 'card',
-        deck: 'gather',
-      },
-      frame: {
-        x: 1391,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'gather-back': {
-      options: {
-        deck: 'gather',
-        type: 'back',
-      },
-      frame: {
-        x: 1545.5,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_10': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 1700,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_11': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 0.5,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_12': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 155,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_13': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 309.5,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_14': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 464,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_15': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 618.5,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_4': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 773,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_5': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 927.5,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_8': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 1082,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-7_9': {
-      options: {
-        type: 'card',
-        deck: 'harvest',
-      },
-      frame: {
-        x: 1236.5,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'harvest-back': {
-      options: {
-        deck: 'harvest',
-        type: 'back',
-      },
-      frame: {
-        x: 1391,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_10': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 1545.5,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_11': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 1700,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_12': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 0.5,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_13': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 155,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_14': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 309.5,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_15': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 464,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_4': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 618.5,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_5': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 773,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_6': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 927.5,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_7': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 1082,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_8': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 1236.5,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-7_9': {
-      options: {
-        type: 'card',
-        deck: 'hunt',
-      },
-      frame: {
-        x: 1391,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'hunt-back': {
-      options: {
-        deck: 'hunt',
-        type: 'back',
-      },
-      frame: {
-        x: 1545.5,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_0': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A rival tribe snuck into your camp and tried to steal your berries!'),
-          _("Roll the Fire Die and remove that many fiber tokens from the group's supply."),
-        ],
-      },
-      frame: {
-        x: 1700,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_1': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A rival tribe snuck into your camp and tried to steal your berries!'),
-          _("Roll the Fire Die and remove that many berry tokens from the group's supply."),
-        ],
-      },
-      frame: {
-        x: 0.5,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_10': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('The morale of the group is very high tonight and everyone sleeps soundly.'),
-          _('Skip taking 1 damage from the next morning phase.'),
-        ],
-      },
-      frame: {
-        x: 155,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_11': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A terrible lightning storm has developed over the valley.'),
-          _(
-            'During the next day phase, whenever drawing a card, roll a Fire Die. If you roll a blank, take 1 damage from a lightning strike.',
-          ),
-        ],
-      },
-      frame: {
-        x: 309.5,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_12': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _("The group notices that one of your tools was broken during the day's activities. It appears to be irreparable."),
-          _('Pick 1 equipped tool from any character and remove it from play.'),
-        ],
-      },
-      frame: {
-        x: 464,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_13': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('You awaken to a stampeding herd of mammoths as they charge through the camp.'),
-          _("Each character rolls a Fire Die. On a blank, you don't react quickly enough and take 1 damage."),
-        ],
-      },
-      frame: {
-        x: 618.5,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_14': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A nearby volcano erupted overnight, filling the air with hot soot, making it difficult to breathe.'),
-          _('Everyone takes an additional 1 damage from the morning phase.'),
-        ],
-      },
-      frame: {
-        x: 773,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_15': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A rainstorm came in overnight and the torrential downpour is threatening to ruin some of your firewood.'),
-          _(
-            'If any character has at least 1 stamina left over from the day phase, they are able to save the wood. Otherwise, remove 1 wood from the fire pit.',
-          ),
-        ],
-      },
-      frame: {
-        x: 927.5,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_2': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A thick fog rolls into the valley, making it almost impossible to see.'),
-          _('You may not perform any Harvest or Hunt actions during the next day phase.'),
-        ],
-      },
-      frame: {
-        x: 1082,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_3': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('There was something wrong with the food you ate today, and as a result, everyone has food poisoning.'),
-          _('Characters cannot gain extra stamina beyond starting values from any source tomorrow.'),
-        ],
-      },
-      frame: {
-        x: 1236.5,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_4': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A rival tribe snuck into your camp and tried to steal your wood!'),
-          _("Roll the Fire Die and remove that many wood tokens from the group's supply."),
-        ],
-      },
-      frame: {
-        x: 1391,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_5': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A rival tribe snuck into your camp and tried to steal your rocks!'),
-          _("Roll the Fire Die and remove that many rock tokens from the group's supply."),
-        ],
-      },
-      frame: {
-        x: 1545.5,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_6': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A rival tribe snuck into your camp and tried to steal your meat!'),
-          _("Roll the Fire Die and remove that many meat tokens from the group's supply."),
-        ],
-      },
-      frame: {
-        x: 1700,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_7': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _(
-            'One of your tribe members tossed a plant they foraged into the fire. The smoke from the herb now creeping over the camp appears to have healing properties.',
-          ),
-          _('Everyone heals 2 HP.'),
-        ],
-      },
-      frame: {
-        x: 0.5,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_8': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('One of your tribe members found some spices during the day and taught everyone how to cook with them.'),
-          _('Eating during the day phase tomorrow heals for 1 extra.'),
-        ],
-      },
-      frame: {
-        x: 155,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-7_9': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A nearby herd of beasts kept everyone awake all night with their screeching.'),
-          _('Start the next morning time phase with -3 stamina.'),
-        ],
-      },
-      frame: {
-        x: 309.5,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-back': {
-      options: {
-        type: 'back',
-        deck: 'night-event',
-      },
-      frame: {
-        x: 464,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_0': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _(
-            'The smoke from the fire last night was thick, making it hard to see around camp. The tribe suffered injuries from tripping and running into unseen objects.',
-          ),
-          _('Each tribe member takes 1 Physical Impairment card.'),
-        ],
-      },
-      frame: {
-        x: 618.5,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_1': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _("It seems some Dino's came down from the mountains last night and decided your camp was a great place to build their nest."),
-          _(
-            "Take 2 Raw Dino Eggs. If you have less than 2 Raw Dino Eggs in your group's supply at the end of the next day phase each tribe member takes 1 Damage before drawing the next Night Event card.",
-          ),
-        ],
-      },
-      frame: {
-        x: 773,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_10': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('High winds have caused the fire to flare up.'),
-          _('Each character can only perform 1 Investigate Fire action tomorrow, due to the increased heat.'),
-        ],
-      },
-      frame: {
-        x: 927.5,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_11': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _("After eating an unknown mushroom today, everyone feels lightheaded and can't focus."),
-          _('Skills that require stamina to activate cannot be used tomorrow.'),
-        ],
-      },
-      frame: {
-        x: 1082,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_12': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [_('Upon checking some of the traps set the previous evening, you find a dead boar.'), _('Group receives 2 meat.')],
-      },
-      frame: {
-        x: 1236.5,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_13': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A sudden cold wind sweeps into the valley, freezing everything it touches.'),
-          _('Everyone takes 1 damage and starts the morning with -2 stamina.'),
-        ],
-      },
-      frame: {
-        x: 1391,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_14': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A group of starving boars has wandered into your camp.'),
-          _(
-            'If your group has any raw berry tokens, remove half of them. The boars eat their fill and move on. If you have no raw berry tokens, any member without a weapon takes 2 damage.',
-          ),
-        ],
-      },
-      frame: {
-        x: 1545.5,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_15': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [_('It was a calm night.'), _('Nothing eventful happened.')],
-      },
-      frame: {
-        x: 1700,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_2': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('The sky lights up with a brilliant glow, followed shortly by a thundering boom. It looks like something fell from the sky!'),
-          _(
-            'If anyone has at least 1 Stamp Mark over from the Day Phase, they may venture out in search of the falling star and take 1 Gemstone token of any color.',
-          ),
-        ],
-      },
-      frame: {
-        x: 0.5,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_3': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('The snowmelt from the local mountains flooded your camp last night and no-one can find their items this morning.'),
-          _('All Weapon and Tool items are un-equipped today and may be re-equipped during the next morning phase.'),
-        ],
-      },
-      frame: {
-        x: 155,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_4': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _("Today was a painfully hot day, and everyone suffered awful sunburns. The fire's heat on your sunburned skin is unbearable."),
-          _('The Investigate Fire action is not available tomorrow.'),
-        ],
-      },
-      frame: {
-        x: 309.5,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_5': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A group of sabertooths are drawn to the smell of your camp.'),
-          _('If you have any raw meat, throw it out to draw them away. Otherwise, everyone takes 1 damage.'),
-        ],
-      },
-      frame: {
-        x: 464,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_6': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _(
-            'The ground beneath everyone begins to tremble. Before anyone can even react, the ground opens up and swallows un-equipped items!',
-          ),
-          _('Remove 1 weapon and 1 tool that are currently equipped from play.'),
-        ],
-      },
-      frame: {
-        x: 618.5,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_7': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('Before sleeping for the night, everyone gathers around the fire and tells stories about their adventures during the day.'),
-          _(
-            'Pick a Resource deck that was used today, look at the top 3 cards then place them back on-top of the deck in their original order. Each character gets 1 FKP token.',
-          ),
-        ],
-      },
-      frame: {
-        x: 773,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-8_8': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('Everyone stayed awake late last night, teaching each other what they had learned about the fire.'),
-          _('Each character gets 1 FKP token.'),
-        ],
-      },
-      frame: {
-        x: 927.5,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_9': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('After unknowingly drinking contaminated water, your short-term memory seems a bit hazy.'),
-          _('All Fire Die rolls are reduced by 1 tomorrow as a result.'),
-        ],
-      },
-      frame: {
-        x: 1082,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_10': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('The tribe slept in this morning to get some much-needed extra rest for their weary bones and muscles.'),
-          _('Remove 1 Physical Hindrance card from each tribe member and skip taking any damage from the morning phase.'),
-        ],
-      },
-      frame: {
-        x: 1236.5,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_11': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _(
-            "The tribe awakens to the sight of completely snow-covered mountains. It wouldn't be safe to try to venture up the mountain paths.",
-          ),
-          _('You may not perform the Explore action today.'),
-        ],
-      },
-      frame: {
-        x: 1391,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_12': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A bone-chilling frost has covered the valley as you slept, freezing the nearby berry bushes.'),
-          _(
-            'Remove the 2 Berry cards from the Forage deck. Shriveling Place 1 extra card by the Fire Pit. Once the forage deck runs out of cards, add the 2 Berry cards back into the Forage deck and discard this card.',
-          ),
-        ],
-      },
-      frame: {
-        x: 1545.5,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_13': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _(
-            "A mudslide from a nearby mountain has made it very difficult to venture out of the camp. It's like trying to walk through quicksand.",
-          ),
-          _('Foraging, Gathering, Harvesting, Hunting, and Exploring cost 1 Stamina to perform during the Day Phase tomorrow.'),
-        ],
-      },
-      frame: {
-        x: 1700,
-        y: 1558,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_14': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _(
-            'The sweltering heat combined with the storm from last night has made the valley very, very muggy, which is causing lots of issues with your crafting materials.',
-          ),
-          _('You may not perform the Craft Item action today.'),
-        ],
-      },
-      frame: {
-        x: 1854.5,
-        y: 0.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_15': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A rival tribe snuck into your camp and tried to steal your dino eggs!'),
-          _("Roll the Fire Die and remove that many dino egg tokens from the group's supply."),
-        ],
-      },
-      frame: {
-        x: 1854.5,
-        y: 223,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_4': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _(
-            'Your tribe is awoken by a howling noise, even through the darkness you can see debris being tossed around in the sky by what looks to be a mountain of wind! You are able to take refuge in a nearby cave, but things are not where they were when you emerge in the morning.',
-          ),
-          _('Shuffle all discarded cards back into their respective resource decks.'),
-        ],
-      },
-      frame: {
-        x: 1854.5,
-        y: 445.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_5': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('The warmth from the fire on this frigid night might attract a predator to your camp.'),
-          _(
-            'Draw 2 cards from the Hunt deck. If one or both of them are Danger! cards, pick the highest damage and deal that amount to 1 tribe member. Discard both cards.',
-          ),
-        ],
-      },
-      frame: {
-        x: 1854.5,
-        y: 668,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_6': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _(
-            "The stream coming down the mountain has changed direction, the path you normally take to get to the Neighboring Tribe seem to have been washed out. You'll have to wait until the water recedes to pass.",
-          ),
-          _('You may not perform the Trade with Neighboring Tribe action today.'),
-        ],
-      },
-      frame: {
-        x: 1854.5,
-        y: 890.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-9_8': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A rival tribe snuck into your camp and tried to steal your gems!'),
-          _("Roll the Fire Die and remove that many gem tokens from the group's supply."),
-        ],
-      },
-      frame: {
-        x: 1854.5,
-        y: 1113,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-    'night-event-10_9': {
-      options: {
-        type: 'card',
-        deck: 'night-event',
-        text: [
-          _('A rival tribe snuck into your camp and tried to steal your medicinal herbs!'),
-          _("Roll the Fire Die and remove that many medicinal herb tokens from the group's supply."),
-        ],
-      },
-      frame: {
-        x: 1854.5,
-        y: 1335.5,
-        w: 152.5,
-        h: 220.5,
-      },
-      rotate: 0,
-    },
-  },
-  meta: {
-    version: '1.0',
-    image: 'decks-spritesheet.png',
-    css: 'decks-card',
-    size: {
-      w: 2009,
-      h: 1780,
-    },
-    scale: '1',
-  },
+  getData: () => ({
+    sprites: {
+      'explore-7_0': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 0.5,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_1': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 155,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_10': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 309.5,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_11': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 464,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_12': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 618.5,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_13': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 773,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_14': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 927.5,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_15': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 1082,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_4': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 1236.5,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_5': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 1391,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_6': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 1545.5,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_7': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 1700,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_8': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 0.5,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-7_9': {
+        options: {
+          type: 'card',
+          deck: 'explore',
+        },
+        frame: {
+          x: 155,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'explore-back': {
+        options: {
+          deck: 'explore',
+          type: 'back',
+        },
+        frame: {
+          x: 309.5,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-7_10': {
+        options: {
+          type: 'card',
+          deck: 'forage',
+        },
+        frame: {
+          x: 464,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-7_11': {
+        options: {
+          type: 'card',
+          deck: 'forage',
+        },
+        frame: {
+          x: 618.5,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-7_12': {
+        options: {
+          type: 'card',
+          deck: 'forage',
+        },
+        frame: {
+          x: 773,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-7_13': {
+        options: {
+          type: 'card',
+          deck: 'forage',
+        },
+        frame: {
+          x: 927.5,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-7_14': {
+        options: {
+          type: 'card',
+          deck: 'forage',
+        },
+        frame: {
+          x: 1082,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-7_15': {
+        options: {
+          type: 'card',
+          deck: 'forage',
+        },
+        frame: {
+          x: 1236.5,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-7_4': {
+        options: {
+          type: 'card',
+          deck: 'forage',
+        },
+        frame: {
+          x: 1391,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-7_8': {
+        options: {
+          type: 'card',
+          deck: 'forage',
+        },
+        frame: {
+          x: 1545.5,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-7_9': {
+        options: {
+          type: 'card',
+          deck: 'forage',
+        },
+        frame: {
+          x: 1700,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'forage-back': {
+        options: {
+          deck: 'forage',
+          type: 'back',
+        },
+        frame: {
+          x: 0.5,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-7_10': {
+        options: {
+          type: 'card',
+          deck: 'gather',
+        },
+        frame: {
+          x: 155,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-7_11': {
+        options: {
+          type: 'card',
+          deck: 'gather',
+        },
+        frame: {
+          x: 309.5,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-7_12': {
+        options: {
+          type: 'card',
+          deck: 'gather',
+        },
+        frame: {
+          x: 464,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-7_13': {
+        options: {
+          type: 'card',
+          deck: 'gather',
+        },
+        frame: {
+          x: 618.5,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-7_14': {
+        options: {
+          type: 'card',
+          deck: 'gather',
+        },
+        frame: {
+          x: 773,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-7_15': {
+        options: {
+          type: 'card',
+          deck: 'gather',
+        },
+        frame: {
+          x: 927.5,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-7_4': {
+        options: {
+          type: 'card',
+          deck: 'gather',
+        },
+        frame: {
+          x: 1082,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-7_8': {
+        options: {
+          type: 'card',
+          deck: 'gather',
+        },
+        frame: {
+          x: 1236.5,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-7_9': {
+        options: {
+          type: 'card',
+          deck: 'gather',
+        },
+        frame: {
+          x: 1391,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'gather-back': {
+        options: {
+          deck: 'gather',
+          type: 'back',
+        },
+        frame: {
+          x: 1545.5,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_10': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 1700,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_11': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 0.5,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_12': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 155,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_13': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 309.5,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_14': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 464,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_15': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 618.5,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_4': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 773,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_5': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 927.5,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_8': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 1082,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-7_9': {
+        options: {
+          type: 'card',
+          deck: 'harvest',
+        },
+        frame: {
+          x: 1236.5,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'harvest-back': {
+        options: {
+          deck: 'harvest',
+          type: 'back',
+        },
+        frame: {
+          x: 1391,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_10': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 1545.5,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_11': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 1700,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_12': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 0.5,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_13': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 155,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_14': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 309.5,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_15': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 464,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_4': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 618.5,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_5': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 773,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_6': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 927.5,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_7': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 1082,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_8': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 1236.5,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-7_9': {
+        options: {
+          type: 'card',
+          deck: 'hunt',
+        },
+        frame: {
+          x: 1391,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'hunt-back': {
+        options: {
+          deck: 'hunt',
+          type: 'back',
+        },
+        frame: {
+          x: 1545.5,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_0': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A rival tribe snuck into your camp and tried to steal your berries!'),
+            _("Roll the Fire Die and remove that many fiber tokens from the group's supply."),
+          ],
+        },
+        frame: {
+          x: 1700,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_1': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A rival tribe snuck into your camp and tried to steal your berries!'),
+            _("Roll the Fire Die and remove that many berry tokens from the group's supply."),
+          ],
+        },
+        frame: {
+          x: 0.5,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_10': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('The morale of the group is very high tonight and everyone sleeps soundly.'),
+            _('Skip taking 1 damage from the next morning phase.'),
+          ],
+        },
+        frame: {
+          x: 155,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_11': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A terrible lightning storm has developed over the valley.'),
+            _(
+              'During the next day phase, whenever drawing a card, roll a Fire Die. If you roll a blank, take 1 damage from a lightning strike.',
+            ),
+          ],
+        },
+        frame: {
+          x: 309.5,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_12': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _("The group notices that one of your tools was broken during the day's activities. It appears to be irreparable."),
+            _('Pick 1 equipped tool from any character and remove it from play.'),
+          ],
+        },
+        frame: {
+          x: 464,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_13': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('You awaken to a stampeding herd of mammoths as they charge through the camp.'),
+            _("Each character rolls a Fire Die. On a blank, you don't react quickly enough and take 1 damage."),
+          ],
+        },
+        frame: {
+          x: 618.5,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_14': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A nearby volcano erupted overnight, filling the air with hot soot, making it difficult to breathe.'),
+            _('Everyone takes an additional 1 damage from the morning phase.'),
+          ],
+        },
+        frame: {
+          x: 773,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_15': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A rainstorm came in overnight and the torrential downpour is threatening to ruin some of your firewood.'),
+            _(
+              'If any character has at least 1 stamina left over from the day phase, they are able to save the wood. Otherwise, remove 1 wood from the fire pit.',
+            ),
+          ],
+        },
+        frame: {
+          x: 927.5,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_2': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A thick fog rolls into the valley, making it almost impossible to see.'),
+            _('You may not perform any Harvest or Hunt actions during the next day phase.'),
+          ],
+        },
+        frame: {
+          x: 1082,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_3': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('There was something wrong with the food you ate today, and as a result, everyone has food poisoning.'),
+            _('Characters cannot gain extra stamina beyond starting values from any source tomorrow.'),
+          ],
+        },
+        frame: {
+          x: 1236.5,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_4': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A rival tribe snuck into your camp and tried to steal your wood!'),
+            _("Roll the Fire Die and remove that many wood tokens from the group's supply."),
+          ],
+        },
+        frame: {
+          x: 1391,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_5': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A rival tribe snuck into your camp and tried to steal your rocks!'),
+            _("Roll the Fire Die and remove that many rock tokens from the group's supply."),
+          ],
+        },
+        frame: {
+          x: 1545.5,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_6': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A rival tribe snuck into your camp and tried to steal your meat!'),
+            _("Roll the Fire Die and remove that many meat tokens from the group's supply."),
+          ],
+        },
+        frame: {
+          x: 1700,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_7': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _(
+              'One of your tribe members tossed a plant they foraged into the fire. The smoke from the herb now creeping over the camp appears to have healing properties.',
+            ),
+            _('Everyone heals 2 HP.'),
+          ],
+        },
+        frame: {
+          x: 0.5,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_8': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('One of your tribe members found some spices during the day and taught everyone how to cook with them.'),
+            _('Eating during the day phase tomorrow heals for 1 extra.'),
+          ],
+        },
+        frame: {
+          x: 155,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-7_9': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A nearby herd of beasts kept everyone awake all night with their screeching.'),
+            _('Start the next morning time phase with -3 stamina.'),
+          ],
+        },
+        frame: {
+          x: 309.5,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-back': {
+        options: {
+          type: 'back',
+          deck: 'night-event',
+        },
+        frame: {
+          x: 464,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_0': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _(
+              'The smoke from the fire last night was thick, making it hard to see around camp. The tribe suffered injuries from tripping and running into unseen objects.',
+            ),
+            _('Each tribe member takes 1 Physical Impairment card.'),
+          ],
+        },
+        frame: {
+          x: 618.5,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_1': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _("It seems some Dino's came down from the mountains last night and decided your camp was a great place to build their nest."),
+            _(
+              "Take 2 Raw Dino Eggs. If you have less than 2 Raw Dino Eggs in your group's supply at the end of the next day phase each tribe member takes 1 Damage before drawing the next Night Event card.",
+            ),
+          ],
+        },
+        frame: {
+          x: 773,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_10': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('High winds have caused the fire to flare up.'),
+            _('Each character can only perform 1 Investigate Fire action tomorrow, due to the increased heat.'),
+          ],
+        },
+        frame: {
+          x: 927.5,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_11': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _("After eating an unknown mushroom today, everyone feels lightheaded and can't focus."),
+            _('Skills that require stamina to activate cannot be used tomorrow.'),
+          ],
+        },
+        frame: {
+          x: 1082,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_12': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [_('Upon checking some of the traps set the previous evening, you find a dead boar.'), _('Group receives 2 meat.')],
+        },
+        frame: {
+          x: 1236.5,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_13': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A sudden cold wind sweeps into the valley, freezing everything it touches.'),
+            _('Everyone takes 1 damage and starts the morning with -2 stamina.'),
+          ],
+        },
+        frame: {
+          x: 1391,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_14': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A group of starving boars has wandered into your camp.'),
+            _(
+              'If your group has any raw berry tokens, remove half of them. The boars eat their fill and move on. If you have no raw berry tokens, any member without a weapon takes 2 damage.',
+            ),
+          ],
+        },
+        frame: {
+          x: 1545.5,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_15': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [_('It was a calm night.'), _('Nothing eventful happened.')],
+        },
+        frame: {
+          x: 1700,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_2': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('The sky lights up with a brilliant glow, followed shortly by a thundering boom. It looks like something fell from the sky!'),
+            _(
+              'If anyone has at least 1 Stamp Mark over from the Day Phase, they may venture out in search of the falling star and take 1 Gemstone token of any color.',
+            ),
+          ],
+        },
+        frame: {
+          x: 0.5,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_3': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('The snowmelt from the local mountains flooded your camp last night and no-one can find their items this morning.'),
+            _('All Weapon and Tool items are un-equipped today and may be re-equipped during the next morning phase.'),
+          ],
+        },
+        frame: {
+          x: 155,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_4': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _("Today was a painfully hot day, and everyone suffered awful sunburns. The fire's heat on your sunburned skin is unbearable."),
+            _('The Investigate Fire action is not available tomorrow.'),
+          ],
+        },
+        frame: {
+          x: 309.5,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_5': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A group of sabertooths are drawn to the smell of your camp.'),
+            _('If you have any raw meat, throw it out to draw them away. Otherwise, everyone takes 1 damage.'),
+          ],
+        },
+        frame: {
+          x: 464,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_6': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _(
+              'The ground beneath everyone begins to tremble. Before anyone can even react, the ground opens up and swallows un-equipped items!',
+            ),
+            _('Remove 1 weapon and 1 tool that are currently equipped from play.'),
+          ],
+        },
+        frame: {
+          x: 618.5,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_7': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('Before sleeping for the night, everyone gathers around the fire and tells stories about their adventures during the day.'),
+            _(
+              'Pick a Resource deck that was used today, look at the top 3 cards then place them back on-top of the deck in their original order. Each character gets 1 FKP token.',
+            ),
+          ],
+        },
+        frame: {
+          x: 773,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-8_8': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('Everyone stayed awake late last night, teaching each other what they had learned about the fire.'),
+            _('Each character gets 1 FKP token.'),
+          ],
+        },
+        frame: {
+          x: 927.5,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_9': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('After unknowingly drinking contaminated water, your short-term memory seems a bit hazy.'),
+            _('All Fire Die rolls are reduced by 1 tomorrow as a result.'),
+          ],
+        },
+        frame: {
+          x: 1082,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_10': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('The tribe slept in this morning to get some much-needed extra rest for their weary bones and muscles.'),
+            _('Remove 1 Physical Hindrance card from each tribe member and skip taking any damage from the morning phase.'),
+          ],
+        },
+        frame: {
+          x: 1236.5,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_11': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _(
+              "The tribe awakens to the sight of completely snow-covered mountains. It wouldn't be safe to try to venture up the mountain paths.",
+            ),
+            _('You may not perform the Explore action today.'),
+          ],
+        },
+        frame: {
+          x: 1391,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_12': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A bone-chilling frost has covered the valley as you slept, freezing the nearby berry bushes.'),
+            _(
+              'Remove the 2 Berry cards from the Forage deck. Shriveling Place 1 extra card by the Fire Pit. Once the forage deck runs out of cards, add the 2 Berry cards back into the Forage deck and discard this card.',
+            ),
+          ],
+        },
+        frame: {
+          x: 1545.5,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_13': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _(
+              "A mudslide from a nearby mountain has made it very difficult to venture out of the camp. It's like trying to walk through quicksand.",
+            ),
+            _('Foraging, Gathering, Harvesting, Hunting, and Exploring cost 1 Stamina to perform during the Day Phase tomorrow.'),
+          ],
+        },
+        frame: {
+          x: 1700,
+          y: 1558,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_14': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _(
+              'The sweltering heat combined with the storm from last night has made the valley very, very muggy, which is causing lots of issues with your crafting materials.',
+            ),
+            _('You may not perform the Craft Item action today.'),
+          ],
+        },
+        frame: {
+          x: 1854.5,
+          y: 0.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_15': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A rival tribe snuck into your camp and tried to steal your dino eggs!'),
+            _("Roll the Fire Die and remove that many dino egg tokens from the group's supply."),
+          ],
+        },
+        frame: {
+          x: 1854.5,
+          y: 223,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_4': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _(
+              'Your tribe is awoken by a howling noise, even through the darkness you can see debris being tossed around in the sky by what looks to be a mountain of wind! You are able to take refuge in a nearby cave, but things are not where they were when you emerge in the morning.',
+            ),
+            _('Shuffle all discarded cards back into their respective resource decks.'),
+          ],
+        },
+        frame: {
+          x: 1854.5,
+          y: 445.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_5': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('The warmth from the fire on this frigid night might attract a predator to your camp.'),
+            _(
+              'Draw 2 cards from the Hunt deck. If one or both of them are Danger! cards, pick the highest damage and deal that amount to 1 tribe member. Discard both cards.',
+            ),
+          ],
+        },
+        frame: {
+          x: 1854.5,
+          y: 668,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_6': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _(
+              "The stream coming down the mountain has changed direction, the path you normally take to get to the Neighboring Tribe seem to have been washed out. You'll have to wait until the water recedes to pass.",
+            ),
+            _('You may not perform the Trade with Neighboring Tribe action today.'),
+          ],
+        },
+        frame: {
+          x: 1854.5,
+          y: 890.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-9_8': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A rival tribe snuck into your camp and tried to steal your gems!'),
+            _("Roll the Fire Die and remove that many gem tokens from the group's supply."),
+          ],
+        },
+        frame: {
+          x: 1854.5,
+          y: 1113,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+      'night-event-10_9': {
+        options: {
+          type: 'card',
+          deck: 'night-event',
+          text: [
+            _('A rival tribe snuck into your camp and tried to steal your medicinal herbs!'),
+            _("Roll the Fire Die and remove that many medicinal herb tokens from the group's supply."),
+          ],
+        },
+        frame: {
+          x: 1854.5,
+          y: 1335.5,
+          w: 152.5,
+          h: 220.5,
+        },
+        rotate: 0,
+      },
+    },
+    meta: {
+      version: '1.0',
+      image: 'decks-spritesheet.png',
+      css: 'decks-card',
+      size: {
+        w: 2009,
+        h: 1780,
+      },
+      scale: '1',
+    },
+  }),
 };

@@ -1,4 +1,4 @@
-import allSprites from '../assets';
+import { getAllData } from '../assets';
 import { addClickListener, addPassiveListener, renderImage, scrollArrow } from '../utils/index';
 export class EatScreen {
   constructor(game) {
@@ -47,15 +47,15 @@ export class EatScreen {
       elem.insertAdjacentHTML(
         'beforeend',
         `<div class="token-block ${food['id']}">
-            <div class="name">${_(allSprites[food['id']].options.name)}</div>
+            <div class="name">${_(getAllData()[food['id']].options.name)}</div>
             <div class="available line"><span class="label">${_('Available')}: </span><span class="value">${available}</span></div>
             <div class="requires line"><span class="label">${_('Requires')}: </span><span class="value">${requires}</span></div>
             <div class="health line ${food['health'] ? '' : 'hidden'}"><span class="label">${_('Health')}: </span><span class="value">${
-          food['health']
-        } <i class="fa fa-heart"></i></span></div>
+              food['health']
+            } <i class="fa fa-heart"></i></span></div>
             <div class="stamina line ${food['stamina'] ? '' : 'hidden'}"><span class="label">${_('Stamina')}: </span><span class="value">${
-          food['stamina']
-        } <i class="fa fa-bolt"></i></span></div>
+              food['stamina']
+            } <i class="fa fa-bolt"></i></span></div>
             <div class="margin"></div>
             <div class="token ${food['id']}"></div>
         <div>`,

@@ -1,4 +1,4 @@
-import allSprites from '../assets';
+import { getAllData } from '../assets';
 import { addClickListener, addPassiveListener, renderImage, scrollArrow, Tweening } from '../utils/index';
 export class ItemTradeScreen {
   constructor(game) {
@@ -96,7 +96,7 @@ export class ItemTradeScreen {
     this.itemSelected = null;
     const {
       frame: { w, h },
-    } = allSprites['item-back'];
+    } = getAllData()['item-back'];
     const scaledWidth = Math.round(w / this.scale);
     const scaledHeight = Math.round(h / this.scale);
 

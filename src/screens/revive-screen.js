@@ -1,4 +1,4 @@
-import allSprites from '../assets';
+import { getAllData } from '../assets';
 import { addClickListener, addPassiveListener, renderImage, scrollArrow } from '../utils/index';
 export class ReviveScreen {
   constructor(game) {
@@ -45,12 +45,12 @@ export class ReviveScreen {
     eatElem.innerHTML = '';
     characterElem.innerHTML = '';
     const renderResource = (food, elem, selectCallback) => {
-      const available = (gameData.resources[food.id] ?? 0) + (food.id == 'meat-cooked' ? gameData.resources['fish-cooked'] ?? 0 : 0);
+      const available = (gameData.resources[food.id] ?? 0) + (food.id == 'meat-cooked' ? (gameData.resources['fish-cooked'] ?? 0) : 0);
       const requires = food['count'];
       elem.insertAdjacentHTML(
         'beforeend',
         `<div class="token-block ${food['id']}">
-            <div class="name">${_(allSprites[food.id].options.name)}</div>
+            <div class="name">${_(getAllData()[food.id].options.name)}</div>
             <div class="available line"><span class="label">${_('Available')}: </span><span class="value">${available}</span></div>
             <div class="requires line"><span class="label">${_('Requires')}: </span><span class="value">${requires}</span></div>
             <div class="health line"><span class="label">${_(

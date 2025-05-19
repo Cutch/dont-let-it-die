@@ -1,4 +1,4 @@
-import allSprites from '../assets';
+import { getAllData } from '../assets';
 import { addClickListener, addPassiveListener, renderImage, scrollArrow } from '../utils/index';
 
 export class DeckSelectionScreen {
@@ -56,7 +56,7 @@ export class DeckSelectionScreen {
           <div>`,
       );
       renderImage(name + '-back', elem.querySelector(`.token.${name}`), { scale: deckScaling[name] ?? 1, pos: 'insert' });
-      addClickListener(elem.querySelector(`.token.${name}`), allSprites[name + '-back'].options.name, () => selectCallback());
+      addClickListener(elem.querySelector(`.token.${name}`), getAllData()[name + '-back'].options.name, () => selectCallback());
     };
     gameData.game.deckSelection.decks.forEach((deckName) => {
       renderItem(deckName, deckSelectionElem, () => {

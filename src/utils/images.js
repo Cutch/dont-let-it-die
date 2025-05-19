@@ -1,9 +1,9 @@
-import allSprites from '../assets';
+import { getAllData } from '../assets';
 export const getSpriteSize = (name, scale = 2) => {
   const {
     frame: { w, h },
     rotate,
-  } = allSprites[name];
+  } = getAllData()[name];
   if (rotate) return { width: h / scale, height: w / scale };
   else return { width: w / scale, height: h / scale };
 };
@@ -26,8 +26,8 @@ export const renderImage = (
 ) => {
   if (scaleLookups[type]) scale = scaleLookups[type];
   // example of adding a div for each player
-  if (!allSprites[name]) throw new Error(`Missing image ${name}`);
-  const text = allSprites[name]?.options?.text;
+  if (!getAllData()[name]) throw new Error(`Missing image ${name}`);
+  const text = getAllData()[name]?.options?.text;
   let html = '';
   if (!textOnly) {
     const {
@@ -37,7 +37,7 @@ export const renderImage = (
       },
       frame: { x, y, w, h },
       rotate,
-    } = allSprites[name];
+    } = getAllData()[name];
     let scaledX = Math.round(x / scale);
     let scaledY = Math.round(y / scale);
     let scaledWidth = Math.round(w / scale);
