@@ -4,7 +4,7 @@ export default {
       options: {
         type: 'item',
         itemType: 'necklace',
-        text: [{ title: 'Blue Necklace' }, '+1 Max Health'],
+        text: [{ title: _('Blue Necklace') }, _('+1 Max Health')],
       },
       frame: {
         x: 0,
@@ -18,7 +18,7 @@ export default {
       options: {
         type: 'item',
         itemType: 'necklace',
-        text: [{ title: 'Yellow Necklace' }, '+1 Max Stamina'],
+        text: [{ title: _('Yellow Necklace') }, _('+1 Max Stamina')],
       },
       frame: {
         x: 440,
@@ -32,7 +32,7 @@ export default {
       options: {
         type: 'item',
         itemType: 'necklace',
-        text: [{ title: 'Purple Necklace' }, 'Once per day re-roll any Fire Die roll'],
+        text: [{ title: _('Purple Necklace') }, _('Once per day re-roll any Fire Die roll')],
       },
       frame: {
         x: 880,

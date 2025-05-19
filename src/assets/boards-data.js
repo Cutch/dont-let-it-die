@@ -11,12 +11,12 @@ export default {
     },
     'track-normal': {
       text: [
-        'Remove (Wood Count) from fire pit',
-        'Increase Day Count +1',
-        'Each character takes 1 Damage',
-        'Refresh up to max stamina',
-        'Trade items as desired',
-        'Pass first player token to the left',
+        _('Remove (Wood Count) from fire pit'),
+        _('Increase Day Count +1'),
+        _('Each character takes 1 Damage'),
+        _('Refresh up to max stamina'),
+        _('Trade items as desired'),
+        _('Pass first player token to the left'),
       ],
       frame: {
         x: 725,
@@ -28,12 +28,12 @@ export default {
     },
     'track-hard': {
       text: [
-        'Remove (Wood Count) from fire pit',
-        'Increase Day Count +1',
-        'Each character takes 1 Damage',
-        'Refresh up to max stamina',
-        'Trade items as desired',
-        'Pass first player token to the left',
+        _('Remove (Wood Count) from fire pit'),
+        _('Increase Day Count +1'),
+        _('Each character takes 1 Damage'),
+        _('Refresh up to max stamina'),
+        _('Trade items as desired'),
+        _('Pass first player token to the left'),
       ],
       frame: {
         x: 1449,
