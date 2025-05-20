@@ -666,6 +666,10 @@ declare('bgagame.dontletitdie', Gamegui, {
             character2: this.mySelectedCharacters?.[1],
           });
         });
+        this.addHelpTooltip({
+          node: elem.querySelector(`.${characterName}`),
+          tooltipText: characterName,
+        });
       });
   },
   updateCharacterSelections: function (gameData) {
@@ -716,7 +720,6 @@ declare('bgagame.dontletitdie', Gamegui, {
       this.addHelpTooltip({
         node: trackContainer.querySelector(`.track-${this.trackDifficulty}`),
         tooltipText: `track-${this.trackDifficulty}`,
-        background: 'white',
       });
 
       trackContainer
@@ -789,7 +792,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     const playArea = $('game_play_area');
     this.tweening = new Tweening(this, playArea);
     this.selector = new Selector(playArea);
-    this.tooltip = new Tooltip(playArea);
+    this.tooltip = new Tooltip($('game_play_area_wrap'));
     this.setupCharacterSelections(gameData);
     this.setupBoard(gameData);
     this.dice = new Dice($('board-container'));

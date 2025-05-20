@@ -37,15 +37,19 @@ export class CharacterSelectionScreen {
       this.cleanup = addPassiveListener('scroll', () => this.scroll());
     }
     characterSelectionElem.innerHTML = '';
-    const renderItem = (cardName, elem, selectCallback) => {
+    const renderItem = (characterName, elem, selectCallback) => {
       elem.insertAdjacentHTML(
         'beforeend',
-        `<div class="token-number-counter ${cardName}">
-            <div class="token ${cardName}"></div>
+        `<div class="token-number-counter ${characterName}">
+            <div class="token ${characterName}"></div>
           <div>`,
       );
-      renderImage(cardName, elem.querySelector(`.token.${cardName}`), { scale: 1.5, pos: 'insert' });
-      addClickListener(elem.querySelector(`.token.${cardName}`), cardName, () => selectCallback());
+      renderImage(characterName, elem.querySelector(`.token.${characterName}`), { scale: 1.5, pos: 'insert' });
+      addClickListener(elem.querySelector(`.token.${characterName}`), characterName, () => selectCallback());
+      this.game.addHelpTooltip({
+        node: elem.querySelector(`.token.${characterName}`),
+        tooltipText: characterName,
+      });
     };
     gameData.selectionState.selectableCharacters.forEach((character) => {
       renderItem(character, characterSelectionElem, () => {

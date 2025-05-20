@@ -137,7 +137,7 @@ class CharacterSelection
 
         $this->game::DbQuery("UPDATE `character` set `confirmed`=1 WHERE `player_id` = $playerId");
         $selectedCharactersArgs = [];
-        $message = '${player_name} selected ';
+        $message = '';
         foreach ($selectedCharacters as $index => $value) {
             $characterObject = $this->game->data->getCharacters()[$value];
             if (array_key_exists('startsWith', $characterObject)) {
@@ -146,13 +146,20 @@ class CharacterSelection
             }
             $this->game->hooks->onCharacterChoose($characterObject);
 
-            $selectedCharactersArgs['character' . ($index + 1)] = $value;
-            if ($index + 1 == sizeof($selectedCharacters)) {
-                $message = $message . ' and ';
-            } elseif ($index > 0) {
-                $message = $message . ', ';
+            switch (sizeof($selectedCharacters)) {
+                case 1:
+                    $message = clienttranslate('${player_name} selected ${character1}');
+                    break;
+                case 2:
+                    $message = clienttranslate('${player_name} selected ${character1} and ${character2}');
+                    break;
+                case 3:
+                    $message = clienttranslate('${player_name} selected ${character1}, ${character2} and ${character3}');
+                    break;
+                case 4:
+                    $message = clienttranslate('${player_name} selected ${character1}, ${character2}, ${character3} and ${character4}');
+                    break;
             }
-            $message = $message . '${character' . ($index + 1) . '}';
         }
         $this->game->character->adjustAllHealth(10);
         $this->game->character->adjustAllStamina(10);
