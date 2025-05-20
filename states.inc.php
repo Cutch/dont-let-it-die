@@ -105,6 +105,7 @@ $machinestates = [
             'actUseSkill',
             'actUseItem',
             'actRevive',
+            'actUndo',
         ],
         'transitions' => [
             'endGame' => 99,

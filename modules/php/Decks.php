@@ -226,6 +226,7 @@ class Decks
     }
     public function pickCard(string $deck): array
     {
+        $this->game->markRandomness();
         $topCard = $this->getDeck($deck)->getCardOnTop('deck');
         if (!$topCard) {
             $this->shuffleInDiscard($deck);

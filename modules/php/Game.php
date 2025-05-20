@@ -34,6 +34,7 @@ include_once dirname(__DIR__) . '/php/CharacterSelection.php';
 include_once dirname(__DIR__) . '/php/Character.php';
 include_once dirname(__DIR__) . '/php/GameData.php';
 include_once dirname(__DIR__) . '/php/SelectionStates.php';
+include_once dirname(__DIR__) . '/php/Undo.php';
 require_once dirname(__DIR__) . '/data/Utils.php';
 require_once dirname(__DIR__) . '/data/Boards.php';
 require_once dirname(__DIR__) . '/data/Characters.php';
@@ -56,6 +57,7 @@ class Game extends \Table
     public ItemTrade $itemTrade;
     public ActInterrupt $actInterrupt;
     public SelectionStates $selectionStates;
+    public Undo $undo;
     public static array $expansionList = ['base', 'mini-expansion', 'hindrance', 'death-valley'];
     /**
      * Your global variables labels:
@@ -87,6 +89,7 @@ class Game extends \Table
         $this->itemTrade = new ItemTrade($this);
         $this->actInterrupt = new ActInterrupt($this);
         $this->selectionStates = new SelectionStates($this);
+        $this->undo = new Undo($this);
         // automatically complete notification args when needed
         $this->notify->addDecorator(function (string $message, array $args) {
             $args['gamestate'] = ['name' => $this->gamestate->state()['name']];
@@ -110,9 +113,12 @@ class Game extends \Table
             return $args;
         });
     }
+    public function actUndo()
+    {
+        $this->undo->actUndo();
+    }
     public function nextState(string $transition)
     {
-        $e = new \Exception();
         if ($this->getBgaEnvironment() == 'studio') {
             $this->log('Transition to \'' . $transition . '\'');
         }
@@ -166,6 +172,10 @@ class Game extends \Table
     public function translate(string $str)
     {
         return $this->_($str);
+    }
+    public function getFromDB(string $str)
+    {
+        return $this->getObjectFromDB($str);
     }
     public function activeCharacterEventLog($message = '', $arg = [])
     {
@@ -263,6 +273,7 @@ class Game extends \Table
     }
     public function rollFireDie(string $actionName, ?string $characterName = null): int
     {
+        $this->markRandomness();
         $rand = rand(1, 6);
         $value = 0;
         if ($rand == 6) {
@@ -379,7 +390,7 @@ class Game extends \Table
             'type' => $resourceType,
         ]);
         $this->hooks->onCookAfter($data);
-        $this->gameData->set('lastAction', 'actCook');
+        $this->setLastAction('actCook');
         $this->completeAction();
     }
     public function actRevive(?string $character, ?string $food): void
@@ -416,7 +427,7 @@ class Game extends \Table
         $this->notify('notify', clienttranslate('${character_name} revived ${character_name_2} they should be recovered by the morning'), [
             'character_name_2' => $this->getCharacterHTML($character),
         ]);
-        $this->gameData->set('lastAction', 'actRevive');
+        $this->setLastAction('actRevive');
         $this->completeAction();
     }
     public function actSpendFKP(string $knowledgeId): void
@@ -454,7 +465,7 @@ class Game extends \Table
             'knowledge_name' => $this->data->getKnowledgeTree()[$knowledgeId]['name'],
         ]);
         $this->hooks->onUnlock($knowledgeObj);
-        $this->gameData->set('lastAction', 'actSpendFKP');
+        $this->setLastAction('actSpendFKP');
         $this->completeAction();
     }
     public function actCraft(?string $itemName = null): void
@@ -521,7 +532,7 @@ class Game extends \Table
                 ]);
             }
         );
-        $this->gameData->set('lastAction', 'actCraft');
+        $this->setLastAction('actCraft');
         $this->completeAction();
     }
     public function actSendToCamp(?int $sendToCampId = null): void
@@ -635,7 +646,7 @@ class Game extends \Table
             'offered' => join(', ', $offeredStr),
             'requested' => join(', ', $requestedStr),
         ]);
-        $this->gameData->set('lastAction', 'actTrade');
+        $this->setLastAction('actTrade');
         $this->completeAction();
     }
     public function actUseHerb(): void
@@ -652,7 +663,7 @@ class Game extends \Table
             function (Game $_this, bool $finalizeInterrupt, $data) {}
         );
 
-        $this->gameData->set('lastAction', 'actUseHerb');
+        $this->setLastAction('actUseHerb');
         $this->completeAction();
     }
     public function actEat(string $resourceType): void
@@ -692,7 +703,7 @@ class Game extends \Table
             }
         );
 
-        $this->gameData->set('lastAction', 'actEat');
+        $this->setLastAction('actEat');
         $this->completeAction();
     }
     public function actAddWood(): void
@@ -708,13 +719,13 @@ class Game extends \Table
             'token_name' => 'wood',
             'count' => 1,
         ]);
-        $this->gameData->set('lastAction', 'actAddWood');
+        $this->setLastAction('actAddWood');
         $this->completeAction();
     }
     public function actUseSkill(string $skillId, ?string $optionValue = null): void
     {
         if ($this->gamestate->state()['name'] == 'playerTurn') {
-            $this->gameData->set('lastAction', 'actUseSkill');
+            $this->setLastAction('actUseSkill');
         }
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
@@ -783,7 +794,7 @@ class Game extends \Table
     public function actUseItem(string $skillId): void
     {
         if ($this->gamestate->state()['name'] == 'playerTurn') {
-            $this->gameData->set('lastAction', 'actUseItem');
+            $this->setLastAction('actUseItem');
         }
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
@@ -852,13 +863,13 @@ class Game extends \Table
     public function actDrawGather(): void
     {
         $this->actDraw('gather');
-        $this->gameData->set('lastAction', 'actDrawGather');
+        $this->setLastAction('actDrawGather');
         $this->completeAction();
     }
     public function actDrawForage(): void
     {
         $this->actDraw('forage');
-        $this->gameData->set('lastAction', 'actDrawForage');
+        $this->setLastAction('actDrawForage');
         $this->completeAction();
     }
     public function actDrawHarvest(): void
@@ -882,7 +893,7 @@ class Game extends \Table
             throw new BgaUserException($this->translate('The equipped tool can\'t be used for harvesting'));
         }
         $this->actDraw('harvest');
-        $this->gameData->set('lastAction', 'actDrawHarvest');
+        $this->setLastAction('actDrawHarvest');
         $this->completeAction();
     }
     public function actDrawHunt(): void
@@ -897,13 +908,13 @@ class Game extends \Table
             throw new BgaUserException($this->translate('You need a weapon to hunt'));
         }
         $this->actDraw('hunt');
-        $this->gameData->set('lastAction', 'actDrawHunt');
+        $this->setLastAction('actDrawHunt');
         $this->completeAction();
     }
     public function actDrawExplore(): void
     {
         $this->actDraw('explore');
-        $this->gameData->set('lastAction', 'actDrawExplore');
+        $this->setLastAction('actDrawExplore');
         $this->completeAction();
     }
     public function actDraw(string $deck): void
@@ -965,7 +976,7 @@ class Game extends \Table
                 ]);
             }
         );
-        $this->gameData->set('lastAction', 'actInvestigateFire');
+        $this->setLastAction('actInvestigateFire');
         $this->completeAction();
     }
     public function actEndTurn(): void
@@ -1964,8 +1975,24 @@ class Game extends \Table
         }
         $this->changed[$type] = true;
     }
-    public function completeAction()
+    public function markRandomness()
     {
+        $this->undo->clearUndoHistory();
+    }
+    public function setLastAction(?string $actionName = null)
+    {
+        $lastAction = $this->gameData->get('lastAction');
+        if ($lastAction == null) {
+            $lastAction = [];
+        }
+
+        $this->gameData->set('lastAction', $actionName);
+    }
+    public function completeAction(bool $saveState = true)
+    {
+        if ($saveState) {
+            $this->undo->saveState();
+        }
         if ($this->changed['token']) {
             $result = [];
             $this->getResources($result);
@@ -2015,11 +2042,11 @@ class Game extends \Table
                 'availableSkills' => $this->actions->getAvailableSkills(),
                 'availableItemSkills' => $this->actions->getAvailableItemSkills(),
             ];
+            if ($this->gamestate->state()['name'] == 'playerTurn') {
+                $result['canUndo'] = $this->undo->canUndo();
+            }
             $this->notify('updateActionButtons', '', ['gameData' => $result]);
         }
-        // if ($this->gamestate->state()['name'] == 'playerTurn') {
-        //     $this->nextState('postActionPhase');
-        // }
     }
 
     public function getArgsData(): array
@@ -2061,6 +2088,9 @@ class Game extends \Table
             $result['actions'] = array_values($this->actions->getValidActions());
             $result['availableSkills'] = $this->actions->getAvailableSkills();
             $result['availableItemSkills'] = $this->actions->getAvailableItemSkills();
+        }
+        if ($this->gamestate->state()['name'] == 'playerTurn') {
+            $result['canUndo'] = $this->undo->canUndo();
         }
         $this->getDecks($result);
         $this->getGameData($result);

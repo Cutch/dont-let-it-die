@@ -146,20 +146,21 @@ class CharacterSelection
             }
             $this->game->hooks->onCharacterChoose($characterObject);
 
-            switch (sizeof($selectedCharacters)) {
-                case 1:
-                    $message = clienttranslate('${player_name} selected ${character1}');
-                    break;
-                case 2:
-                    $message = clienttranslate('${player_name} selected ${character1} and ${character2}');
-                    break;
-                case 3:
-                    $message = clienttranslate('${player_name} selected ${character1}, ${character2} and ${character3}');
-                    break;
-                case 4:
-                    $message = clienttranslate('${player_name} selected ${character1}, ${character2}, ${character3} and ${character4}');
-                    break;
-            }
+            $selectedCharactersArgs['character' . ($index + 1)] = $value;
+        }
+        switch (sizeof($selectedCharacters)) {
+            case 1:
+                $message = clienttranslate('${player_name} selected ${character1}');
+                break;
+            case 2:
+                $message = clienttranslate('${player_name} selected ${character1} and ${character2}');
+                break;
+            case 3:
+                $message = clienttranslate('${player_name} selected ${character1}, ${character2} and ${character3}');
+                break;
+            case 4:
+                $message = clienttranslate('${player_name} selected ${character1}, ${character2}, ${character3} and ${character4}');
+                break;
         }
         $this->game->character->adjustAllHealth(10);
         $this->game->character->adjustAllStamina(10);

@@ -112,3 +112,12 @@ CREATE TABLE IF NOT EXISTS `character` (
     FOREIGN KEY (player_id) REFERENCES player(player_id),
     PRIMARY KEY (`character_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+CREATE TABLE IF NOT EXISTS `undoState` (
+    `undo_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `character_name` varchar(10) NOT NULL,
+    `gamelog_move_id` int(10) unsigned NULL,
+    `itemTable` text DEFAULT '',
+    `characterTable` text DEFAULT '',
+    `globalsTable` text DEFAULT '',
+    PRIMARY KEY (`undo_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8;

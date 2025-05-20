@@ -578,7 +578,8 @@ class CharactersData
                     ],
                     'skill2' => [
                         'type' => 'skill',
-                        'state' => ['playerTurn'],
+                        'state' => ['interrupt'],
+                        'interruptState' => ['playerTurn'],
                         'name' => clienttranslate('Reduce Crafting Resources'),
                         'onCraft' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);

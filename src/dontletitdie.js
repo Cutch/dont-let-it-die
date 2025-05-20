@@ -1340,7 +1340,8 @@ declare('bgagame.dontletitdie', Gamegui, {
           break;
         case 'playerTurn':
           if (isActive) {
-            this.statusBar.addActionButton(_('Undo'), () => this.bgaPerformAction('actUndo'), { color: 'secondary' });
+            if (this.gamedatas.canUndo)
+              this.statusBar.addActionButton(_('Undo'), () => this.bgaPerformAction('actUndo'), { color: 'secondary' });
             this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
           }
           break;

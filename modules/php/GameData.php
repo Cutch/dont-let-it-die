@@ -107,10 +107,17 @@ class GameData
     }
     public function getItems(): array
     {
-        // if (!$this->cachedGameItems) {
-        //     $this->cachedGameItems = $this->game->getCollectionFromDb('SELECT item_id, item_name FROM `item`', true);
-        // }
         return $this->cachedGameItems;
+    }
+    public function setItems($data): void
+    {
+        $newMax = 0;
+        if (sizeof($data) > 0) {
+            $newMax = max(array_keys($data));
+        }
+        // Only removing as this is used by the undo
+        $this->game::DbQuery("DELETE FROM item WHERE item_id > $newMax");
+        $this->cachedGameItems = $data;
     }
     public function createItem(string $itemName): int
     {
