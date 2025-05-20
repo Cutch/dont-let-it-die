@@ -4,14 +4,9 @@ namespace Bga\Games\DontLetItDie;
 use Bga\Games\DontLetItDie\Game;
 class TokensData
 {
-    private array $data;
     public function getData(): array
     {
-        return $this->data;
-    }
-    public function __construct()
-    {
-        $this->data = [
+        return [
             '1-token' => [
                 'count' => 1,
                 'type' => 'token',

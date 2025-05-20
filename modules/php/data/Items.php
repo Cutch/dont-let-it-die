@@ -73,18 +73,9 @@ if (!function_exists('getUsePerDay')) {
 }
 class ItemsData
 {
-    private array $data;
     public function getData(): array
     {
-        array_walk($this->data, function (&$item) {
-            $item['totalCost'] = array_sum(array_values(array_key_exists('cost', $item) ? $item['cost'] : []));
-        });
-        $itemsData = array_orderby($this->data, 'craftingLevel', SORT_ASC, 'itemType', SORT_DESC, 'totalCost', SORT_ASC);
-        return $itemsData;
-    }
-    public function __construct()
-    {
-        $this->data = [
+        $data = [
             'bow-and-arrow' => [
                 'type' => 'item',
                 'craftingLevel' => 3,
@@ -1178,5 +1169,10 @@ class ItemsData
                 ],
             ],
         ];
+        array_walk($data, function (&$item) {
+            $item['totalCost'] = array_sum(array_values(array_key_exists('cost', $item) ? $item['cost'] : []));
+        });
+        $itemsData = array_orderby($data, 'craftingLevel', SORT_ASC, 'itemType', SORT_DESC, 'totalCost', SORT_ASC);
+        return $itemsData;
     }
 }

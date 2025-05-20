@@ -4,14 +4,9 @@ namespace Bga\Games\DontLetItDie;
 use Bga\Games\DontLetItDie\Game;
 class KnowledgeTreeData
 {
-    private array $data;
     public function getData(): array
     {
-        return $this->data;
-    }
-    public function __construct()
-    {
-        $this->data = [
+        return [
             'warmth-1' => [
                 'name' => clienttranslate('Warmth 1'),
                 'onGetCharacterData' => function (Game $game, $item, &$data) {

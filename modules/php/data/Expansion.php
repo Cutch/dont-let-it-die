@@ -5,14 +5,9 @@ use Bga\Games\DontLetItDie\Game;
 use BgaUserException;
 class ExpansionData
 {
-    private array $data;
     public function getData(): array
     {
-        return $this->data;
-    }
-    public function __construct()
-    {
-        $this->data = [
+        return [
             'day-event-back' => [
                 'deck' => 'day-event',
                 'deckType' => 'day-event',

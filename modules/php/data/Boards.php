@@ -4,14 +4,9 @@ namespace Bga\Games\DontLetItDie;
 use Bga\Games\DontLetItDie\Game;
 class BoardsData
 {
-    private array $data;
     public function getData(): array
     {
-        return $this->data;
-    }
-    public function __construct()
-    {
-        $this->data = [
+        return [
             'character-board' => [],
             'track-normal' => [],
             'track-hard' => [],

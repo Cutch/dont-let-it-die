@@ -25,23 +25,7 @@ class Data
 
     public function __construct(Game $game)
     {
-        $decksData = (new DecksData())->getData();
-        $expansionData = (new ExpansionData())->getData();
-        $charactersData = (new CharactersData())->getData();
-        $tokensData = (new TokensData())->getData();
-        $boardsData = (new BoardsData())->getData();
-        $knowledgeTreeData = (new KnowledgeTreeData())->getData();
-        $upgradesData = (new UpgradesData())->getData();
-        $itemsData = (new ItemsData())->getData();
         $this->game = $game;
-        $this->decks = array_merge(addId($decksData), addId($expansionData));
-        $this->characters = addId($charactersData);
-        $this->expansion = addId($expansionData);
-        $this->tokens = addId($tokensData);
-        $this->boards = addId($boardsData);
-        $this->knowledgeTree = array_merge(addId($knowledgeTreeData), addId($upgradesData));
-        $this->items = addId($itemsData);
-        $this->upgrades = addId($upgradesData);
     }
     private function expansionFilter(array $data)
     {
@@ -55,6 +39,25 @@ class Data
     }
     private function get($name)
     {
+        if (!isset($this->decks)) {
+            $decksData = (new DecksData())->getData();
+            $expansionData = (new ExpansionData())->getData();
+            $charactersData = (new CharactersData())->getData();
+            $tokensData = (new TokensData())->getData();
+            $boardsData = (new BoardsData())->getData();
+            $knowledgeTreeData = (new KnowledgeTreeData())->getData();
+            $upgradesData = (new UpgradesData())->getData();
+            $itemsData = (new ItemsData())->getData();
+            $this->decks = array_merge(addId($decksData), addId($expansionData));
+            $this->characters = addId($charactersData);
+            $this->expansion = addId($expansionData);
+            $this->tokens = addId($tokensData);
+            $this->boards = addId($boardsData);
+            $this->knowledgeTree = array_merge(addId($knowledgeTreeData), addId($upgradesData));
+            $this->items = addId($itemsData);
+            $this->upgrades = addId($upgradesData);
+        }
+
         return array_filter($this->$name, [$this, 'expansionFilter']);
     }
     public function getDecks()
@@ -91,12 +94,12 @@ class Data
     }
     public function getValidKnowledgeTree()
     {
-        $data = $this->boards['knowledge-tree-' . $this->game->getDifficulty()]['track'];
+        $data = $this->getBoards()['knowledge-tree-' . $this->game->getDifficulty()]['track'];
         $unlocks = $this->game->getUnlockedKnowledgeIds(false);
         $upgrades = $this->game->gameData->get('upgrades');
         $mapping = [];
         array_walk($upgrades, function ($v, $k) use (&$mapping) {
-            $mapping[$v['replace']] = $this->upgrades[$k];
+            $mapping[$v['replace']] = $this->getUpgrades()[$k];
         });
         $hasRequiredData = array_filter(
             $data,

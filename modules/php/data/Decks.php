@@ -29,14 +29,9 @@ if (!function_exists('rivalTribe')) {
 
 class DecksData
 {
-    private array $data;
     public function getData(): array
     {
-        return $this->data;
-    }
-    public function __construct()
-    {
-        $this->data = [
+        return [
             'explore-7_0' => [
                 'deck' => 'explore',
                 'type' => 'deck',

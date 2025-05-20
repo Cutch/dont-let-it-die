@@ -5,22 +5,9 @@ use Bga\Games\DontLetItDie\Game;
 use BgaUserException;
 class CharactersData
 {
-    private array $data;
     public function getData(): array
     {
-        return $this->data;
-    }
-    private function clearCharacterSkills(&$skills, $itemId)
-    {
-        array_walk($skills, function ($v, $k) use (&$skills, $itemId) {
-            if ($v['characterId'] == $itemId) {
-                unset($skills[$k]);
-            }
-        });
-    }
-    public function __construct()
-    {
-        $this->data = [
+        return [
             'Gronk' => [
                 // Done
                 'type' => 'character',
@@ -2023,5 +2010,13 @@ class CharactersData
                 // Cannot be used with Atouk, handled in choose
             ],
         ];
+    }
+    private function clearCharacterSkills(&$skills, $itemId)
+    {
+        array_walk($skills, function ($v, $k) use (&$skills, $itemId) {
+            if ($v['characterId'] == $itemId) {
+                unset($skills[$k]);
+            }
+        });
     }
 }

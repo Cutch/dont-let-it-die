@@ -5,14 +5,9 @@ use Bga\Games\DontLetItDie\Game;
 use BgaUserException;
 class UpgradesData
 {
-    private array $data;
     public function getData(): array
     {
-        return $this->data;
-    }
-    public function __construct()
-    {
-        $this->data = [
+        return [
             '1-A' => [
                 'deck' => 'upgrade',
                 'type' => 'deck',
