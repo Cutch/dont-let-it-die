@@ -72,7 +72,7 @@ class Encounter
             })
         );
         if (sizeof($selectedWeapon) == 0) {
-            throw new BgaUserException($this->game->translate('That weapon choice is not available'));
+            throw new BgaUserException($this->game::totranslate('That weapon choice is not available'));
         }
         $selectedWeapon = $selectedWeapon[0];
         $items = $this->game->gameData->getItems();
@@ -87,20 +87,20 @@ class Encounter
             foreach ($bothWeapons as $k => $weapon) {
                 $itemObj = $this->game->data->getItems()[$items[$weapon['itemId']]];
                 if (!(!array_key_exists('requires', $itemObj) || $itemObj['requires']($this->game, $itemObj))) {
-                    throw new BgaUserException($this->game->translate('A weapon is missing its requirements'));
+                    throw new BgaUserException($this->game::totranslate('A weapon is missing its requirements'));
                 }
             }
         } else {
             $itemObj = $this->game->data->getItems()[$items[$weaponId]];
             if (!(!array_key_exists('requires', $itemObj) || $itemObj['requires']($this->game, $itemObj))) {
-                throw new BgaUserException($this->game->translate('A weapon is missing its requirements'));
+                throw new BgaUserException($this->game::totranslate('A weapon is missing its requirements'));
             }
         }
 
         if (array_key_exists('useCost', $selectedWeapon)) {
             foreach ($selectedWeapon['useCost'] as $key => $value) {
                 if ($this->game->adjustResource($key, -$value)['left'] > 0) {
-                    throw new BgaUserException($this->game->translate('Missing resources'));
+                    throw new BgaUserException($this->game::totranslate('Missing resources'));
                 }
             }
         }

@@ -1,3 +1,4 @@
+import dojo from 'dojo';
 export default {
   getData: () => ({
     sprites: {
@@ -1109,7 +1110,7 @@ export default {
           type: 'card',
           deck: 'night-event',
           text: [
-            _('A rival tribe snuck into your camp and tried to steal your berries!'),
+            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your berries!'), {}),
             _("Roll the Fire Die and remove that many fiber tokens from the group's supply."),
           ],
         },
