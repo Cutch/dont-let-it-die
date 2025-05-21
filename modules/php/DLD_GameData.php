@@ -8,7 +8,7 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  *
- * DLD_Game.php
+ * Game.php
  *
  * This is the main file for your game logic.
  *
@@ -23,7 +23,7 @@ use Exception;
 
 class DLD_GameData
 {
-    private DLD_Game $game;
+    private Game $game;
     private ?array $resourcesBeforeTransaction = null;
     private array $cachedGameData = [];
     private array $cachedGameItems = [];
@@ -78,7 +78,7 @@ class DLD_GameData
         ],
         'destroyedResources' => [],
     ];
-    public function __construct(DLD_Game $game)
+    public function __construct(Game $game)
     {
         $this->game = $game;
         $this->reload();

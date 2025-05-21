@@ -8,7 +8,7 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  *
- * DLD_Game.php
+ * Game.php
  *
  * This is the main file for your game logic.
  *
@@ -28,23 +28,23 @@ set_error_handler(function ($severity, $message, $file, $line) {
     }
 });
 require_once APP_GAMEMODULE_PATH . 'module/table/table.game.php';
-include_once dirname(__DIR__) . '/php/Data.php';
-include_once dirname(__DIR__) . '/php/Actions.php';
-include_once dirname(__DIR__) . '/php/CharacterSelection.php';
-include_once dirname(__DIR__) . '/php/Character.php';
-include_once dirname(__DIR__) . '/php/GameData.php';
-include_once dirname(__DIR__) . '/php/SelectionStates.php';
-include_once dirname(__DIR__) . '/php/Undo.php';
-require_once dirname(__DIR__) . '/php/data-files/Utils.php';
-require_once dirname(__DIR__) . '/php/data-files/Boards.php';
-require_once dirname(__DIR__) . '/php/data-files/Characters.php';
-require_once dirname(__DIR__) . '/php/data-files/Decks.php';
-require_once dirname(__DIR__) . '/php/data-files/Expansion.php';
-require_once dirname(__DIR__) . '/php/data-files/KnowledgeTree.php';
-require_once dirname(__DIR__) . '/php/data-files/Items.php';
-require_once dirname(__DIR__) . '/php/data-files/Tokens.php';
-require_once dirname(__DIR__) . '/php/data-files/Upgrades.php';
-class DLD_Game extends \Table
+include_once dirname(__DIR__) . '/php/DLD_Data.php';
+include_once dirname(__DIR__) . '/php/DLD_Actions.php';
+include_once dirname(__DIR__) . '/php/DLD_CharacterSelection.php';
+include_once dirname(__DIR__) . '/php/DLD_Character.php';
+include_once dirname(__DIR__) . '/php/DLD_GameData.php';
+include_once dirname(__DIR__) . '/php/DLD_SelectionStates.php';
+include_once dirname(__DIR__) . '/php/DLD_Undo.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Utils.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Boards.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Characters.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Decks.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Expansion.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_KnowledgeTree.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Items.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Tokens.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Upgrades.php';
+class Game extends \Table
 {
     public DLD_Character $character;
     public DLD_Actions $actions;
@@ -476,7 +476,7 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onCraft'],
-            function (DLD_Game $_this) use ($itemName) {
+            function (Game $_this) use ($itemName) {
                 if (!$itemName) {
                     throw new BgaUserException($_this::totranslate('Select an item'));
                 }
@@ -500,7 +500,7 @@ class DLD_Game extends \Table
                     'itemType' => $itemType,
                 ];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $itemName = $data['itemName'];
                 $item = $data['item'];
                 $itemType = $data['itemType'];
@@ -656,12 +656,12 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onUseHerb'],
-            function (DLD_Game $_this) {
+            function (Game $_this) {
                 // $this->log('onUseHerb');
                 // $this->actions->validateCanRunAction('actUseHerb');
                 return ['herb' => 1];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {}
+            function (Game $_this, bool $finalizeInterrupt, $data) {}
         );
 
         $this->setLastAction('actUseHerb');
@@ -673,14 +673,14 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onEat'],
-            function (DLD_Game $_this) use ($resourceType) {
+            function (Game $_this) use ($resourceType) {
                 $this->actions->validateCanRunAction('actEat', null, $resourceType);
                 $tokenData = $this->data->getTokens()[$resourceType];
                 $data = ['type' => $resourceType, ...$tokenData['actEat'], 'tokenName' => $tokenData['name']];
                 $this->hooks->onEatBefore($data);
                 return $data;
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 if (array_key_exists('health', $data)) {
                     $this->character->adjustActiveHealth($data['health']);
                 }
@@ -732,7 +732,7 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onUseSkill'],
-            function (DLD_Game $_this) use ($skillId, $optionValue) {
+            function (Game $_this) use ($skillId, $optionValue) {
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 // $this->character->addExtraTime();
                 // $this->log('$skillId', $skillId);
@@ -751,7 +751,7 @@ class DLD_Game extends \Table
                     'nextState' => $this->gamestate->state()['name'] == 'dayEvent' ? 'playerTurn' : false,
                 ];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) use ($optionValue) {
+            function (Game $_this, bool $finalizeInterrupt, $data) use ($optionValue) {
                 $skill = $data['skill'];
                 $character = $data['character'];
                 $skillId = $data['skillId'];
@@ -801,7 +801,7 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onUseSkill'],
-            function (DLD_Game $_this) use ($skillId) {
+            function (Game $_this) use ($skillId) {
                 $_this->character->setSubmittingCharacter('actUseItem', $skillId);
                 // $this->character->addExtraTime();
                 $_this->actions->validateCanRunAction('actUseItem', $skillId);
@@ -817,7 +817,7 @@ class DLD_Game extends \Table
                     'turnCharacter' => $this->character->getTurnCharacter(),
                 ];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $skill = $data['skill'];
                 $character = $data['character'];
                 $skillId = $data['skillId'];
@@ -925,7 +925,7 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onDraw'],
-            function (DLD_Game $_this, $deck) {
+            function (Game $_this, $deck) {
                 $this->actions->validateCanRunAction('actDraw' . ucfirst($deck));
                 $data = ['deck' => $deck, 'cancel' => false];
                 $this->hooks->onActDraw($data);
@@ -938,7 +938,7 @@ class DLD_Game extends \Table
                 }
                 return ['deck' => $deck, 'card' => [...$card], ...$data];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 extract($data);
                 if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
                     $_this->actions->spendActionCost('actDraw' . ucfirst($deck));
@@ -959,14 +959,14 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onInvestigateFire'],
-            function (DLD_Game $_this) use ($guess) {
+            function (Game $_this) use ($guess) {
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
                 $_this->activeCharacterEventLog(clienttranslate('${character_name} investigated the fire'));
                 $roll = $_this->rollFireDie(clienttranslate('Investigate Fire'), $character['character_name']);
                 return ['roll' => $roll, 'originalRoll' => $roll, 'guess' => $guess];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
                     $_this->actions->spendActionCost('actInvestigateFire');
                 }
@@ -1150,11 +1150,11 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onPostActionPhase'],
-            function (DLD_Game $_this) use (&$interrupted) {
+            function (Game $_this) use (&$interrupted) {
                 $interrupted = true;
                 return [];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) use (&$interrupted) {
+            function (Game $_this, bool $finalizeInterrupt, $data) use (&$interrupted) {
                 $interrupted = false;
                 $this->nextState('morningPhase');
             }
@@ -1168,7 +1168,7 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onResolveDraw'],
-            function (DLD_Game $_this) {
+            function (Game $_this) {
                 // $character = $this->character->getSubmittingCharacter();
                 // deck,card
                 $state = $this->gameData->get('state');
@@ -1194,7 +1194,7 @@ class DLD_Game extends \Table
                 }
                 return [...$state, 'discard' => false];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) use (&$moveToDrawCardState) {
+            function (Game $_this, bool $finalizeInterrupt, $data) use (&$moveToDrawCardState) {
                 $deck = $data['deck'];
                 $card = $data['card'];
                 if ($data['discard']) {
@@ -1237,13 +1237,13 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onDayEvent'],
-            function (DLD_Game $_this) {
+            function (Game $_this) {
                 $state = $this->gameData->get('state');
                 $deck = $state['deck'];
                 $card = $state['card'];
                 return ['card' => $card, 'deck' => 'day-event'];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
                 $this->nightEventLog(clienttranslate('Something unexpected happens, drawing a day event'));
                 // $this->nextState('playerTurn');
@@ -1256,12 +1256,12 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onNight'],
-            function (DLD_Game $_this) {
+            function (Game $_this) {
                 $card = $this->decks->pickCard('night-event');
                 $this->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
                 return ['card' => $card, 'deck' => 'night-event'];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
                 $this->nightEventLog(clienttranslate('It\'s night, drawing from the night deck'));
                 $this->nextState('nightDrawCard');
@@ -1274,7 +1274,7 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onNightDrawCard'],
-            function (DLD_Game $_this) {
+            function (Game $_this) {
                 // deck,card
                 $state = $this->gameData->get('state');
                 $deck = $state['deck'];
@@ -1282,7 +1282,7 @@ class DLD_Game extends \Table
                 $this->cardDrawEvent($card, $deck);
                 return ['state' => $state];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $card = $data['state']['card'];
                 $_this->hooks->reconnectHooks($card, $_this->decks->getCard($card['id']));
 
@@ -1302,10 +1302,10 @@ class DLD_Game extends \Table
     //         __FUNCTION__,
     //         func_get_args(),
     //         [$this->hooks, 'onNightPost'],
-    //         function (DLD_Game $_this) {
+    //         function (Game $_this) {
     //             return [];
     //         },
-    //         function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+    //         function (Game $_this, bool $finalizeInterrupt, $data) {
     //             $this->nextState('morningPhase');
     //         }
     //     );
@@ -1490,10 +1490,10 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onDinnerPhasePost'],
-            function (DLD_Game $_this) {
+            function (Game $_this) {
                 return [];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $this->nextState('nightPhase');
             }
         );
@@ -1566,7 +1566,7 @@ class DLD_Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onMorning'],
-            function (DLD_Game $_this) {
+            function (Game $_this) {
                 $day = $this->gameData->get('day');
                 $day += 1;
                 $this->gameData->set('day', $day);
@@ -1608,7 +1608,7 @@ class DLD_Game extends \Table
                     'nextState' => 'tradePhase',
                 ];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 // extract($data);
                 $health = $data['health'];
                 $stamina = $data['stamina'];
@@ -1658,10 +1658,10 @@ class DLD_Game extends \Table
     //         __FUNCTION__,
     //         func_get_args(),
     //         [$this->hooks, 'onMorningPost'],
-    //         function (DLD_Game $_this) {
+    //         function (Game $_this) {
     //             return [];
     //         },
-    //         function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+    //         function (Game $_this, bool $finalizeInterrupt, $data) {
     //             $this->nextState('tradePhase');
     //         }
     //     );

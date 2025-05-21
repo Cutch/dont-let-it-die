@@ -8,8 +8,8 @@ use BgaUserException;
 
 class DLD_ItemTrade
 {
-    private DLD_Game $game;
-    public function __construct(DLD_Game $game)
+    private Game $game;
+    public function __construct(Game $game)
     {
         $this->game = $game;
     }

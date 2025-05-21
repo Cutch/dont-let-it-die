@@ -7,9 +7,9 @@ use BgaUserException;
 
 class DLD_Hooks
 {
-    private DLD_Game $game;
+    private Game $game;
     private bool $checkInterrupt = false;
-    public function __construct(DLD_Game $game)
+    public function __construct(Game $game)
     {
         $this->game = $game;
     }

@@ -8,10 +8,10 @@ use Exception;
 
 class DLD_Undo
 {
-    private DLD_Game $game;
+    private Game $game;
     private array $initialState;
     private bool $actionWasCleared = false;
-    public function __construct(DLD_Game $game)
+    public function __construct(Game $game)
     {
         $this->game = $game;
         $this->loadInitialState();

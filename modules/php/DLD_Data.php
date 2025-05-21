@@ -2,18 +2,18 @@
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
-require_once dirname(__DIR__) . '/php/data-files/Utils.php';
-require_once dirname(__DIR__) . '/php/data-files/Boards.php';
-require_once dirname(__DIR__) . '/php/data-files/Characters.php';
-require_once dirname(__DIR__) . '/php/data-files/Decks.php';
-require_once dirname(__DIR__) . '/php/data-files/Expansion.php';
-require_once dirname(__DIR__) . '/php/data-files/KnowledgeTree.php';
-require_once dirname(__DIR__) . '/php/data-files/Items.php';
-require_once dirname(__DIR__) . '/php/data-files/Tokens.php';
-require_once dirname(__DIR__) . '/php/data-files/Upgrades.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Utils.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Boards.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Characters.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Decks.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Expansion.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_KnowledgeTree.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Items.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Tokens.php';
+require_once dirname(__DIR__) . '/php/data-files/DLD_Upgrades.php';
 class DLD_Data
 {
-    private DLD_Game $game;
+    private Game $game;
     private array $decks;
     private array $characters;
     private array $tokens;
@@ -23,7 +23,7 @@ class DLD_Data
     private array $upgrades;
     private array $expansion;
 
-    public function __construct(DLD_Game $game)
+    public function __construct(Game $game)
     {
         $this->game = $game;
     }

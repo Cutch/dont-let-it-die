@@ -1720,7 +1720,7 @@ export default {
               "The tribe awakens to the sight of completely snow-covered mountains. It wouldn't be safe to try to venture up the mountain paths.",
             ),
             dojo.string.substitute(_('You may not perform the ${action} action today.'), {
-              resource: _('Explore'),
+              action: _('Explore'),
             }),
           ],
         },
@@ -1779,7 +1779,7 @@ export default {
               'The sweltering heat combined with the storm from last night has made the valley very, very muggy, which is causing lots of issues with your crafting materials.',
             ),
             dojo.string.substitute(_('You may not perform the ${action} action today.'), {
-              resource: _('Craft'),
+              action: _('Craft'),
             }),
           ],
         },
@@ -1859,7 +1859,7 @@ export default {
               "The stream coming down the mountain has changed direction, the path you normally take to get to the Neighboring Tribe seem to have been washed out. You'll have to wait until the water recedes to pass.",
             ),
             dojo.string.substitute(_('You may not perform the ${action} action today.'), {
-              resource: _('Trade'),
+              action: _('Trade'),
             }),
           ],
         },

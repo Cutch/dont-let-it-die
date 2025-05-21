@@ -8,7 +8,7 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  *
- * DLD_Game.php
+ * Game.php
  *
  * This is the main file for your game logic.
  *
@@ -22,8 +22,8 @@ use BgaUserException;
 
 class DLD_Encounter
 {
-    private DLD_Game $game;
-    public function __construct(DLD_Game $game)
+    private Game $game;
+    public function __construct(Game $game)
     {
         $this->game = $game;
     }
@@ -123,7 +123,7 @@ class DLD_Encounter
             __FUNCTION__,
             func_get_args(),
             [$this->game->hooks, 'onEncounter'],
-            function (DLD_Game $_this) {
+            function (Game $_this) {
                 $state = $_this->gameData->get('state');
                 $card = $state['card'];
                 $deck = $state['deck'];
@@ -243,7 +243,7 @@ class DLD_Encounter
                     'stamina' => 0,
                 ];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 if ($data['stamina'] != 0) {
                     $_this->character->adjustActiveStamina($data['stamina']);
                 }

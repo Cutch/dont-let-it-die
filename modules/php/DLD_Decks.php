@@ -8,11 +8,11 @@ use Exception;
 
 class DLD_Decks
 {
-    private DLD_Game $game;
+    private Game $game;
     private array $decks;
     private array $cachedData = [];
     private array $decksNames;
-    public function __construct(DLD_Game $game)
+    public function __construct(Game $game)
     {
         $this->decksNames = [
             'explore' => clienttranslate('Explore'),

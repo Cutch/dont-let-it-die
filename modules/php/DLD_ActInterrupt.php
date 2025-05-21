@@ -7,11 +7,11 @@ use Closure;
 
 class DLD_ActInterrupt
 {
-    private DLD_Game $game;
+    private Game $game;
     private array $activatableSkills = [];
     // private array $calledFunction = [];
 
-    public function __construct(DLD_Game $game)
+    public function __construct(Game $game)
     {
         $this->game = $game;
         // $this->calledFunction = [];

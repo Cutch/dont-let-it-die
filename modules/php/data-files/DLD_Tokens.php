@@ -1,7 +1,7 @@
 <?php
 namespace Bga\Games\DontLetItDie;
 
-use Bga\Games\DontLetItDie\DLD_Game;
+use Bga\Games\DontLetItDie\Game;
 class DLD_TokensData
 {
     public function getData(): array
@@ -115,7 +115,7 @@ class DLD_TokensData
                     'count' => 2,
                     'health' => 1,
                 ],
-                'requires' => function (DLD_Game $game) {
+                'requires' => function (Game $game) {
                     return in_array('Sig', $game->character->getAllCharacterIds());
                 },
             ],
@@ -128,7 +128,7 @@ class DLD_TokensData
                     'count' => 1,
                     'health' => 2,
                 ],
-                'requires' => function (DLD_Game $game) {
+                'requires' => function (Game $game) {
                     return in_array('Sig', $game->character->getAllCharacterIds());
                 },
             ],
@@ -211,7 +211,7 @@ class DLD_TokensData
                 'type' => 'resource',
                 'name' => clientTranslate('Stew'),
                 'expansion' => 'hindrance',
-                'requires' => function (DLD_Game $game) {
+                'requires' => function (Game $game) {
                     return in_array('Tiku', $game->character->getAllCharacterIds());
                 },
             ],
@@ -220,7 +220,7 @@ class DLD_TokensData
                 'type' => 'resource',
                 'name' => clientTranslate('Trap'),
                 'expansion' => 'hindrance',
-                'requires' => function (DLD_Game $game) {
+                'requires' => function (Game $game) {
                     return in_array('Rex', $game->character->getAllCharacterIds());
                 },
             ],

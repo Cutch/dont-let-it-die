@@ -8,7 +8,7 @@ use Exception;
 
 class DLD_Character
 {
-    private DLD_Game $game;
+    private Game $game;
     private ?string $submittingCharacter = null;
     private array $cachedData = [];
     private static array $characterColumns = [

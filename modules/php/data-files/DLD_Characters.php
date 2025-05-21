@@ -1,7 +1,7 @@
 <?php
 namespace Bga\Games\DontLetItDie;
 
-use Bga\Games\DontLetItDie\DLD_Game;
+use Bga\Games\DontLetItDie\Game;
 use BgaUserException;
 class DLD_CharactersData
 {
@@ -22,10 +22,10 @@ class DLD_CharactersData
                         'name' => clienttranslate('Gain 2 Stamina'),
                         'health' => 2,
                         'perDay' => 1,
-                        'getPerDayKey' => function (DLD_Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill) {
                             return $skill['characterId'];
                         },
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             $game->character->adjustActiveStamina(2);
                             $game->character->adjustActiveHealth(-2);
@@ -42,7 +42,7 @@ class DLD_CharactersData
                             );
                             return ['notify' => false];
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
@@ -50,7 +50,7 @@ class DLD_CharactersData
                         },
                     ],
                 ],
-                'onEncounterPost' => function (DLD_Game $game, $char, &$data) {
+                'onEncounterPost' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['encounterHealth'] <= $data['characterDamage']) {
                         $data['stamina'] += 2;
                         $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
@@ -67,17 +67,17 @@ class DLD_CharactersData
                 'stamina' => '7',
                 'name' => 'Grub',
                 'slots' => ['weapon', 'tool'],
-                'onGetValidActions' => function (DLD_Game $game, $char, &$data) {
+                'onGetValidActions' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         unset($data['actDrawHunt']);
                     }
                 },
-                'onEncounterPre' => function (DLD_Game $game, $char, &$data) {
+                'onEncounterPre' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         $data['escape'] = true;
                     }
                 },
-                'onDraw' => function (DLD_Game $game, $char, &$data) {
+                'onDraw' => function (Game $game, $char, &$data) {
                     $deck = $data['deck'];
                     if ($char['isActive'] && $deck == 'gather') {
                         if ($game->adjustResource('fiber', 1)['changed'] > 0) {
@@ -95,12 +95,12 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Kara',
                 'slots' => ['weapon', 'tool'],
-                'onEat' => function (DLD_Game $game, $char, &$data) {
+                'onEat' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         $data['health'] *= 2;
                     }
                 },
-                'onGetEatData' => function (DLD_Game $game, $char, &$data) {
+                'onGetEatData' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         $data['health'] *= 2;
                     }
@@ -112,16 +112,16 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'perDay' => 1,
-                        'getPerDayKey' => function (DLD_Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill) {
                             return $skill['characterId'] . $skill['id'];
                         },
-                        'onInvestigateFire' => function (DLD_Game $game, $skill, &$data) {
+                        'onInvestigateFire' => function (Game $game, $skill, &$data) {
                             if ($data['roll'] < 3 && getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1) {
                                 // If kara is not the character, and the roll is not the max
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $char = $game->character->getCharacterData($skill['characterId']);
                                 $game->activeCharacterEventLog(
@@ -132,7 +132,7 @@ class DLD_CharactersData
                                 usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
                         },
                     ],
@@ -142,16 +142,16 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'cancellable' => true,
                         'perDay' => 1,
-                        'getPerDayKey' => function (DLD_Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill) {
                             return $skill['characterId'] . 'stamina';
                         },
-                        'onGetActionCost' => function (DLD_Game $game, $skill, &$data) {
+                        'onGetActionCost' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if (!$char['isActive'] && $data['action'] == 'actUseSkill' && $data['subAction'] == $skill['id']) {
                                 $data['perDay'] = 1 - getUsePerDay($skill['getPerDayKey']($game, $skill), $game);
                             }
                         },
-                        'onUseSkill' => function (DLD_Game $game, $skill, &$data) {
+                        'onUseSkill' => function (Game $game, $skill, &$data) {
                             if ($data['skillId'] == $skill['id']) {
                                 $turnChar = $game->character->getTurnCharacter();
                                 $char = $game->character->getCharacterData($skill['characterId']);
@@ -167,7 +167,7 @@ class DLD_CharactersData
                                 );
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return !$char['isActive'] &&
                                 getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
@@ -181,15 +181,15 @@ class DLD_CharactersData
                         'interruptState' => ['playerTurn'],
                         'cancellable' => true,
                         'perDay' => 1,
-                        'getPerDayKey' => function (DLD_Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill) {
                             return $skill['characterId'] . 'stamina'; // This should match skill 2
                         },
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $data['args'] = ['Karaskill3'];
                             }
                         },
-                        'onGetActionCost' => function (DLD_Game $game, $skill, &$data) {
+                        'onGetActionCost' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $interruptState = $game->actInterrupt->getState('actUseSkill');
                             if (
@@ -208,7 +208,7 @@ class DLD_CharactersData
                                 );
                             }
                         },
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             $turn_char = $game->character->getTurnCharacter();
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             $game->character->adjustStamina($turn_char['character_name'], 2);
@@ -218,7 +218,7 @@ class DLD_CharactersData
                             ]);
                             return ['notify' => false];
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return !$char['isActive'] && getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
                         },
@@ -239,7 +239,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('Shuffle Discard Pile'),
                         'state' => ['playerTurn'],
                         'stamina' => 2,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 // Shuffle it
@@ -248,7 +248,7 @@ class DLD_CharactersData
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
                         },
-                        'onDeckSelection' => function (DLD_Game $game, $skill, $data) {
+                        'onDeckSelection' => function (Game $game, $skill, $data) {
                             if ($game->gameData->get('state')['id'] == $skill['id']) {
                                 $game->decks->shuffleInDiscard($data['deckName'], false);
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
@@ -260,13 +260,13 @@ class DLD_CharactersData
                                 );
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'];
                         },
                     ],
                 ],
-                'onEncounterPost' => function (DLD_Game $game, $char, $data) {
+                'onEncounterPost' => function (Game $game, $char, $data) {
                     if ($data['encounterHealth'] <= $data['characterDamage']) {
                         $data['stamina'] += 1;
 
@@ -289,20 +289,20 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['nightPhase', 'nightDrawCard'],
                         'perDay' => 1,
-                        'getPerDayKey' => function (DLD_Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill) {
                             return $skill['characterId'] . $skill['id'];
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
                                 $game->gameData->getResource('bone') > 0;
                         },
-                        'onNightDrawCard' => function (DLD_Game $game, $skill, $data) {
+                        'onNightDrawCard' => function (Game $game, $skill, $data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $char = $game->character->getCharacterData($skill['characterId']);
                                 usePerDay($skill['getPerDayKey']($game, $skill), $game);
@@ -317,12 +317,12 @@ class DLD_CharactersData
                         },
                     ],
                 ],
-                'onGetActionSelectable' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionSelectable' => function (Game $game, $char, &$data) {
                     if ($data['action'] == 'actSpendFKP') {
                         $data['selectable'] = ['fkp', 'bone'];
                     }
                 },
-                'onRollDie' => function (DLD_Game $game, $char, &$data) {
+                'onRollDie' => function (Game $game, $char, &$data) {
                     $data['sendNotification']();
                     if ($char['isActive'] && $data['value'] == 1) {
                         if ($game->adjustResource('berry', 1)['changed'] > 0) {
@@ -343,7 +343,7 @@ class DLD_CharactersData
                 'startsWith' => 'skull-shield',
                 'slots' => ['weapon', 'tool'],
                 // If using an herb to clear a physical hindrance gain a health
-                'onUseHerb' => function (DLD_Game $game, $char, &$data) {
+                'onUseHerb' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         $game->character->adjustHealth($char['id'], 1);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
@@ -358,7 +358,7 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'name' => clienttranslate('Trade/Take 1 Physical Hindrance'),
                         'stamina' => 2,
-                        'onUse' => function (DLD_Game $game, $skill, &$data) {
+                        'onUse' => function (Game $game, $skill, &$data) {
                             $myCharId = $skill['characterId'];
                             $characters = array_values(
                                 array_map(
@@ -381,7 +381,7 @@ class DLD_CharactersData
                             $data['interrupt'] = true;
                             return ['notify' => false, 'nextState' => false, 'interrupt' => true, 'spendActionCost' => false];
                         },
-                        'onHindranceSelection' => function (DLD_Game $game, $skill, &$data) {
+                        'onHindranceSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('hindranceSelection');
                             if ($state && $state['id'] == $skill['id']) {
                                 $myCount = 0;
@@ -461,7 +461,7 @@ class DLD_CharactersData
                                 $data['nextState'] = 'playerTurn';
                             }
                         },
-                        'onHindranceSelectionAfter' => function (DLD_Game $game, $skill, &$data) {
+                        'onHindranceSelectionAfter' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('hindranceSelection');
                             if ($state && $state['id'] == $skill['id']) {
                                 if ($data['nextState'] != false) {
@@ -470,7 +470,7 @@ class DLD_CharactersData
                                 }
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] &&
                                 sizeof(
@@ -496,10 +496,10 @@ class DLD_CharactersData
                         'name' => clienttranslate('Gain 2 Health'),
                         'stamina' => 2,
                         'perDay' => 1,
-                        'getPerDayKey' => function (DLD_Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill) {
                             return $skill['characterId'] . $skill['id'];
                         },
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             $game->character->adjustActiveStamina(-2);
                             $game->character->adjustActiveHealth(2);
@@ -514,7 +514,7 @@ class DLD_CharactersData
                             );
                             return ['notify' => false];
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
@@ -522,7 +522,7 @@ class DLD_CharactersData
                         },
                     ],
                 ],
-                'onEncounterPre' => function (DLD_Game $game, $char, &$data) {
+                'onEncounterPre' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['name'] == 'Beast') {
                         $data['encounterHealth'] = 0;
                         $data['willTakeDamage'] = 0;
@@ -543,10 +543,10 @@ class DLD_CharactersData
                         'name' => clienttranslate('Gain 1 Wood'),
                         'stamina' => 2,
                         'perDay' => 1,
-                        'getPerDayKey' => function (DLD_Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill) {
                             return $skill['characterId'] . $skill['id'];
                         },
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             $game->character->adjustActiveStamina(-2);
@@ -556,7 +556,7 @@ class DLD_CharactersData
                                 'resource_type' => 'wood',
                             ]);
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
@@ -568,7 +568,7 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'name' => clienttranslate('Reduce Crafting Resources'),
-                        'onCraft' => function (DLD_Game $game, $skill, &$data) {
+                        'onCraft' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $existingData = $game->actInterrupt->getState('actCraft');
                             if ($char['isActive'] && !$existingData) {
@@ -577,11 +577,11 @@ class DLD_CharactersData
                                 $data['interrupt'] = true;
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] && sizeof(array_filter($game->gameData->getResources())) > 0;
                         },
-                        'onResourceSelection' => function (DLD_Game $game, $skill, &$data) {
+                        'onResourceSelection' => function (Game $game, $skill, &$data) {
                             if ($game->gameData->get('state')['id'] == $skill['id']) {
                                 $state = $game->actInterrupt->getState('actCraft');
                                 $maxChange = clamp(array_sum($state['data']['item']['cost']) - 2, 0, 2);
@@ -594,7 +594,7 @@ class DLD_CharactersData
                                 $game->actInterrupt->setState('actCraft', $state);
                             }
                         },
-                        'onResourceSelectionOptions' => function (DLD_Game $game, $skill, &$resources) {
+                        'onResourceSelectionOptions' => function (Game $game, $skill, &$resources) {
                             $state = $game->gameData->get('state');
                             if ($state['id'] == $skill['id']) {
                                 $resources = $state['item']['cost'];
@@ -602,7 +602,7 @@ class DLD_CharactersData
                         },
                     ],
                 ],
-                'onGetValidActions' => function (DLD_Game $game, $char, &$data) {
+                'onGetValidActions' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         unset($data['actDrawHunt']);
                         unset($data['actDrawForage']);
@@ -615,7 +615,7 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Ayla',
                 'slots' => ['weapon', 'tool'],
-                'onGetActionCost' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionCost' => function (Game $game, $char, &$data) {
                     // Tested
                     if ($char['isActive'] && $data['action'] == 'actDrawHunt') {
                         $data['stamina'] = min($data['stamina'], 2);
@@ -628,12 +628,12 @@ class DLD_CharactersData
                         // Tested
                         'name' => clienttranslate('Convert 1 Berry to Fiber'),
                         'stamina' => 1,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             $game->adjustResource('berry', -1);
                             $game->adjustResource('fiber', 1);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} converted 1 raw berry to 1 fiber'));
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] &&
                                 $game->gameData->getResource('berry') > 0 &&
@@ -647,15 +647,15 @@ class DLD_CharactersData
                         'stamina' => 0,
                         'perDay' => 1,
                         'state' => ['postEncounter'],
-                        'getPerDayKey' => function (DLD_Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill) {
                             return $skill['characterId'] . $skill['id'];
                         },
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             $game->character->adjustActiveHealth(2);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} healed by 2'));
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive'] && $char['health'] < $char['maxHealth']) {
                                 $state = $game->gameData->get('encounterState');
@@ -673,21 +673,21 @@ class DLD_CharactersData
                 'stamina' => '4',
                 'name' => 'River',
                 'slots' => ['weapon', 'tool'],
-                'getPerDayKey' => function (DLD_Game $game, $char, &$data) {
+                'getPerDayKey' => function (Game $game, $char, &$data) {
                     return [$char['id']];
                 },
-                'onGetActionCost' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionCost' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['action'] == 'actInvestigateFire' && getUsePerDay($char['id'], $game) < 1) {
                         $data['stamina'] = min($data['stamina'], 0);
                     }
                 },
-                'onInvestigateFire' => function (DLD_Game $game, $char, &$data) {
+                'onInvestigateFire' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && getUsePerDay($char['id'], $game) < 1) {
                         usePerDay($char['id'], $game);
                         $data['spendActionCost'] = false;
                     }
                 },
-                'onDraw' => function (DLD_Game $game, $char, &$data) {
+                'onDraw' => function (Game $game, $char, &$data) {
                     $card = $data['card'];
                     if ($char['isActive'] && $card['deckType'] == 'nothing') {
                         $game->adjustResource('fkp', 2);
@@ -697,7 +697,7 @@ class DLD_CharactersData
                         ]);
                     }
                 },
-                'onGetActionSelectable' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionSelectable' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['action'] == 'actEat') {
                         $data['selectable'] = array_filter(
                             $data['selectable'],
@@ -717,12 +717,12 @@ class DLD_CharactersData
                 'slots' => ['weapon', 'tool'],
                 'expansion' => 'mini-expansion',
                 // Skip trading ITEMS with others
-                'onGetActionCost' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionCost' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['action'] == 'actInvestigateFire') {
                         $data['stamina'] = 5;
                     }
                 },
-                'onInvestigateFire' => function (DLD_Game $game, $char, &$data) {
+                'onInvestigateFire' => function (Game $game, $char, &$data) {
                     $char = $game->character->getCharacterData($char['characterId']);
                     if (!$char['isActive']) {
                         $roll2 = $game->rollFireDie($char['character_name']);
@@ -735,14 +735,14 @@ class DLD_CharactersData
                         'name' => clienttranslate('Go Fish'),
                         'state' => ['playerTurn'],
                         'stamina' => 2,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             $skill['sendNotification']();
                             $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => $game->rollFireDie($skill['name']),
                                 'resource_type' => 'fish',
                             ]);
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $hasItem =
                                 sizeof(
@@ -765,16 +765,16 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Tara',
                 'slots' => ['weapon', 'tool'],
-                'getPerDayKey' => function (DLD_Game $game, $char, &$data) {
+                'getPerDayKey' => function (Game $game, $char, &$data) {
                     return [$char['id'] . 'skillonEat'];
                 },
-                'onEat' => function (DLD_Game $game, $char, &$data) {
+                'onEat' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && getUsePerDay($char['id'] . 'skillonEat', $game) < 1) {
                         $data['stamina'] = 2;
                         usePerDay($char['id'] . 'skillonEat', $game);
                     }
                 },
-                'onGetEatData' => function (DLD_Game $game, $char, &$data) {
+                'onGetEatData' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && getUsePerDay($char['id'] . 'skillonEat', $game) < 1) {
                         $data['stamina'] = 2;
                     }
@@ -785,10 +785,10 @@ class DLD_CharactersData
                         'name' => clienttranslate('Heal 1 Health'),
                         'state' => ['playerTurn'],
                         'stamina' => 2,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             $game->activeCharacterEventLog(clienttranslate('${character_name} healed for 1 hp'));
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'];
                         },
@@ -801,10 +801,10 @@ class DLD_CharactersData
                 'stamina' => '3',
                 'name' => 'Nirv',
                 'slots' => ['weapon', 'tool'],
-                'getPerDayKey' => function (DLD_Game $game, $char, &$data) {
+                'getPerDayKey' => function (Game $game, $char, &$data) {
                     return [$char['id'] . 'skillonDraw'];
                 },
-                'onNight' => function (DLD_Game $game, $char, &$data) {
+                'onNight' => function (Game $game, $char, &$data) {
                     if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
                         foreach ($game->character->getAllCharacterData() as $k => $character) {
                             if (
@@ -822,7 +822,7 @@ class DLD_CharactersData
                         );
                     }
                 },
-                'onEncounterPost' => function (DLD_Game $game, $char, &$data) {
+                'onEncounterPost' => function (Game $game, $char, &$data) {
                     if ($data['encounterHealth'] <= $data['characterDamage']) {
                         if (
                             sizeof(
@@ -841,12 +841,12 @@ class DLD_CharactersData
                         }
                     }
                 },
-                'onGetActionCost' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionCost' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['action'] == 'actDrawGather' && getUsePerDay($char['id'] . 'skillonDraw', $game) < 1) {
                         $data['stamina'] = min($data['stamina'], 0);
                     }
                 },
-                'onDraw' => function (DLD_Game $game, $char, &$data) {
+                'onDraw' => function (Game $game, $char, &$data) {
                     $deck = $data['deck'];
                     if ($char['isActive'] && $deck == 'gather' && getUsePerDay($char['id'] . 'skillonDraw', $game) < 1) {
                         usePerDay($char['id'] . 'skillonDraw', $game);
@@ -863,7 +863,7 @@ class DLD_CharactersData
                 'startsWith' => 'mortar-and-pestle',
                 'slots' => ['weapon', 'tool'],
                 // Revive with 6 cooked berries
-                'onGetActionSelectable' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionSelectable' => function (Game $game, $char, &$data) {
                     if ($data['action'] == 'actRevive') {
                         array_push($data['selectable'], [...$game->data->getTokens()['berry-cooked'], 'actRevive' => ['count' => 6]]);
                     }
@@ -874,7 +874,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('Remove Physical Hindrance'),
                         'state' => ['playerTurn'],
                         'stamina' => 3,
-                        'onUse' => function (DLD_Game $game, $skill, &$data) {
+                        'onUse' => function (Game $game, $skill, &$data) {
                             $game->selectionStates->initiateHindranceSelection(
                                 $skill['id'],
                                 array_map(
@@ -889,7 +889,7 @@ class DLD_CharactersData
                             $data['interrupt'] = true;
                             return ['notify' => false, 'nextState' => false, 'interrupt' => true, 'spendActionCost' => false];
                         },
-                        'onHindranceSelection' => function (DLD_Game $game, $skill, &$data) {
+                        'onHindranceSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('hindranceSelection');
                             if ($state && $state['id'] == $skill['id']) {
                                 $count = 0;
@@ -916,7 +916,7 @@ class DLD_CharactersData
                                 $data['nextState'] = 'playerTurn';
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] &&
                                 sizeof(
@@ -942,7 +942,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('View Top Card'),
                         'state' => ['playerTurn'],
                         'stamina' => 2,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 $game->gameData->set('state', ['id' => $skill['id']]);
@@ -952,7 +952,7 @@ class DLD_CharactersData
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
                         },
-                        'onDeckSelection' => function (DLD_Game $game, $skill, $data) {
+                        'onDeckSelection' => function (Game $game, $skill, $data) {
                             if ($game->gameData->get('state')['id'] == $skill['id']) {
                                 $game->markRandomness();
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
@@ -964,7 +964,7 @@ class DLD_CharactersData
                                 ]);
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'];
                         },
@@ -974,7 +974,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('Place Trap'),
                         'state' => ['playerTurn'],
                         'stamina' => 1,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             // Place or move trap
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
@@ -1015,7 +1015,7 @@ class DLD_CharactersData
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
                         },
-                        'onDeckSelection' => function (DLD_Game $game, $skill, &$data) {
+                        'onDeckSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->gameData->get('state');
                             if ($state['id'] == $skill['id']) {
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
@@ -1059,7 +1059,7 @@ class DLD_CharactersData
                                 }
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $maxCount = $game->gameData->getResourceMax('trap');
                             return $char['isActive'] && $maxCount > 0;
@@ -1070,7 +1070,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('Trap It'),
                         'state' => ['interrupt'],
                         'interruptState' => ['drawCard'],
-                        'onResolveDrawPre' => function (DLD_Game $game, $skill, &$data) {
+                        'onResolveDrawPre' => function (Game $game, $skill, &$data) {
                             $card = $data['card'];
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $tokens = $game->gameData->get('tokens') ?? [];
@@ -1083,10 +1083,10 @@ class DLD_CharactersData
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             return ['notify' => false];
                         },
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->decks->removeFromDeck($data['data']['deck'], $data['data']['card']['id']);
                                 $data['data']['discard'] = true;
@@ -1103,7 +1103,7 @@ class DLD_CharactersData
                                 ]);
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $tokens = $game->gameData->get('tokens') ?? [];
                             $count = sizeof(
@@ -1123,7 +1123,7 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Mabe',
                 'slots' => ['weapon', 'tool'],
-                'onGetValidActions' => function (DLD_Game $game, $char, &$data) {
+                'onGetValidActions' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         unset($data['actInvestigateFire']);
                     }
@@ -1134,7 +1134,7 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'name' => clienttranslate('Copy Resource'),
                         'stamina' => 3,
-                        'onUse' => function (DLD_Game $game, $skill, $data) {
+                        'onUse' => function (Game $game, $skill, $data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 $game->gameData->set('state', ['id' => $skill['id']]);
@@ -1142,11 +1142,11 @@ class DLD_CharactersData
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] && sizeof(array_filter($game->gameData->getResources())) > 0;
                         },
-                        'onResourceSelection' => function (DLD_Game $game, $skill, &$data) {
+                        'onResourceSelection' => function (Game $game, $skill, &$data) {
                             if ($game->gameData->get('state')['id'] == $skill['id']) {
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                 $game->adjustResource($data['resourceType'], 1);
@@ -1161,7 +1161,7 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'name' => clienttranslate('Roll Low Health Die'),
                         'perDay' => 1,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             $skill['sendNotification']();
                             $value = $game->rollFireDie($skill['name'], $skill['characterId']);
                             usePerDay($skill['id'], $game);
@@ -1179,7 +1179,7 @@ class DLD_CharactersData
                                 ]);
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] && $char['health'] < 3 && getUsePerDay($skill['id'], $game) < 1;
                         },
@@ -1192,17 +1192,17 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Nanuk',
                 'slots' => ['weapon', 'tool'],
-                'onEat' => function (DLD_Game $game, $char, &$data) {
+                'onEat' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         $data['health'] *= 2;
                     }
                 },
-                'onGetEatData' => function (DLD_Game $game, $char, &$data) {
+                'onGetEatData' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         $data['health'] *= 2;
                     }
                 },
-                'onGetActionSelectable' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionSelectable' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['action'] == 'actEat') {
                         $data['selectable'] = array_filter(
                             $data['selectable'],
@@ -1221,16 +1221,16 @@ class DLD_CharactersData
                 'name' => 'Nibna',
                 'startsWith' => 'bag',
                 'slots' => ['weapon', 'tool'],
-                'getPerDayKey' => function (DLD_Game $game, $char, &$data) {
+                'getPerDayKey' => function (Game $game, $char, &$data) {
                     return [$char['id']];
                 },
-                'onEat' => function (DLD_Game $game, $char, &$data) {
+                'onEat' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && getUsePerDay($char['id'], $game) < 1) {
                         usePerDay($char['id'], $game);
                         $data['health'] *= 2;
                     }
                 },
-                'onGetEatData' => function (DLD_Game $game, $char, &$data) {
+                'onGetEatData' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && getUsePerDay($char['id'], $game) < 1) {
                         $data['health'] *= 2;
                     }
@@ -1241,7 +1241,7 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'name' => clienttranslate('Heal everyone else for 1 hp'),
                         'health' => 2,
-                        'onUse' => function (DLD_Game $game, $skill, $data) {
+                        'onUse' => function (Game $game, $skill, $data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 foreach ($game->character->getAllCharacterData() as $k => $character) {
@@ -1258,7 +1258,7 @@ class DLD_CharactersData
                                 }
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'];
                         },
@@ -1272,7 +1272,7 @@ class DLD_CharactersData
                 'stamina' => '6',
                 'name' => 'Zeebo',
                 'slots' => ['weapon'],
-                'onDraw' => function (DLD_Game $game, $char, &$data) {
+                'onDraw' => function (Game $game, $char, &$data) {
                     $card = $data['card'];
                     if ($char['isActive'] && $card['type'] == 'berry') {
                         if ($game->character->adjustActiveHealth(1) == 1) {
@@ -1290,23 +1290,23 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['drawCard'],
                         'stamina' => 3,
-                        'onResolveDraw' => function (DLD_Game $game, $skill, $data) {
+                        'onResolveDraw' => function (Game $game, $skill, $data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $card = $data['card'];
                             if ($char['isActive'] && $card['deckType'] == 'resource') {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             return ['notify' => false];
                         },
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->adjustResource($data['data']['card']['resourceType'], $data['data']['card']['count']);
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} doubled the resources they found'));
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'];
                         },
@@ -1321,13 +1321,13 @@ class DLD_CharactersData
                 'name' => 'Thunk',
                 'startsWith' => 'sharp-stick',
                 'slots' => ['weapon', 'tool'],
-                'onGetValidActions' => function (DLD_Game $game, $char, &$data) {
+                'onGetValidActions' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         unset($data['actDrawForage']);
                         unset($data['actDrawGather']);
                     }
                 },
-                'onDraw' => function (DLD_Game $game, $char, &$data) {
+                'onDraw' => function (Game $game, $char, &$data) {
                     $deck = $data['deck'];
                     if ($char['isActive'] && $deck == 'hunt') {
                         if ($game->adjustResource('meat', 1)['changed'] > 0) {
@@ -1346,7 +1346,7 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Tiku',
                 'slots' => ['weapon', 'tool'],
-                'onDraw' => function (DLD_Game $game, $char, &$data) {
+                'onDraw' => function (Game $game, $char, &$data) {
                     $card = $data['card'];
                     $deck = $data['deck'];
                     if ($char['isActive'] && $deck == 'explore' && $card['deckType'] != 'encounter') {
@@ -1359,7 +1359,7 @@ class DLD_CharactersData
                     }
                 },
                 // Not affected by mental hindrance, can hold 4 physical
-                'onMaxHindrance' => function (DLD_Game $game, $char, &$data) {
+                'onMaxHindrance' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         $data['maxPhysicalHindrance'] = 4;
                         $data['canDrawMentalHindrance'] = false;
@@ -1371,7 +1371,7 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'name' => clienttranslate('Make Stew'),
                         'stamina' => 1,
-                        'onUse' => function (DLD_Game $game, $skill, $data) {
+                        'onUse' => function (Game $game, $skill, $data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 $game->adjustResource('berry', -1);
@@ -1380,7 +1380,7 @@ class DLD_CharactersData
                                 $game->adjustResource('stew', 1);
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] &&
                                 $game->gameData->getResourceLeft('stew') != 0 &&
@@ -1393,7 +1393,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('Eat Stew'),
                         'stamina' => 1,
                         'skillOptions' => [],
-                        'getSkillOptions' => function (DLD_Game $game, $skill, &$data) {
+                        'getSkillOptions' => function (Game $game, $skill, &$data) {
                             $skillOptions = &$data['skillOptions'];
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if (array_key_exists('getPerDayKey', $char)) {
@@ -1405,7 +1405,7 @@ class DLD_CharactersData
                                 }
                             }
                         },
-                        'onUse' => function (DLD_Game $game, $skill, $data) {
+                        'onUse' => function (Game $game, $skill, $data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $skillId = $skill['optionValue'];
                             if ($skillId == 'char') {
@@ -1416,7 +1416,7 @@ class DLD_CharactersData
                             }
                             $game->adjustResource('stew', -1);
                         },
-                        'onUseSkill' => function (DLD_Game $game, $skill, &$data) {
+                        'onUseSkill' => function (Game $game, $skill, &$data) {
                             if ($data['skillId'] == $skill['id']) {
                                 $turnChar = $game->character->getTurnCharacterId();
                                 $skill['characterId'] = $turnChar;
@@ -1424,7 +1424,7 @@ class DLD_CharactersData
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             if ($game->gameData->getResource('stew') == 0) {
                                 return false;
                             }
@@ -1453,12 +1453,12 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Vog',
                 'slots' => ['weapon', 'tool'],
-                'onGetActionCost' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionCost' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['action'] == 'actEat') {
                         $data['stamina'] += 1;
                     }
                 },
-                'onMorning' => function (DLD_Game $game, $char, &$data) {
+                'onMorning' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         array_push($data['skipMorningDamage'], 'Vog');
                     }
@@ -1471,7 +1471,7 @@ class DLD_CharactersData
                         // 'interruptState' => ['playerTurn'],
                         'interruptState' => ['drawCard'],
                         'health' => 0,
-                        'onGetActionCost' => function (DLD_Game $game, $skill, &$data) {
+                        'onGetActionCost' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $interruptState = $game->actInterrupt->getState('actUseSkill');
                             if (
@@ -1486,14 +1486,14 @@ class DLD_CharactersData
                                 $data['health'] = $damageTaken;
                             }
                         },
-                        'onEncounterPre' => function (DLD_Game $game, $skill, &$data) {
+                        'onEncounterPre' => function (Game $game, $skill, &$data) {
                             $damageTaken = $game->encounter->countDamageTaken($data);
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if (!$char['isActive'] && $damageTaken > 0) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $interruptState = $game->actInterrupt->getState('stResolveEncounter');
                                 $damageTaken = $game->encounter->countDamageTaken($interruptState['data']);
@@ -1507,10 +1507,10 @@ class DLD_CharactersData
                                 $game->actInterrupt->setState('stResolveEncounter', $interruptState);
                             }
                         },
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             return ['notify' => false];
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return !$char['isActive'];
                         },
@@ -1533,10 +1533,10 @@ class DLD_CharactersData
                 'stamina' => '6',
                 'name' => 'Blarg',
                 'slots' => ['weapon', 'tool'],
-                'onGetMaxBuildingCount' => function (DLD_Game $game, $char, &$data) {
+                'onGetMaxBuildingCount' => function (Game $game, $char, &$data) {
                     $data['count'] = 2;
                 },
-                'onGetUnlockCost' => function (DLD_Game $game, $unlock, &$data) {
+                'onGetUnlockCost' => function (Game $game, $unlock, &$data) {
                     $game->log($data);
                     if (str_contains($data['id'], 'crafting')) {
                         $data['unlockCost'] -= 2;
@@ -1548,7 +1548,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('Give Item'),
                         'state' => ['playerTurn'],
                         'stamina' => 1,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacter();
                             $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
                                 $currentCharacter
@@ -1580,7 +1580,7 @@ class DLD_CharactersData
                             );
                             return ['notify' => false, 'nextState' => false];
                         },
-                        'onCharacterSelection' => function (DLD_Game $game, $skill, &$data) {
+                        'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $characterSelectionState = $game->selectionStates->getState('characterSelection');
                             if ($characterSelectionState && $characterSelectionState['id'] == $skill['id']) {
                                 $itemSelectionState = $game->selectionStates->getState('itemSelection');
@@ -1603,7 +1603,7 @@ class DLD_CharactersData
                                 $game->character->equipAndValidateEquipment($characterId, $itemId);
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] && sizeof($char['equipment']) > 0;
                         },
@@ -1618,12 +1618,12 @@ class DLD_CharactersData
                 'name' => 'Cali',
                 'slots' => ['weapon', 'tool'],
                 // Guess is handled on the FE
-                'onCharacterChoose' => function (DLD_Game $game, $char, &$data) {
+                'onCharacterChoose' => function (Game $game, $char, &$data) {
                     if ($data['id'] == $char['id']) {
                         $game->character->addHindrance($char['id'], $game->decks->getCard('hindrance_1_4'));
                     }
                 },
-                'onGetActionCostPre' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionCostPre' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['action'] == 'actInvestigateFire') {
                         $data['stamina'] = min($data['stamina'], 2);
                     }
@@ -1634,13 +1634,13 @@ class DLD_CharactersData
                         'name' => clienttranslate('Double Healing'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $this->clearCharacterSkills($data['skills'], $skill['characterId']);
                                 $data['data']['health'] *= 2;
                             }
                         },
-                        'onEat' => function (DLD_Game $game, $skill, &$data) {
+                        'onEat' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
                             if ($char['isActive']) {
                                 if (str_contains('-cooked', $data['type'])) {
@@ -1648,7 +1648,7 @@ class DLD_CharactersData
                                 }
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'];
                         },
@@ -1658,7 +1658,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('+1 Max Health'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $this->clearCharacterSkills($data['skills'], $skill['characterId']);
                                 $game->character->updateCharacterData($skill['characterId'], function (&$data) {
@@ -1666,7 +1666,7 @@ class DLD_CharactersData
                                 });
                             }
                         },
-                        'onEat' => function (DLD_Game $game, $skill, &$data) {
+                        'onEat' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
                             if ($char['isActive']) {
                                 if (str_contains('-cooked', $data['type'])) {
@@ -1674,7 +1674,7 @@ class DLD_CharactersData
                                 }
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'];
                         },
@@ -1688,14 +1688,14 @@ class DLD_CharactersData
                 'stamina' => '7',
                 'name' => 'Loka',
                 'slots' => ['weapon', 'tool'],
-                'onUnlock' => function (DLD_Game $game, $char, &$data) {
+                'onUnlock' => function (Game $game, $char, &$data) {
                     $game->adjustResource('wood', 1);
                     $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                         'count' => 1,
                         'resource_type' => 'wood',
                     ]);
                 },
-                'onGetResourceMax' => function (DLD_Game $game, $char, &$data) {
+                'onGetResourceMax' => function (Game $game, $char, &$data) {
                     $data['maxCount'] -= getUsePerForever('hide-token', $game);
                 },
                 'skills' => [
@@ -1704,10 +1704,10 @@ class DLD_CharactersData
                         'name' => clienttranslate('Hold Hide'),
                         'state' => ['playerTurn'],
                         'stamina' => 2,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             usePerForever('hide-token', $game);
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'];
                         },
@@ -1717,18 +1717,18 @@ class DLD_CharactersData
                         'name' => clienttranslate('Reduce Damage'),
                         'state' => ['interrupt'],
                         'interruptState' => ['resolveEncounter'],
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 subtractPerForever('hide-token', $game);
                             }
                         },
-                        'onEncounterPre' => function (DLD_Game $game, $skill, &$data) {
+                        'onEncounterPre' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
                             if ($char['isActive']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] && getUsePerForever('hide-token', $game) > 0;
                         },
@@ -1738,19 +1738,19 @@ class DLD_CharactersData
                         'name' => clienttranslate('+1 Resource'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 subtractPerForever('hide-token', $game);
                             }
                         },
-                        'onResolveDraw' => function (DLD_Game $game, $skill, &$data) {
+                        'onResolveDraw' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
                             $card = $data['card'];
                             if ($char['isActive'] && $card['deckType'] == 'resource') {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] && getUsePerForever('hide-token', $game) > 0;
                         },
@@ -1764,7 +1764,7 @@ class DLD_CharactersData
                 'stamina' => '7',
                 'name' => 'Tooth',
                 'slots' => [],
-                'onGetValidActions' => function (DLD_Game $game, $char, &$data) {
+                'onGetValidActions' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         unset($data['actCook']);
                         unset($data['actCraft']);
@@ -1772,7 +1772,7 @@ class DLD_CharactersData
                         unset($data['actInvestigateFire']);
                     }
                 },
-                'onEncounterPre' => function (DLD_Game $game, $char, &$data) {
+                'onEncounterPre' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         $data['characterDamage'] = 2;
                     }
@@ -1784,7 +1784,7 @@ class DLD_CharactersData
                         'name' => str_replace('${name}', 'Tooth', clienttranslate('Pet ${name}')),
                         'stamina' => 2,
                         'global' => true,
-                        'onUse' => function (DLD_Game $game, $skill) {
+                        'onUse' => function (Game $game, $skill) {
                             // $game->character->adjustStamina($game->character->getTurnCharacterId(), -2);
                             $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
@@ -1793,7 +1793,7 @@ class DLD_CharactersData
                             ]);
                             // return ['spendActionCost' => false];
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return !$char['isActive'];
                         },
@@ -1807,7 +1807,7 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Sooha',
                 'slots' => ['weapon', 'tool'],
-                'onInvestigateFire' => function (DLD_Game $game, $char, &$data) {
+                'onInvestigateFire' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['roll'] == 0) {
                         $game->character->adjustActiveHealth(-1);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
@@ -1821,13 +1821,13 @@ class DLD_CharactersData
                         ]);
                     }
                 },
-                'onGetCharacterData' => function (DLD_Game $game, $char, &$data) {
+                'onGetCharacterData' => function (Game $game, $char, &$data) {
                     if ($char['id'] == $data['id'] && in_array('relaxation', $game->getUnlockedKnowledgeIds())) {
                         // $game->log('onGetCharacterData', $data['maxHealth'], clamp($data['maxHealth'] + 2, 0, 10));
                         $data['maxHealth'] = clamp($data['maxHealth'] + 2, 0, 10);
                     }
                 },
-                'onUnlock' => function (DLD_Game $game, $char, &$data) {
+                'onUnlock' => function (Game $game, $char, &$data) {
                     if ($data['id'] == 'relaxation') {
                         // $game->log('relaxation', $data, $char);
                         $game->character->adjustHealth($char['id'], 10);
@@ -1839,7 +1839,7 @@ class DLD_CharactersData
                     }
                 },
                 // TODO: Can spend health as if it was stamina (Needs testing)
-                'onSpendActionCost' => function (DLD_Game $game, $char, &$data) {
+                'onSpendActionCost' => function (Game $game, $char, &$data) {
                     if ($char['id'] == $game->character->getSubmittingCharacterId()) {
                         if (array_key_exists('stamina', $data) && $data['stamina'] > 0) {
                             $diff = $game->character->getActiveStamina() - $data['stamina'];
@@ -1865,24 +1865,24 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'damage' => 1,
-                        'onInvestigateFire' => function (DLD_Game $game, $skill, &$data) {
+                        'onInvestigateFire' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $data['data']['roll'] += 1;
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'];
                         },
                     ],
                 ],
-                'onEncounterPost' => function (DLD_Game $game, $char, &$data) {
+                'onEncounterPost' => function (Game $game, $char, &$data) {
                     $damageTaken = $game->encounter->countDamageTaken($data);
                     if ($char['isActive'] && $damageTaken > 0) {
                         $data['stamina'] += 1;
@@ -1892,7 +1892,7 @@ class DLD_CharactersData
                         ]);
                     }
                 },
-                'onInvestigateFire' => function (DLD_Game $game, $char, &$data) {
+                'onInvestigateFire' => function (Game $game, $char, &$data) {
                     if ($data['roll'] == 3) {
                         $game->character->updateCharacterData($char['id'], function (&$data) {
                             $data['modifiedMaxStamina'] += 1;
@@ -1907,7 +1907,7 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Yurt',
                 'slots' => ['weapon', 'tool'],
-                'onCraft' => function (DLD_Game $game, $char, &$data) {
+                'onCraft' => function (Game $game, $char, &$data) {
                     // Choose tribe member to gain 1 hp or 1 stamina
                     // $data['interrupt'] = true;
                     $game->selectionStates->initiateState(
@@ -1930,7 +1930,7 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['characterSelection'],
                         'name' => clienttranslate('Give 1 Health'),
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->character->setSubmittingCharacter('actUseSkill', $activatedSkill['id']);
                                 $this->clearCharacterSkills($data['skills'], $skill['characterId']);
@@ -1944,10 +1944,10 @@ class DLD_CharactersData
                                 $data['nextState'] = 'playerTurn';
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             return true;
                         },
-                        // 'onCraft' => function (DLD_Game $game, $skill, &$data) {
+                        // 'onCraft' => function (Game $game, $skill, &$data) {
                         // Choose tribe member to gain 1 hp or 1 stamina
                         // $data['interrupt'] = true;
                         // $game->selectionStates->initiateState(
@@ -1964,7 +1964,7 @@ class DLD_CharactersData
                         // $char = $game->character->getCharacterData($skill['characterId']);
                         // $game->actInterrupt->addSkillInterrupt($char['skills']['Yurtskill2']);
                         // },
-                        'onCharacterSelection' => function (DLD_Game $game, $skill, &$data) {
+                        'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['characterId'] . 'craft') {
                                 $game->actInterrupt->addSkillInterrupt($skill);
@@ -1976,7 +1976,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('Give 1 Stamina'),
                         'state' => ['interrupt'],
                         'interruptState' => ['characterSelection'],
-                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->character->setSubmittingCharacter('actUseSkill', $activatedSkill['id']);
                                 $this->clearCharacterSkills($data['skills'], $skill['characterId']);
@@ -1990,10 +1990,10 @@ class DLD_CharactersData
                                 $data['nextState'] = 'playerTurn';
                             }
                         },
-                        'requires' => function (DLD_Game $game, $skill) {
+                        'requires' => function (Game $game, $skill) {
                             return true;
                         },
-                        'onCharacterSelection' => function (DLD_Game $game, $skill, &$data) {
+                        'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['characterId'] . 'craft') {
                                 $game->actInterrupt->addSkillInterrupt($skill);
@@ -2001,7 +2001,7 @@ class DLD_CharactersData
                         },
                     ],
                 ],
-                'onGetActionCost' => function (DLD_Game $game, $char, &$data) {
+                'onGetActionCost' => function (Game $game, $char, &$data) {
                     if ($data['action'] == 'actCraft') {
                         $data['stamina'] = max($data['stamina'] - 2, 0);
                     }

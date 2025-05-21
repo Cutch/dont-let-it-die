@@ -57,7 +57,7 @@ export default {
           text: [
             { title: _('Crafting') + ' 1' },
             dojo.string.substitute(_('Allows crafting all items marked with a ${color} circle'), {
-              resource: _('yellow'),
+              color: _('yellow'),
             }),
           ],
         },
@@ -67,7 +67,7 @@ export default {
           text: [
             { title: _('Crafting') + ' 2' },
             dojo.string.substitute(_('Allows crafting all items marked with a ${color} circle'), {
-              resource: _('blue'),
+              color: _('blue'),
             }),
           ],
         },
@@ -77,7 +77,7 @@ export default {
           text: [
             { title: _('Crafting') + ' 3' },
             dojo.string.substitute(_('Allows crafting all items marked with a ${color} circle'), {
-              resource: _('red'),
+              color: _('red'),
             }),
           ],
         },

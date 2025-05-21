@@ -9,9 +9,9 @@ use Exception;
 
 class DLD_SelectionStates
 {
-    private DLD_Game $game;
+    private Game $game;
     private bool $stateChanged = false;
-    public function __construct(DLD_Game $game)
+    public function __construct(Game $game)
     {
         $this->game = $game;
     }
@@ -29,7 +29,7 @@ class DLD_SelectionStates
             __FUNCTION__,
             func_get_args(),
             [$this->game->hooks, 'onCharacterSelection'],
-            function (DLD_Game $_this) use ($characterId) {
+            function (Game $_this) use ($characterId) {
                 if (!$characterId) {
                     throw new BgaUserException($_this::totranslate('Select a Character'));
                 }
@@ -41,7 +41,7 @@ class DLD_SelectionStates
                     'nextState' => $stateData['nextState'],
                 ];
             },
-            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $this->completeSelectionState($data['nextState']);
             }
         );

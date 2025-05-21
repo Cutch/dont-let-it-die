@@ -1,7 +1,7 @@
 <?php
 namespace Bga\Games\DontLetItDie;
 
-use Bga\Games\DontLetItDie\DLD_Game;
+use Bga\Games\DontLetItDie\Game;
 class DLD_BoardsData
 {
     public function getData(): array
@@ -18,14 +18,14 @@ class DLD_BoardsData
                         'upgradeType' => 'start',
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             return true;
                         },
                     ],
                     'warmth-2' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-1', $unlocks);
                         },
@@ -33,7 +33,7 @@ class DLD_BoardsData
                     'warmth-3' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-2', $unlocks);
                         },
@@ -41,7 +41,7 @@ class DLD_BoardsData
                     'spices' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-3', $unlocks) && in_array('crafting-1', $unlocks);
                         },
@@ -49,7 +49,7 @@ class DLD_BoardsData
                     'cooking-1' => [
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-1', $unlocks);
                         },
@@ -57,7 +57,7 @@ class DLD_BoardsData
                     'cooking-2' => [
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('cooking-1', $unlocks);
                         },
@@ -65,7 +65,7 @@ class DLD_BoardsData
                     'crafting-1' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('cooking-1', $unlocks);
                         },
@@ -73,7 +73,7 @@ class DLD_BoardsData
                     'crafting-2' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-1', $unlocks);
                         },
@@ -82,7 +82,7 @@ class DLD_BoardsData
                         'upgradeType' => 'end',
                         'unlockCost' => 15,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-2', $unlocks) && in_array('spices', $unlocks);
                         },
@@ -95,14 +95,14 @@ class DLD_BoardsData
                         'upgradeType' => 'start',
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             return true;
                         },
                     ],
                     'warmth-2' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-1', $unlocks);
                         },
@@ -110,7 +110,7 @@ class DLD_BoardsData
                     'warmth-3' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-2', $unlocks);
                         },
@@ -118,7 +118,7 @@ class DLD_BoardsData
                     'cooking-1' => [
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-1', $unlocks);
                         },
@@ -126,7 +126,7 @@ class DLD_BoardsData
                     'cooking-2' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('cooking-1', $unlocks);
                         },
@@ -134,7 +134,7 @@ class DLD_BoardsData
                     'relaxation' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('cooking-2', $unlocks);
                         },
@@ -142,7 +142,7 @@ class DLD_BoardsData
                     'crafting-1' => [
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('cooking-1', $unlocks);
                         },
@@ -150,7 +150,7 @@ class DLD_BoardsData
                     'forage-1' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-1', $unlocks);
                         },
@@ -158,7 +158,7 @@ class DLD_BoardsData
                     'forage-2' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('forage-1', $unlocks);
                         },
@@ -166,7 +166,7 @@ class DLD_BoardsData
                     'hunt-1' => [
                         'unlockCost' => 6,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('forage-2', $unlocks);
                         },
@@ -174,7 +174,7 @@ class DLD_BoardsData
                     'crafting-2' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-1', $unlocks);
                         },
@@ -182,7 +182,7 @@ class DLD_BoardsData
                     'resource-1' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-2', $unlocks);
                         },
@@ -190,7 +190,7 @@ class DLD_BoardsData
                     'crafting-3' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-2', $unlocks);
                         },
@@ -198,7 +198,7 @@ class DLD_BoardsData
                     'resource-2' => [
                         'unlockCost' => 6,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-3', $unlocks);
                         },
@@ -207,7 +207,7 @@ class DLD_BoardsData
                         'upgradeType' => 'end',
                         'unlockCost' => 15,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('resource-2', $unlocks) && in_array('hunt-1', $unlocks);
                         },
@@ -220,14 +220,14 @@ class DLD_BoardsData
                         'upgradeType' => 'start',
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             return true;
                         },
                     ],
                     'resource-1' => [
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-1', $unlocks);
                         },
@@ -235,7 +235,7 @@ class DLD_BoardsData
                     'crafting-2' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('resource-1', $unlocks);
                         },
@@ -243,7 +243,7 @@ class DLD_BoardsData
                     'crafting-3' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-2', $unlocks);
                         },
@@ -251,7 +251,7 @@ class DLD_BoardsData
                     'relaxation' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-3', $unlocks);
                         },
@@ -259,7 +259,7 @@ class DLD_BoardsData
                     'cooking-1' => [
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-1', $unlocks);
                         },
@@ -267,7 +267,7 @@ class DLD_BoardsData
                     'warmth-1' => [
                         'unlockCost' => 3,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('resource-1', $unlocks) && in_array('cooking-1', $unlocks);
                         },
@@ -275,7 +275,7 @@ class DLD_BoardsData
                     'forage-1' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-1', $unlocks);
                         },
@@ -283,7 +283,7 @@ class DLD_BoardsData
                     'warmth-2' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('forage-1', $unlocks);
                         },
@@ -291,7 +291,7 @@ class DLD_BoardsData
                     'forage-2' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-2', $unlocks);
                         },
@@ -299,7 +299,7 @@ class DLD_BoardsData
                     'warmth-3' => [
                         'unlockCost' => 4,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('forage-2', $unlocks);
                         },
@@ -307,7 +307,7 @@ class DLD_BoardsData
                     'cooking-2' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('forage-2', $unlocks);
                         },
@@ -315,7 +315,7 @@ class DLD_BoardsData
                     'hunt-1' => [
                         'unlockCost' => 6,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('cooking-2', $unlocks);
                         },
@@ -323,7 +323,7 @@ class DLD_BoardsData
                     'resource-2' => [
                         'unlockCost' => 6,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('forage-1', $unlocks);
                         },
@@ -332,7 +332,7 @@ class DLD_BoardsData
                         'upgradeType' => 'end',
                         'unlockCost' => 15,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('resource-2', $unlocks) && in_array('hunt-1', $unlocks);
                         },
@@ -345,14 +345,14 @@ class DLD_BoardsData
                         'upgradeType' => 'start',
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             return true;
                         },
                     ],
                     'crafting-1' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-1', $unlocks);
                         },
@@ -360,7 +360,7 @@ class DLD_BoardsData
                     'resource-1' => [
                         'unlockCost' => 5,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-1', $unlocks);
                         },
@@ -368,7 +368,7 @@ class DLD_BoardsData
                     'crafting-2' => [
                         'unlockCost' => 7,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('resource-1', $unlocks);
                         },
@@ -376,7 +376,7 @@ class DLD_BoardsData
                     'relaxation' => [
                         'unlockCost' => 7,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-2', $unlocks);
                         },
@@ -384,7 +384,7 @@ class DLD_BoardsData
                     'crafting-3' => [
                         'unlockCost' => 7,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('relaxation', $unlocks);
                         },
@@ -392,7 +392,7 @@ class DLD_BoardsData
                     'resource-2' => [
                         'unlockCost' => 7,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-3', $unlocks);
                         },
@@ -400,7 +400,7 @@ class DLD_BoardsData
                     'hunt-1' => [
                         'unlockCost' => 9,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('relaxation', $unlocks);
                         },
@@ -409,7 +409,7 @@ class DLD_BoardsData
                     'cooking-1' => [
                         'unlockCost' => 6,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-1', $unlocks);
                         },
@@ -417,7 +417,7 @@ class DLD_BoardsData
                     'warmth-2' => [
                         'unlockCost' => 7,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('cooking-1', $unlocks);
                         },
@@ -425,7 +425,7 @@ class DLD_BoardsData
                     'cooking-2' => [
                         'unlockCost' => 7,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('warmth-2', $unlocks);
                         },
@@ -433,7 +433,7 @@ class DLD_BoardsData
                     'warmth-3' => [
                         'unlockCost' => 7,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('cooking-2', $unlocks);
                         },
@@ -441,7 +441,7 @@ class DLD_BoardsData
                     'forage-1' => [
                         'unlockCost' => 7,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('crafting-2', $unlocks) && in_array('cooking-2', $unlocks);
                         },
@@ -449,7 +449,7 @@ class DLD_BoardsData
                     'forage-2' => [
                         'unlockCost' => 9,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('forage-1', $unlocks);
                         },
@@ -458,7 +458,7 @@ class DLD_BoardsData
                         'upgradeType' => 'end',
                         'unlockCost' => 20,
                         'type' => 'unlock',
-                        'requires' => function (DLD_Game $game, $obj) {
+                        'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
                             return in_array('forage-2', $unlocks) && in_array('hunt-1', $unlocks);
                         },

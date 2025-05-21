@@ -8,14 +8,14 @@ use BgaUserException;
 class DLD_Actions
 {
     private $actions;
-    private DLD_Game $game;
-    public function __construct(DLD_Game $game)
+    private Game $game;
+    public function __construct(Game $game)
     {
         $this->actions = addId([
             'actRevive' => [
                 'state' => ['playerTurn'],
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     $variables = $game->gameData->getResources();
                     $array = $this->getActionSelectable($action['id']);
                     $array = array_filter(
@@ -38,7 +38,7 @@ class DLD_Actions
                             })
                         ) > 0;
                 },
-                'selectable' => function (DLD_Game $game) {
+                'selectable' => function (Game $game) {
                     return array_values(
                         array_filter(
                             $game->getValidTokens(),
@@ -54,7 +54,7 @@ class DLD_Actions
                 'state' => ['playerTurn'],
                 'stamina' => 0,
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     $array = $this->getActionSelectable($action['id']);
                     $variables = $game->gameData->getResources(...$array);
                     $resourceCount = array_sum(
@@ -69,7 +69,7 @@ class DLD_Actions
                         })
                     ) > 0;
                 },
-                'selectable' => function (DLD_Game $game) {
+                'selectable' => function (Game $game) {
                     return ['fkp'];
                 },
             ],
@@ -77,7 +77,7 @@ class DLD_Actions
                 'state' => ['playerTurn', 'dinnerPhase'],
                 'stamina' => 0,
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     $variables = $game->gameData->getResources();
                     $array = $this->getActionSelectable($action['id']);
                     $array = array_filter(
@@ -91,7 +91,7 @@ class DLD_Actions
                     );
                     return sizeof($array) > 0;
                 },
-                'selectable' => function (DLD_Game $game) {
+                'selectable' => function (Game $game) {
                     return array_values(
                         array_filter(
                             $game->getValidTokens(),
@@ -107,7 +107,7 @@ class DLD_Actions
                 'state' => ['playerTurn'],
                 'stamina' => 0,
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     $wood = $game->gameData->getResource('wood');
                     return $wood > 0;
                 },
@@ -116,18 +116,18 @@ class DLD_Actions
                 'state' => ['playerTurn'],
                 'stamina' => 1,
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     return sizeof($this->game->character->getTurnCharacter()['physicalHindrance']) > 0 &&
                         $game->gameData->getResource('herb') > 0;
                 },
-                'selectable' => function (DLD_Game $game) {
+                'selectable' => function (Game $game) {
                     return [];
                 },
-                'onUseHerbPre' => function (DLD_Game $game, $action, &$data) {
+                'onUseHerbPre' => function (Game $game, $action, &$data) {
                     $game->selectionStates->initiateHindranceSelection($action['id']);
                     return ['notify' => false, 'nextState' => false, 'interrupt' => true];
                 },
-                'onHindranceSelection' => function (DLD_Game $game, $action, &$data) {
+                'onHindranceSelection' => function (Game $game, $action, &$data) {
                     $state = $game->selectionStates->getState('hindranceSelection');
                     if ($state && $state['id'] == $action['id']) {
                         $count = 0;
@@ -160,7 +160,7 @@ class DLD_Actions
                 'state' => ['playerTurn'],
                 'stamina' => 1,
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     $array = $this->getActionSelectable($action['id']);
                     $variables = $game->gameData->getResources();
                     $count = 0;
@@ -171,7 +171,7 @@ class DLD_Actions
                     }
                     return $count >= $game->getTradeRatio();
                 },
-                'selectable' => function (DLD_Game $game) {
+                'selectable' => function (Game $game) {
                     $tokens = $game->getValidTokens();
                     unset($tokens['stew']);
                     unset($tokens['trap']);
@@ -182,7 +182,7 @@ class DLD_Actions
                 'state' => ['playerTurn'],
                 'stamina' => 1,
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     $array = $this->getActionSelectable($action['id']);
                     $variables = $game->gameData->getResources();
                     $count = 0;
@@ -193,7 +193,7 @@ class DLD_Actions
                     }
                     return $count > 0;
                 },
-                'selectable' => function (DLD_Game $game) {
+                'selectable' => function (Game $game) {
                     return [];
                 },
             ],
@@ -209,7 +209,7 @@ class DLD_Actions
                 'state' => ['playerTurn'],
                 'stamina' => 3,
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     return sizeof(
                         array_filter($game->character->getActiveEquipment(), function ($data) {
                             return $data['itemType'] == 'tool' && !in_array($data['id'], ['mortar-and-pestle', 'bandage']);
@@ -221,7 +221,7 @@ class DLD_Actions
                 'state' => ['playerTurn'],
                 'stamina' => 3,
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     return sizeof(
                         array_filter($game->character->getActiveEquipment(), function ($data) {
                             return $data['itemType'] == 'weapon';
@@ -239,12 +239,12 @@ class DLD_Actions
                 'state' => ['playerTurn'],
                 'stamina' => 3,
                 'type' => 'action',
-                'requires' => function (DLD_Game $game) {
+                'requires' => function (Game $game) {
                     $result = [];
                     $game->getItemData($result);
                     return sizeof(array_filter(array_values($result['availableEquipment']))) > 0;
                 },
-                'selectable' => function (DLD_Game $game) {
+                'selectable' => function (Game $game) {
                     $craftedItems = $game->getCraftedItems();
                     $craftingLevel = $game->gameData->get('craftingLevel');
                     $buildings = $game->gameData->get('buildings');
@@ -261,7 +261,7 @@ class DLD_Actions
                         )
                     );
                 },
-                'onGetActionCost' => function (DLD_Game $game, $action, &$data) {
+                'onGetActionCost' => function (Game $game, $action, &$data) {
                     if ($data['action'] == 'actCraft' && $data['subAction'] == 'rock-weapon') {
                         $data['stamina'] = min($data['stamina'], 1);
                     }
@@ -282,7 +282,7 @@ class DLD_Actions
                     return $states;
                 },
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     return sizeof($this->getAvailableSkills()) > 0;
                 },
             ],
@@ -297,14 +297,14 @@ class DLD_Actions
                     return $states;
                 },
                 'type' => 'action',
-                'requires' => function (DLD_Game $game, $action) {
+                'requires' => function (Game $game, $action) {
                     return sizeof($this->getAvailableItemSkills()) > 0;
                 },
             ],
             'actTradeItem' => [
                 'state' => ['tradePhase'],
                 'type' => 'action',
-                // 'requires' => function (DLD_Game $game, $action) {
+                // 'requires' => function (Game $game, $action) {
                 //     return sizeof($game->character->getSubmittingCharacter()['equipment']) > 0;
                 // },
             ],
