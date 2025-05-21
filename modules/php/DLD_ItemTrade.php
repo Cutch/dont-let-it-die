@@ -6,10 +6,10 @@ use Bga\GameFramework\Actions\Types\JsonParam;
 
 use BgaUserException;
 
-class ItemTrade
+class DLD_ItemTrade
 {
-    private Game $game;
-    public function __construct(Game $game)
+    private DLD_Game $game;
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
     }

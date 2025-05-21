@@ -2,18 +2,18 @@
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
-require_once dirname(__DIR__) . '/php/data/Utils.php';
-require_once dirname(__DIR__) . '/php/data/Boards.php';
-require_once dirname(__DIR__) . '/php/data/Characters.php';
-require_once dirname(__DIR__) . '/php/data/Decks.php';
-require_once dirname(__DIR__) . '/php/data/Expansion.php';
-require_once dirname(__DIR__) . '/php/data/KnowledgeTree.php';
-require_once dirname(__DIR__) . '/php/data/Items.php';
-require_once dirname(__DIR__) . '/php/data/Tokens.php';
-require_once dirname(__DIR__) . '/php/data/Upgrades.php';
-class Data
+require_once dirname(__DIR__) . '/php/data-files/Utils.php';
+require_once dirname(__DIR__) . '/php/data-files/Boards.php';
+require_once dirname(__DIR__) . '/php/data-files/Characters.php';
+require_once dirname(__DIR__) . '/php/data-files/Decks.php';
+require_once dirname(__DIR__) . '/php/data-files/Expansion.php';
+require_once dirname(__DIR__) . '/php/data-files/KnowledgeTree.php';
+require_once dirname(__DIR__) . '/php/data-files/Items.php';
+require_once dirname(__DIR__) . '/php/data-files/Tokens.php';
+require_once dirname(__DIR__) . '/php/data-files/Upgrades.php';
+class DLD_Data
 {
-    private Game $game;
+    private DLD_Game $game;
     private array $decks;
     private array $characters;
     private array $tokens;
@@ -23,7 +23,7 @@ class Data
     private array $upgrades;
     private array $expansion;
 
-    public function __construct(Game $game)
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
     }
@@ -40,14 +40,14 @@ class Data
     private function get($name)
     {
         if (!isset($this->decks)) {
-            $decksData = (new DecksData())->getData();
-            $expansionData = (new ExpansionData())->getData();
-            $charactersData = (new CharactersData())->getData();
-            $tokensData = (new TokensData())->getData();
-            $boardsData = (new BoardsData())->getData();
-            $knowledgeTreeData = (new KnowledgeTreeData())->getData();
-            $upgradesData = (new UpgradesData())->getData();
-            $itemsData = (new ItemsData())->getData();
+            $decksData = (new DLD_DecksData())->getData();
+            $expansionData = (new DLD_ExpansionData())->getData();
+            $charactersData = (new DLD_CharactersData())->getData();
+            $tokensData = (new DLD_TokensData())->getData();
+            $boardsData = (new DLD_BoardsData())->getData();
+            $knowledgeTreeData = (new DLD_KnowledgeTreeData())->getData();
+            $upgradesData = (new DLD_UpgradesData())->getData();
+            $itemsData = (new DLD_ItemsData())->getData();
             $this->decks = array_merge(addId($decksData), addId($expansionData));
             $this->characters = addId($charactersData);
             $this->expansion = addId($expansionData);

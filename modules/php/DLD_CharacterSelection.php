@@ -6,10 +6,10 @@ namespace Bga\Games\DontLetItDie;
 use BgaUserException;
 use Exception;
 
-class CharacterSelection
+class DLD_CharacterSelection
 {
-    private Game $game;
-    public function __construct(Game $game)
+    private DLD_Game $game;
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
     }

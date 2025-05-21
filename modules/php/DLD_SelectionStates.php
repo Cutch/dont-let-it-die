@@ -7,11 +7,11 @@ use Bga\GameFramework\Actions\Types\JsonParam;
 use BgaUserException;
 use Exception;
 
-class SelectionStates
+class DLD_SelectionStates
 {
-    private Game $game;
+    private DLD_Game $game;
     private bool $stateChanged = false;
-    public function __construct(Game $game)
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
     }
@@ -29,7 +29,7 @@ class SelectionStates
             __FUNCTION__,
             func_get_args(),
             [$this->game->hooks, 'onCharacterSelection'],
-            function (Game $_this) use ($characterId) {
+            function (DLD_Game $_this) use ($characterId) {
                 if (!$characterId) {
                     throw new BgaUserException($_this::totranslate('Select a Character'));
                 }
@@ -41,7 +41,7 @@ class SelectionStates
                     'nextState' => $stateData['nextState'],
                 ];
             },
-            function (Game $_this, bool $finalizeInterrupt, $data) {
+            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
                 $this->completeSelectionState($data['nextState']);
             }
         );

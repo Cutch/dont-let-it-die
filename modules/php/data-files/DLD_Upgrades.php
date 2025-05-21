@@ -1,9 +1,9 @@
 <?php
 namespace Bga\Games\DontLetItDie;
 
-use Bga\Games\DontLetItDie\Game;
+use Bga\Games\DontLetItDie\DLD_Game;
 use BgaUserException;
-class UpgradesData
+class DLD_UpgradesData
 {
     public function getData(): array
     {
@@ -13,7 +13,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Charcoal Writing'),
                 'unlockCost' => 6,
-                'onGetUnlockCost' => function (Game $game, $unlock, &$data) {
+                'onGetUnlockCost' => function (DLD_Game $game, $unlock, &$data) {
                     $data['unlockCost'] -= 1;
                 },
             ],
@@ -22,7 +22,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Tracking'),
                 'unlockCost' => 5,
-                'onEncounterPre' => function (Game $game, $unlock, &$data) {
+                'onEncounterPre' => function (DLD_Game $game, $unlock, &$data) {
                     $data['willReceiveMeat'] += 1;
                 },
             ],
@@ -39,13 +39,13 @@ class UpgradesData
                         'interruptState' => ['playerTurn'],
                         'perDay' => 1,
                         'global' => true,
-                        'onInvestigateFire' => function (Game $game, $skill, &$data) {
+                        'onInvestigateFire' => function (DLD_Game $game, $skill, &$data) {
                             $char = $game->character->getTurnCharacterId();
                             if (getUsePerDay($char . 'flint', $game) < 1 && $game->gameData->getResource('rock') > 0) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 // $interruptState = $game->actInterrupt->getState('actInvestigateFire');
                                 $game->adjustResource('rock', -1);
@@ -54,7 +54,7 @@ class UpgradesData
                                 usePerDay($char . 'flint', $game);
                             }
                         },
-                        'requires' => function (Game $game, $skill) {
+                        'requires' => function (DLD_Game $game, $skill) {
                             $char = $game->character->getTurnCharacterId();
                             return getUsePerDay($char . 'flint', $game) < 1;
                         },
@@ -66,7 +66,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Fire Stoking'),
                 'unlockCost' => 8,
-                'onAddFireWood' => function (Game $game, $unlock, &$data) {
+                'onAddFireWood' => function (DLD_Game $game, $unlock, &$data) {
                     $char = $game->character->getTurnCharacterId();
                     if (getUsePerDay($char . $unlock['id'], $game) < 1) {
                         usePerDay($char . $unlock['id'], $game);
@@ -86,7 +86,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Haggle'),
                 'unlockCost' => 4,
-                'onGetTradeRatio' => function (Game $game, $unlock, &$data) {
+                'onGetTradeRatio' => function (DLD_Game $game, $unlock, &$data) {
                     $char = $game->character->getTurnCharacterId();
                     if (getUsePerDay($char . $unlock['id'], $game) < 1) {
                         if (!$data['checkOnly']) {
@@ -101,7 +101,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Trade Routes'),
                 'unlockCost' => 5,
-                'onGetActionCost' => function (Game $game, $unlock, &$data) {
+                'onGetActionCost' => function (DLD_Game $game, $unlock, &$data) {
                     if ($data['action'] == 'actTrade') {
                         $data['stamina'] = min($data['stamina'], 0);
                     }
@@ -112,7 +112,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Planning'),
                 'unlockCost' => 6,
-                'onEndTurn' => function (Game $game, $unlock, &$data) {
+                'onEndTurn' => function (DLD_Game $game, $unlock, &$data) {
                     if ($game->gameData->get('lastAction') == 'actInvestigateFire') {
                         if ($game->adjustResource('fkp', 1)['changed'] > 0) {
                             $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
@@ -136,17 +136,17 @@ class UpgradesData
                         'state' => ['playerTurn'],
                         'perDay' => 1,
                         'global' => true,
-                        'onUse' => function (Game $game, $skill, &$data) {
+                        'onUse' => function (DLD_Game $game, $skill, &$data) {
                             $char = $game->character->getTurnCharacterId();
                             usePerDay($char . '12-B', $game);
                         },
-                        'requires' => function (Game $game, $skill) {
+                        'requires' => function (DLD_Game $game, $skill) {
                             $char = $game->character->getTurnCharacterId();
                             return getUsePerDay($char . '12-B', $game) < 1;
                         },
                     ],
                 ],
-                'onInvestigateFire' => function (Game $game, $skill, &$data) {
+                'onInvestigateFire' => function (DLD_Game $game, $skill, &$data) {
                     $char = $game->character->getTurnCharacterId();
                     if (getUsePerDay($char . '12-B', $game) == 1) {
                         usePerDay($char . '12-B', $game);
@@ -159,7 +159,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Bone Efficiency'),
                 'unlockCost' => 4,
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDraw' => function (DLD_Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'hide') {
                         if ($game->adjustResource('hide', 1)['changed'] > 0) {
@@ -177,7 +177,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Hide Efficiency'),
                 'unlockCost' => 4,
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDraw' => function (DLD_Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'bone') {
                         if ($game->adjustResource('bone', 1)['changed'] > 0) {
@@ -195,7 +195,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Medicinal Herb Efficiency'),
                 'unlockCost' => 5,
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDraw' => function (DLD_Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'herb') {
                         if ($game->adjustResource('herb', 1)['changed'] > 0) {
@@ -213,7 +213,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Dino Egg Efficiency'),
                 'unlockCost' => 5,
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDraw' => function (DLD_Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'dino-egg') {
                         if ($game->adjustResource('dino-egg', 1)['changed'] > 0) {
@@ -231,7 +231,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Jewelry'),
                 'unlockCost' => 5,
-                'onGetActionSelectable' => function (Game $game, $skill, &$data) {
+                'onGetActionSelectable' => function (DLD_Game $game, $skill, &$data) {
                     if ($data['action'] == 'actCraft') {
                         array_push(
                             $data['selectable'],
@@ -262,10 +262,10 @@ class UpgradesData
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'global' => true,
-                        'onMorning' => function (Game $game, $skill, &$data) {
+                        'onMorning' => function (DLD_Game $game, $skill, &$data) {
                             $game->actInterrupt->addSkillInterrupt($skill);
                         },
-                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->gameData->destroyResource('fiber');
                                 $interruptState = $game->actInterrupt->getState('stMorningPhase');
@@ -288,10 +288,10 @@ class UpgradesData
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'global' => true,
-                        'onMorning' => function (Game $game, $skill, &$data) {
+                        'onMorning' => function (DLD_Game $game, $skill, &$data) {
                             $game->actInterrupt->addSkillInterrupt($skill);
                         },
-                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $interruptState = $game->actInterrupt->getState('stMorningPhase');
                                 $interruptState['health'] += 1;
@@ -307,7 +307,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Smoke Cover'),
                 'unlockCost' => 4,
-                'onNightDrawCard' => function (Game $game, $unlock, &$data) {
+                'onNightDrawCard' => function (DLD_Game $game, $unlock, &$data) {
                     if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
                         $roll = min($game->rollFireDie($unlock['name']), $game->rollFireDie($unlock['name']));
                         rivalTribe($game, $data, $roll);
@@ -321,7 +321,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Revenge'),
                 'unlockCost' => 8,
-                'onNightDrawCard' => function (Game $game, $unlock, &$data) {
+                'onNightDrawCard' => function (DLD_Game $game, $unlock, &$data) {
                     if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
                         $resourceType = $data['card']['resourceType'];
                         $roll = $game->rollFireDie($unlock['name']);
@@ -354,7 +354,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Hot Rock Sauna'),
                 'unlockCost' => 6,
-                'onGetCharacterData' => function (Game $game, $unlock, &$data) {
+                'onGetCharacterData' => function (DLD_Game $game, $unlock, &$data) {
                     $data['maxHealth'] = clamp($data['maxHealth'] + 3, 0, 10);
                     $data['maxStamina'] = clamp($data['maxStamina'] - 1, 0, 10);
                 },
@@ -364,7 +364,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Hot Rock Walking'),
                 'unlockCost' => 7,
-                'onGetCharacterData' => function (Game $game, $unlock, &$data) {
+                'onGetCharacterData' => function (DLD_Game $game, $unlock, &$data) {
                     $data['maxHealth'] = clamp($data['maxHealth'] - 1, 0, 10);
                     $data['maxStamina'] = clamp($data['maxStamina'] + 2, 0, 10);
                 },
@@ -375,7 +375,7 @@ class UpgradesData
                 'name' => clienttranslate('Smoked Food'),
                 'unlockCost' => 4,
                 'disabled' => true,
-                'onAdjustHealth' => function (Game $game, $unlock, &$data) {
+                'onAdjustHealth' => function (DLD_Game $game, $unlock, &$data) {
                     if ($data['change']) {
                         $aboveMax = $data['health'] + $data['change'] - $data['maxHealth'];
                         if ($aboveMax > 0) {
@@ -400,7 +400,7 @@ class UpgradesData
                         }
                     }
                 },
-                'onCharacterSelection' => function (Game $game, $unlock, &$data) {
+                'onCharacterSelection' => function (DLD_Game $game, $unlock, &$data) {
                     $state = $game->selectionStates->getState('characterSelection');
                     if ($state && $state['id'] == $unlock['id']) {
                         $aboveMax = $state['aboveMax'];
@@ -417,7 +417,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('First Aid'),
                 'unlockCost' => 6,
-                'onGetActionSelectable' => function (Game $game, $char, &$data) {
+                'onGetActionSelectable' => function (DLD_Game $game, $char, &$data) {
                     if ($data['action'] == 'actRevive') {
                         array_walk($data['selectable'], function (&$d) {
                             if ($d['id'] == 'meat-cooked') {
@@ -440,7 +440,7 @@ class UpgradesData
                         'perDay' => 1,
                         'global' => true,
                         'cost' => ['fkp' => 2],
-                        'onUse' => function (Game $game, $skill, &$data) {
+                        'onUse' => function (DLD_Game $game, $skill, &$data) {
                             $char = $game->character->getTurnCharacterId();
                             if (getUsePerDay($char . $skill['id'], $game) < 1) {
                                 usePerDay($char . $skill['id'], $game);
@@ -464,7 +464,7 @@ class UpgradesData
                                 }
                             }
                         },
-                        'requires' => function (Game $game, $skill) {
+                        'requires' => function (DLD_Game $game, $skill) {
                             $char = $game->character->getTurnCharacterId();
                             return getUsePerDay($char . $skill['id'], $game) < 1;
                         },
@@ -484,10 +484,10 @@ class UpgradesData
                         'state' => ['playerTurn'],
                         'stamina' => 2,
                         'global' => true,
-                        'onUse' => function (Game $game, $skill, &$data) {
+                        'onUse' => function (DLD_Game $game, $skill, &$data) {
                             // $char = $game->character->getTurnCharacterId();
                         },
-                        'onUseSkill' => function (Game $game, $skill, &$data) {
+                        'onUseSkill' => function (DLD_Game $game, $skill, &$data) {
                             if ($data['skillId'] == $skill['id']) {
                                 $decksDiscards = $game->decks->listDeckDiscards(
                                     array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames())
@@ -517,7 +517,7 @@ class UpgradesData
                                 //         }
                             }
                         },
-                        'onCardSelection' => function (Game $game, $skill, &$data) {
+                        'onCardSelection' => function (DLD_Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('cardSelection');
                             if ($state && $state['id'] == $skill['id']) {
                                 // $game->data->getDecks()[$data['cardId']];
@@ -537,10 +537,10 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Berry Farming'),
                 'unlockCost' => 5,
-                'onUse' => function (Game $game, $unlock) {
+                'onUse' => function (DLD_Game $game, $unlock) {
                     $game->gameData->destroyResource('berry', 1);
                 },
-                'onMorningAfter' => function (Game $game, $unlock) {
+                'onMorningAfter' => function (DLD_Game $game, $unlock) {
                     $count = $game->adjustResource('berry', 1)['changed'];
                     if ($count > 0) {
                         $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
@@ -555,7 +555,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Meditation'),
                 'unlockCost' => 5,
-                'onUse' => function (Game $game, $unlock) {
+                'onUse' => function (DLD_Game $game, $unlock) {
                     $game->character->adjustAllHealth(10);
                     $game->notify('tree', clienttranslate('Everyone gained ${count} ${character_resource}'), [
                         'count' => clienttranslate('full'),
@@ -576,21 +576,21 @@ class UpgradesData
                         'perDay' => 1,
                         'stamina' => 4,
                         'global' => true,
-                        'onUse' => function (Game $game, $skill, &$data) {
+                        'onUse' => function (DLD_Game $game, $skill, &$data) {
                             $char = $game->character->getTurnCharacterId();
                             if (getUsePerDay($char . 'rest', $game) < 1) {
                                 $game->selectionStates->initiateHindranceSelection($skill['id']);
                             }
                         },
-                        'requires' => function (Game $game, $skill) {
+                        'requires' => function (DLD_Game $game, $skill) {
                             $char = $game->character->getTurnCharacterId();
                             return sizeof($game->character->getTurnCharacter()['physicalHindrance']) > 0 &&
                                 getUsePerDay($char . 'rest', $game) < 1;
                         },
-                        'onUseHerbPre' => function (Game $game, $action, &$data) {
+                        'onUseHerbPre' => function (DLD_Game $game, $action, &$data) {
                             return ['notify' => false, 'nextState' => false, 'interrupt' => true];
                         },
-                        'onHindranceSelection' => function (Game $game, $skill, &$data) {
+                        'onHindranceSelection' => function (DLD_Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('hindranceSelection');
                             $char = $game->character->getTurnCharacterId();
                             if ($state && $state['id'] == $skill['id']) {
@@ -628,7 +628,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Clarity'),
                 'unlockCost' => 7,
-                'onUse' => function (Game $game, $unlock) {
+                'onUse' => function (DLD_Game $game, $unlock) {
                     $chars = $game->character->getAllCharacterData();
                     foreach ($chars as $char) {
                         foreach ($char['mentalHindrance'] as $card) {
@@ -637,7 +637,7 @@ class UpgradesData
                     }
                 },
                 // Not affected by mental hindrance, can hold 4 physical
-                'onMaxHindrance' => function (Game $game, $unlock, &$data) {
+                'onMaxHindrance' => function (DLD_Game $game, $unlock, &$data) {
                     $data['maxPhysicalHindrance'] = 4;
                     $data['canDrawMentalHindrance'] = false;
                 },
@@ -647,7 +647,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Cooperation'),
                 'unlockCost' => 5,
-                'onMorningAfter' => function (Game $game, $unlock, &$data) {
+                'onMorningAfter' => function (DLD_Game $game, $unlock, &$data) {
                     $data['nextState'] = false;
 
                     $game->selectionStates->initiateState(
@@ -663,7 +663,7 @@ class UpgradesData
                         'tradePhase'
                     );
                 },
-                'onCharacterSelection' => function (Game $game, $unlock, &$data) {
+                'onCharacterSelection' => function (DLD_Game $game, $unlock, &$data) {
                     $state = $game->selectionStates->getState('characterSelection');
                     if ($state && $state['id'] == $unlock['id']) {
                         $game->character->setFirstTurnOrder($state['selectedCharacterId']);
@@ -676,7 +676,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Resourceful'),
                 'unlockCost' => 4,
-                'onDraw' => function (Game $game, $unlock, &$data) {
+                'onDraw' => function (DLD_Game $game, $unlock, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'nothing') {
                         $game->character->adjustActiveStamina(1);
@@ -688,7 +688,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Torches'),
                 'unlockCost' => 6,
-                'onEncounterPre' => function (Game $game, $unlock, &$data) {
+                'onEncounterPre' => function (DLD_Game $game, $unlock, &$data) {
                     if ($data['willTakeDamage'] > 0) {
                         $data['willTakeDamage'] -= 1;
                     }
@@ -699,7 +699,7 @@ class UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Tempering'),
                 'unlockCost' => 7,
-                'onEncounterPre' => function (Game $game, $unlock, &$data) {
+                'onEncounterPre' => function (DLD_Game $game, $unlock, &$data) {
                     if ($data['characterDamage'] > 0) {
                         $data['characterDamage'] += 1;
                     }

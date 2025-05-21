@@ -5,11 +5,11 @@ namespace Bga\Games\DontLetItDie;
 
 use BgaUserException;
 
-class Hooks
+class DLD_Hooks
 {
-    private Game $game;
+    private DLD_Game $game;
     private bool $checkInterrupt = false;
-    public function __construct(Game $game)
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
     }

@@ -6,9 +6,9 @@ namespace Bga\Games\DontLetItDie;
 use BgaUserException;
 use Exception;
 
-class Character
+class DLD_Character
 {
-    private Game $game;
+    private DLD_Game $game;
     private ?string $submittingCharacter = null;
     private array $cachedData = [];
     private static array $characterColumns = [

@@ -6,9 +6,9 @@ namespace Bga\Games\DontLetItDie;
 use Deck;
 use Exception;
 
-class Decks
+class DLD_Decks
 {
-    private Game $game;
+    private DLD_Game $game;
     private array $decks;
     private array $cachedData = [];
     private static $decksNames = [
@@ -22,7 +22,7 @@ class Decks
         'physical-hindrance',
         'mental-hindrance',
     ];
-    public function __construct(Game $game)
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
         foreach ($this->getAllDeckNames() as $deck) {

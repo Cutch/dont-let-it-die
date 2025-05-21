@@ -8,7 +8,7 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  *
- * Game.php
+ * DLD_Game.php
  *
  * This is the main file for your game logic.
  *
@@ -20,10 +20,10 @@ namespace Bga\Games\DontLetItDie;
 
 use BgaUserException;
 
-class Encounter
+class DLD_Encounter
 {
-    private Game $game;
-    public function __construct(Game $game)
+    private DLD_Game $game;
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
     }
@@ -123,7 +123,7 @@ class Encounter
             __FUNCTION__,
             func_get_args(),
             [$this->game->hooks, 'onEncounter'],
-            function (Game $_this) {
+            function (DLD_Game $_this) {
                 $state = $_this->gameData->get('state');
                 $card = $state['card'];
                 $deck = $state['deck'];
@@ -243,7 +243,7 @@ class Encounter
                     'stamina' => 0,
                 ];
             },
-            function (Game $_this, bool $finalizeInterrupt, $data) {
+            function (DLD_Game $_this, bool $finalizeInterrupt, $data) {
                 if ($data['stamina'] != 0) {
                     $_this->character->adjustActiveStamina($data['stamina']);
                 }

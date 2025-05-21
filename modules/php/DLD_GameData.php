@@ -8,7 +8,7 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  *
- * Game.php
+ * DLD_Game.php
  *
  * This is the main file for your game logic.
  *
@@ -21,9 +21,9 @@ namespace Bga\Games\DontLetItDie;
 use BgaUserException;
 use Exception;
 
-class GameData
+class DLD_GameData
 {
-    private Game $game;
+    private DLD_Game $game;
     private ?array $resourcesBeforeTransaction = null;
     private array $cachedGameData = [];
     private array $cachedGameItems = [];
@@ -78,7 +78,7 @@ class GameData
         ],
         'destroyedResources' => [],
     ];
-    public function __construct(Game $game)
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
         $this->reload();

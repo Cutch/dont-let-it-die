@@ -1,9 +1,9 @@
 <?php
 namespace Bga\Games\DontLetItDie;
 
-use Bga\Games\DontLetItDie\Game;
+use Bga\Games\DontLetItDie\DLD_Game;
 use BgaUserException;
-class ExpansionData
+class DLD_ExpansionData
 {
     public function getData(): array
     {
@@ -29,7 +29,7 @@ class ExpansionData
                         'type' => 'skill',
                         'name' => clienttranslate('Tame the beast'),
                         'state' => ['dayEvent'],
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->activeCharacterEventLog(clienttranslate('${character_name} obtained a ${item_name}'), [
                                 'item_name' => clienttranslate('Wolf Pup'),
                             ]);
@@ -48,7 +48,7 @@ class ExpansionData
                         'name' => clienttranslate('Ask Wolf Pup to Fetch'),
                         'state' => ['playerTurn'],
                         'stamina' => 2,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             if ($game->rollFireDie($skill['parentName'], $game->character->getTurnCharacterId()) == 0) {
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                     'count' => 1,
@@ -82,14 +82,14 @@ class ExpansionData
                         'name' => clienttranslate('Make a snappy comeback'),
                         'state' => ['dayEvent', 'resolveEncounter'],
                         'health' => 1,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->gameData->set('state', [
                                 'card' => $game->data->getExpansion()[$skill['parentId']],
                                 'deck' => 'day-event',
                             ]);
                             return ['notify' => false, 'nextState' => 'resolveEncounter'];
                         },
-                        'onEncounterPost' => function (Game $game, $skill, &$data) {
+                        'onEncounterPost' => function (DLD_Game $game, $skill, &$data) {
                             $game->log('encounter', $data);
                             if ($data['encounterHealth'] <= $data['characterDamage']) {
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} obtained a ${item_name}'), [
@@ -111,13 +111,13 @@ class ExpansionData
                         'state' => ['interrupt'],
                         'interruptState' => ['resolveEncounter'],
                         'perForever' => 2,
-                        'onGetActionCost' => function (Game $game, $skill, &$data) {
+                        'onGetActionCost' => function (DLD_Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
                             if ($data['action'] == 'actUseItem' && $data['subAction'] == $skill['id']) {
                                 $data['perForever'] = 2 - getUsePerForever($char['id'] . $skill['id'], $game);
                             }
                         },
-                        'onEncounterPre' => function (Game $game, $skill, &$data) {
+                        'onEncounterPre' => function (DLD_Game $game, $skill, &$data) {
                             $damageTaken = $game->encounter->countDamageTaken($data);
                             $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
 
@@ -125,7 +125,7 @@ class ExpansionData
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
-                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                        'onInterrupt' => function (DLD_Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
                                 usePerForever($char['id'] . $skill['id'], $game);
@@ -148,7 +148,7 @@ class ExpansionData
                                 }
                             }
                         },
-                        'requires' => function (Game $game, $skill) {
+                        'requires' => function (DLD_Game $game, $skill) {
                             $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
                             $game->log('requirement', $char['isActive'], getUsePerForever($char['id'] . $skill['id'], $game) < 2, $skill);
                             return $char['isActive'] && getUsePerForever($char['id'] . $skill['id'], $game) < 2;
@@ -167,7 +167,7 @@ class ExpansionData
                         'name' => clienttranslate('Yoink!'),
                         'state' => ['dayEvent'],
                         'stamina' => 1,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->adjustResource('berry', 2);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 2,
@@ -181,7 +181,7 @@ class ExpansionData
                         'name' => clienttranslate('We\'ll see about that'),
                         'state' => ['dayEvent'],
                         'health' => 1,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->adjustResource('berry', 3);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 5,
@@ -203,7 +203,7 @@ class ExpansionData
                         'name' => clienttranslate('Oops'),
                         'state' => ['dayEvent'],
                         'stamina' => 3,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->adjustResource('wood', 3);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 3,
@@ -217,7 +217,7 @@ class ExpansionData
                         'name' => clienttranslate('Who needs tools?'),
                         'state' => ['dayEvent'],
                         'health' => 1,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->adjustResource('wood', 1);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 1,
@@ -243,14 +243,14 @@ class ExpansionData
                         'name' => clienttranslate('AaaaaaAAaaaAAAaaAAAAAaAAAA!!'),
                         'state' => ['dayEvent'],
                         'health' => 2,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 2,
                                 'character_resource' => clienttranslate('Health'),
                             ]);
                             return ['notify' => false];
                         },
-                        'requires' => function (Game $game, $skill) {
+                        'requires' => function (DLD_Game $game, $skill) {
                             return getUsePerDay($skill['parentId'], $game) == 0;
                         },
                     ],
@@ -259,7 +259,7 @@ class ExpansionData
                         'name' => clienttranslate('When in doubt, throw a rock'),
                         'state' => ['dayEvent'],
                         'cost' => ['rock' => 1],
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->adjustResource('rock', -1);
                             if (getUsePerDay($skill['parentId'], $game) == 0) {
                                 usePerDay($skill['parentId'], $game);
@@ -283,7 +283,7 @@ class ExpansionData
                             }
                             return ['notify' => false, 'nextState' => false];
                         },
-                        'requires' => function (Game $game, $skill) {
+                        'requires' => function (DLD_Game $game, $skill) {
                             return $game->gameData->getResource('rock') >= 1 && getUsePerDay($skill['parentId'], $game) < 3;
                         },
                     ],
@@ -292,11 +292,11 @@ class ExpansionData
                         'name' => clienttranslate('Give Up'),
                         'state' => ['dayEvent'],
                         'health' => 2,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->character->adjustActiveHealth(-2);
                             return ['notify' => false];
                         },
-                        'requires' => function (Game $game, $skill) {
+                        'requires' => function (DLD_Game $game, $skill) {
                             return getUsePerDay($skill['parentId'], $game) > 0 && getUsePerDay($skill['parentId'], $game) < 3;
                         },
                     ],
@@ -318,7 +318,7 @@ class ExpansionData
                         'type' => 'skill',
                         'name' => clienttranslate('The only good snake'),
                         'state' => ['dayEvent'],
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->character->adjustActiveStamina(2);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                 'count' => 2,
@@ -326,7 +326,7 @@ class ExpansionData
                             ]);
                             return ['notify' => false];
                         },
-                        'requires' => function (Game $game, $skill) {
+                        'requires' => function (DLD_Game $game, $skill) {
                             return sizeof(
                                 array_filter($game->character->getActiveEquipment(), function ($equipment) {
                                     return $equipment['itemType'] == 'weapon';
@@ -338,7 +338,7 @@ class ExpansionData
                         'type' => 'skill',
                         'name' => clienttranslate('Maybe if I just move my foot'),
                         'state' => ['dayEvent'],
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->character->updateCharacterData($game->character->getTurnCharacterId(), function (&$data) {
                                 $data['modifiedMaxStamina'] -= 1;
                             });
@@ -357,7 +357,7 @@ class ExpansionData
                         'type' => 'skill',
                         'name' => clienttranslate('Sorry about that!'),
                         'state' => ['dayEvent'],
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
                             $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
                                 $currentCharacter
@@ -378,7 +378,7 @@ class ExpansionData
                             );
                             return ['notify' => false, 'nextState' => false];
                         },
-                        'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                        'onCharacterSelection' => function (DLD_Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['id']) {
                                 $game->character->adjustHealth($data['characterId'], -1);
@@ -395,7 +395,7 @@ class ExpansionData
                         'name' => clienttranslate('Let\'s think about this'),
                         'state' => ['dayEvent'],
                         'stamina' => 2,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
                             $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
                                 $currentCharacter
@@ -414,7 +414,7 @@ class ExpansionData
                             );
                             return ['notify' => false, 'nextState' => false];
                         },
-                        'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                        'onCharacterSelection' => function (DLD_Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['id']) {
                                 $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
@@ -443,7 +443,7 @@ class ExpansionData
                         'type' => 'skill',
                         'name' => clienttranslate('Nope'),
                         'state' => ['dayEvent'],
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
                             if ($game->rollFireDie(clienttranslate('Day Event'), $currentCharacter) != 0) {
                                 $game->character->adjustHealth($currentCharacter, -1);
@@ -464,7 +464,7 @@ class ExpansionData
                         'type' => 'skill',
                         'name' => clienttranslate('It doesn\'t look that tough'),
                         'state' => ['dayEvent'],
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
                             if (
                                 $game->rollFireDie(clienttranslate('Day Event'), $currentCharacter) +
@@ -504,7 +504,7 @@ class ExpansionData
                         'name' => clienttranslate('Climb a tree'),
                         'state' => ['dayEvent'],
                         'stamina' => 2,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             return ['notify' => false];
                         },
                     ],
@@ -513,7 +513,7 @@ class ExpansionData
                         'name' => clienttranslate('Backtrack'),
                         'state' => ['dayEvent'],
                         'health' => 1,
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                 'count' => 1,
                                 'character_resource' => clienttranslate('Health'),
@@ -533,7 +533,7 @@ class ExpansionData
                         'type' => 'skill',
                         'name' => clienttranslate('Sneak around'),
                         'state' => ['dayEvent'],
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
                             if ($game->rollFireDie(clienttranslate('Day Event'), $currentCharacter) == 0) {
                                 $game->character->adjustActiveStamina(-2);
@@ -551,7 +551,7 @@ class ExpansionData
                         'type' => 'skill',
                         'name' => clienttranslate('Head back to camp'),
                         'state' => ['dayEvent'],
-                        'onUse' => function (Game $game, $skill) {
+                        'onUse' => function (DLD_Game $game, $skill) {
                             $game->character->adjustActiveStamina(-1);
                             $game->adjustResource('berry', 2);
                             $game->activeCharacterEventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
@@ -570,7 +570,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Blind'),
-                'onAcquireHindrance' => function (Game $game, $card, &$data) {
+                'onAcquireHindrance' => function (DLD_Game $game, $card, &$data) {
                     if ($card['id'] == $data['id']) {
                         $character = $game->character->getTurnCharacter();
                         $weapons = array_filter($character['equipment'], function ($item) {
@@ -596,7 +596,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('has a'),
                 'dropSentence' => clienttranslate('no longer has a'),
                 'name' => clienttranslate('Broken Arm'),
-                'onAcquireHindrance' => function (Game $game, $card, &$data) {
+                'onAcquireHindrance' => function (DLD_Game $game, $card, &$data) {
                     if ($card['id'] == $data['id']) {
                         // No weapon can be equipped
                         $character = $game->character->getTurnCharacter();
@@ -624,7 +624,7 @@ class ExpansionData
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Berserk'),
                 'disabled' => true,
-                'onAdjustHealth' => function (Game $game, $card, &$data) {
+                'onAdjustHealth' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         // TODO
                     }
@@ -634,7 +634,7 @@ class ExpansionData
                 //         'type' => 'skill',
                 //         'name' => clienttranslate('Berserk'),
                 //         'state' => ['playerTurn', 'nightPhase', 'morningPhase'],
-                //         'onUse' => function (Game $game, $skill) {
+                //         'onUse' => function (DLD_Game $game, $skill) {
                 //             $currentCharacter = $game->character->getTurnCharacterId();
                 //             $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use ($currentCharacter) {
                 //                 return $character != $currentCharacter;
@@ -648,7 +648,7 @@ class ExpansionData
                 //             $game->nextState('characterSelection');
                 //             return ['notify' => false, 'nextState' => false];
                 //         },
-                //         'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                //         'onCharacterSelection' => function (DLD_Game $game, $skill, &$data) {
                 //             $state = $game->gameData->get('characterSelectionState');
                 //             if ($state && $state['id'] == $skill['id']) {
                 //                 $game->character->adjustHealth($data['characterId'], -1);
@@ -671,7 +671,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Cowardly'),
-                'onResolveDraw' => function (Game $game, $card, &$data) {
+                'onResolveDraw' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         $data['discard'] = true;
                         $game->activeCharacterEventLog(clienttranslate('${character_name} ran from the encounter'));
@@ -690,7 +690,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('has a'),
                 'dropSentence' => clienttranslate('no longer has a'),
                 'name' => clienttranslate('Broken Leg'),
-                'onGetValidActions' => function (Game $game, $card, &$data) {
+                'onGetValidActions' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         unset($data['actDrawForage']);
                         unset($data['actDrawGather']);
@@ -708,7 +708,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Obsessive'),
-                'onEndTurn' => function (Game $game, $card, &$data) {
+                'onEndTurn' => function (DLD_Game $game, $card, &$data) {
                     if ($card['id'] == $data['id']) {
                         $character = $game->character->getTurnCharacter();
                         if ($character['health'] % 2 == 1) {
@@ -730,7 +730,7 @@ class ExpansionData
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Paranoid'),
                 // Always eat
-                'onHandleEat' => function (Game $game, $card, &$data, ?string $preferType = null) {
+                'onHandleEat' => function (DLD_Game $game, $card, &$data, ?string $preferType = null) {
                     $variables = $game->gameData->getResources();
                     $array = $game->actions->getActionSelectable('actEat');
                     $array = array_values(
@@ -769,18 +769,18 @@ class ExpansionData
                         }
                     }
                 },
-                'onEatBefore' => function (Game $game, $card, &$data) {
+                'onEatBefore' => function (DLD_Game $game, $card, &$data) {
                     if ($game->character->getSubmittingCharacterId() != $card['characterId']) {
                         $card['onHandleEat']($game, $card, $data, $data['type']);
                     }
                 },
-                'onCookAfter' => function (Game $game, $card, &$data) {
+                'onCookAfter' => function (DLD_Game $game, $card, &$data) {
                     $card['onHandleEat']($game, $card, $data);
                 },
-                'onResolveDraw' => function (Game $game, $card, &$data) {
+                'onResolveDraw' => function (DLD_Game $game, $card, &$data) {
                     $card['onHandleEat']($game, $card, $data);
                 },
-                'onPlayerTurn' => function (Game $game, $card, &$data) {
+                'onPlayerTurn' => function (DLD_Game $game, $card, &$data) {
                     $card['onHandleEat']($game, $card, $data);
                 },
             ],
@@ -791,7 +791,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('has a'),
                 'dropSentence' => clienttranslate('no longer has a'),
                 'name' => clienttranslate('Bad Back'),
-                'onAcquireHindrance' => function (Game $game, $card, &$data) {
+                'onAcquireHindrance' => function (DLD_Game $game, $card, &$data) {
                     if ($card['id'] == $data['id']) {
                         // No weapon can be equipped
                         $character = $game->character->getTurnCharacter();
@@ -818,7 +818,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Depressed'),
-                'onGetActionCost' => function (Game $game, $card, &$data) {
+                'onGetActionCost' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['stamina'] > 0) {
                         $data['stamina'] += 1;
                     }
@@ -832,12 +832,12 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Dumb'),
-                'onGetActionCost' => function (Game $game, $card, &$data) {
+                'onGetActionCost' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['action'] == 'actInvestigateFire') {
                         $data['stamina'] += 1;
                     }
                 },
-                'onInvestigateFire' => function (Game $game, $card, &$data) {
+                'onInvestigateFire' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {
                         $game->activeCharacterEventLog(clienttranslate('${character_name} is dumb'));
                         $data['roll'] -= 1;
@@ -852,7 +852,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Forgetful'),
-                'onActDraw' => function (Game $game, $card, &$data) {
+                'onActDraw' => function (DLD_Game $game, $card, &$data) {
                     if (
                         $card['characterId'] == $game->character->getTurnCharacterId() &&
                         in_array($data['deck'], ['gather', 'hunt', 'harvest', 'forage'])
@@ -875,7 +875,7 @@ class ExpansionData
                 'name' => clienttranslate('Anti-Social'),
                 // Can't trade
                 // Can't be healed by skills, going to handle this on the individual skills
-                'onItemTrade' => function (Game $game, $card, &$data) {
+                'onItemTrade' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         if (
                             (isset($data['trade1']['character']['id']) && $data['trade1']['character']['id'] == $card['characterId']) ||
@@ -906,7 +906,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Sun Burnt'),
-                'onGetValidActions' => function (Game $game, $card, &$data) {
+                'onGetValidActions' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         unset($data['actInvestigateFire']);
                     }
@@ -920,7 +920,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('has'),
                 'dropSentence' => clienttranslate('no longer has'),
                 'name' => clienttranslate('Swollen Eyes'),
-                'onDraw' => function (Game $game, $card, &$data) {
+                'onDraw' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $card['deckType'] == 'resource') {
                         $card['count'] -= 1;
                     }
@@ -934,7 +934,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('has a'),
                 'dropSentence' => clienttranslate('no longer has a'),
                 'name' => clienttranslate('Deep Wound'),
-                'onGetCharacterData' => function (Game $game, $card, &$data) {
+                'onGetCharacterData' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         $data['maxHealth'] = clamp($data['maxHealth'] - 1, 0, 10);
                     }
@@ -948,7 +948,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Dehydrated'),
-                'onEncounterPre' => function (Game $game, $card, &$data) {
+                'onEncounterPre' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         $data['willTakeDamage'] += 1;
                     }
@@ -962,7 +962,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('has a'),
                 'dropSentence' => clienttranslate('no longer has a'),
                 'name' => clienttranslate('Twisted Ankle'),
-                'onGetCharacterData' => function (Game $game, $card, &$data) {
+                'onGetCharacterData' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         $data['maxStamina'] = clamp($data['maxStamina'] - 1, 0, 10);
                     }
@@ -976,7 +976,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Nauseous'),
-                'onGetValidActions' => function (Game $game, $card, &$data) {
+                'onGetValidActions' => function (DLD_Game $game, $card, &$data) {
                     if (
                         $card['characterId'] == $game->character->getTurnCharacterId() &&
                         getUsePerDay($card['id'] . 'nauseous', $game) < 1
@@ -984,7 +984,7 @@ class ExpansionData
                         unset($data['actEat']);
                     }
                 },
-                'onEat' => function (Game $game, $card, &$data) {
+                'onEat' => function (DLD_Game $game, $card, &$data) {
                     if (
                         $card['characterId'] == $game->character->getTurnCharacterId() &&
                         getUsePerDay($card['id'] . 'nauseous', $game) < 1
@@ -1002,7 +1002,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('has'),
                 'dropSentence' => clienttranslate('no longer has'),
                 'name' => clienttranslate('Parasites'),
-                'onAdjustHealth' => function (Game $game, $card, &$data) {
+                'onAdjustHealth' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['change'] > 0) {
                         $data['change'] -= 1;
                     }
@@ -1026,7 +1026,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Diseased'),
-                'onMorning' => function (Game $game, $card, &$data) {
+                'onMorning' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         $game->character->adjustActiveHealth(-1);
                         $game->activeCharacterEventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
@@ -1044,7 +1044,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Exhausted'),
-                'onMorningAfter' => function (Game $game, $card, &$data) {
+                'onMorningAfter' => function (DLD_Game $game, $card, &$data) {
                     $game->character->adjustStamina($game->character->getTurnCharacterId(), -2);
                     $game->activeCharacterEventLog(clienttranslate('${character_name} is exhausted'));
                 },
@@ -1057,7 +1057,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Malnourished'),
-                'onEncounterPre' => function (Game $game, $card, &$data) {
+                'onEncounterPre' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         $data['encounterHealth'] += 1;
                     }
@@ -1071,7 +1071,7 @@ class ExpansionData
                 'acquireSentence' => clienttranslate('has a'),
                 'dropSentence' => clienttranslate('no longer has a'),
                 'name' => clienttranslate('Concussion'),
-                'onInvestigateFire' => function (Game $game, $card, &$data) {
+                'onInvestigateFire' => function (DLD_Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {
                         $game->activeCharacterEventLog(clienttranslate('${character_name} has a') . clienttranslate('Concussion'), []);
                         $data['roll'] -= 1;

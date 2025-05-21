@@ -5,13 +5,13 @@ namespace Bga\Games\DontLetItDie;
 
 use Closure;
 
-class ActInterrupt
+class DLD_ActInterrupt
 {
-    private Game $game;
+    private DLD_Game $game;
     private array $activatableSkills = [];
     // private array $calledFunction = [];
 
-    public function __construct(Game $game)
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
         // $this->calledFunction = [];

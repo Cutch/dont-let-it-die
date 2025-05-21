@@ -6,12 +6,12 @@ namespace Bga\Games\DontLetItDie;
 use BgaUserException;
 use Exception;
 
-class Undo
+class DLD_Undo
 {
-    private Game $game;
+    private DLD_Game $game;
     private array $initialState;
     private bool $actionWasCleared = false;
-    public function __construct(Game $game)
+    public function __construct(DLD_Game $game)
     {
         $this->game = $game;
         $this->loadInitialState();
