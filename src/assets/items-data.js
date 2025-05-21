@@ -1,3 +1,4 @@
+import dojo from 'dojo';
 export default {
   getData: () => ({
     sprites: {
@@ -37,7 +38,14 @@ export default {
         options: {
           type: 'item',
           itemType: 'weapon',
-          text: [{ title: _('Bone Scythe') }, _('Item Type') + ': ' + _('Weapon'), _('Take 1 Fiber when you draw a Fiber Card')],
+          text: [
+            { title: _('Bone Scythe') },
+            _('Item Type') + ': ' + _('Weapon'),
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Fiber'),
+              card: _('Fiber'),
+            }),
+          ],
         },
         frame: { x: 1314, y: 0, w: 438, h: 438 },
         rotate: 0,
@@ -46,7 +54,14 @@ export default {
         options: {
           type: 'item',
           itemType: 'tool',
-          text: [{ title: _('Bag') }, _('Item Type') + ': ' + _('Tool'), _('Take 1 Berry when you draw a Berry Card')],
+          text: [
+            { title: _('Bag') },
+            _('Item Type') + ': ' + _('Tool'),
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Berry'),
+              card: _('Berry'),
+            }),
+          ],
         },
         frame: { x: 1752, y: 0, w: 438, h: 438 },
         rotate: 0,
@@ -103,7 +118,14 @@ export default {
         options: {
           type: 'item',
           itemType: 'tool',
-          text: [{ title: _('Hatchet') }, _('Item Type') + ': ' + _('Tool'), _('Take 1 wood when you draw a Wood Card')],
+          text: [
+            { title: _('Hatchet') },
+            _('Item Type') + ': ' + _('Tool'),
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Wood'),
+              card: _('Wood'),
+            }),
+          ],
         },
         frame: { x: 2190, y: 439, w: 438, h: 438 },
         rotate: 0,
@@ -117,7 +139,9 @@ export default {
             _('Item Type') + ': ' + _('Weapon'),
             _('Damage') + ': ' + 1,
             _('Range') + ': ' + 1,
-            _('-1 max stamina'),
+            dojo.string.substitute(_('${number} Max Stamina'), {
+              number: '-1',
+            }),
           ],
         },
         frame: { x: 0, y: 880, w: 438, h: 438 },
@@ -127,7 +151,7 @@ export default {
         options: {
           type: 'item',
           itemType: 'building',
-          text: [{ title: _('Cooking Hut') }, _('Item Type') + ': ' + _('Building'), _('Gain an additional +2 HP when eating food')],
+          text: [{ title: _('Cooking Hut') }, _('Item Type') + ': ' + _('Building'), _('Gain an additional +2 Health when eating food')],
         },
         frame: { x: 439, y: 880, w: 438, h: 438 },
         rotate: 0,
@@ -136,7 +160,14 @@ export default {
         options: {
           type: 'item',
           itemType: 'tool',
-          text: [{ title: _('Carving Knife') }, _('Item Type') + ': ' + _('Tool'), _('Take 1 raw meat when you draw a Meat Card')],
+          text: [
+            { title: _('Carving Knife') },
+            _('Item Type') + ': ' + _('Tool'),
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Meat'),
+              card: _('Meat'),
+            }),
+          ],
         },
         frame: { x: 876, y: 880, w: 438, h: 438 },
         rotate: 0,
@@ -161,7 +192,14 @@ export default {
         options: {
           type: 'item',
           itemType: 'tool',
-          text: [{ title: _('Pick Axe') }, _('Item Type') + ': ' + _('Tool'), _('Take 1 stone when you draw a Rock Card')],
+          text: [
+            { title: _('Pick Axe') },
+            _('Item Type') + ': ' + _('Tool'),
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Rock'),
+              card: _('Rock'),
+            }),
+          ],
         },
         frame: { x: 2190, y: 880, w: 438, h: 438 },
         rotate: 0,
@@ -259,7 +297,9 @@ export default {
           text: [
             { title: _('Bandage') },
             _('Item Type') + ': ' + _('Tool'),
-            _('+1 Maximum Health'),
+            dojo.string.substitute(_('${number} Max Health'), {
+              number: '+1',
+            }),
             _('While equipped, on Death, remove item from game and revive as normal'),
             _('Does NOT give access to the Harvest deck'),
           ],
@@ -275,7 +315,9 @@ export default {
           text: [
             { title: _('Skull Shield') },
             _('Item Type') + ': ' + _('Tool'),
-            _('+1 Maximum Health while equipped'),
+            dojo.string.substitute(_('${number} Max Health'), {
+              number: '+1',
+            }),
             _('Ignore all damage from a Danger! Card, twice per day'),
           ],
         },

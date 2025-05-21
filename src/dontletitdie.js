@@ -1289,7 +1289,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           });
           break;
         case 'tooManyItems':
-          this.statusBar.addActionButton(_('Send To Camp'), () => {
+          this.statusBar.addActionButton(_('Send to Camp'), () => {
             this.bgaPerformAction('actSendToCamp', { sendToCampId: this.tooManyItemsScreen.getSelectedId() }).then(() =>
               this.tooManyItemsScreen.hide(),
             );

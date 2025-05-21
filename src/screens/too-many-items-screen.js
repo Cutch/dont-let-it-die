@@ -24,7 +24,7 @@ export class TooManyItemsScreen {
         'beforeend',
         `<div id="too-many-items-screen" class="dlid__container">
             <div id="tmi-items" class="dlid__container"><h3>${_(
-              gameData.selectionState.title ?? 'Select 1 to Send To Camp',
+              gameData.selectionState.title ?? 'Select 1 to send to camp',
             )}</h3><div class="items"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,

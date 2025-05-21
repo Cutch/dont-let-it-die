@@ -33,7 +33,7 @@ export default {
           text: [
             _("Something's not right... The hair on the back of your neck stands straight up, a great beast is near..."),
             {
-              title: _('Tame the beast.'),
+              title: _('Tame the beast'),
             },
             _(
               "Out of nowhere a beast emerges from a bush and pounces on you! You do your best to fight it off, but it's far too quick and you are easily overwhelmed. Defeated and covered in slobber, you hold up your new wolf pup friend. Give him a name! He doesn't seem to want to leave your side. Set this card next to your character. Spend 2 Stamina, roll the Fire Die. On a blank, take 1 Damage, otherwise take 1 Rock, once per day.",
@@ -57,7 +57,7 @@ export default {
               "You've been tasked with going to the river to get the Tribe some more water. While wading in the river, you feel pressure and a sharp pain in your ankle!",
             ),
             {
-              title: _('Make a snappy comeback.'),
+              title: _('Make a snappy comeback'),
             },
             _(
               'Take 1 Damage. You manage to shake it loose! It looks pretty angry though... Fight the Snapping Turtle in normal combat. S: +1 = 1 Damage | 1 Life If you win, take this card and flip it upside down.',
@@ -122,7 +122,7 @@ export default {
             _(
               'You try to run away, but the flying beast is much too fast! It grabs you in its talons and soars high into the sky. After struggling, you manage to break free, plummeting down to the ground. Take 2 Damage.',
             ),
-            { title: _('When in doubt, throw a rock.') },
+            { title: _('When in doubt, throw a rock') },
             _(
               'You may discard 1 Rock to roll the Fire Die. On a blank roll add the Rock token to this card. After 2 Rock tokens have been added, remove and discard them along with this card. Take 3 Meat tokens.',
             ),
@@ -200,7 +200,7 @@ export default {
           deck: 'day-event',
           text: [
             _("You notice you're being followed, out of the corner of your eye you see a weird looking lizard..."),
-            { title: _('Nope.') },
+            { title: _('Nope') },
             _('Roll the Fire Die, if you roll a blank, you escape without taking damage, otherwise, take 1 Damage.'),
             { title: _("It doesn't look that tough...") },
             _(
@@ -222,9 +222,9 @@ export default {
           deck: 'day-event',
           text: [
             _("After getting distracted by a shiny beetle, you find yourself lost in a part of the valley you've never seen before."),
-            { title: _('Climb a tree.') },
+            { title: _('Climb a tree') },
             _('Spend 2 Stamina to climb the tallest tree you can find, you see the camp off in the distance.'),
-            { title: _('Backtrack.') },
+            { title: _('Backtrack') },
             _('You follow your tracks back to the path, but all that extra walking took a toll on your empty stomach. Take 1 Damage.'),
           ],
         },
@@ -243,11 +243,11 @@ export default {
           text: [
             _("You spot a herd of Mammoths being chased by a Sabertooth. With all this commotion in the area, it's not safe to stay."),
             {
-              title: _('Sneak around.'),
+              title: _('Sneak around'),
             },
             _('You decide to chance it. Roll the Fire Die, if you get a blank, you lose 2 Stamina. Otherwise take 2 Meat.'),
             {
-              title: _('Head back to camp.'),
+              title: _('Head back to camp'),
             },
             _(
               'On the way back to the camp, you trip and fail, losing 1 Stamina. Luckily, it seems you tripped on a Berry bush. Take 2 Berries.',
@@ -365,7 +365,7 @@ export default {
           text: [
             { title: _('Paranoid') },
             _(
-              'When you have less than Max HP and you have enough food tokens to eat, you must always eat it immediately and before other tribe members.',
+              'When you have less than Max Health and you have enough food tokens to eat, you must always eat it immediately and before other tribe members.',
             ),
           ],
         },

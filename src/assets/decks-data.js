@@ -1110,8 +1110,12 @@ export default {
           type: 'card',
           deck: 'night-event',
           text: [
-            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your berries!'), {}),
-            _("Roll the Fire Die and remove that many fiber tokens from the group's supply."),
+            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your ${resource}!'), {
+              resource: _('Fiber'),
+            }),
+            dojo.string.substitute(_("Roll the Fire Die and remove that many ${resource} tokens from the group's supply."), {
+              resource: _('Fiber'),
+            }),
           ],
         },
         frame: {
@@ -1127,8 +1131,12 @@ export default {
           type: 'card',
           deck: 'night-event',
           text: [
-            _('A rival tribe snuck into your camp and tried to steal your berries!'),
-            _("Roll the Fire Die and remove that many berry tokens from the group's supply."),
+            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your ${resource}!'), {
+              resource: _('Berries'),
+            }),
+            dojo.string.substitute(_("Roll the Fire Die and remove that many ${resource} tokens from the group's supply."), {
+              resource: _('Berry'),
+            }),
           ],
         },
         frame: {
@@ -1284,8 +1292,12 @@ export default {
           type: 'card',
           deck: 'night-event',
           text: [
-            _('A rival tribe snuck into your camp and tried to steal your wood!'),
-            _("Roll the Fire Die and remove that many wood tokens from the group's supply."),
+            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your ${resource}!'), {
+              resource: _('Wood'),
+            }),
+            dojo.string.substitute(_("Roll the Fire Die and remove that many ${resource} tokens from the group's supply."), {
+              resource: _('Wood'),
+            }),
           ],
         },
         frame: {
@@ -1301,8 +1313,12 @@ export default {
           type: 'card',
           deck: 'night-event',
           text: [
-            _('A rival tribe snuck into your camp and tried to steal your rocks!'),
-            _("Roll the Fire Die and remove that many rock tokens from the group's supply."),
+            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your ${resource}!'), {
+              resource: _('Berries'),
+            }),
+            dojo.string.substitute(_("Roll the Fire Die and remove that many ${resource} tokens from the group's supply."), {
+              resource: _('Berries'),
+            }),
           ],
         },
         frame: {
@@ -1318,8 +1334,12 @@ export default {
           type: 'card',
           deck: 'night-event',
           text: [
-            _('A rival tribe snuck into your camp and tried to steal your meat!'),
-            _("Roll the Fire Die and remove that many meat tokens from the group's supply."),
+            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your ${resource}!'), {
+              resource: _('Meat'),
+            }),
+            dojo.string.substitute(_("Roll the Fire Die and remove that many ${resource} tokens from the group's supply."), {
+              resource: _('Meat'),
+            }),
           ],
         },
         frame: {
@@ -1338,7 +1358,7 @@ export default {
             _(
               'One of your tribe members tossed a plant they foraged into the fire. The smoke from the herb now creeping over the camp appears to have healing properties.',
             ),
-            _('Everyone heals 2 HP.'),
+            _('Everyone heals 2 Health.'),
           ],
         },
         frame: {
@@ -1539,7 +1559,7 @@ export default {
           text: [
             _('The sky lights up with a brilliant glow, followed shortly by a thundering boom. It looks like something fell from the sky!'),
             _(
-              'If anyone has at least 1 Stamp Mark over from the Day Phase, they may venture out in search of the falling star and take 1 Gemstone token of any color.',
+              'If anyone has at least 1 Stamp Mark over from the Day Phase, they may venture out in search of the falling star and take 1 Gem token of any color.',
             ),
           ],
         },
@@ -1699,7 +1719,9 @@ export default {
             _(
               "The tribe awakens to the sight of completely snow-covered mountains. It wouldn't be safe to try to venture up the mountain paths.",
             ),
-            _('You may not perform the Explore action today.'),
+            dojo.string.substitute(_('You may not perform the ${action} action today.'), {
+              resource: _('Explore'),
+            }),
           ],
         },
         frame: {
@@ -1756,7 +1778,9 @@ export default {
             _(
               'The sweltering heat combined with the storm from last night has made the valley very, very muggy, which is causing lots of issues with your crafting materials.',
             ),
-            _('You may not perform the Craft Item action today.'),
+            dojo.string.substitute(_('You may not perform the ${action} action today.'), {
+              resource: _('Craft'),
+            }),
           ],
         },
         frame: {
@@ -1772,8 +1796,12 @@ export default {
           type: 'card',
           deck: 'night-event',
           text: [
-            _('A rival tribe snuck into your camp and tried to steal your dino eggs!'),
-            _("Roll the Fire Die and remove that many dino egg tokens from the group's supply."),
+            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your ${resource}!'), {
+              resource: _('Dino Eggs'),
+            }),
+            dojo.string.substitute(_("Roll the Fire Die and remove that many ${resource} tokens from the group's supply."), {
+              resource: _('Dino Egg'),
+            }),
           ],
         },
         frame: {
@@ -1830,7 +1858,9 @@ export default {
             _(
               "The stream coming down the mountain has changed direction, the path you normally take to get to the Neighboring Tribe seem to have been washed out. You'll have to wait until the water recedes to pass.",
             ),
-            _('You may not perform the Trade with Neighboring Tribe action today.'),
+            dojo.string.substitute(_('You may not perform the ${action} action today.'), {
+              resource: _('Trade'),
+            }),
           ],
         },
         frame: {
@@ -1846,8 +1876,12 @@ export default {
           type: 'card',
           deck: 'night-event',
           text: [
-            _('A rival tribe snuck into your camp and tried to steal your gems!'),
-            _("Roll the Fire Die and remove that many gem tokens from the group's supply."),
+            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your ${resource}!'), {
+              resource: _('Gems'),
+            }),
+            dojo.string.substitute(_("Roll the Fire Die and remove that many ${resource} tokens from the group's supply."), {
+              resource: _('Gem'),
+            }),
           ],
         },
         frame: {
@@ -1863,8 +1897,12 @@ export default {
           type: 'card',
           deck: 'night-event',
           text: [
-            _('A rival tribe snuck into your camp and tried to steal your medicinal herbs!'),
-            _("Roll the Fire Die and remove that many medicinal herb tokens from the group's supply."),
+            dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your ${resource}!'), {
+              resource: _('Medicinal Herbs'),
+            }),
+            dojo.string.substitute(_("Roll the Fire Die and remove that many ${resource} tokens from the group's supply."), {
+              resource: _('Medicinal Herbs'),
+            }),
           ],
         },
         frame: {

@@ -1,3 +1,4 @@
+import dojo from 'dojo';
 export default {
   getData: () => ({
     sprites: {
@@ -5,7 +6,12 @@ export default {
         options: {
           type: 'item',
           itemType: 'necklace',
-          text: [{ title: _('Blue Necklace') }, _('+1 Max Health')],
+          text: [
+            { title: _('Blue Necklace') },
+            dojo.string.substitute(_('${number} Max Health'), {
+              number: '+1',
+            }),
+          ],
         },
         frame: {
           x: 0,
@@ -19,7 +25,12 @@ export default {
         options: {
           type: 'item',
           itemType: 'necklace',
-          text: [{ title: _('Yellow Necklace') }, _('+1 Max Stamina')],
+          text: [
+            { title: _('Yellow Necklace') },
+            dojo.string.substitute(_('${number} Max Stamina'), {
+              number: '+1',
+            }),
+          ],
         },
         frame: {
           x: 440,

@@ -11,19 +11,20 @@ class DLD_Decks
     private DLD_Game $game;
     private array $decks;
     private array $cachedData = [];
-    private static $decksNames = [
-        'explore',
-        'harvest',
-        'forage',
-        'hunt',
-        'gather',
-        'day-event',
-        'night-event',
-        'physical-hindrance',
-        'mental-hindrance',
-    ];
+    private array $decksNames;
     public function __construct(DLD_Game $game)
     {
+        $this->decksNames = [
+            'explore' => clienttranslate('Explore'),
+            'harvest' => clienttranslate('Harvest'),
+            'forage' => clienttranslate('Forage'),
+            'hunt' => clienttranslate('Hunt'),
+            'gather' => clienttranslate('Gather'),
+            'day-event' => clienttranslate('Day Event'),
+            'night-event' => clienttranslate('Night Event'),
+            'physical-hindrance' => clienttranslate('Physical Hindrance'),
+            'mental-hindrance' => clienttranslate('Mental Hindrance'),
+        ];
         $this->game = $game;
         foreach ($this->getAllDeckNames() as $deck) {
             $this->decks[$deck] = $this->game->initDeck(str_replace('-', '', $deck));
@@ -54,10 +55,14 @@ class DLD_Decks
     {
         return $this->decks[$name];
     }
+    public function getDeckName(string $name): string
+    {
+        return $this->decksNames[$name];
+    }
     public function getAllDeckNames(): array
     {
         return array_values(
-            array_filter(self::$decksNames, function ($name) {
+            array_filter(array_keys($this->decksNames), function ($name) {
                 return array_key_exists($name . '-back', $this->game->data->getDecks());
             })
         );
@@ -200,7 +205,7 @@ class DLD_Decks
             $this->getDeck($deck)->moveCard($cards[0]['id'], 'deck');
             $results = [
                 'deck' => $deck,
-                'deckName' => str_replace('-', ' ', $deck),
+                'deckName' => $this->getDeckName($deck),
             ];
             $this->game->getDecks($results);
             $this->game->notify('shuffle', '', $results);
@@ -215,7 +220,7 @@ class DLD_Decks
         unset($this->cachedData[$deck]);
         $results = [
             'deck' => $deck,
-            'deckName' => str_replace('-', ' ', $deck),
+            'deckName' => $this->getDeckName($deck),
         ];
         $this->game->getDecks($results);
         if ($notify) {

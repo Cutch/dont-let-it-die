@@ -16,7 +16,7 @@ export default {
       'berry-cooked': {
         options: {
           type: 'resource',
-          name: _('Berry Cooked'),
+          name: _('Cooked Berry'),
         },
         frame: {
           x: 339,
@@ -52,7 +52,7 @@ export default {
       'dino-egg-cooked': {
         options: {
           type: 'resource',
-          name: _('Dino Egg Cooked'),
+          name: _('Cooked Dino Egg'),
         },
         frame: {
           x: 113,
@@ -76,7 +76,7 @@ export default {
       'fish-cooked': {
         options: {
           type: 'resource',
-          name: _('Fish Cooked'),
+          name: _('Cooked Fish'),
         },
         frame: {
           x: 339,
@@ -172,7 +172,7 @@ export default {
       'meat-cooked': {
         options: {
           type: 'resource',
-          name: _('Meat Cooked'),
+          name: _('Cooked Meat'),
         },
         frame: {
           x: 565,

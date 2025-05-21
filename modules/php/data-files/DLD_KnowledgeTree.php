@@ -8,19 +8,22 @@ class DLD_KnowledgeTreeData
     {
         return [
             'warmth-1' => [
-                'name' => clienttranslate('Warmth 1'),
+                'name' => clienttranslate('Warmth'),
+                'name_suffix' => ' 1',
                 'onGetCharacterData' => function (DLD_Game $game, $item, &$data) {
                     $data['maxStamina'] = clamp($data['maxStamina'] + 1, 0, 10);
                 },
             ],
             'warmth-2' => [
-                'name' => clienttranslate('Warmth 2'),
+                'name' => clienttranslate('Warmth'),
+                'name_suffix' => ' 2',
                 'onGetCharacterData' => function (DLD_Game $game, $item, &$data) {
                     $data['maxStamina'] = clamp($data['maxStamina'] + 1, 0, 10);
                 },
             ],
             'warmth-3' => [
-                'name' => clienttranslate('Warmth 3'),
+                'name' => clienttranslate('Warmth'),
+                'name_suffix' => ' 3',
                 'onGetCharacterData' => function (DLD_Game $game, $item, &$data) {
                     $data['maxStamina'] = clamp($data['maxStamina'] + 1, 0, 10);
                 },
@@ -35,7 +38,8 @@ class DLD_KnowledgeTreeData
                 },
             ],
             'cooking-1' => [
-                'name' => clienttranslate('Cooking 1'),
+                'name' => clienttranslate('Cooking'),
+                'name_suffix' => ' 1',
                 'onGetActionSelectable' => function (DLD_Game $game, $obj, &$data) {
                     if ($data['action'] == 'actCook') {
                         array_push($data['selectable'], 'berry');
@@ -43,7 +47,8 @@ class DLD_KnowledgeTreeData
                 },
             ],
             'cooking-2' => [
-                'name' => clienttranslate('Cooking 2'),
+                'name' => clienttranslate('Cooking'),
+                'name_suffix' => ' 2',
                 'onGetActionSelectable' => function (DLD_Game $game, $obj, &$data) {
                     if ($data['action'] == 'actCook') {
                         array_push($data['selectable'], 'meat', 'fish', 'dino-egg');
@@ -51,21 +56,24 @@ class DLD_KnowledgeTreeData
                 },
             ],
             'crafting-1' => [
-                'name' => clienttranslate('Crafting 1'),
+                'name' => clienttranslate('Crafting'),
+                'name_suffix' => ' 1',
                 'onUse' => function (DLD_Game $game, $obj) {
                     $craftingLevel = $game->gameData->get('craftingLevel');
                     $game->gameData->set('craftingLevel', max($craftingLevel, 1));
                 },
             ],
             'crafting-2' => [
-                'name' => clienttranslate('Crafting 2'),
+                'name' => clienttranslate('Crafting'),
+                'name_suffix' => ' 2',
                 'onUse' => function (DLD_Game $game, $obj) {
                     $craftingLevel = $game->gameData->get('craftingLevel');
                     $game->gameData->set('craftingLevel', max($craftingLevel, 2));
                 },
             ],
             'crafting-3' => [
-                'name' => clienttranslate('Crafting 3'),
+                'name' => clienttranslate('Crafting'),
+                'name_suffix' => ' 3',
                 'onUse' => function (DLD_Game $game, $obj) {
                     $craftingLevel = $game->gameData->get('craftingLevel');
                     $game->gameData->set('craftingLevel', max($craftingLevel, 3));
@@ -79,7 +87,8 @@ class DLD_KnowledgeTreeData
                 },
             ],
             'resource-1' => [
-                'name' => clienttranslate('Resource 1'),
+                'name' => clienttranslate('Resource'),
+                'name_suffix' => ' 1',
                 'onResolveDraw' => function (DLD_Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
@@ -94,7 +103,8 @@ class DLD_KnowledgeTreeData
                 },
             ],
             'resource-2' => [
-                'name' => clienttranslate('Resource 2'),
+                'name' => clienttranslate('Resource'),
+                'name_suffix' => ' 2',
                 'onResolveDraw' => function (DLD_Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
@@ -109,7 +119,8 @@ class DLD_KnowledgeTreeData
                 },
             ],
             'hunt-1' => [
-                'name' => clienttranslate('Hunt 1'),
+                'name' => clienttranslate('Hunt'),
+                'name_suffix' => ' 1',
                 'onResolveDraw' => function (DLD_Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
@@ -124,7 +135,8 @@ class DLD_KnowledgeTreeData
                 },
             ],
             'forage-1' => [
-                'name' => clienttranslate('Forage 1'),
+                'name' => clienttranslate('Forage'),
+                'name_suffix' => ' 1',
                 'onResolveDraw' => function (DLD_Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
@@ -139,7 +151,8 @@ class DLD_KnowledgeTreeData
                 },
             ],
             'forage-2' => [
-                'name' => clienttranslate('Forage 2'),
+                'name' => clienttranslate('Forage'),
+                'name_suffix' => ' 2',
                 'onResolveDraw' => function (DLD_Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {

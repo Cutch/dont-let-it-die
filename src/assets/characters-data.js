@@ -1,3 +1,4 @@
+import dojo from 'dojo';
 export default {
   getData: () => ({
     sprites: {
@@ -25,7 +26,10 @@ export default {
             { title: 'Grub' },
             _('Grub can NOT perform the Hunt action'),
             _('Immediately escapes all Danger! cards'),
-            _('Take 1 Fiber when drawing a Gather card'),
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Fiber'),
+              card: _('Gather'),
+            }),
           ],
         },
         frame: {
@@ -40,7 +44,7 @@ export default {
           type: 'character',
           text: [
             { title: 'Kara' },
-            _('Eating food grants double HP'),
+            _('Eating food grants double Health'),
             _("Re-roll anybody's Investigate Fire action, once per day"),
             _('Add 2 stamina to anybody (Except Kara), once per day'),
           ],
@@ -94,7 +98,9 @@ export default {
             { title: 'Faye' },
             _('When Faye uses a Medicinal Herb on herself to remove a Physical Hindrance card, heal 1'),
             _('Spend Stamina, trade or take 1 Physical Hindrance from another Tribe Member'),
-            _('Starts with a Skull Shield'),
+            dojo.string.substitute(_('Starts with a ${item}!'), {
+              item: _('Skull Shield'),
+            }),
           ],
         },
         frame: {
@@ -147,7 +153,7 @@ export default {
             { title: 'Ayla' },
             _('Hunting costs Ayla 2 stamina'),
             _('Spend 1 Stamina to turn, 1 raw berry into 1 fiber'),
-            _('Heal 2 HP when killing a Danger! card, once per day'),
+            _('Heal 2 Health when killing a Danger! card, once per day'),
           ],
         },
         frame: {
@@ -197,9 +203,12 @@ export default {
           type: 'character',
           text: [
             { title: 'Tara' },
-            _('Gain 2 stamina when gaining HP from eating berries, once per day'),
-            _('Take 1 Berry when drawing a Forage card'),
-            _('Spend 2 stamina to heal any character for 1 HP'),
+            _('Gain 2 stamina when gaining Health from eating berries, once per day'),
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Berry'),
+              card: _('Forage'),
+            }),
+            _('Spend 2 stamina to heal any character for 1 Health'),
           ],
         },
         frame: {
@@ -214,8 +223,8 @@ export default {
           type: 'character',
           text: [
             { title: 'Nirv' },
-            _('When any tribe member kills a Danger! card, Nirv heals 1 HP'),
-            _('When drawing a Rival Tribe Night Event card, all tribe members heal 1 HP'),
+            _('When any tribe member kills a Danger! card, Nirv heals 1 Health'),
+            _('When drawing a Rival Tribe Night Event card, all tribe members heal 1 Health'),
             _('Nirv has a free Gather action, once per day'),
           ],
         },
@@ -234,7 +243,9 @@ export default {
             { title: 'Oof' },
             _('When Oof is part of the tribe, you may also revive characters with 6 Cooked Berries'),
             _('Spend 3 Stamina, remove 1 Physical Hindrance from any tribe member'),
-            _('Starts with a Mortar and Pestle'),
+            dojo.string.substitute(_('Starts with a ${item}!'), {
+              item: _('Mortar and Pestle'),
+            }),
           ],
         },
         frame: {
@@ -252,7 +263,9 @@ export default {
             { title: 'Rex' },
             _('Spend 2 Stamina to look at the top card from a Resource deck, place it back on top of the deck'),
             _('Spend 1 Stamina to move or place 1 Trap token by a Resource deck'),
-            _('Starts with a Fire Stick'),
+            dojo.string.substitute(_('Starts with a ${item}!'), {
+              item: _('Fire Stick'),
+            }),
           ],
         },
         frame: {
@@ -268,7 +281,7 @@ export default {
           text: [
             { title: 'Mabe' },
             _(
-              'When Mabe falls below 3 HP, roll the Fire die. A blank means Mabe gains 2 stamina, otherwise take 1 FKP. Once per day phase',
+              'When Mabe falls below 3 Health, roll the Fire die. A blank means Mabe gains 2 stamina, otherwise take 1 FKP. Once per day phase',
             ),
             _("If you have at least one resource, spend 3 stamina to 'copy' it and take another of the chosen resource type"),
             _('Can NOT perform the Investigate Fire action'),
@@ -286,7 +299,7 @@ export default {
           type: 'character',
           text: [
             { title: 'Nanuk' },
-            _('Nanuk can only eat Meat, but gains double HP from it'),
+            _('Nanuk can only eat Meat, but gains double Health from it'),
             _('Tribe members gain 1 FKP for every Danger! card they kill'),
             _('After killing a Danger! card, Nanuk may choose Hide or Bone in place of Meat'),
           ],
@@ -303,9 +316,11 @@ export default {
           type: 'character',
           text: [
             { title: 'Nibna' },
-            _('When Nibna eats food and her HP is 1, the food heals for double, once per day'),
-            _('Take 2 HP damage to heal the rest of the group 1 HP'),
-            _('Starts with a Bag'),
+            _('When Nibna eats food and her Health is 1, the food heals for double, once per day'),
+            _('Take 2 Health damage to heal the rest of the group 1 Health'),
+            dojo.string.substitute(_('Starts with a ${item}!'), {
+              item: _('Bag'),
+            }),
           ],
         },
         frame: {
@@ -321,7 +336,7 @@ export default {
           text: [
             { title: 'Zeebo' },
             _('Zeebo can NOT equip Tool items'),
-            _('Zeebo heals 1 HP every time he draws a berry card'),
+            _('Zeebo heals 1 Health every time he draws a berry card'),
             _('Spend 3 Stamina after drawing a resource card to take double the listed amount'),
           ],
         },
@@ -338,8 +353,13 @@ export default {
           text: [
             { title: 'Thunk' },
             _('Thunk can NOT perform Forage or Gather actions'),
-            _('Take 1 Meat when drawing a Hunt card'),
-            _('Starts with a Sharp Stick'),
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Meat'),
+              card: _('Hunt'),
+            }),
+            dojo.string.substitute(_('Starts with a ${item}!'), {
+              item: _('Sharp Stick'),
+            }),
           ],
         },
         frame: {
@@ -422,7 +442,7 @@ export default {
             _(
               'Investigate Fire actions cost Cali 2 Stamina. Call out what the roll will be before rolling. If correct, take double, otherwise take nothing',
             ),
-            _('When Cali eats Cooked food, pick between Healing double OR gaining 1 Max HP'),
+            _('When Cali eats Cooked food, pick between Healing double OR gaining 1 Max Health'),
             _("Starts with the 'Paranoid' Mental Hindrance"),
           ],
         },
@@ -484,7 +504,7 @@ export default {
             { title: 'Tooth' },
             _('Cannot use the Investigate Fire, Cook, Craft or Trade actions. Cannot equip Items'),
             _('When facing a Danger! card, resolve combat as if Tooth had a 2 Damage, 1 Range Weapon'),
-            _("On a Tribe member's turn, they may spend 2 Stamina to pet Tooth and gain 1 HP"),
+            _("On a Tribe member's turn, they may spend 2 Stamina to pet Tooth and gain 1 Health"),
           ],
         },
         frame: {
@@ -500,9 +520,9 @@ export default {
           type: 'character',
           text: [
             { title: 'Sooha' },
-            _('When rolling a 0 on an Investigate Fire action, lose 1 HP and gain 2 FKP'),
+            _('When rolling a 0 on an Investigate Fire action, lose 1 Health and gain 2 FKP'),
             _('Can spend Health as if it were Stamina'),
-            _('The Relaxation discovery gives Sooha a total of +4 Max HP and Heals him fully'),
+            _('The Relaxation discovery gives Sooha a total of +4 Max Health and Heals him fully'),
           ],
         },
         frame: {
@@ -518,7 +538,7 @@ export default {
           type: 'character',
           text: [
             { title: 'Samp' },
-            _('Once per Investigate Fire action, Samp may lose 1 HP to add 1 to the roll'),
+            _('Once per Investigate Fire action, Samp may lose 1 Health to add 1 to the roll'),
             _('When Samp takes any damage from a Danger! card, he gains 1 Stamina'),
             _('When a Tribe member rolls a 3 while Investigating the Fire, Samp gains 1 Max Stamina'),
           ],
@@ -536,7 +556,7 @@ export default {
           type: 'character',
           text: [
             { title: 'Yurt' },
-            _('When a Tribe member crafts an Item, Yurt picks anyone to gain 1 HP or 1 Stamina'),
+            _('When a Tribe member crafts an Item, Yurt picks anyone to gain 1 Health or 1 Stamina'),
             _('The craft action for the Tribe costs -2 Stamina'),
             _('Cannot be in the same tribe as Atouk'),
           ],

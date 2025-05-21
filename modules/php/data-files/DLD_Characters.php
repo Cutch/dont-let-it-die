@@ -782,7 +782,7 @@ class DLD_CharactersData
                 'skills' => [
                     'skill1' => [
                         'type' => 'skill',
-                        'name' => clienttranslate('Heal 1 HP'),
+                        'name' => clienttranslate('Heal 1 Health'),
                         'state' => ['playerTurn'],
                         'stamina' => 2,
                         'onUse' => function (DLD_Game $game, $skill) {
@@ -1100,7 +1100,6 @@ class DLD_CharactersData
                                 $game->gameData->destroyResource('trap');
                                 $game->activeCharacterEventLog(clienttranslate('${character_name} removed a ${name} from the game'), [
                                     ...$data['data']['card'],
-                                    'deck' => str_replace('-', ' ', $data['data']['deck']),
                                 ]);
                             }
                         },

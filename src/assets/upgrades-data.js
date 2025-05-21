@@ -1,3 +1,4 @@
+import dojo from 'dojo';
 export default {
   getData: () => ({
     sprites: {
@@ -177,7 +178,7 @@ export default {
           text: [
             { title: _('Jewelry') },
             { title: _('Cost') + ': ' + 5 },
-            _('Once per day, use a Craft action and spend 1 Gemstone and 1 Fiber to craft a Necklace. See rulebook for details'),
+            _('Once per day, use a Craft action and spend 1 Gems and 1 Fiber to craft a Necklace.'),
           ],
         },
         frame: {
@@ -274,7 +275,16 @@ export default {
       '3-A': {
         options: {
           type: 'upgrade',
-          text: [{ title: _('Hot Rock Sauna') }, { title: _('Cost') + ': ' + 6 }, _('+3 Max HP'), _('-1 Max Stamina')],
+          text: [
+            { title: _('Hot Rock Sauna') },
+            { title: _('Cost') + ': ' + 6 },
+            dojo.string.substitute(_('${number} Max Health'), {
+              number: '+3',
+            }),
+            dojo.string.substitute(_('${number} Max Stamina'), {
+              number: '-1',
+            }),
+          ],
         },
         frame: {
           x: 0,
@@ -286,7 +296,16 @@ export default {
       '3-B': {
         options: {
           type: 'upgrade',
-          text: [{ title: _('Hot Rock Walking') }, { title: _('Cost') + ': ' + 7 }, _('+2 Max Stamina'), _('-1 Max HP')],
+          text: [
+            { title: _('Hot Rock Walking') },
+            { title: _('Cost') + ': ' + 7 },
+            dojo.string.substitute(_('${number} Max Stamina'), {
+              number: '+2',
+            }),
+            dojo.string.substitute(_('${number} Max Health'), {
+              number: '-1',
+            }),
+          ],
         },
         frame: {
           x: 276,
@@ -301,7 +320,7 @@ export default {
           text: [
             { title: _('Smoked Food') },
             { title: _('Cost') + ': ' + 4 },
-            _('Eating Food: Excess healing over max HP may be given to a tribe member'),
+            _('Eating Food: Excess healing over Max Health may be given to a tribe member'),
           ],
         },
         frame: {
@@ -382,7 +401,7 @@ export default {
           text: [
             { title: _('Meditation') },
             { title: _('Cost') + ': ' + 5 },
-            _('All tribe members instantly heal back up to their Max HP when this is unlocked'),
+            _('All tribe members instantly heal back up to their Max Health when this is unlocked'),
           ],
         },
         frame: {

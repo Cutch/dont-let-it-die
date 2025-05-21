@@ -462,8 +462,8 @@ class DLD_Game extends \Table
         array_key_exists('onUse', $knowledgeObj) ? $knowledgeObj['onUse']($this, $knowledgeObj) : null;
         $this->notify('notify', clienttranslate('${character_name} unlocked ${knowledge_name}${knowledge_name_suffix}'), [
             'knowledgeId' => $knowledgeId,
-            'knowledge_name' => $this->data->getKnowledgeTree()[$knowledgeId]['name'],
-            'knowledge_name_suffix' => $this->data->getKnowledgeTree()[$knowledgeId]['name_suffix'],
+            'knowledge_name' => $knowledgeObj['name'],
+            'knowledge_name_suffix' => array_key_exists('name_suffix', $knowledgeObj) ? $knowledgeObj['name_suffix'] : '',
         ]);
         $this->hooks->onUnlock($knowledgeObj);
         $this->setLastAction('actSpendFKP');
@@ -933,7 +933,7 @@ class DLD_Game extends \Table
                 if (!$data['cancel']) {
                     $card = $this->decks->pickCard($deck);
                     $this->activeCharacterEventLog(clienttranslate('${character_name} draws from the ${deck} deck'), [
-                        'deck' => str_replace('-', ' ', $deck),
+                        'deck' => $this->decks->getDeckName($deck),
                     ]);
                 }
                 return ['deck' => $deck, 'card' => [...$card], ...$data];
@@ -1178,22 +1178,16 @@ class DLD_Game extends \Table
                 if ($card['deckType'] == 'resource') {
                     $this->adjustResource($card['resourceType'], $card['count']);
 
-                    $this->activeCharacterEventLog(clienttranslate('${character_name} found ${count} ${name}'), [
-                        ...$card,
-                        'deck' => str_replace('-', ' ', $deck),
-                    ]);
+                    $this->activeCharacterEventLog(clienttranslate('${character_name} found ${count} ${name}'), [...$card]);
                 } elseif ($card['deckType'] == 'encounter') {
                     // Change state and check for health/damage modifications
                     $this->activeCharacterEventLog(
                         clienttranslate('${character_name} encountered a ${name} (${health} health, ${damage} damage)'),
-                        [...$card, 'deck' => str_replace('-', ' ', $deck)]
+                        [...$card]
                     );
                 } elseif ($card['deckType'] == 'nothing') {
                     if (!$this->isValidExpansion('mini-expansion')) {
-                        $this->activeCharacterEventLog(clienttranslate('${character_name} did nothing'), [
-                            'deck' => str_replace('-', ' ', $deck),
-                            ...$card,
-                        ]);
+                        $this->activeCharacterEventLog(clienttranslate('${character_name} did nothing'));
                     }
                 } elseif ($card['deckType'] == 'physical-hindrance' || $card['deckType'] == 'mental-hindrance') {
                 } else {

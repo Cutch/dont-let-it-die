@@ -1,21 +1,154 @@
+import dojo from 'dojo';
 export default {
   getData: () => ({
     sprites: {
-      'warmth-1': { options: { text: [{ title: _('Warmth 1') }, _('+1 Max Stamina')] } },
-      'warmth-2': { options: { text: [{ title: _('Warmth 2') }, _('+1 Max Stamina')] } },
-      'warmth-3': { options: { text: [{ title: _('Warmth 3') }, _('+1 Max Stamina')] } },
-      'cooking-1': { options: { text: [{ title: _('Cooking 1') }, _('Unlocks Cooked Berries')] } },
-      'cooking-2': { options: { text: [{ title: _('Cooking 2') }, _('Unlocks Cooked Meat')] } },
-      'crafting-1': { options: { text: [{ title: _('Crafting 1') }, _('Allows crafting all items marked with a yellow circle')] } },
-      'crafting-2': { options: { text: [{ title: _('Crafting 2') }, _('Allows crafting all items marked with a blue circle')] } },
-      'crafting-3': { options: { text: [{ title: _('Crafting 3') }, _('Allows crafting all items marked with a red circle')] } },
-      spices: { options: { text: [{ title: _('Spices') }, _('Eating food grants +1 HP')] } },
-      relaxation: { options: { text: [{ title: _('Relaxation') }, _('+2 Max HP, instantly heal +2 HP when unlocked')] } },
-      'forage-1': { options: { text: [{ title: _('Forage 1') }, _('+1 berries when you draw berries')] } },
-      'forage-2': { options: { text: [{ title: _('Forage 2') }, _('+1 fiber when you draw fiber')] } },
-      'resource-1': { options: { text: [{ title: _('Resource 1') }, _('+1 rock when you draw rocks')] } },
-      'resource-2': { options: { text: [{ title: _('Resource 2') }, _('+1 wood when you draw wood')] } },
-      'hunt-1': { options: { text: [{ title: _('Hunt 1') }, _('+1 meat when you draw meat')] } },
+      'warmth-1': {
+        options: {
+          text: [
+            { title: _('Warmth') + ' 1' },
+            dojo.string.substitute(_('${number} Max Stamina'), {
+              number: '+1',
+            }),
+          ],
+        },
+      },
+      'warmth-2': {
+        options: {
+          text: [
+            { title: _('Warmth') + ' 2' },
+            dojo.string.substitute(_('${number} Max Stamina'), {
+              number: '+1',
+            }),
+          ],
+        },
+      },
+      'warmth-3': {
+        options: {
+          text: [
+            { title: _('Warmth') + ' 3' },
+            dojo.string.substitute(_('${number} Max Stamina'), {
+              number: '+1',
+            }),
+          ],
+        },
+      },
+      'cooking-1': {
+        options: {
+          text: [
+            { title: _('Cooking') + ' 1' },
+            dojo.string.substitute(_('Unlocks Cooked ${resource}'), {
+              resource: _('Berries'),
+            }),
+          ],
+        },
+      },
+      'cooking-2': {
+        options: {
+          text: [
+            { title: _('Cooking') + ' 2' },
+            dojo.string.substitute(_('Unlocks Cooked ${resource}'), {
+              resource: _('Meat'),
+            }),
+          ],
+        },
+      },
+      'crafting-1': {
+        options: {
+          text: [
+            { title: _('Crafting') + ' 1' },
+            dojo.string.substitute(_('Allows crafting all items marked with a ${color} circle'), {
+              resource: _('yellow'),
+            }),
+          ],
+        },
+      },
+      'crafting-2': {
+        options: {
+          text: [
+            { title: _('Crafting') + ' 2' },
+            dojo.string.substitute(_('Allows crafting all items marked with a ${color} circle'), {
+              resource: _('blue'),
+            }),
+          ],
+        },
+      },
+      'crafting-3': {
+        options: {
+          text: [
+            { title: _('Crafting') + ' 3' },
+            dojo.string.substitute(_('Allows crafting all items marked with a ${color} circle'), {
+              resource: _('red'),
+            }),
+          ],
+        },
+      },
+      spices: { options: { text: [{ title: _('Spices') }, _('Eating food grants +1 Health')] } },
+      relaxation: {
+        options: {
+          text: [
+            { title: _('Relaxation') },
+            dojo.string.substitute(_('${number} Max Health'), {
+              number: '+2',
+            }),
+            _('instantly heal +2 Health when unlocked'),
+          ],
+        },
+      },
+      'forage-1': {
+        options: {
+          text: [
+            { title: _('Forage') + ' 1' },
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Berry'),
+              card: _('Berry'),
+            }),
+          ],
+        },
+      },
+      'forage-2': {
+        options: {
+          text: [
+            { title: _('Forage') + ' 2' },
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Fiber'),
+              card: _('Fiber'),
+            }),
+          ],
+        },
+      },
+      'resource-1': {
+        options: {
+          text: [
+            { title: _('Resource') + ' 1' },
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Rock'),
+              card: _('Rock'),
+            }),
+          ],
+        },
+      },
+      'resource-2': {
+        options: {
+          text: [
+            { title: _('Resource') + ' 2' },
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Wood'),
+              card: _('Wood'),
+            }),
+          ],
+        },
+      },
+      'hunt-1': {
+        options: {
+          text: [
+            { title: _('Hunt') + ' 1' },
+            dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
+              resource: _('Meat'),
+              card: _('Meat'),
+            }),
+          ],
+        },
+      },
       'fire-starter': { options: { text: [{ title: _('Fire Starter') }, _('WIN!')] } },
       'knowledge-tree-easy': {
         upgrades: {
