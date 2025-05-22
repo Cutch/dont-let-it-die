@@ -50,18 +50,9 @@ export default {
         },
         rotate: 0,
       },
-      instructions: {
-        frame: {
-          x: 2173,
-          y: 1,
-          w: 722,
-          h: 1468,
-        },
-        rotate: 90,
-      },
       board: {
         frame: {
-          x: 2897,
+          x: 2173,
           y: 1,
           w: 722,
           h: 1468,
@@ -74,7 +65,7 @@ export default {
       image: 'boards-spritesheet.png',
       css: 'boards-card',
       size: {
-        w: 3621,
+        w: 2897,
         h: 1470,
       },
       scale: '1',

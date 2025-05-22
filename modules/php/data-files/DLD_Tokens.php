@@ -7,54 +7,6 @@ class DLD_TokensData
     public function getData(): array
     {
         return [
-            '1-token' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '1-unlocked' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '2-token' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '2-unlocked' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '3-token' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '3-unlocked' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '4-token' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '4-unlocked' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '5-token' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '5-unlocked' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '6-token' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
-            '6-unlocked' => [
-                'count' => 1,
-                'type' => 'token',
-            ],
             'berry' => [
                 'count' => 8,
                 'type' => 'resource',

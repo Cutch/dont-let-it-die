@@ -1,169 +1,13 @@
 export default {
   getData: () => ({
     sprites: {
-      berry: {
-        options: {
-          type: 'resource',
-          name: _('Berry'),
-        },
-        frame: {
-          x: 226,
-          y: 226,
-          w: 111,
-          h: 111,
-        },
-      },
-      'berry-cooked': {
-        options: {
-          type: 'resource',
-          name: _('Cooked Berry'),
-        },
-        frame: {
-          x: 339,
-          y: 226,
-          w: 111,
-          h: 111,
-        },
-      },
-      bone: {
-        options: {
-          type: 'resource',
-          name: _('Bone'),
-        },
-        frame: {
-          x: 452,
-          y: 226,
-          w: 111,
-          h: 111,
-        },
-      },
-      'dino-egg': {
-        options: {
-          type: 'resource',
-          name: _('Dino Egg'),
-        },
-        frame: {
-          x: 0,
-          y: 339,
-          w: 111,
-          h: 111,
-        },
-      },
-      'dino-egg-cooked': {
-        options: {
-          type: 'resource',
-          name: _('Cooked Dino Egg'),
-        },
-        frame: {
-          x: 113,
-          y: 339,
-          w: 111,
-          h: 111,
-        },
-      },
-      fish: {
-        options: {
-          type: 'resource',
-          name: _('Fish'),
-        },
-        frame: {
-          x: 226,
-          y: 339,
-          w: 111,
-          h: 111,
-        },
-      },
-      'fish-cooked': {
-        options: {
-          type: 'resource',
-          name: _('Cooked Fish'),
-        },
-        frame: {
-          x: 339,
-          y: 339,
-          w: 111,
-          h: 111,
-        },
-      },
-      fkp: {
-        options: {
-          type: 'resource',
-          name: _('Fire Knowledge Point'),
-        },
-        frame: {
-          x: 452,
-          y: 339,
-          w: 111,
-          h: 111,
-        },
-      },
-      'fkp-unlocked': {
-        options: {
-          type: 'resource',
-          name: _('Unlocked Fire Knowledge Point'),
-        },
-        frame: {
-          x: 0,
-          y: 452,
-          w: 111,
-          h: 111,
-        },
-      },
-      'gem-b': {
-        options: {
-          type: 'resource',
-          name: _('Gem'),
-        },
-        frame: {
-          x: 113,
-          y: 452,
-          w: 111,
-          h: 111,
-        },
-      },
-      'gem-p': {
-        options: {
-          type: 'resource',
-          name: _('Gem'),
-        },
-        frame: {
-          x: 226,
-          y: 452,
-          w: 111,
-          h: 111,
-        },
-      },
-      'gem-y': {
-        options: {
-          type: 'resource',
-          name: _('Gem'),
-        },
-        frame: {
-          x: 339,
-          y: 452,
-          w: 111,
-          h: 111,
-        },
-      },
-      fiber: {
-        options: {
-          type: 'resource',
-          name: _('Fiber'),
-        },
-        frame: {
-          x: 452,
-          y: 452,
-          w: 111,
-          h: 111,
-        },
-      },
       hide: {
         options: {
           type: 'resource',
           name: _('Hide'),
         },
         frame: {
-          x: 565,
+          x: 0,
           y: 0,
           w: 111,
           h: 111,
@@ -175,8 +19,164 @@ export default {
           name: _('Cooked Meat'),
         },
         frame: {
-          x: 565,
+          x: 113,
+          y: 0,
+          w: 111,
+          h: 111,
+        },
+      },
+      berry: {
+        options: {
+          type: 'resource',
+          name: _('Berry'),
+        },
+        frame: {
+          x: 226,
+          y: 0,
+          w: 111,
+          h: 111,
+        },
+      },
+      'berry-cooked': {
+        options: {
+          type: 'resource',
+          name: _('Cooked Berry'),
+        },
+        frame: {
+          x: 339,
+          y: 0,
+          w: 111,
+          h: 111,
+        },
+      },
+      bone: {
+        options: {
+          type: 'resource',
+          name: _('Bone'),
+        },
+        frame: {
+          x: 452,
+          y: 0,
+          w: 111,
+          h: 111,
+        },
+      },
+      'dino-egg': {
+        options: {
+          type: 'resource',
+          name: _('Dino Egg'),
+        },
+        frame: {
+          x: 0,
           y: 113,
+          w: 111,
+          h: 111,
+        },
+      },
+      'dino-egg-cooked': {
+        options: {
+          type: 'resource',
+          name: _('Cooked Dino Egg'),
+        },
+        frame: {
+          x: 113,
+          y: 113,
+          w: 111,
+          h: 111,
+        },
+      },
+      fish: {
+        options: {
+          type: 'resource',
+          name: _('Fish'),
+        },
+        frame: {
+          x: 226,
+          y: 113,
+          w: 111,
+          h: 111,
+        },
+      },
+      'fish-cooked': {
+        options: {
+          type: 'resource',
+          name: _('Cooked Fish'),
+        },
+        frame: {
+          x: 339,
+          y: 113,
+          w: 111,
+          h: 111,
+        },
+      },
+      fkp: {
+        options: {
+          type: 'resource',
+          name: _('Fire Knowledge Point'),
+        },
+        frame: {
+          x: 452,
+          y: 113,
+          w: 111,
+          h: 111,
+        },
+      },
+      'fkp-unlocked': {
+        options: {
+          type: 'resource',
+          name: _('Unlocked Fire Knowledge Point'),
+        },
+        frame: {
+          x: 0,
+          y: 226,
+          w: 111,
+          h: 111,
+        },
+      },
+      'gem-b': {
+        options: {
+          type: 'resource',
+          name: _('Gem'),
+        },
+        frame: {
+          x: 113,
+          y: 226,
+          w: 111,
+          h: 111,
+        },
+      },
+      'gem-p': {
+        options: {
+          type: 'resource',
+          name: _('Gem'),
+        },
+        frame: {
+          x: 226,
+          y: 226,
+          w: 111,
+          h: 111,
+        },
+      },
+      'gem-y': {
+        options: {
+          type: 'resource',
+          name: _('Gem'),
+        },
+        frame: {
+          x: 339,
+          y: 226,
+          w: 111,
+          h: 111,
+        },
+      },
+      fiber: {
+        options: {
+          type: 'resource',
+          name: _('Fiber'),
+        },
+        frame: {
+          x: 452,
+          y: 226,
           w: 111,
           h: 111,
         },
@@ -188,7 +188,7 @@ export default {
         },
         frame: {
           x: 565,
-          y: 226,
+          y: 0,
           w: 111,
           h: 111,
         },
@@ -200,7 +200,7 @@ export default {
         },
         frame: {
           x: 565,
-          y: 339,
+          y: 113,
           w: 111,
           h: 111,
         },
@@ -212,7 +212,7 @@ export default {
         },
         frame: {
           x: 565,
-          y: 452,
+          y: 226,
           w: 111,
           h: 111,
         },
@@ -224,7 +224,7 @@ export default {
         },
         frame: {
           x: 0,
-          y: 565,
+          y: 339,
           w: 111,
           h: 111,
         },
@@ -236,7 +236,7 @@ export default {
         },
         frame: {
           x: 113,
-          y: 565,
+          y: 339,
           w: 111,
           h: 111,
         },
@@ -248,7 +248,7 @@ export default {
         },
         frame: {
           x: 226,
-          y: 565,
+          y: 339,
           w: 111,
           h: 111,
         },
@@ -260,7 +260,7 @@ export default {
       css: 'token-card',
       size: {
         w: 678,
-        h: 678,
+        h: 452,
       },
       scale: '1',
     },
