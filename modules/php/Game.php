@@ -97,10 +97,10 @@ class Game extends \Table
                 $args['character_name'] = $this->getCharacterHTML();
             }
             if (!array_key_exists('player_name', $args) && str_contains($message, '${player_name}')) {
-                if (array_key_exists('player_id', $args)) {
-                    $args['player_name'] = $this->getPlayerNameById($args['player_id']);
+                if (array_key_exists('playerId', $args)) {
+                    $args['player_name'] = $this->getPlayerNameById($args['playerId']);
                 } elseif (array_key_exists('character_name', $args)) {
-                    $playerId = (int) $this->character->getCharacterData($args['character_name'])['player_id'];
+                    $playerId = (int) $this->character->getCharacterData($args['character_name'])['playerId'];
                     $args['player_name'] = $this->getPlayerNameById($playerId);
                 } else {
                     $playerId = (int) $this->getActivePlayerId();
@@ -139,7 +139,7 @@ class Game extends \Table
             $char = $this->character->getSubmittingCharacter();
             $name = $char['character_name'];
         }
-        $playerName = $this->getPlayerNameById($char['player_id']);
+        $playerName = $this->getPlayerNameById($char['playerId']);
         $playerColor = $char['player_color'];
         return "<!--PNS--><span class=\"playername\" style=\"color:#$playerColor;\">$name ($playerName)</span><!--PNE-->";
     }
@@ -653,8 +653,6 @@ class Game extends \Table
             func_get_args(),
             [$this->hooks, 'onUseHerb'],
             function (Game $_this) {
-                // $this->log('onUseHerb');
-                // $this->actions->validateCanRunAction('actUseHerb');
                 return ['herb' => 1];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {}
@@ -731,10 +729,8 @@ class Game extends \Table
             function (Game $_this) use ($skillId, $optionValue) {
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 // $this->character->addExtraTime();
-                // $this->log('$skillId', $skillId);
                 $_this->actions->validateCanRunAction('actUseSkill', $skillId);
                 $res = $_this->character->getSkill($skillId);
-                // $this->log('$res', $res);
                 $skill = $res['skill'];
                 $character = $res['character'];
                 $_this->character->setSubmittingCharacter(null);
@@ -770,7 +766,6 @@ class Game extends \Table
                     // var_dump(json_encode([array_key_exists('onUse', $skill)]));
                     $result = array_key_exists('onUse', $skill) ? $skill['onUse']($this, $skill, $character) : null;
                     if (!$result || !array_key_exists('spendActionCost', $result) || $result['spendActionCost'] != false) {
-                        // $this->log('$spendActionCost', $skillId);
                         $_this->actions->spendActionCost('actUseSkill', $skillId);
                     }
                     if (!$notificationSent && (!$result || !array_key_exists('notify', $result) || $result['notify'] != false)) {
@@ -801,7 +796,6 @@ class Game extends \Table
                 $_this->character->setSubmittingCharacter('actUseItem', $skillId);
                 // $this->character->addExtraTime();
                 $_this->actions->validateCanRunAction('actUseItem', $skillId);
-                // $this->log('validateCanRunAction', $skillId);
                 $character = $this->character->getSubmittingCharacter();
 
                 $skills = $this->actions->getActiveEquipmentSkills();
@@ -817,7 +811,6 @@ class Game extends \Table
                 $skill = $data['skill'];
                 $character = $data['character'];
                 $skillId = $data['skillId'];
-                $this->log('end', $skillId);
 
                 $skills = $this->actions->getActiveEquipmentSkills();
                 $_this->hooks->reconnectHooks($skill, $skills[$skillId]);
@@ -1567,7 +1560,6 @@ class Game extends \Table
                 return $d['player_no'] == 1;
             })
         );
-        $this->log($players);
         $this->gamestate->setPlayersMultiactive([$players[0]['player_id']], 'playerTurn');
         foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
             $this->giveExtraTime((int) $playerId);
@@ -1942,7 +1934,6 @@ class Game extends \Table
     public function getActiveNightCards(): array
     {
         $activeNightCards = $this->getActiveNightCardIds();
-        $this->log($this->data->getDecks());
         return array_map(function ($cardId) {
             $card = $this->data->getDecks()[$cardId];
             return $card;
@@ -2208,6 +2199,29 @@ class Game extends \Table
         $this->activeNextPlayer();
     }
 
+    public function zombieBack(): void
+    {
+        $returningPlayerId = $this->getCurrentPlayerId();
+        $this->character->unZombiePlayer($returningPlayerId);
+        $this->character->clearCache();
+
+        $stateName = $this->gamestate->state()['name'];
+        $stateType = $this->gamestate->state()['type'];
+        $this->log($stateName, $stateType, $returningPlayerId, $this->character->getTurnCharacter()['playerId']);
+        if ($stateType === 'activeplayer') {
+            if ($returningPlayerId == $this->character->getTurnCharacter()['playerId']) {
+                $this->nextState('changeZombiePlayer');
+                $this->gamestate->changeActivePlayer($returningPlayerId);
+                $this->nextState($stateName);
+            }
+        } elseif ($stateType === 'multipleactiveplayer') {
+            $this->gameData->resetMultiActiveCharacter();
+        }
+        $this->notify('zombieBackDLD', '', [
+            'gameData' => $this->getAllDatas(),
+        ]);
+        $this->completeAction(false);
+    }
     /**
      * This method is called each time it is the turn of a player who has quit the game (= "zombie" player).
      * You can do whatever you want in order to make sure the turn of this player ends appropriately
@@ -2226,26 +2240,57 @@ class Game extends \Table
      */
     protected function zombieTurn(array $state, int $active_player): void
     {
-        $state_name = $state['name'];
+        $this->undo->clearUndoHistory();
+
+        $stateName = $state['name'];
+        $characters = $this->character->getAllCharacterData(true);
+        $mapping = [];
+        $charactersToMove = [];
+        array_walk($characters, function ($char) use ($active_player, &$mapping, &$charactersToMove) {
+            $charPId = (int) $char['playerId'];
+            if ($charPId == (int) $active_player) {
+                array_push($charactersToMove, $char['id']);
+            } else {
+                if (!array_key_exists($charPId, $mapping)) {
+                    $mapping[$charPId] = [];
+                }
+                array_push($mapping[$charPId], $char['id']);
+            }
+        });
+
+        array_walk($charactersToMove, function ($charId) use ($active_player, &$mapping, &$charactersToMove) {
+            $minPlayerId = 0;
+            $minCount = 99;
+            array_walk($mapping, function ($v, $k) use (&$minCount, &$minPlayerId) {
+                if (sizeof($v) < $minCount) {
+                    $minPlayerId = $k;
+                }
+            });
+            array_push($mapping[$minPlayerId], $charId);
+            $this->character->assignNecromancer($minPlayerId, $charId);
+        });
+        $this->character->clearCache();
 
         if ($state['type'] === 'activeplayer') {
-            switch ($state_name) {
-                default:
-                    $this->nextState('zombiePass');
-                    break;
-            }
+            $currentCharId = $this->character->getTurnCharacterId();
+            $newPlayerId = array_keys(
+                array_filter($mapping, function ($v) use ($currentCharId) {
+                    return array_search($currentCharId, $v);
+                })
+            )[0];
 
-            return;
+            $this->nextState('changeZombiePlayer');
+            $this->gamestate->changeActivePlayer($newPlayerId);
+            $this->nextState($stateName);
+        } elseif ($state['type'] === 'multipleactiveplayer') {
+            $this->gameData->resetMultiActiveCharacter();
         }
-
-        // Make sure player is in a non-blocking status for role turn.
-        if ($state['type'] === 'multipleactiveplayer') {
-            $this->gamestate->setPlayerNonMultiactive($active_player, '');
-            return;
-        }
-
-        throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
+        $this->notify('zombieChange', '', [
+            'gameData' => $this->getAllDatas(),
+        ]);
+        $this->completeAction(false);
     }
+
     // TEST FUNCTIONS START HERE
     public function giveResources()
     {

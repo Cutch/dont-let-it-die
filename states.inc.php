@@ -119,6 +119,7 @@ $machinestates = [
             'itemSelection' => 19,
             'interrupt' => 22,
             'cardSelection' => 17,
+            'changeZombiePlayer' => 97,
         ],
     ],
     11 => [
@@ -226,7 +227,7 @@ $machinestates = [
         'action' => 'stPostEncounter',
         'args' => 'argPostEncounter',
         'possibleactions' => [],
-        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'drawCard' => 11],
+        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'drawCard' => 11, 'changeZombiePlayer' => 97],
     ],
     22 => [
         'name' => 'interrupt',
@@ -259,7 +260,7 @@ $machinestates = [
         'type' => 'activeplayer',
         'args' => 'argWhichWeapon',
         'possibleactions' => ['actChooseWeapon'],
-        'transitions' => ['resolveEncounter' => 20],
+        'transitions' => ['resolveEncounter' => 20, 'changeZombiePlayer' => 97],
     ],
     24 => [
         'name' => 'dayEvent',
@@ -280,6 +281,7 @@ $machinestates = [
             'cardSelection' => 17,
             'hindranceSelection' => 18,
             'resolveEncounter' => 20,
+            'changeZombiePlayer' => 97,
         ],
     ],
     27 => [
@@ -300,7 +302,7 @@ $machinestates = [
         'type' => 'activeplayer',
         'action' => 'stDinnerPhasePost',
         'possibleactions' => [],
-        'transitions' => ['nightPhase' => 30],
+        'transitions' => ['nightPhase' => 30, 'changeZombiePlayer' => 97],
         'initialprivate' => 29,
     ],
     29 => [
@@ -406,14 +408,12 @@ $machinestates = [
         'possibleactions' => [],
         'transitions' => ['tradePhaseActions' => 61],
     ],
-    // 97 => [
-    //     'name' => 'postActionPhase',
-    //     'descriptionmyturn' => clienttranslate('Resolving'),
-    //     'type' => 'activePlayer',
-    //     'action' => 'stPostActionPhase',
-    //     'possibleactions' => ['actUseSkill', 'actUseItem'],
-    //     'transitions' => [],
-    // ],
+    97 => [
+        'name' => 'changeZombiePlayer',
+        'descriptionmyturn' => clienttranslate('Waiting for other players'),
+        'type' => 'game',
+        'transitions' => [],
+    ],
     // Final state.
     // Please do not modify (and do not overload action/args methods).
     98 => [
@@ -425,6 +425,7 @@ $machinestates = [
         'args' => 'argGameEnd',
     ],
 ];
-// foreach ($machinestates as $key => $state) {
-//     $machinestates[97]['transitions'][$key] = $state['name'];
-// }
+
+foreach ($machinestates as $key => $state) {
+    $machinestates[97]['transitions'][$state['name']] = $key;
+}

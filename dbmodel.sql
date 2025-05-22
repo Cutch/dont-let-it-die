@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 CREATE TABLE IF NOT EXISTS `character` (
     `character_name` varchar(10) NOT NULL,
     `player_id` int(10) unsigned NOT NULL,
+    `necromancer_player_id` int(10) unsigned NULL,
     `item_1` int(10) unsigned NULL,
     `item_2` int(10) unsigned NULL,
     `item_3` int(10) unsigned NULL,
@@ -110,6 +111,7 @@ CREATE TABLE IF NOT EXISTS `character` (
     FOREIGN KEY (item_2) REFERENCES item(item_id),
     FOREIGN KEY (item_3) REFERENCES item(item_id),
     FOREIGN KEY (player_id) REFERENCES player(player_id),
+    FOREIGN KEY (necromancer_player_id) REFERENCES player(player_id),
     PRIMARY KEY (`character_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 CREATE TABLE IF NOT EXISTS `undoState` (

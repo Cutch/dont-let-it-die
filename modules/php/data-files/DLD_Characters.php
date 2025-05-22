@@ -1526,7 +1526,6 @@ class DLD_CharactersData
                     $data['count'] = 2;
                 },
                 'onGetUnlockCost' => function (Game $game, $unlock, &$data) {
-                    $game->log($data);
                     if (str_contains($data['id'], 'crafting')) {
                         $data['unlockCost'] -= 2;
                     }

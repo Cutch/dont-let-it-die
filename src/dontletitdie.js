@@ -129,7 +129,6 @@ declare('bgagame.dontletitdie', Gamegui, {
   updatePlayers: function (gameData) {
     // If character selection, keep removing characters
     if (gameData.gamestate?.name === 'characterSelect') document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
-
     const scale = 3;
     Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character, i) => {
       // Player side board
@@ -916,7 +915,11 @@ declare('bgagame.dontletitdie', Gamegui, {
     Object.assign(this.gamedatas, clone);
   },
   isActive: function () {
-    return this.getActivePlayers().includes(this.player_id.toString()) || this.isPlayerActive();
+    return (
+      this.getActivePlayers()
+        .map((d) => d.toString())
+        .includes(this.player_id.toString()) || gameui.isPlayerActive()
+    );
   },
   ///////////////////////////////////////////////////
   //// Game & client states
@@ -1475,6 +1478,8 @@ declare('bgagame.dontletitdie', Gamegui, {
     //            during 3 seconds after calling the method in order to let the players
     //            see what is happening in the game.
 
+    dojo.subscribe('zombieBackDLD', this, 'notif_zombieBack');
+    dojo.subscribe('zombieChange', this, 'notif_zombieChange');
     dojo.subscribe('activeCharacter', this, 'notif_tokenUsed');
     dojo.subscribe('tradeItem', this, 'notif_tradeItem');
     dojo.subscribe('tokenUsed', this, 'notif_tokenUsed');
@@ -1513,8 +1518,12 @@ declare('bgagame.dontletitdie', Gamegui, {
     for (const logId of Object.keys(gameui.log_to_move_id)) {
       const moveId = parseInt(gameui.log_to_move_id[logId], 10);
       if (moveId > lastMoveId) {
-        $(`log_${logId}`).remove();
-        $(`dockedlog_${logId}`).remove();
+        try {
+          $(`log_${logId}`).remove();
+        } catch (e) {}
+        try {
+          $(`dockedlog_${logId - 1}`).remove();
+        } catch (e) {}
       }
     }
   },
@@ -1547,6 +1556,24 @@ declare('bgagame.dontletitdie', Gamegui, {
     // if (notification.args?.gamestate?.name == 'tradePhase') this.itemTradeScreen.update(notification.args);
     if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
   },
+  notif_zombieChange: async function (notification) {
+    await this.notificationWrapper(notification);
+    if (isStudio()) console.log('notif_zombieChange', notification);
+    document.querySelectorAll('.character-side-container').forEach((node) => node.remove());
+    document.querySelectorAll('#players-container .player-card').forEach((node) => node.remove());
+
+    this.updatePlayers(notification.args.gameData);
+  },
+  notif_zombieBack: async function (notification) {
+    await this.notificationWrapper(notification);
+    if (isStudio()) console.log('notif_zombieBack', notification);
+    $('zombieBack').style.display = 'none';
+    document.querySelectorAll('.character-side-container').forEach((node) => node.remove());
+    document.querySelectorAll('#players-container .player-card').forEach((node) => node.remove());
+
+    this.updatePlayers(notification.args.gameData);
+  },
+
   notif_updateActionButtons: async function (notification) {
     if (isStudio()) console.log('notif_updateActionButtons', notification);
     await this.notificationWrapper(notification);

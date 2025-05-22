@@ -221,6 +221,21 @@ class DLD_GameData
             $this->addMultiActiveCharacter($id);
         }
     }
+    // Used for zombie turns
+    public function resetMultiActiveCharacter(): bool
+    {
+        $activateCharacters = $this->getAllMultiActiveCharacterIds();
+
+        $activePlayerIds = array_unique(
+            array_map(function ($c) {
+                return $this->game->character->getCharacterData($c)['playerId'];
+            }, $activateCharacters)
+        );
+        if (sizeof($activePlayerIds) == 0) {
+            $this->game->character->setSubmittingCharacter(null);
+        }
+        return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, 'playerTurn', true);
+    }
     public function addMultiActiveCharacter(string $characterId, bool $exclusive = false): bool
     {
         $activateCharacters = $this->getAllMultiActiveCharacterIds();
@@ -231,13 +246,13 @@ class DLD_GameData
         }
         if (!in_array($characterId, $activateCharacters)) {
             array_push($activateCharacters, $characterId);
-            $this->game->giveExtraTime($this->game->character->getCharacterData($characterId)['player_id']);
+            $this->game->giveExtraTime($this->game->character->getCharacterData($characterId)['playerId']);
         }
         $this->set('activateCharacters', $activateCharacters);
 
         $activePlayerIds = array_unique(
             array_map(function ($c) {
-                return $this->game->character->getCharacterData($c)['player_id'];
+                return $this->game->character->getCharacterData($c)['playerId'];
             }, $activateCharacters)
         );
         $this->game->log('state 1', $activePlayerIds, 'playerTurn');
@@ -258,7 +273,7 @@ class DLD_GameData
 
         $activePlayerIds = array_unique(
             array_map(function ($c) {
-                return $this->game->character->getCharacterData($c)['player_id'];
+                return $this->game->character->getCharacterData($c)['playerId'];
             }, $activateCharacters)
         );
         $this->game->log('state 2', $activePlayerIds, $state);

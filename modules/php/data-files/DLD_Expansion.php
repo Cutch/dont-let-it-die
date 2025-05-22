@@ -93,7 +93,6 @@ class DLD_ExpansionData
                             return ['notify' => false, 'nextState' => 'resolveEncounter'];
                         },
                         'onEncounterPost' => function (Game $game, $skill, &$data) {
-                            $game->log('encounter', $data);
                             if ($data['encounterHealth'] <= $data['characterDamage']) {
                                 $game->eventLog(clienttranslate('${character_name} obtained a ${item_name} ${buttons}'), [
                                     'item_name' => clienttranslate('Shell Shield'),
@@ -135,7 +134,6 @@ class DLD_ExpansionData
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
                                 usePerForever($char['id'] . $skill['id'], $game);
-                                $game->log('onInterrupt', $data);
                                 $data['data']['willTakeDamage'] = 0;
 
                                 $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage ${buttons}'), [
@@ -159,7 +157,6 @@ class DLD_ExpansionData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
-                            $game->log('requirement', $char['isActive'], getUsePerForever($char['id'] . $skill['id'], $game) < 2, $skill);
                             return $char['isActive'] && getUsePerForever($char['id'] . $skill['id'], $game) < 2;
                         },
                     ],

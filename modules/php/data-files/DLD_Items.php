@@ -289,7 +289,6 @@ class DLD_ItemsData
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $char = $game->character->getCharacterData($skill['characterId']);
                                 usePerDay($char['id'] . $skill['id'], $game);
-                                $game->log('onInterrupt', $data);
                                 $data['data']['willTakeDamage'] = 0;
 
                                 $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage ${buttons}'), [
@@ -363,7 +362,6 @@ class DLD_ItemsData
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $char = $game->character->getCharacterData($skill['characterId']);
                                 usePerDay($char['id'] . $skill['id'], $game);
-                                $game->log('onInterrupt', $data);
                                 $data['data']['willTakeDamage'] = 0;
 
                                 $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage ${buttons}'), [
@@ -1056,7 +1054,6 @@ class DLD_ItemsData
                         },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
-                                $game->log('$skill', $skill);
                                 $game->character->unequipEquipment($skill['characterId'], [$skill['itemId']]);
                                 clearItemSkills($data['skills'], $skill['itemId']);
                             }
@@ -1168,7 +1165,6 @@ class DLD_ItemsData
                         'interruptState' => ['playerTurn'],
                         'perDay' => 1,
                         'onInvestigateFire' => function (Game $game, $skill, &$data) {
-                            $game->log('onInvestigateFire', $skill);
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($data['roll'] < 3 && getUsePerDay($char['id'] . 'gem-p-necklace', $game) < 1) {
                                 // If kara is not the character, and the roll is not the max

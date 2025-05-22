@@ -24,8 +24,8 @@ class DLD_ItemTrade
         foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
             $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
         }
-        // $this->game->gamestate->nextPrivateState($trade1['character']['player_id'], 'tradePhaseActions');
-        // $this->game->gamestate->nextPrivateState($trade2['character']['player_id'], 'tradePhaseActions');
+        // $this->game->gamestate->nextPrivateState($trade1['character']['playerId'], 'tradePhaseActions');
+        // $this->game->gamestate->nextPrivateState($trade2['character']['playerId'], 'tradePhaseActions');
     }
     public function actCancelTrade(): void
     {
@@ -36,8 +36,8 @@ class DLD_ItemTrade
         foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
             $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
         }
-        // $this->game->gamestate->nextPrivateState($trade1['character']['player_id'], 'tradePhaseActions');
-        // $this->game->gamestate->nextPrivateState($trade2['character']['player_id'], 'tradePhaseActions');
+        // $this->game->gamestate->nextPrivateState($trade1['character']['playerId'], 'tradePhaseActions');
+        // $this->game->gamestate->nextPrivateState($trade2['character']['playerId'], 'tradePhaseActions');
         $this->game->gameData->set('tradeState', null);
     }
     public function actTradeDone(): void
@@ -62,8 +62,8 @@ class DLD_ItemTrade
         array_walk($data['selection'], function (&$trade) use ($selfId, &$hasSelf, &$hasItem, &$trade1, &$trade2, &$sendToCamp) {
             if (array_key_exists('character', $trade)) {
                 $trade['character'] = $this->game->character->getCharacterData($trade['character']);
-                $hasSelf = $hasSelf || $selfId == $trade['character']['player_id'];
-                if ($selfId == $trade['character']['player_id']) {
+                $hasSelf = $hasSelf || $selfId == $trade['character']['playerId'];
+                if ($selfId == $trade['character']['playerId']) {
                     if (!$trade1) {
                         $trade1 = $trade;
                     } else {
@@ -151,12 +151,12 @@ class DLD_ItemTrade
                 'gameData' => $results,
             ]);
         } else {
-            if ($trade1['character']['player_id'] != $trade2['character']['player_id']) {
+            if ($trade1['character']['playerId'] != $trade2['character']['playerId']) {
                 $this->game->gameData->set('tradeState', [
                     'trade1' => $trade1,
                     'trade2' => $trade2,
                 ]);
-                $toPlayerId = $trade2['character']['player_id'];
+                $toPlayerId = $trade2['character']['playerId'];
                 if (!$this->game->gamestate->isPlayerActive($toPlayerId)) {
                     $this->game->gamestate->setPlayersMultiactive([$toPlayerId], 'playerTurn', false);
                     $this->game->gamestate->initializePrivateState($toPlayerId);

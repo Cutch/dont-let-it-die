@@ -14,6 +14,7 @@ class DLD_Character
     private static array $characterColumns = [
         'character_name',
         'player_id',
+        'necromancer_player_id',
         'item_1',
         'item_2',
         'item_3',
@@ -34,9 +35,13 @@ class DLD_Character
     }
     public function addExtraTime(?int $extraTime = null)
     {
-        $this->game->giveExtraTime($this->getTurnCharacter()['player_id'], $extraTime);
+        $this->game->giveExtraTime($this->getTurnCharacter()['playerId'], $extraTime);
     }
 
+    public function clearCache()
+    {
+        $this->cachedData = [];
+    }
     public function _updateCharacterData(string $name, array $data)
     {
         // Update db
@@ -104,6 +109,11 @@ class DLD_Character
             }
         }
     }
+    public function unZombiePlayer($playerId): void
+    {
+        $this->game::DbQuery("UPDATE `player` SET player_zombie='0' WHERE player_id=$playerId");
+        $this->game::DbQuery("UPDATE `character` SET necromancer_player_id=NULL WHERE player_id=$playerId");
+    }
     public function getAllCharacterIds(): array
     {
         $turnOrder = $this->game->gameData->get('turnOrder');
@@ -120,9 +130,16 @@ class DLD_Character
     {
         return array_values(
             array_filter($this->getAllCharacterData(), function ($char) use ($playerId) {
-                return (int) $char['player_id'] == (int) $playerId;
+                return (int) $char['playerId'] == (int) $playerId;
             })
         );
+    }
+    public function assignNecromancer(string|int $playerId, $characterId): void
+    {
+        $this->updateCharacterData($characterId, function (&$char) use ($playerId) {
+            $char['necromancer_player_id'] = $playerId;
+            $char['playerId'] = $playerId;
+        });
     }
     public function getCalculatedData(array $characterData, bool $_skipHooks = false): array
     {
@@ -223,6 +240,15 @@ class DLD_Character
         $characterData['maxHealth'] = clamp($characterData['maxHealth'], 0, 10);
         $characterData['health'] = clamp($characterData['health'], 0, $characterData['maxHealth']);
         $characterData['stamina'] = clamp($characterData['stamina'], 0, $characterData['maxStamina']);
+        $characterData['playerId'] = $characterData['player_id'];
+        if (
+            $characterData['player_zombie'] &&
+            array_key_exists('necromancer_player_id', $characterData) &&
+            $characterData['necromancer_player_id']
+        ) {
+            $characterData['playerId'] = $characterData['necromancer_player_id'];
+        }
+
         return $characterData;
     }
     public function getCharacterData(string $name, $_skipHooks = false): array
@@ -231,7 +257,7 @@ class DLD_Character
             return $this->getCalculatedData($this->cachedData[$name], $_skipHooks);
         } else {
             $this->cachedData[$name] = $this->game->getCollectionFromDb(
-                "SELECT c.*, player_color FROM `character` c INNER JOIN `player` p ON p.player_id = c.player_id WHERE character_name = '$name'"
+                "SELECT c.*, player_color, player_zombie FROM `character` c INNER JOIN `player` p ON p.player_id = c.player_id WHERE character_name = '$name'"
             )[$name];
             return $this->getCalculatedData($this->cachedData[$name], $_skipHooks);
         }
@@ -493,8 +519,8 @@ class DLD_Character
         $characterData = $this->getCharacterData($character);
 
         $playerId = (int) $this->game->getActivePlayerId();
-        if ($playerId != $characterData['player_id']) {
-            $this->game->gamestate->changeActivePlayer($characterData['player_id']);
+        if ($playerId != $characterData['playerId']) {
+            $this->game->gamestate->changeActivePlayer($characterData['playerId']);
             $this->addExtraTime();
         }
         $this->game->markChanged('player');
@@ -640,7 +666,7 @@ class DLD_Character
                 'isActive' => $char['isActive'],
                 'equipment' => $char['equipment'],
                 'playerColor' => $char['player_color'],
-                'playerId' => $char['player_id'],
+                'playerId' => $char['playerId'],
                 'stamina' => $char['stamina'],
                 'maxStamina' => $char['maxStamina'],
                 'maxHealth' => $char['maxHealth'],

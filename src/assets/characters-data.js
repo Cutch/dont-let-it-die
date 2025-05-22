@@ -188,6 +188,7 @@ export default {
             _('Sig can NOT obtain items from trading with another character'),
             _('The Investigate Fire action costs Sig 5 stamina, but you roll the die twice and add the rolls together'),
             _('If Sig has a Sharp Stick or Spear equipped, he may spend 2 stamina to roll the Fire die and take that many Fish tokens'),
+            _('Fish are treated like Meat for cooking and eating'),
           ],
           expansion: 'mini-expansion',
         },

@@ -17,12 +17,12 @@
   }
 }
 .shuffle-1 {
-  animation: 0.75s 2 alternate slide-1;
+  animation: 0.75s 2 alternate dld_slide-1;
 }
 .shuffle-2 {
-  animation: 0.75s 2 alternate slide-2;
+  animation: 0.75s 2 alternate dld_slide-2;
 }
-@keyframes slide-1 {
+@keyframes dld_slide-1 {
   0% {
     transform: translateX(0%);
     z-index: 1;
@@ -53,7 +53,7 @@
     display: none;
   }
 }
-@keyframes slide-2 {
+@keyframes dld_slide-2 {
   0% {
     transform: translateX(0%);
     z-index: 2;
