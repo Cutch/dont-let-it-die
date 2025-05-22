@@ -142,7 +142,7 @@ class DLD_ItemsData
                                     )
                                 );
                                 if ($characterCount > 1) {
-                                    throw new BgaUserException($game::totranslate('Only 1 character\'s hindrances can be selected'));
+                                    throw new BgaUserException(clienttranslate('Only 1 character\'s hindrances can be selected'));
                                 }
                                 $count = 0;
                                 foreach ($state['characters'] as $char) {
@@ -162,7 +162,7 @@ class DLD_ItemsData
                                     }
                                 }
                                 if ($count > 2) {
-                                    throw new BgaUserException($game::totranslate('Up to 2 hindrances can be removed'));
+                                    throw new BgaUserException(clienttranslate('Up to 2 hindrances can be removed'));
                                 }
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                 $data['nextState'] = 'playerTurn';

@@ -53,7 +53,7 @@ $gameinfos = [
     // the tie breaker to the players.
     // Note: if you are NOT using any tie breaker, leave the empty string.
     //
-    // Example: 'tie_breaker_description' => totranslate( "Number of remaining cards in hand" ),
+    // Example: 'tie_breaker_description' => _( "Number of remaining cards in hand" ),
     'tie_breaker_description' => '',
 
     // If in the game, all losers are equal (no score to rank them or explicit in the rules that losers are not ranked between them), set this to true

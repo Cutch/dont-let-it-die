@@ -887,7 +887,7 @@ class DLD_ExpansionData
                             (isset($data['trade1']['character']['id']) && $data['trade1']['character']['id'] == $card['characterId']) ||
                             (isset($data['trade2']['character']['id']) && $data['trade2']['character']['id'] == $card['characterId'])
                         ) {
-                            throw new BgaUserException($game::totranslate('Cannot trade with') . $card['characterId']);
+                            throw new BgaUserException(clienttranslate('Cannot trade with') . $card['characterId']);
                         }
                     }
                 },

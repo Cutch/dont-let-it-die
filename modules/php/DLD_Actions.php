@@ -148,7 +148,7 @@ class DLD_Actions
                             }
                         }
                         if ($count > 1) {
-                            throw new BgaUserException($this->game::totranslate('Only 1 hindrance can be removed'));
+                            throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
                         }
                         $game->adjustResource('herb', -$data['herb']);
                         $game->notify('notify', clienttranslate('${character_name} used a herb to cure their wounds'));
@@ -585,17 +585,17 @@ class DLD_Actions
         $stamina = $character['stamina'];
         $health = $character['health'];
         if (array_key_exists('stamina', $cost) && $stamina < $cost['stamina']) {
-            throw new BgaUserException($this->game::totranslate('Not enough stamina'));
+            throw new BgaUserException(clienttranslate('Not enough stamina'));
         }
         if (array_key_exists('health', $cost) && $health < $cost['health']) {
-            throw new BgaUserException($this->game::totranslate('Not enough health'));
+            throw new BgaUserException(clienttranslate('Not enough health'));
         }
         if (!$this->checkRequirements($this->getAction($action, $subAction, ...$args))) {
-            throw new BgaUserException($this->game::totranslate('Can\'t use this action'));
+            throw new BgaUserException(clienttranslate('Can\'t use this action'));
         }
         $validActions = $this->getValidActions();
         if (!array_key_exists($action, $validActions)) {
-            throw new BgaUserException($this->game::totranslate('This action can not be used this turn'));
+            throw new BgaUserException(clienttranslate('This action can not be used this turn'));
         }
         $turnActions = $this->game->gameData->get('turnActions');
         $turnActions[$action] = ($turnActions[$action] ?? 0) + 1;

@@ -42,7 +42,7 @@ class DLD_CharacterSelection
                 )
             ) > 0
         ) {
-            throw new BgaUserException($this->game::totranslate('Character Selected By Another Player'));
+            throw new BgaUserException(clienttranslate('Character Selected By Another Player'));
         }
         // Remove player's previous selected
         $this->game::DbQuery("DELETE FROM `character` WHERE player_id = $playerId");
@@ -60,7 +60,7 @@ class DLD_CharacterSelection
         }
         $characterIds = $this->game->character->getAllCharacterIds();
         if (in_array('Atouk', $characterIds) && in_array('Yurt', $characterIds)) {
-            throw new BgaUserException($this->game::totranslate('Atouk and Yurt cannot be in the same tribe'));
+            throw new BgaUserException(clienttranslate('Atouk and Yurt cannot be in the same tribe'));
         }
         // Notify Players
         $results = [];
@@ -92,10 +92,10 @@ class DLD_CharacterSelection
             $count = 1;
         }
         if (sizeof(array_filter($characters)) > $count) {
-            throw new BgaUserException($this->game::totranslate('Too many characters selected'));
+            throw new BgaUserException(clienttranslate('Too many characters selected'));
         }
         if ($checkIfNotEnough && sizeof(array_filter($characters)) != $count) {
-            throw new BgaUserException($this->game::totranslate('Not enough characters selected'));
+            throw new BgaUserException(clienttranslate('Not enough characters selected'));
         }
     }
     private function setTurnOrder($playerId, $selectedCharacters)

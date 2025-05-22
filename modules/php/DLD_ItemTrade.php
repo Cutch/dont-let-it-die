@@ -50,7 +50,7 @@ class DLD_ItemTrade
     public function actTradeItem(#[JsonParam] array $data): void
     {
         if (sizeof($data['selection']) != 2) {
-            throw new BgaUserException($this->game::totranslate('You must select 2 items to trade'));
+            throw new BgaUserException(clienttranslate('You must select 2 items to trade'));
         }
         $selfId = $this->game->getCurrentPlayer();
         $hasSelf = false;
@@ -81,10 +81,10 @@ class DLD_ItemTrade
             }
         });
         if (!$hasSelf) {
-            throw new BgaUserException($this->game::totranslate('Select one of your character\'s items to trade'));
+            throw new BgaUserException(clienttranslate('Select one of your character\'s items to trade'));
         }
         if (!$hasItem) {
-            throw new BgaUserException($this->game::totranslate('Select one item to trade'));
+            throw new BgaUserException(clienttranslate('Select one item to trade'));
         }
         $hookData = [
             'sendToCamp' => $sendToCamp,
@@ -112,13 +112,13 @@ class DLD_ItemTrade
                 $hasDuplicateTool = $result['hasDuplicateTool'];
 
                 if ($trade1['character']['id'] == 'Sig') {
-                    throw new BgaUserException($this->game::totranslate('Sig cannot obtain items from trade'));
+                    throw new BgaUserException(clienttranslate('Sig cannot obtain items from trade'));
                 }
                 if (!$hasOpenSlots) {
-                    throw new BgaUserException($this->game::totranslate('There is no open slot for that item type'));
+                    throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
                 }
                 if ($hasDuplicateTool) {
-                    throw new BgaUserException($this->game::totranslate('Cannot have a duplicate tool'));
+                    throw new BgaUserException(clienttranslate('Cannot have a duplicate tool'));
                 }
                 array_push($characterItems, $itemId2);
             }
@@ -201,13 +201,13 @@ class DLD_ItemTrade
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
             if ($trade2['character']['id'] == 'Sig') {
-                throw new BgaUserException($this->game::totranslate('Sig cannot obtain items from trade'));
+                throw new BgaUserException(clienttranslate('Sig cannot obtain items from trade'));
             }
             if (!$hasOpenSlots) {
-                throw new BgaUserException($this->game::totranslate('There is no open slot for that item type'));
+                throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
             }
             if ($hasDuplicateTool) {
-                throw new BgaUserException($this->game::totranslate('Cannot of a duplicate tool'));
+                throw new BgaUserException(clienttranslate('Cannot of a duplicate tool'));
             }
             array_push($characterItems2, $itemId1);
         }
@@ -217,13 +217,13 @@ class DLD_ItemTrade
             $hasDuplicateTool = $result['hasDuplicateTool'];
 
             if ($trade1['character']['id'] == 'Sig') {
-                throw new BgaUserException($this->game::totranslate('Sig cannot obtain items from trade'));
+                throw new BgaUserException(clienttranslate('Sig cannot obtain items from trade'));
             }
             if (!$hasOpenSlots) {
-                throw new BgaUserException($this->game::totranslate('There is no open slot for that item type'));
+                throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
             }
             if ($hasDuplicateTool) {
-                throw new BgaUserException($this->game::totranslate('Cannot of a duplicate tool'));
+                throw new BgaUserException(clienttranslate('Cannot of a duplicate tool'));
             }
             array_push($characterItems1, $itemId2);
         }

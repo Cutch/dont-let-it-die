@@ -31,7 +31,7 @@ class DLD_SelectionStates
             [$this->game->hooks, 'onCharacterSelection'],
             function (Game $_this) use ($characterId) {
                 if (!$characterId) {
-                    throw new BgaUserException($_this::totranslate('Select a Character'));
+                    throw new BgaUserException(clienttranslate('Select a Character'));
                 }
                 $stateData = $this->getState(null);
                 $stateData['selectedCharacterId'] = $characterId;
@@ -50,7 +50,7 @@ class DLD_SelectionStates
     {
         // $this->game->character->addExtraTime();
         if (!$resourceType) {
-            throw new BgaUserException($this->game::totranslate('Select a Resource'));
+            throw new BgaUserException(clienttranslate('Select a Resource'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedResourceType'] = $resourceType;
@@ -65,7 +65,7 @@ class DLD_SelectionStates
     public function actSelectHindrance(#[JsonParam] array $data): void
     {
         if (sizeof($data) == 0) {
-            throw new BgaUserException($this->game::totranslate('Select a Hindrance'));
+            throw new BgaUserException(clienttranslate('Select a Hindrance'));
         }
         $stateData = $this->getState(null);
         $stateData['selections'] = $data;
@@ -85,7 +85,7 @@ class DLD_SelectionStates
     public function actSelectCard(?string $cardId = null): void
     {
         if (!$cardId) {
-            throw new BgaUserException($this->game::totranslate('Select a Card'));
+            throw new BgaUserException(clienttranslate('Select a Card'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedCardId'] = $cardId;
@@ -100,7 +100,7 @@ class DLD_SelectionStates
     public function actSelectItem(?string $itemId = null, ?string $characterId = null): void
     {
         if (!$itemId) {
-            throw new BgaUserException($this->game::totranslate('Select an item'));
+            throw new BgaUserException(clienttranslate('Select an item'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedItemId'] = $itemId;
@@ -118,7 +118,7 @@ class DLD_SelectionStates
     {
         // $this->game->character->addExtraTime();
         if (!$deckName) {
-            throw new BgaUserException($this->game::totranslate('Select a Deck'));
+            throw new BgaUserException(clienttranslate('Select a Deck'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedDeckName'] = $deckName;
@@ -134,7 +134,7 @@ class DLD_SelectionStates
     {
         // $this->character->addExtraTime();
         if (!$sendToCampId) {
-            throw new BgaUserException($this->game::totranslate('Select an item'));
+            throw new BgaUserException(clienttranslate('Select an item'));
         }
         $state = $this->getState($this->game->gamestate->state()['name']);
         $items = $state['items'];
@@ -146,7 +146,7 @@ class DLD_SelectionStates
                 }, $items)
             )
         ) {
-            throw new BgaUserException($this->game::totranslate('Invalid Item'));
+            throw new BgaUserException(clienttranslate('Invalid Item'));
         }
         $items = array_map(function ($d) {
             return $d['itemId'];
@@ -178,7 +178,7 @@ class DLD_SelectionStates
         if ($stateName) {
             $state = $this->game->gameData->get($stateName);
             if (array_key_exists('cancellable', $state) && !$state['cancellable']) {
-                throw new BgaUserException($this->game::totranslate('This action cannot be cancelled'));
+                throw new BgaUserException(clienttranslate('This action cannot be cancelled'));
             }
             $this->game->gameData->set($stateName, [...$state, 'cancelled' => true]);
         }

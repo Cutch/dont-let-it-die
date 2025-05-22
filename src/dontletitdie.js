@@ -774,17 +774,24 @@ declare('bgagame.dontletitdie', Gamegui, {
   },
   setup: function (gameData) {
     dojo.subscribe('addMoveToLog', gameui, (logId, moveId) => {
-      const node = document.querySelector(`#log_${logId} .dlid__log-button`);
-      if (node) {
-        addClickListener(node, 'Card', () => {
-          this.tooltip.show();
-          renderImage(node.getAttribute('data-id'), this.tooltip.renderByElement(), {
-            withText: true,
-            ...(node.getAttribute('data-type') ? { type: 'tooltip-' + node.getAttribute('data-type') } : {}),
-            pos: 'replace',
+      const addButtonListener = (node) => {
+        if (node) {
+          addClickListener(node, 'Card', () => {
+            this.tooltip.show();
+            renderImage(node.getAttribute('data-id'), this.tooltip.renderByElement(), {
+              withText: true,
+              ...(node.getAttribute('data-type') ? { type: 'tooltip-' + node.getAttribute('data-type') } : {}),
+              pos: 'replace',
+            });
           });
-        });
-      }
+        }
+      };
+      const node1 = document.querySelector(`#log_${logId} .dlid__log-button`);
+      addButtonListener(node1);
+      setTimeout(() => {
+        const node2 = document.querySelector(`#dockedlog_${logId} .dlid__log-button`);
+        addButtonListener(node2);
+      }, 0);
     });
 
     $('game_play_area_wrap').classList.add('dlid');
@@ -1473,6 +1480,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       const moveId = parseInt(gameui.log_to_move_id[logId], 10);
       if (moveId > lastMoveId) {
         $(`log_${logId}`).remove();
+        $(`dockedlog_${logId}`).remove();
       }
     }
   },

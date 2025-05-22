@@ -612,7 +612,7 @@ class DLD_UpgradesData
                                     }
                                 }
                                 if ($count > 1) {
-                                    throw new BgaUserException($game::totranslate('Only 1 hindrance can be removed'));
+                                    throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
                                 }
                                 $data['nextState'] = 'playerTurn';
                             }

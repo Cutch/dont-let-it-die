@@ -951,7 +951,7 @@ class DLD_DecksData
                             }
                         }
                         if ($characterTotal == $characterCount && $characterTotal == $count) {
-                            throw new BgaUserException($game::totranslate('Remove 1 hindrance from each character'));
+                            throw new BgaUserException(clienttranslate('Remove 1 hindrance from each character'));
                         }
                         $data['nextState'] = 'playerTurn';
                     }

@@ -199,7 +199,7 @@ namespace {
      * This function works exactly like 'clienttranslate', except it tells BGA that the string is not needed on client
      * side.
      */
-    function totranslate(string $text): string
+    function _(string $text): string
     {
         return ''; 
     }
@@ -1368,7 +1368,7 @@ namespace {
         /**
          * Translation function using appropriate gettext domain.
          */
-        public function _(string $text): string
+        public static function _(string $text): string
         {            
             return '';
         }
