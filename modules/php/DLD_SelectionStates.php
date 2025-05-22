@@ -124,7 +124,7 @@ class DLD_SelectionStates
         $stateData['selectedDeckName'] = $deckName;
         $this->setState(null, $stateData);
         $data = [
-            'deckName' => $deckName,
+            'deck' => $deckName,
             'nextState' => $stateData['nextState'],
         ];
         $this->game->hooks->onDeckSelection($data);

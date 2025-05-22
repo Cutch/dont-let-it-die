@@ -177,13 +177,9 @@ class Game extends \Table
     {
         return $this->getObjectFromDB($str);
     }
-    public function activeCharacterEventLog($message = '', $arg = [])
+    public function eventLog($message = '', $arg = [])
     {
-        $this->notify('notify', $message, [...$arg]);
-    }
-    public function nightEventLog($message, $arg = [])
-    {
-        $this->notify('nightEvent', $message, $arg);
+        $this->notify('notify', $message, $arg);
     }
     public function checkHindrance($drawPhysical = true, ?string $char = null): bool
     {
@@ -323,7 +319,7 @@ class Game extends \Table
         ?string $character4 = null
     ): void {
         $this->characterSelection->actCharacterClicked($character1, $character2, $character3, $character4);
-        $this->completeAction();
+        $this->completeAction(false);
     }
     public function actChooseCharacters(): void
     {
@@ -331,7 +327,7 @@ class Game extends \Table
             $this->addExtraTime();
         }
         $this->characterSelection->actChooseCharacters();
-        $this->completeAction();
+        $this->completeAction(false);
     }
     public function actMoveDiscovery(string $upgradeId, string $upgradeReplaceId): void
     {
@@ -528,8 +524,9 @@ class Game extends \Table
                     $this->character->equipAndValidateEquipment($character['id'], $itemId);
                 }
                 $this->hooks->onCraftAfter($data);
-                $_this->notify('notify', clienttranslate('${character_name} crafted a ${item_name}'), [
+                $_this->eventLog(clienttranslate('${character_name} crafted a ${item_name} ${buttons}'), [
                     'item_name' => $item['name'],
+                    'buttons' => notifyButtons([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
                 ]);
             }
         );
@@ -569,8 +566,11 @@ class Game extends \Table
         }
         $items = $this->gameData->getItems();
 
-        $this->notify('notify', clienttranslate('{item_name} destroyed'), [
+        $this->notify('notify', clienttranslate('{item_name} destroyed ${buttons}'), [
             'item_name' => $this->data->getItems()[$items[$itemId]]['name'],
+            'buttons' => notifyButtons([
+                ['name' => $this->data->getItems()[$items[$itemId]]['name'], 'dataId' => $itemId, 'dataType' => 'item'],
+            ]),
         ]);
     }
     public function actDestroyItem(int $itemId): void
@@ -932,7 +932,7 @@ class Game extends \Table
                 $card = [];
                 if (!$data['cancel']) {
                     $card = $this->decks->pickCard($deck);
-                    $this->activeCharacterEventLog(clienttranslate('${character_name} draws from the ${deck} deck'), [
+                    $this->eventLog(clienttranslate('${character_name} draws from the ${deck} deck'), [
                         'deck' => $this->decks->getDeckName($deck),
                     ]);
                 }
@@ -962,7 +962,7 @@ class Game extends \Table
             function (Game $_this) use ($guess) {
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
-                $_this->activeCharacterEventLog(clienttranslate('${character_name} investigated the fire'));
+                $_this->eventLog(clienttranslate('${character_name} investigated the fire'));
                 $roll = $_this->rollFireDie(clienttranslate('Investigate Fire'), $character['character_name']);
                 return ['roll' => $roll, 'originalRoll' => $roll, 'guess' => $guess];
             },
@@ -971,7 +971,7 @@ class Game extends \Table
                     $_this->actions->spendActionCost('actInvestigateFire');
                 }
                 $_this->adjustResource('fkp', $data['roll']);
-                $this->activeCharacterEventLog(clienttranslate('${character_name} ${character_name} received ${count} ${resource_type}'), [
+                $this->eventLog(clienttranslate('${character_name} ${character_name} received ${count} ${resource_type}'), [
                     'count' => $data['roll'],
                     'resource_type' => 'fkp',
                 ]);
@@ -983,15 +983,16 @@ class Game extends \Table
     public function actEndTurn(): void
     {
         // Notify all players about the choice to pass.
-        $this->activeCharacterEventLog(clienttranslate('${character_name} ends their turn'));
+        $this->eventLog(clienttranslate('${character_name} ends their turn'));
 
         // at the end of the action, move to the next state
         $this->endTurn();
-        $this->completeAction();
+        $this->completeAction(false);
     }
     public function actDone(): void
     {
         // $this->character->addExtraTime();
+        $saveState = true;
         $stateName = $this->gamestate->state()['name'];
         if ($stateName == 'postEncounter') {
             $this->nextState('playerTurn');
@@ -1000,6 +1001,7 @@ class Game extends \Table
         } elseif ($stateName == 'interrupt') {
             $this->actInterrupt->onInterruptCancel();
         } elseif ($stateName == 'dinnerPhase') {
+            $saveState = false;
             $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'nightPhase');
         } elseif ($stateName == 'startHindrance') {
             if (
@@ -1011,9 +1013,10 @@ class Game extends \Table
             ) {
                 throw new BgaUserException($this::totranslate('All discoveries must replace an existing track discovery'));
             }
+            $saveState = false;
             $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'playerTurn');
         }
-        $this->completeAction();
+        $this->completeAction($saveState);
     }
 
     public function argResourceSelection()
@@ -1138,7 +1141,7 @@ class Game extends \Table
         $char = $this->character->getTurnCharacter();
         $this->hooks->onPlayerTurn($char);
         if ($char['isActive'] && $char['incapacitated']) {
-            $this->activeCharacterEventLog(clienttranslate('${character_name} is incapacitated'));
+            $this->eventLog(clienttranslate('${character_name} is incapacitated'));
             $this->endTurn();
         }
         // }
@@ -1178,18 +1181,51 @@ class Game extends \Table
                 if ($card['deckType'] == 'resource') {
                     $this->adjustResource($card['resourceType'], $card['count']);
 
-                    $this->activeCharacterEventLog(clienttranslate('${character_name} found ${count} ${name}'), [...$card]);
+                    $this->eventLog(clienttranslate('${character_name} found ${count} ${name}(s) ${buttons}'), [
+                        ...$card,
+                        'buttons' => notifyButtons([
+                            ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
+                        ]),
+                    ]);
                 } elseif ($card['deckType'] == 'encounter') {
                     // Change state and check for health/damage modifications
-                    $this->activeCharacterEventLog(
-                        clienttranslate('${character_name} encountered a ${name} (${health} health, ${damage} damage)'),
-                        [...$card]
+                    $this->eventLog(
+                        clienttranslate('${character_name} encountered a ${name} (${health} health, ${damage} damage) ${buttons}'),
+                        [
+                            ...$card,
+                            'buttons' => notifyButtons([
+                                ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
+                            ]),
+                        ]
                     );
                 } elseif ($card['deckType'] == 'nothing') {
                     if (!$this->isValidExpansion('mini-expansion')) {
-                        $this->activeCharacterEventLog(clienttranslate('${character_name} did nothing'));
+                        $this->eventLog(
+                            clienttranslate('${character_name} did nothing ${buttons}', [
+                                'buttons' => notifyButtons([
+                                    ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
+                                ]),
+                            ])
+                        );
                     }
-                } elseif ($card['deckType'] == 'physical-hindrance' || $card['deckType'] == 'mental-hindrance') {
+                } elseif ($card['deckType'] == 'physical-hindrance') {
+                    $this->eventLog(
+                        clienttranslate('${character_name} must draw a ${deck} ${buttons}', [
+                            'deck' => clienttranslate('Physical Hindrance'),
+                            'buttons' => notifyButtons([
+                                ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
+                            ]),
+                        ])
+                    );
+                } elseif ($card['deckType'] == 'mental-hindrance') {
+                    $this->eventLog(
+                        clienttranslate('${character_name} must draw a ${deck} ${buttons}', [
+                            'deck' => clienttranslate('Mental Hindrance'),
+                            'buttons' => notifyButtons([
+                                ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
+                            ]),
+                        ])
+                    );
                 } else {
                 }
                 return [...$state, 'discard' => false];
@@ -1245,7 +1281,12 @@ class Game extends \Table
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
-                $this->nightEventLog(clienttranslate('Something unexpected happens, drawing a day event'));
+                $card = $data['card'];
+                $this->eventLog(clienttranslate('Something unexpected happens, drawing a day event ${buttons}'), [
+                    'buttons' => notifyButtons([
+                        ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'day-event'],
+                    ]),
+                ]);
                 // $this->nextState('playerTurn');
             }
         );
@@ -1263,7 +1304,7 @@ class Game extends \Table
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
-                $this->nightEventLog(clienttranslate('It\'s night, drawing from the night deck'));
+                $this->eventLog(clienttranslate('It\'s night, drawing from the night deck'));
                 $this->nextState('nightDrawCard');
             }
         );
@@ -1291,6 +1332,13 @@ class Game extends \Table
                 if (!$data || !array_key_exists('onUse', $data) || $data['onUse'] != false) {
                     $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
                 }
+                $this->eventLog(
+                    clienttranslate('Drew night event ${buttons}', [
+                        'buttons' => notifyButtons([
+                            ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'night-event'],
+                        ]),
+                    ])
+                );
 
                 $this->nextState('morningPhase');
             }

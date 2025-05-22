@@ -20,7 +20,7 @@ if (!function_exists('rivalTribe')) {
             }
             $game->adjustResource($resourceType, $left);
         }
-        $game->nightEventLog(clienttranslate('A rival tribe tried to steal ${number} ${resource_type}'), [
+        $game->eventLog(clienttranslate('A rival tribe tried to steal ${number} ${resource_type}'), [
             'number' => $roll,
             'resource_type' => $resourceType,
         ]);
@@ -464,7 +464,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'onMorning' => function (Game $game, $nightCard, &$data) {
                     $data['health'] = 0;
-                    $game->nightEventLog(clienttranslate('No damage taken in the morning'));
+                    $game->eventLog(clienttranslate('No damage taken in the morning'));
                 },
             ],
             'night-event-7_11' => [
@@ -475,7 +475,7 @@ class DLD_DecksData
                     $roll = $game->rollFireDie(clienttranslate('Night Event'));
                     if ($roll == 0) {
                         $game->character->adjustActiveHealth(-1);
-                        $game->nightEventLog(clienttranslate('${character_name} was struck by lightning (1 damage)'));
+                        $game->eventLog(clienttranslate('${character_name} was struck by lightning (1 damage)'));
                     }
                 },
             ],
@@ -517,13 +517,13 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Mammoths storm the camp'));
+                    $game->eventLog(clienttranslate('Mammoths storm the camp'));
                     $game->character->updateAllCharacterData(function ($character) use ($game) {
                         $roll = $game->rollFireDie(clienttranslate('Night Event'), $character['character_name']);
                         // On blank roll take a damage
                         if ($roll == 0) {
                             $game->character->adjustHealth($character['character_name'], -1);
-                            $game->nightEventLog(clienttranslate('${character_name} took 1 damage'), [
+                            $game->eventLog(clienttranslate('${character_name} took 1 damage'), [
                                 'character_name' => $game->getCharacterHTML($character['character_name']),
                             ]);
                             return false;
@@ -537,7 +537,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'onMorning' => function (Game $game, $nightCard, &$data) {
                     $data['health'] = min($data['health'] - 1, 0);
-                    $game->nightEventLog(clienttranslate('A volcano causes an additional health damage'));
+                    $game->eventLog(clienttranslate('A volcano causes an additional health damage'));
                 },
             ],
             'night-event-7_15' => [
@@ -550,12 +550,12 @@ class DLD_DecksData
                         })
                     );
                     if (sizeof($charactersWithStamina) > 0) {
-                        $game->nightEventLog(clienttranslate('${character_name} had some extra stamina and saved the wood'), [
+                        $game->eventLog(clienttranslate('${character_name} had some extra stamina and saved the wood'), [
                             'character_name' => $charactersWithStamina[0]['character_name'],
                         ]);
                     } else {
                         $game->adjustResource('fireWood', -1);
-                        $game->nightEventLog(clienttranslate('1 firewood was lost'));
+                        $game->eventLog(clienttranslate('1 firewood was lost'));
                         $game->gameData->set('morningState', [
                             ...$game->gameData->get('morningState') ?? [],
                             'allowFireWoodAddition' => true,
@@ -576,7 +576,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 // Can't gain stamina next day (not including morning)
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Can\'t gain stamina tomorrow'));
+                    $game->eventLog(clienttranslate('Can\'t gain stamina tomorrow'));
                 },
                 'onCheckSkillRequirements' => function (Game $game, $nightCard, $data, &$requires) {
                     // Stamina skills can't be used
@@ -626,7 +626,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
                     $game->character->adjustAllHealth(2);
-                    $game->nightEventLog(clienttranslate('Everyone gained ${count} ${character_resource}'), [
+                    $game->eventLog(clienttranslate('Everyone gained ${count} ${character_resource}'), [
                         'count' => 2,
                         'character_resource' => clienttranslate('Health'),
                     ]);
@@ -636,7 +636,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Everyone heals 1 extra hp when eating tomorrow'));
+                    $game->eventLog(clienttranslate('Everyone heals 1 extra hp when eating tomorrow'));
                 },
                 'onEat' => function (Game $game, $nightCard, &$data) {
                     $data['health'] += 1;
@@ -649,7 +649,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Lack of sleep lessens everyone\'s stamina'));
+                    $game->eventLog(clienttranslate('Lack of sleep lessens everyone\'s stamina'));
                 },
                 'onMorning' => function (Game $game, $nightCard, &$data) {
                     $data['stamina'] -= 3;
@@ -664,7 +664,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Everyone is injured'));
+                    $game->eventLog(clienttranslate('Everyone is injured'));
                     // Everyone take physical hindrance
                     foreach ($game->character->getAllCharacterIds() as $char) {
                         $game->checkHindrance(true, $char);
@@ -679,7 +679,7 @@ class DLD_DecksData
                     // Add 3 raw eggs to supply
                     // If 3 raw eggs are not there by night, everyone takes 1 damage
                     $count = $game->adjustResource('dino-egg', 3)['changed'];
-                    $game->nightEventLog(clienttranslate('Received ${count} ${resource_type}'), [
+                    $game->eventLog(clienttranslate('Received ${count} ${resource_type}'), [
                         'count' => $count,
                         'resource_type' => 'dino-egg',
                     ]);
@@ -698,7 +698,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Only 2 investigate fire action can be taken tomorrow'));
+                    $game->eventLog(clienttranslate('Only 2 investigate fire action can be taken tomorrow'));
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     if (
@@ -713,7 +713,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Bad mushrooms make some skills not work tomorrow'));
+                    $game->eventLog(clienttranslate('Bad mushrooms make some skills not work tomorrow'));
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     // Stamina skills can't be used
@@ -725,14 +725,14 @@ class DLD_DecksData
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
                     $game->adjustResource('meat', 2);
-                    $game->nightEventLog(clienttranslate('The tribe receives 2 meat'));
+                    $game->eventLog(clienttranslate('The tribe receives 2 meat'));
                 },
             ],
             'night-event-8_13' => [
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Freezing winds deal 1 damage and lessens everyone\'s stamina'));
+                    $game->eventLog(clienttranslate('Freezing winds deal 1 damage and lessens everyone\'s stamina'));
                     $game->character->adjustAllHealth(-1);
                 },
                 'onMorning' => function (Game $game, $nightCard, &$data) {
@@ -748,12 +748,12 @@ class DLD_DecksData
                         $lostBerries = floor($berries / 2);
                         $game->adjustResource('berry', -$lostBerries);
                         if ($lostBerries == 1) {
-                            $game->nightEventLog(clienttranslate('Boars steal ${count} berry'), ['count' => $lostBerries]);
+                            $game->eventLog(clienttranslate('Boars steal ${count} berry'), ['count' => $lostBerries]);
                         } else {
-                            $game->nightEventLog(clienttranslate('Boars steal ${count} berries'), ['count' => $lostBerries]);
+                            $game->eventLog(clienttranslate('Boars steal ${count} berries'), ['count' => $lostBerries]);
                         }
                     } else {
-                        $game->nightEventLog(clienttranslate('Boars attack everyone without a weapon for 2 damage'));
+                        $game->eventLog(clienttranslate('Boars attack everyone without a weapon for 2 damage'));
                         $game->character->updateAllCharacterData(function ($character) use ($game) {
                             if (
                                 sizeof(
@@ -773,7 +773,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('The night was peaceful'));
+                    $game->eventLog(clienttranslate('The night was peaceful'));
                 },
             ],
             'night-event-8_2' => [
@@ -790,12 +790,14 @@ class DLD_DecksData
                         $left = $game->adjustResource('gem-y', 1)['left'];
                         $left = $game->adjustResource('gem-p', $left)['left'];
                         $left = $game->adjustResource('gem-b', $left)['left'];
-                        $game->nightEventLog(clienttranslate('${character_name} found one gem stone'), [
+                        $game->eventLog(clienttranslate('${character_name} found ${count} ${name}(s)'), [
                             'character_name' => $charactersWithStamina[0]['character_name'],
+                            'count' => 1,
+                            'name' => clienttranslate('Gem'),
                         ]);
                     } else {
                         $game->adjustResource('fireWood', -1);
-                        $game->nightEventLog(clienttranslate('1 firewood was lost'));
+                        $game->eventLog(clienttranslate('1 firewood was lost'));
                         $game->gameData->set('morningState', [
                             ...$game->gameData->get('morningState') ?? [],
                             'allowFireWoodAddition' => true,
@@ -808,7 +810,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('All items have disappeared'));
+                    $game->eventLog(clienttranslate('All items have disappeared'));
                     foreach ($game->character->getAllCharacterData() as $char) {
                         if (sizeof($char['equipment']) > 0) {
                             $game->character->unequipEquipment(
@@ -825,7 +827,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Can\'t investigate the fire tomorrow, it\'s too hot'));
+                    $game->eventLog(clienttranslate('Can\'t investigate the fire tomorrow, it\'s too hot'));
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     unset($data['actInvestigateFire']);
@@ -838,9 +840,9 @@ class DLD_DecksData
                     $meat = $game->gameData->getResource('meat');
                     if ($meat > 0) {
                         $game->adjustResource('meat', -1);
-                        $game->nightEventLog(clienttranslate('${count} meat is used to distract some sabertooths'), ['count' => 1]);
+                        $game->eventLog(clienttranslate('${count} meat is used to distract some sabertooths'), ['count' => 1]);
                     } else {
-                        $game->nightEventLog(clienttranslate('Sabertooths attack everyone for 2 damage'));
+                        $game->eventLog(clienttranslate('Sabertooths attack everyone for 2 damage'));
                         $game->character->adjustAllHealth(-2);
                     }
                 },
@@ -882,7 +884,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Sharing knowledge increases fire knowledge by 4'));
+                    $game->eventLog(clienttranslate('Sharing knowledge increases fire knowledge by 4'));
                     $game->adjustResource('fkp', 4);
                 },
             ],
@@ -890,11 +892,11 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('All fire die rolls will be reduced tomorrow'));
+                    $game->eventLog(clienttranslate('All fire die rolls will be reduced tomorrow'));
                 },
                 'onRollDie' => function (Game $game, $nightCard, &$data) {
                     if ($data['value'] > 1) {
-                        $game->nightEventLog(clienttranslate('Roll reduced by 1'));
+                        $game->eventLog(clienttranslate('Roll reduced by 1'));
                     }
                     $data['value'] = max($data['value'], $data['value'] - 1);
                 },
@@ -914,7 +916,7 @@ class DLD_DecksData
                     $turnOrder = $game->gameData->get('turnOrder');
                     $turnOrder = array_values(array_filter($turnOrder));
                     array_push($data['skipMorningDamage'], ...$turnOrder);
-                    $game->nightEventLog(clienttranslate('No damage taken in the morning'));
+                    $game->eventLog(clienttranslate('No damage taken in the morning'));
                 },
                 'onHindranceSelection' => function (Game $game, $nightCard, &$data) {
                     $state = $game->selectionStates->getState('hindranceSelection');
@@ -960,7 +962,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('No exploring tomorrow'));
+                    $game->eventLog(clienttranslate('No exploring tomorrow'));
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     unset($data['actDrawExplore']);
@@ -971,7 +973,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Berries can\'t be found until the forage deck runs out of cards'));
+                    $game->eventLog(clienttranslate('Berries can\'t be found until the forage deck runs out of cards'));
                     // Need to add a globally active card
                     $game->decks->discardCards('forage', function ($data) {
                         return array_key_exists('resourceType', $data) && $data['resourceType'] == 'berry';
@@ -983,7 +985,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Actions outside of camp are harder tomorrow'));
+                    $game->eventLog(clienttranslate('Actions outside of camp are harder tomorrow'));
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     $data['actDrawForage'] += 1;
@@ -998,7 +1000,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Unable to craft tomorrow'));
+                    $game->eventLog(clienttranslate('Unable to craft tomorrow'));
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     unset($data['actCraft']);
@@ -1023,7 +1025,7 @@ class DLD_DecksData
                     foreach ($game->decks->getAllDeckNames() as $deck) {
                         $game->decks->shuffleInDiscard($deck, false);
                     }
-                    $game->nightEventLog(clienttranslate('All decks have been shuffled'));
+                    $game->eventLog(clienttranslate('All decks have been shuffled'));
                 },
             ],
             'night-event-9_5' => [
@@ -1033,18 +1035,22 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     $card1 = $game->decks->pickCard('hunt');
                     $card2 = $game->decks->pickCard('hunt');
-                    $game->nightEventLog(clienttranslate('Drew 2 from the ${deck} deck'), [
+                    $game->eventLog(clienttranslate('Drew 2 from the ${deck} deck ${buttons}'), [
                         'deck' => 'hunt',
+                        'buttons' => notifyButtons([
+                            ['name' => clienttranslate('Hunt'), 'dataId' => $card1['id'], 'dataType' => 'card'],
+                            ['name' => clienttranslate('Hunt'), 'dataId' => $card2['id'], 'dataType' => 'card'],
+                        ]),
                     ]);
                     $maxDamage = max(
                         array_key_exists('damage', $card1) ? $card1['damage'] : 0,
                         array_key_exists('damage', $card2) ? $card2['damage'] : 0
                     );
                     if ($maxDamage > 0) {
-                        $game->nightEventLog(clienttranslate('Received ${damage}'), ['damage' => $maxDamage]);
+                        $game->eventLog(clienttranslate('Received ${damage}'), ['damage' => $maxDamage]);
                         // Choose tribe member to receive damage
                     } else {
-                        $game->nightEventLog(clienttranslate('No predator\'s visited the camp'));
+                        $game->eventLog(clienttranslate('No predator\'s visited the camp'));
                     }
                 },
             ],
@@ -1053,7 +1059,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->nightEventLog(clienttranslate('Unable to trade with tribes tomorrow'));
+                    $game->eventLog(clienttranslate('Unable to trade with tribes tomorrow'));
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     unset($data['actTrade']);

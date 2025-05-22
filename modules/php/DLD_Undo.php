@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Bga\Games\DontLetItDie;
 
 use BgaUserException;
+use Error;
 use Exception;
 
 class DLD_Undo
@@ -64,7 +65,20 @@ class DLD_Undo
     }
     public function resetNotifications($moveId): void
     {
+        // $removeNotifications = array_merge(
+        //     ...array_map(function ($json) {
+        //         return json_decode($json);
+        //     }, array_keys(
+        //         $this->game->getCollectionFromDB(
+        //             'SELECT json_extract(`gamelog_notification`, \'$[*].uid\') as array FROM `gamelog` WHERE gamelog_move_id > ' .
+        //                 $moveId .
+        //                 ' AND json_extract(`gamelog_notification`, \'$[*].log\') REGEXP \'"[^"]{4,}"\'',
+        //             true
+        //         )
+        //     ))
+        // );
         $this->game::DbQuery("DELETE FROM `gamelog` WHERE gamelog_move_id > $moveId");
+        $this->game->notify('resetNotifications', '', ['moveId' => $moveId]);
     }
 
     public function loadInitialState(): void

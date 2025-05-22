@@ -18,6 +18,7 @@
 import dojo from 'dojo'; // Loads the dojo object using dojoConfig if needed
 import declare from 'dojo/_base/declare'; // Add 'declare' to dojo if needed
 import Gamegui from 'ebg/core/gamegui'; // Loads Gamegui class onto ebg.core.gamegui if needed
+import Gamenotif from 'ebg/gamenotif';
 import 'ebg/counter'; // Loads Counter class onto ebg.counter if needed
 import { getAllData } from './assets';
 import { CardSelectionScreen } from './screens/card-selection-screen';
@@ -534,7 +535,6 @@ declare('bgagame.dontletitdie', Gamegui, {
           'Warning, the morning phase will cause ${count} fire wood to be removed. If there is not enough fire wood the game is lost.',
         ).replace('${count}', count),
         iconCSS: 'fa fa-fire dld-warning',
-        background: 'white',
       });
     }
     renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
@@ -773,6 +773,20 @@ declare('bgagame.dontletitdie', Gamegui, {
     });
   },
   setup: function (gameData) {
+    dojo.subscribe('addMoveToLog', gameui, (logId, moveId) => {
+      const node = document.querySelector(`#log_${logId} .dlid__log-button`);
+      if (node) {
+        addClickListener(node, 'Card', () => {
+          this.tooltip.show();
+          renderImage(node.getAttribute('data-id'), this.tooltip.renderByElement(), {
+            withText: true,
+            ...(node.getAttribute('data-type') ? { type: 'tooltip-' + node.getAttribute('data-type') } : {}),
+            pos: 'replace',
+          });
+        });
+      }
+    });
+
     $('game_play_area_wrap').classList.add('dlid');
     $('right-side').classList.add('dlid');
 
@@ -1360,7 +1374,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     }
   },
 
-  addHelpTooltip: function ({ node, text = '', tooltipText = '', iconCSS, background = 'white' }) {
+  addHelpTooltip: function ({ node, text = '', tooltipText = '', iconCSS }) {
     // game.addTooltip(id, helpString, actionString);
     if (!node.querySelector('.tooltip')) {
       node.insertAdjacentHTML(
@@ -1426,6 +1440,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     dojo.subscribe('shuffle', this, 'notif_shuffle');
     dojo.subscribe('cardDrawn', this, 'notif_cardDrawn');
     dojo.subscribe('rollFireDie', this, 'notif_rollFireDie');
+    dojo.subscribe('resetNotifications', this, 'notif_resetNotifications');
     this.notifqueue.setSynchronous('cardDrawn', 1000);
     this.notifqueue.setSynchronous('rollFireDie', 1000);
     this.notifqueue.setSynchronous('shuffle', 1500);
@@ -1449,6 +1464,16 @@ declare('bgagame.dontletitdie', Gamegui, {
     }
     if (notification.args.gameData) {
       this.updateGameDatas(notification.args.gameData);
+    }
+  },
+  notif_resetNotifications: async function (notification) {
+    await this.notificationWrapper(notification);
+    const lastMoveId = parseInt(notification.args.moveId, 10);
+    for (const logId of Object.keys(gameui.log_to_move_id)) {
+      const moveId = parseInt(gameui.log_to_move_id[logId], 10);
+      if (moveId > lastMoveId) {
+        $(`log_${logId}`).remove();
+      }
     }
   },
   notif_rollFireDie: async function (notification) {

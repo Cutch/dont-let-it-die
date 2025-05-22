@@ -335,10 +335,13 @@ class DLD_Character
         });
         $this->game->decks->removeFromDeck($card['deck'], $card['id']);
         $this->game->hooks->onAcquireHindrance($card);
-        $this->game->activeCharacterEventLog(clienttranslate('${character_name} ${acquireSentence} ${name}'), [
+        $this->game->eventLog(clienttranslate('${character_name} ${acquireSentence} ${name} ${buttons}'), [
             'acquireSentence' => $card['acquireSentence'],
             'name' => $card['name'],
             'character_name' => $this->game->getCharacterHTML($characterName),
+            'buttons' => notifyButtons([
+                ['name' => $this->game->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'hindrance'],
+            ]),
         ]);
     }
     public function removeHindrance(string $characterName, array $card): void
@@ -351,10 +354,13 @@ class DLD_Character
                 }
             );
         });
-        $this->game->activeCharacterEventLog(clienttranslate('${character_name} no longer ${dropSentence} ${cardName}'), [
+        $this->game->eventLog(clienttranslate('${character_name} no longer ${dropSentence} ${cardName} ${buttons}'), [
             'dropSentence' => $card['dropSentence'],
             'cardName' => $card['name'],
             'character_name' => $this->game->getCharacterHTML($characterName),
+            'buttons' => notifyButtons([
+                ['name' => $this->game->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'hindrance'],
+            ]),
         ]);
         $this->game->decks->addBackToDeck($card['deck'], $card['id']);
     }
@@ -582,7 +588,7 @@ class DLD_Character
         $data['health'] = clamp($data['health'] + $hookData['change'], 0, $data['maxHealth']);
         $prev = $data['health'] - $prev;
         if ($data['health'] == 0 && !$data['incapacitated']) {
-            $this->game->activeCharacterEventLog(clienttranslate('${character_name} is incapacitated'), [
+            $this->game->eventLog(clienttranslate('${character_name} is incapacitated'), [
                 'character_name' => $this->game->getCharacterHTML($characterName),
             ]);
             $data['incapacitated'] = true;
