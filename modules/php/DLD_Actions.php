@@ -558,6 +558,14 @@ class DLD_Actions
                         $this->game->actInterrupt->getLatestInterruptState()['data']['currentState'],
                         $actionObj['interruptState']
                     ))) &&
+            (!(array_key_exists('manuallyAdd', $actionObj) && $actionObj['manuallyAdd']) ||
+                ($this->game->actInterrupt->getLatestInterruptState() &&
+                    in_array(
+                        $actionObj['id'],
+                        array_map(function ($d) {
+                            return $d['id'];
+                        }, $this->game->actInterrupt->getLatestInterruptState()['data']['skills'])
+                    ))) &&
             (!array_key_exists('requires', $actionObj) || $actionObj['requires']($this->game, $actionObj, ...$args));
     }
     public function spendActionCost(string $action, ?string $subAction = null)
