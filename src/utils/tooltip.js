@@ -4,9 +4,11 @@ export class Tooltip {
   constructor(gamePlayAreaElem) {
     gamePlayAreaElem.insertAdjacentHTML(
       'beforeend',
-      `<div id="tooltip-overlay"><div class="inner">
+      `<div id="tooltip-overlay">
         <div class="close"><i class="fa fa-times fa-2x" aria-hidden="true"></i></div>
-        <div class="body"></div>
+        <div class="inner">
+          <div class="body">
+        </div>
       </div></div>`,
     );
     this.tooltipElem = $('tooltip-overlay');

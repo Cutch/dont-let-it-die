@@ -23,12 +23,15 @@
     justify-content: center;
   }
   .close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
     border-radius: 50%;
     border: 1px solid black;
     background-color: white;
     z-index: 1;
-    width: 3rem;
-    height: 3rem;
+    width: 4rem;
+    height: 4rem;
     display: flex;
     align-items: center;
     justify-content: center;

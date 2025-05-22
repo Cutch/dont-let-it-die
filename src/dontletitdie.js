@@ -18,7 +18,6 @@
 import dojo from 'dojo'; // Loads the dojo object using dojoConfig if needed
 import declare from 'dojo/_base/declare'; // Add 'declare' to dojo if needed
 import Gamegui from 'ebg/core/gamegui'; // Loads Gamegui class onto ebg.core.gamegui if needed
-import Gamenotif from 'ebg/gamenotif';
 import 'ebg/counter'; // Loads Counter class onto ebg.counter if needed
 import { getAllData } from './assets';
 import { CardSelectionScreen } from './screens/card-selection-screen';
@@ -36,7 +35,7 @@ import { TokenScreen } from './screens/token-screen';
 import { TooManyItemsScreen } from './screens/too-many-items-screen';
 import { UpgradeSelectionScreen } from './screens/upgrade-selection-screen';
 import { WeaponScreen } from './screens/weapon-screen';
-import { addClickListener, Deck, Dice, renderImage, renderText, Selector, Tooltip, Tweening } from './utils/index';
+import { addClickListener, Deck, Dice, isStudio, renderImage, renderText, Selector, Tooltip, Tweening } from './utils/index';
 
 declare('bgagame.dontletitdie', Gamegui, {
   constructor: function () {
@@ -47,6 +46,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.selector = null;
     this.tooltip = null;
     this.decks = {};
+    this.clickListeners = [];
     this.cardSelectionScreen = new CardSelectionScreen(this);
     this.characterSelectionScreen = new CharacterSelectionScreen(this);
     this.deckSelectionScreen = new DeckSelectionScreen(this);
@@ -628,10 +628,6 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.decks[deck].drawCard(gameData.game.partials[deck].id, true);
         }
         this.decks[deck].updateMarker(gameData.decks[deck]);
-
-        addClickListener(document.querySelector(`.board .${deck}-back`), `${uppercaseDeck} Deck`, () => {
-          this.bgaPerformAction(`actDraw${uppercaseDeck}`);
-        });
       }
     });
 
@@ -726,10 +722,6 @@ declare('bgagame.dontletitdie', Gamegui, {
         .querySelector(`.track-${this.trackDifficulty}`)
         .insertAdjacentHTML('beforeend', `<div id="fire-pit" class="fire-pit"><div class="fire-wood"></div></div>`);
       renderImage(`fire`, $('fire-pit'), { scale: 4, pos: 'insert' });
-
-      addClickListener(document.querySelector(`#fire-pit .fire-wood`), 'Add Fire Wood', () => {
-        this.bgaPerformAction(`actAddWood`);
-      });
     }
     // const firewoodElem = document.querySelector(`#fire-pit .fire-wood`);
     // firewoodElem.innerHTML = '';
@@ -848,13 +840,14 @@ declare('bgagame.dontletitdie', Gamegui, {
     }
 
     const selections = document.querySelector(`#knowledge-container .selections`);
+    const upgradeData = getAllData()[`knowledge-tree-${this.difficulty}`].upgrades;
     selections.innerHTML = '';
     // Hindrance show new discoveries
     if (gameData.upgrades) {
       Object.keys(gameData.upgrades).forEach((unlockId) => {
         const unlockSpot = gameData.upgrades[unlockId].replace;
         if (unlockSpot) {
-          const { x, y } = getAllData()[`knowledge-tree-${this.difficulty}`].upgrades[unlockSpot];
+          const { x, y } = upgradeData[unlockSpot];
           selections.insertAdjacentHTML(
             'beforeend',
             `<div class="discovery-spot ${unlockSpot}" style="position: absolute;top: ${(y - 7) * 1.2}px; left: ${
@@ -874,7 +867,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     knowledgeContainer.innerHTML = '';
     gameData.unlocks.forEach((unlockName) => {
       const unlockSpot = gameData.upgrades[unlockName]?.replace ?? unlockName;
-      const { x, y } = getAllData()[`knowledge-tree-${this.difficulty}`].upgrades[unlockSpot];
+      const { x, y } = upgradeData[unlockSpot];
       knowledgeContainer.insertAdjacentHTML(
         'beforeend',
         `<div id="knowledge-${unlockSpot}" class="fkp" style="top: ${y * 1.2}px; left: ${x * 1.2}px;"></div>`,
@@ -884,7 +877,7 @@ declare('bgagame.dontletitdie', Gamegui, {
 
     gameData.allUnlocks.forEach((unlockId) => {
       if (gameData.upgrades[unlockId]) return;
-      const { x, y } = getAllData()[`knowledge-tree-${this.difficulty}`].upgrades[unlockId];
+      const { x, y } = upgradeData[unlockId];
       selections.insertAdjacentHTML(
         'beforeend',
         `<div class="fkp-spot ${unlockId}" style="top: ${(y - 7) * 1.2}px; left: ${(x - 103) * 1.2}px;"></div>`,
@@ -896,6 +889,26 @@ declare('bgagame.dontletitdie', Gamegui, {
         renderImage(unlockId, this.tooltip.renderByElement(), { textOnly: true, pos: 'insert', type: 'tooltip-unlock' });
       });
     });
+
+    // Sort the nodes in the selection for tab indexing
+    const items = selections.children;
+    const itemsArr = [];
+    for (const i in items) {
+      if (items[i].nodeType == 1) {
+        itemsArr.push(items[i]);
+      }
+    }
+
+    itemsArr.sort((a, b) => {
+      const dx = Math.round((parseInt(a.style?.left ?? 0, 10) - parseInt(b.style?.left ?? 0, 10)) / 10);
+      const dy = Math.round((parseInt(a.style?.top ?? 0, 10) - parseInt(b.style?.top ?? 0, 10)) / 10);
+      if (dy !== 0) return dy;
+      else return dx;
+    });
+
+    for (const i = 0; i < itemsArr.length; ++i) {
+      selections.appendChild(itemsArr[i]);
+    }
   },
   updateGameDatas: function (gameData = {}) {
     const clone = { ...gameData };
@@ -918,8 +931,8 @@ declare('bgagame.dontletitdie', Gamegui, {
       this.updateGameDatas(args.args.gameData);
     }
     const isActive = this.isActive();
-
-    console.log('Entering state: ' + stateName, args, isActive, this.getActivePlayers(), gameui.isPlayerActive(), this.player_id);
+    if (isStudio())
+      console.log('Entering state: ' + stateName, args, isActive, this.getActivePlayers(), gameui.isPlayerActive(), this.player_id);
     // this.updateResources(args.args);
     switch (stateName) {
       case 'tooManyItems':
@@ -981,7 +994,7 @@ declare('bgagame.dontletitdie', Gamegui, {
   //                 You can use this method to perform some user interface changes at this moment.
   //
   onLeavingState: async function (stateName) {
-    console.log('Leaving state: ' + stateName);
+    if (isStudio()) console.log('Leaving state: ' + stateName);
     switch (stateName) {
       case 'morningPhase':
         await this.wait(500);
@@ -1041,23 +1054,29 @@ declare('bgagame.dontletitdie', Gamegui, {
         ` <i class="fa fa-circle-o-notch dlid__forever"></i> ` + _('${remaining} left').replace(/\$\{remaining\}/, action['perForever']);
     return suffix;
   },
+  clearActionButtons: function () {
+    this.removeActionButtons();
+    this.clickListeners.forEach((clear) => clear());
+    this.clickListeners = [];
+  },
   onUpdateActionButtons: async function (stateName, args) {
     this.updateGameDatas(args);
     const actions = args?.actions;
     // this.currentActions = actions;
     const isActive = this.isActive();
-    console.log(
-      'onUpdateActionButtons',
-      isActive,
-      this.getActivePlayers(),
-      gameui.isPlayerActive(),
-      this.player_id,
-      args,
-      actions,
-      stateName,
-    );
+    if (isStudio())
+      console.log(
+        'onUpdateActionButtons',
+        isActive,
+        this.getActivePlayers(),
+        gameui.isPlayerActive(),
+        this.player_id,
+        args,
+        actions,
+        stateName,
+      );
     if (isActive && stateName && actions != null) {
-      this.removeActionButtons();
+      this.clearActionButtons();
 
       // Add test action buttons in the action status bar, simulating a card click:
       if (actions) {
@@ -1081,10 +1100,25 @@ declare('bgagame.dontletitdie', Gamegui, {
                 );
               }
             }
+            if (actionId === 'actAddWood') {
+              this.clickListeners.push(
+                addClickListener(document.querySelector(`#fire-pit .fire-wood`), 'Add Fire Wood', () => {
+                  this.bgaPerformAction(`actAddWood`);
+                }),
+              );
+            } else if (['actDrawGather', 'actDrawForage', 'actDrawHarvest', 'actDrawHunt', 'actDrawExplore'].includes(actionId)) {
+              const uppercaseDeck = actionId.slice(7);
+
+              this.clickListeners.push(
+                addClickListener(document.querySelector(`.board .${uppercaseDeck.toLowerCase()}-back`), `${uppercaseDeck} Deck`, () => {
+                  this.bgaPerformAction(`actDraw${uppercaseDeck}`);
+                }),
+              );
+            }
             const suffix = this.getActionSuffixHTML(action);
             return this.statusBar.addActionButton(`${this.getActionMappings()[actionId]}${suffix}`, () => {
               if (actionId === 'actSpendFKP') {
-                this.removeActionButtons();
+                this.clearActionButtons();
                 Object.values(this.gamedatas.availableUnlocks).forEach((unlock) => {
                   const suffix = this.getActionSuffixHTML(unlock);
                   this.statusBar.addActionButton(`${_(unlock.name)}${suffix}`, () => {
@@ -1093,7 +1127,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                 });
                 this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
               } else if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
-                this.removeActionButtons();
+                this.clearActionButtons();
                 Object.values(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills).forEach(
                   (skill) => {
                     (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
@@ -1107,7 +1141,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                 );
                 this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
               } else if (actionId === 'actTrade') {
-                this.removeActionButtons();
+                this.clearActionButtons();
                 this.tradeScreen.show(this.gamedatas);
                 this.statusBar.addActionButton(this.getActionMappings().actTradeItem + `${suffix}`, () => {
                   if (!this.tradeScreen.hasError()) {
@@ -1138,7 +1172,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                 // .catch(console.error);
                 // }
               } else if (actionId === 'actCraft') {
-                this.removeActionButtons();
+                this.clearActionButtons();
                 this.craftScreen.show(this.gamedatas);
                 this.statusBar.addActionButton(this.getActionMappings().actCraft + `${suffix}`, () => {
                   if (!this.craftScreen.hasError()) {
@@ -1160,7 +1194,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                   { color: 'secondary' },
                 );
               } else if (actionId === 'actCook') {
-                this.removeActionButtons();
+                this.clearActionButtons();
                 this.cookScreen.show(this.gamedatas);
                 this.statusBar.addActionButton(this.getActionMappings().actEat + `${suffix}`, () => {
                   if (!this.cookScreen.hasError()) {
@@ -1182,7 +1216,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                   { color: 'secondary' },
                 );
               } else if (actionId === 'actRevive') {
-                this.removeActionButtons();
+                this.clearActionButtons();
                 this.reviveScreen.show(this.gamedatas);
                 this.statusBar.addActionButton(this.getActionMappings().actRevive + `${suffix}`, () => {
                   if (!this.reviveScreen.hasError()) {
@@ -1207,7 +1241,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                 );
               }
               // else if (actionId === 'actUseHerb') {
-              //   this.removeActionButtons();
+              //   this.clearActionButtons();
               //   this.eatScreen.show(args);
               //   this.statusBar.addActionButton(this.getActionMappings().actUseHerb + `${suffix}`, () => {
               //     if (!this.eatScreen.hasError()) {
@@ -1230,7 +1264,7 @@ declare('bgagame.dontletitdie', Gamegui, {
               //   );
               // }
               else if (actionId === 'actEat') {
-                this.removeActionButtons();
+                this.clearActionButtons();
                 this.eatScreen.show(this.gamedatas);
                 this.statusBar.addActionButton(_('Eat') + `${suffix}`, () => {
                   if (!this.eatScreen.hasError()) {
@@ -1252,7 +1286,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                   { color: 'secondary' },
                 );
               } else if (actionId === 'actInvestigateFire' && this.gamedatas.activeCharacter === 'Cali') {
-                this.removeActionButtons();
+                this.clearActionButtons();
                 [0, 1, 2, 3].forEach((i) => {
                   this.statusBar.addActionButton(`${_('Guess')} ${i}`, () => {
                     return this.bgaPerformAction(actionId, { guess: i });
@@ -1486,25 +1520,25 @@ declare('bgagame.dontletitdie', Gamegui, {
   },
   notif_rollFireDie: async function (notification) {
     await this.notificationWrapper(notification);
-    console.log('notif_rollFireDie', notification);
+    if (isStudio()) console.log('notif_rollFireDie', notification);
     return this.dice.roll(notification.args.roll);
   },
   notif_cardDrawn: async function (notification) {
     await this.notificationWrapper(notification);
-    console.log('notif_cardDrawn', notification);
+    if (isStudio()) console.log('notif_cardDrawn', notification);
     this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
     await this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
     this.decks[notification.args.deck].updateMarker(notification.args.decks[notification.args.deck]);
   },
   notif_shuffle: async function (notification) {
     await this.notificationWrapper(notification);
-    console.log('notif_shuffle', notification);
+    if (isStudio()) console.log('notif_shuffle', notification);
     this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
     return this.decks[notification.args.deck].shuffle();
   },
   notif_updateGameData: async function (notification) {
     await this.notificationWrapper(notification);
-    console.log('notif_updateGameData', notification);
+    if (isStudio()) console.log('notif_updateGameData', notification);
     this.updatePlayers(notification.args.gameData);
     this.updateItems(notification.args.gameData);
     this.updateKnowledgeTree(notification.args.gameData);
@@ -1514,13 +1548,13 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
   },
   notif_updateActionButtons: async function (notification) {
-    console.log('notif_updateActionButtons', notification);
+    if (isStudio()) console.log('notif_updateActionButtons', notification);
     await this.notificationWrapper(notification);
     await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
   },
   notif_updateKnowledgeTree: async function (notification) {
     await this.notificationWrapper(notification);
-    console.log('notif_updateKnowledgeTree', notification);
+    if (isStudio()) console.log('notif_updateKnowledgeTree', notification);
     this.updateItems(notification.args.gameData);
     this.updateKnowledgeTree(notification.args.gameData);
     if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
@@ -1528,7 +1562,7 @@ declare('bgagame.dontletitdie', Gamegui, {
 
   notif_characterClicked: async function (notification) {
     await this.notificationWrapper(notification);
-    console.log('notif_characterClicked', notification);
+    if (isStudio()) console.log('notif_characterClicked', notification);
     this.selectedCharacters = notification.args.gameData.characters;
     this.updateCharacterSelections(notification.args);
   },
@@ -1537,13 +1571,13 @@ declare('bgagame.dontletitdie', Gamegui, {
   },
   notif_updateCharacterData: async function (notification) {
     await this.notificationWrapper(notification);
-    console.log('notif_updateCharacterData', notification);
+    if (isStudio()) console.log('notif_updateCharacterData', notification);
     this.updatePlayers(notification.args.gameData);
     this.updateItems(notification.args.gameData);
   },
   notif_tokenUsed: async function (notification) {
     await this.notificationWrapper(notification);
-    console.log('notif_tokenUsed', notification);
+    if (isStudio()) console.log('notif_tokenUsed', notification);
     this.updateResources(notification.args.gameData);
   },
 });

@@ -1196,32 +1196,26 @@ class Game extends \Table
                     );
                 } elseif ($card['deckType'] == 'nothing') {
                     if (!$this->isValidExpansion('mini-expansion')) {
-                        $this->eventLog(
-                            clienttranslate('${character_name} did nothing ${buttons}', [
-                                'buttons' => notifyButtons([
-                                    ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
-                                ]),
-                            ])
-                        );
+                        $this->eventLog(clienttranslate('${character_name} did nothing ${buttons}'), [
+                            'buttons' => notifyButtons([
+                                ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
+                            ]),
+                        ]);
                     }
                 } elseif ($card['deckType'] == 'physical-hindrance') {
-                    $this->eventLog(
-                        clienttranslate('${character_name} must draw a ${deck} ${buttons}', [
-                            'deck' => clienttranslate('Physical Hindrance'),
-                            'buttons' => notifyButtons([
-                                ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
-                            ]),
-                        ])
-                    );
+                    $this->eventLog(clienttranslate('${character_name} must draw a ${deck} ${buttons}'), [
+                        'deck' => clienttranslate('Physical Hindrance'),
+                        'buttons' => notifyButtons([
+                            ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
+                        ]),
+                    ]);
                 } elseif ($card['deckType'] == 'mental-hindrance') {
-                    $this->eventLog(
-                        clienttranslate('${character_name} must draw a ${deck} ${buttons}', [
-                            'deck' => clienttranslate('Mental Hindrance'),
-                            'buttons' => notifyButtons([
-                                ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
-                            ]),
-                        ])
-                    );
+                    $this->eventLog(clienttranslate('${character_name} must draw a ${deck} ${buttons}'), [
+                        'deck' => clienttranslate('Mental Hindrance'),
+                        'buttons' => notifyButtons([
+                            ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
+                        ]),
+                    ]);
                 } else {
                 }
                 return [...$state, 'discard' => false];
@@ -1328,13 +1322,11 @@ class Game extends \Table
                 if (!$data || !array_key_exists('onUse', $data) || $data['onUse'] != false) {
                     $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
                 }
-                $this->eventLog(
-                    clienttranslate('Drew night event ${buttons}', [
-                        'buttons' => notifyButtons([
-                            ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'night-event'],
-                        ]),
-                    ])
-                );
+                $this->eventLog(clienttranslate('Drew night event ${buttons}'), [
+                    'buttons' => notifyButtons([
+                        ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'night-event'],
+                    ]),
+                ]);
 
                 $this->nextState('morningPhase');
             }

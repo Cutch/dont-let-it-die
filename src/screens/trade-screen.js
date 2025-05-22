@@ -1,4 +1,4 @@
-import { addClickListener, addPassiveListener, renderImage, scrollArrow } from '../utils/index';
+import { addClickListener, addPassiveListener, addShowHideButton, renderImage, scrollArrow } from '../utils/index';
 export class TradeScreen {
   constructor(game) {
     this.game = game;
