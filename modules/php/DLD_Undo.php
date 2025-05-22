@@ -11,11 +11,11 @@ class DLD_Undo
 {
     private Game $game;
     private array $initialState;
+    private ?int $savedMoveId = null;
     private bool $actionWasCleared = false;
     public function __construct(Game $game)
     {
         $this->game = $game;
-        $this->loadInitialState();
     }
 
     public function actUndo(): void
@@ -28,7 +28,7 @@ class DLD_Undo
         }
         $char = $this->game->character->getTurnCharacterId();
         $undoState = $this->game->getFromDB(
-            'SELECT * FROM `undoState` a INNER JOIN (SELECT max(undo_id) last_id FROM `undoState`) b WHERE b.last_id = a.undo_id'
+            'SELECT * FROM `undoState` a INNER JOIN (SELECT max(undo_id) max_last_id FROM `undoState`) b WHERE b.max_last_id = a.undo_id'
         );
         $storedCharacterId = $undoState['character_name'];
         if ($char != $storedCharacterId) {
@@ -65,18 +65,6 @@ class DLD_Undo
     }
     public function resetNotifications($moveId): void
     {
-        // $removeNotifications = array_merge(
-        //     ...array_map(function ($json) {
-        //         return json_decode($json);
-        //     }, array_keys(
-        //         $this->game->getCollectionFromDB(
-        //             'SELECT json_extract(`gamelog_notification`, \'$[*].uid\') as array FROM `gamelog` WHERE gamelog_move_id > ' .
-        //                 $moveId .
-        //                 ' AND json_extract(`gamelog_notification`, \'$[*].log\') REGEXP \'"[^"]{4,}"\'',
-        //             true
-        //         )
-        //     ))
-        // );
         $this->game::DbQuery("DELETE FROM `gamelog` WHERE gamelog_move_id > $moveId");
         $this->game->notify('resetNotifications', '', ['moveId' => $moveId]);
     }
@@ -92,6 +80,7 @@ class DLD_Undo
             'itemsData' => $itemsData,
             'characterData' => $characterData,
             'globalsData' => $globalsData,
+            'stateName' => $this->game->gamestate->state()['name'],
         ];
     }
     public function saveState(): void
@@ -99,14 +88,18 @@ class DLD_Undo
         $char = $this->game->character->getTurnCharacterId();
         if (
             !$this->actionWasCleared &&
-            $this->game->gamestate->state()['name'] == 'playerTurn' &&
             $this->initialState &&
+            $this->initialState['stateName'] == 'playerTurn' &&
             $char == $this->game->character->getSubmittingCharacterId()
         ) {
+            if ($this->savedMoveId != null) {
+                $this->game::DbQuery('DELETE FROM `undoState` where gamelog_move_id=' . $this->savedMoveId);
+            }
             $moveId = $this->initialState['moveId'];
             $itemsData = $this->initialState['itemsData'];
             $characterData = $this->initialState['characterData'];
             $globalsData = $this->initialState['globalsData'];
+            $this->savedMoveId = $moveId;
             $this->game::DbQuery(
                 "INSERT INTO `undoState` (`character_name`, `gamelog_move_id`, `itemTable`, `characterTable`, `globalsTable`) VALUES ('$char', $moveId, '$itemsData', '$characterData', '$globalsData')"
             );

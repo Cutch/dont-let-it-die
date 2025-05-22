@@ -117,6 +117,10 @@ class Game extends \Table
     {
         $this->undo->actUndo();
     }
+    protected function initTable(): void
+    {
+        $this->undo->loadInitialState();
+    }
     public function nextState(string $transition)
     {
         if ($this->getBgaEnvironment() == 'studio') {
@@ -1456,6 +1460,7 @@ class Game extends \Table
         $this->hooks->onEndTurn($data);
         $this->gameData->set('lastAction', null);
         $this->nextState('endTurn');
+        $this->undo->clearUndoHistory();
     }
     /**
      * The action method of state `nextCharacter` is called every time the current game state is set to `nextCharacter`.
@@ -2201,8 +2206,10 @@ class Game extends \Table
 
     public function zombieBack(): void
     {
+        $this->undo->clearUndoHistory();
         $returningPlayerId = $this->getCurrentPlayerId();
         $this->character->unZombiePlayer($returningPlayerId);
+        $this->reloadPlayersBasicInfos();
         $this->character->clearCache();
 
         $stateName = $this->gamestate->state()['name'];
