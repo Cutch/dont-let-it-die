@@ -268,8 +268,19 @@ class DLD_Encounter
                         }
                     }
                     $damageTaken = $this->countDamageTaken($data);
+                    if ($damageTaken > 0) {
+                        $this->game->incStat($damageTaken, 'health_lost', $this->game->character->getSubmittingCharacter()['playerId']);
+                    }
+                    if ($data['characterDamage'] > 0) {
+                        $this->game->incStat(
+                            $data['characterDamage'],
+                            'damage_done',
+                            $this->game->character->getSubmittingCharacter()['playerId']
+                        );
+                    }
                     $data['damageTaken'] = $damageTaken;
                     if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                        // Killed
                         if ($damageTaken != 0) {
                             if ($data['damageStamina']) {
                                 $_this->character->adjustActiveStamina(-$damageTaken);
@@ -279,6 +290,7 @@ class DLD_Encounter
                         }
                         if ($_this->character->getActiveHealth() != 0) {
                             $_this->adjustResource('meat', $data['willReceiveMeat']);
+
                             if ($damageTaken > 0) {
                                 $_this->eventLog(
                                     '${character_name} defeated a ${name}, gained ${willReceiveMeat} meat and lost ${damageTaken} ${resource}',
@@ -293,6 +305,13 @@ class DLD_Encounter
                                     clienttranslate('${character_name} defeated a ${name} and gained ${willReceiveMeat} meat'),
                                     [...$data]
                                 );
+                            }
+                            foreach ($data['loot'] as $k => $num) {
+                                $_this->adjustResource($k, $num);
+                                $this->game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                                    'count' => $num,
+                                    'resource_type' => $k,
+                                ]);
                             }
                         }
                     } else {

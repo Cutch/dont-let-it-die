@@ -264,6 +264,9 @@ class Game extends \Table
         $newValue = clamp($currentCount + $change, 0, $maxCount);
         $this->gameData->setResource($resourceType, $newValue);
         $difference = $currentCount - $newValue + $change;
+        if ($change > 0) {
+            $this->incStat($change, 'resources_collected', $this->character->getSubmittingCharacter()['playerId']);
+        }
 
         return ['left' => $difference, 'changed' => $newValue - $currentCount];
     }
@@ -1623,6 +1626,7 @@ class Game extends \Table
                 $this->notify('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
                     'day' => $day,
                 ]);
+                $this->setStat($day, 'day_number');
                 if ($day == 14) {
                     $this->lose();
                 }
@@ -2190,6 +2194,11 @@ class Game extends \Table
             )
         );
 
+        $this->initStat('table', 'day_number', 1);
+        $this->initStat('player', 'damage_done', 0);
+        $this->initStat('player', 'health_lost', 0);
+        $this->initStat('player', 'stamina_used', 0);
+        $this->initStat('player', 'resources_collected', 0);
         $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         $this->reloadPlayersBasicInfos();
 

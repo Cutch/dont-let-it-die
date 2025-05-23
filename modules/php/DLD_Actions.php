@@ -582,6 +582,10 @@ class DLD_Actions
         }
         if (array_key_exists('stamina', $cost)) {
             $this->game->character->adjustActiveStamina(-$cost['stamina']);
+
+            if ($cost['stamina'] > 0) {
+                $this->game->incStat($cost['stamina'], 'stamina_used', $this->game->character->getSubmittingCharacter()['playerId']);
+            }
         }
     }
     public function validateCanRunAction(string $action, ?string $subAction = null, ...$args)

@@ -1,1 +1,31 @@
-{}
+{
+    "table": {
+        "day_number": {
+            "id": 10,
+            "name": "Day Number",
+            "type": "int"
+        }
+    },
+    "player": {
+        "damage_done": {
+            "id": 10,
+            "name": "Damage Done",
+            "type": "int"
+        },
+        "stamina_used": {
+            "id": 11,
+            "name": "Stamina Used",
+            "type": "int"
+        },
+        "resources_collected": {
+            "id": 12,
+            "name": "Resources Collected",
+            "type": "int"
+        },
+        "health_lost": {
+            "id": 13,
+            "name": "Health Lost",
+            "type": "int"
+        }
+    }
+}
