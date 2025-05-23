@@ -226,7 +226,7 @@ $machinestates = [
         'type' => 'activeplayer',
         'action' => 'stPostEncounter',
         'args' => 'argPostEncounter',
-        'possibleactions' => [],
+        'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'drawCard' => 11, 'changeZombiePlayer' => 97],
     ],
     22 => [

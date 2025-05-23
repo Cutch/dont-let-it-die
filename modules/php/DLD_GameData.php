@@ -187,7 +187,7 @@ class DLD_GameData
     }
     public function getResourceLeft(string $name): int
     {
-        return $this->getResource($name) - $this->getResourceMax($name);
+        return $this->getResourceMax($name) - $this->getResource($name);
     }
     public function getResources(...$names): array
     {

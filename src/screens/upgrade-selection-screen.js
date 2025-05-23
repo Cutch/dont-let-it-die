@@ -51,7 +51,9 @@ export class UpgradeSelectionScreen {
       const { x, y } = getAllData()[`knowledge-tree-${this.game.difficulty}`].upgrades[unlockId];
       selections.insertAdjacentHTML(
         'beforeend',
-        `<div class="fkp-spot ${gameData.selectableUpgrades.includes(unlockId) ? 'fkp-spot-outline' : ''} ${unlockId}" style="top: ${(y - 7) * 1.2}px; left: ${(x - 103) * 1.2}px;"></div>`,
+        `<div class="fkp-spot ${
+          gameData.selectableUpgrades.includes(unlockId) && this.game.isActive() ? 'fkp-spot-outline' : ''
+        } ${unlockId}" style="top: ${(y - 7) * 1.2}px; left: ${(x - 103) * 1.2}px;"></div>`,
       );
       const elem = selections.querySelector(`.fkp-spot.${unlockId}`);
       if (!gameData.selectableUpgrades.includes(unlockId)) {
@@ -69,30 +71,31 @@ export class UpgradeSelectionScreen {
           });
         }
         if (this.upgradeSelected.replace == unlockId) elem.style['outline'] = `5px solid #fff`;
-        addClickListener(elem, 'Select', () => {
-          const filled = Object.entries(gameData.upgrades).reduce((acc, [k, v]) => (v.replace ? { ...acc, [v.replace]: k } : acc), {});
-          // Swap condition
-          if (
-            this.upgradeSelected.from == null &&
-            this.upgradeSelected.replace &&
-            this.upgradeSelected.replace != unlockId &&
-            (filled[this.upgradeSelected.replace] || filled[unlockId])
-          ) {
-            this.upgradeSelected.from = unlockId;
-            elem.style['outline'] = `5px solid #fff`;
-          } else {
-            if (this.upgradeSelected.replace) {
-              selections.querySelector(`.fkp-spot.${this.upgradeSelected.replace}`).style['outline'] = '';
-            }
-            if (this.upgradeSelected.replace == unlockId) {
-              this.upgradeSelected.replace = null;
-            } else {
-              this.upgradeSelected.replace = unlockId;
+        if (this.game.isActive())
+          addClickListener(elem, 'Select', () => {
+            const filled = Object.entries(gameData.upgrades).reduce((acc, [k, v]) => (v.replace ? { ...acc, [v.replace]: k } : acc), {});
+            // Swap condition
+            if (
+              this.upgradeSelected.from == null &&
+              this.upgradeSelected.replace &&
+              this.upgradeSelected.replace != unlockId &&
+              (filled[this.upgradeSelected.replace] || filled[unlockId])
+            ) {
+              this.upgradeSelected.from = unlockId;
               elem.style['outline'] = `5px solid #fff`;
+            } else {
+              if (this.upgradeSelected.replace) {
+                selections.querySelector(`.fkp-spot.${this.upgradeSelected.replace}`).style['outline'] = '';
+              }
+              if (this.upgradeSelected.replace == unlockId) {
+                this.upgradeSelected.replace = null;
+              } else {
+                this.upgradeSelected.replace = unlockId;
+                elem.style['outline'] = `5px solid #fff`;
+              }
             }
-          }
-          this.sendSelection();
-        });
+            this.sendSelection();
+          });
       }
     });
   }
@@ -130,18 +133,19 @@ export class UpgradeSelectionScreen {
       renderImage(unlockId, itemsElem, { scale: 1 });
       const discovery = itemsElem.querySelector(`*[name="${unlockId}"]`);
       discovery.insertAdjacentHTML('beforeend', `<i class="fa fa-check-circle-o fa-2x upgrade-placed" aria-hidden="true"></i>`);
-      addClickListener(discovery, 'Select', () => {
-        if (this.upgradeSelected.from) {
-          itemsElem.querySelector(`*[name="${this.upgradeSelected.from}"]`).style['outline'] = '';
-        }
-        if (this.upgradeSelected.from == unlockId) {
-          this.upgradeSelected.from = null;
-        } else {
-          this.upgradeSelected.from = unlockId;
-          discovery.style['outline'] = `5px solid #fff`;
-        }
-        this.sendSelection();
-      });
+      if (this.game.isActive())
+        addClickListener(discovery, 'Select', () => {
+          if (this.upgradeSelected.from) {
+            itemsElem.querySelector(`*[name="${this.upgradeSelected.from}"]`).style['outline'] = '';
+          }
+          if (this.upgradeSelected.from == unlockId) {
+            this.upgradeSelected.from = null;
+          } else {
+            this.upgradeSelected.from = unlockId;
+            discovery.style['outline'] = `5px solid #fff`;
+          }
+          this.sendSelection();
+        });
       this.game.addHelpTooltip({
         node: discovery,
         tooltipText: unlockId,

@@ -486,7 +486,7 @@ export default {
             { title: 'Loka' },
             _('Gain 1 Wood when the Tribe unlocks a discovery'),
             _(
-              'Spend 2 Stamina, from the supply, place a Hide token here. Loka can discard a Hide on this card back to the supply to reduce damage of a Danger! card by 1 OR take +1 Resource from a drawn Resource card',
+              'Spend 2 Stamina, place a Hide token here from the supply. Loka can discard a Hide on this card back to the supply to reduce damage of a Danger! card by 1 OR take +1 Resource from a drawn Resource card',
             ),
           ],
         },

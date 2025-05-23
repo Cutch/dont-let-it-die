@@ -22,6 +22,11 @@ if (!function_exists('getUsePerDay')) {
         $dailyUseItems[$itemId] = array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] - 1 : 0;
         $game->gameData->set('dailyUseItems', $dailyUseItems);
         $game->markChanged('token');
+        $game->markChanged('player');
+    }
+    function getUsePerForeverItems(Game $game)
+    {
+        return $game->gameData->get('foreverUseItems');
     }
     function getUsePerForever(string $itemId, Game $game)
     {
@@ -34,6 +39,7 @@ if (!function_exists('getUsePerDay')) {
         $foreverUseItems[$itemId] = array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] + 1 : 1;
         $game->gameData->set('foreverUseItems', $foreverUseItems);
         $game->markChanged('token');
+        $game->markChanged('player');
     }
     function subtractPerForever(string $itemId, Game $game)
     {
@@ -41,6 +47,7 @@ if (!function_exists('getUsePerDay')) {
         $foreverUseItems[$itemId] = min(0, array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] - 1 : 0);
         $game->gameData->set('foreverUseItems', $foreverUseItems);
         $game->markChanged('token');
+        $game->markChanged('player');
     }
     function clearUsePerForever(string $itemId, Game $game)
     {
@@ -48,6 +55,7 @@ if (!function_exists('getUsePerDay')) {
         $foreverUseItems[$itemId] = 0;
         $game->gameData->set('foreverUseItems', $foreverUseItems);
         $game->markChanged('token');
+        $game->markChanged('player');
     }
     function array_orderby()
     {
@@ -209,7 +217,8 @@ class DLD_ItemsData
                 ],
                 'onDraw' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
-                    if ($card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
+                    $char = $game->character->getCharacterData($item['characterId']);
+                    if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
                         $game->gameData->setResource('fiber', $game->gameData->getResource('fiber') + 1);
                         $game->notify(
                             'usedItem',
@@ -235,7 +244,9 @@ class DLD_ItemsData
                 ],
                 'onDraw' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
-                    if ($card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
+
+                    $char = $game->character->getCharacterData($item['characterId']);
+                    if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
                         $game->gameData->setResource('berry', $game->gameData->getResource('berry') + 1);
                         $game->notify(
                             'usedItem',
@@ -437,7 +448,8 @@ class DLD_ItemsData
                 ],
                 'onDraw' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
-                    if ($card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
+                    $char = $game->character->getCharacterData($item['characterId']);
+                    if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
                         $game->gameData->setResource('wood', $game->gameData->getResource('wood') + 1);
                         $game->notify(
                             'usedItem',
@@ -498,7 +510,8 @@ class DLD_ItemsData
                 ],
                 'onDraw' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
-                    if ($card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
+                    $char = $game->character->getCharacterData($item['characterId']);
+                    if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
                         $game->adjustResource('meat', 1);
                         $game->notify(
                             'usedItem',
@@ -547,7 +560,8 @@ class DLD_ItemsData
                 ],
                 'onDraw' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
-                    if ($card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
+                    $char = $game->character->getCharacterData($item['characterId']);
+                    if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
                         $game->gameData->setResource('rock', $game->gameData->getResource('rock') + 1);
                         $game->notify(
                             'usedItem',

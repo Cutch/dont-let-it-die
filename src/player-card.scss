@@ -52,6 +52,12 @@
     left: -1rem;
     z-index: 5;
   }
+  .extra-token {
+    position: absolute;
+    bottom: -1rem;
+    right: -1rem;
+    z-index: 5;
+  }
   .first-player-marker > .image {
     border-radius: unset;
     border: unset;
@@ -94,7 +100,10 @@
     position: absolute;
     width: 20px;
     height: 20px;
-    transition: top 1s linear, left 1s linear, transform 1s linear;
+    transition:
+      top 1s linear,
+      left 1s linear,
+      transform 1s linear;
     border: 3px solid #cdcdcd;
     background-color: #9c9c9c;
     border-radius: 50%;
@@ -103,7 +112,10 @@
     position: absolute;
     width: 20px;
     height: 20px;
-    transition: top 1s linear, left 1s linear, transform 1s linear;
+    transition:
+      top 1s linear,
+      left 1s linear,
+      transform 1s linear;
     border-radius: 50%;
     display: flex;
     align-items: center;

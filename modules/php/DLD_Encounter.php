@@ -248,6 +248,7 @@ class DLD_Encounter
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
+                $_this->log('encounterData', $data);
                 if ($data['stamina'] != 0) {
                     $_this->character->adjustActiveStamina($data['stamina']);
                 }

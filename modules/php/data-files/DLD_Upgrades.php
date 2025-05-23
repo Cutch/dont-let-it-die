@@ -268,9 +268,7 @@ class DLD_UpgradesData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->gameData->destroyResource('fiber');
-                                $interruptState = $game->actInterrupt->getState('stMorningPhase');
-                                $interruptState['woodNeeded'] -= 1;
-                                $game->actInterrupt->setState('stMorningPhase', $interruptState);
+                                $data['data']['woodNeeded'] -= 1;
                             }
                         },
                     ],
@@ -293,10 +291,8 @@ class DLD_UpgradesData
                         },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
-                                $interruptState = $game->actInterrupt->getState('stMorningPhase');
-                                $interruptState['health'] += 1;
-                                $interruptState['woodNeeded'] -= 1;
-                                $game->actInterrupt->setState('stMorningPhase', $interruptState);
+                                $data['data']['health'] += 1;
+                                $data['data']['woodNeeded'] -= 1;
                             }
                         },
                     ],

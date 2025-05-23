@@ -695,7 +695,7 @@ class Game extends \Table
                     if ($left == 0) {
                         $this->notify(
                             'notify',
-                            array_key_exists('stamina', $data)
+                            !array_key_exists('stamina', $data)
                                 ? clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health')
                                 : clienttranslate(
                                     '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
@@ -1324,7 +1324,7 @@ class Game extends \Table
                 if (!$data || !array_key_exists('onUse', $data) || $data['onUse'] != false) {
                     $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
                 }
-                $this->eventLog(clienttranslate('Draw night event ${buttons}'), [
+                $this->eventLog('${buttons}', [
                     'buttons' => notifyButtons([
                         ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'night-event'],
                     ]),
@@ -1839,6 +1839,7 @@ class Game extends \Table
                 return $this->hasResourceCost($item['cost']);
             })
         );
+        $result['foreverUseItems'] = getUsePerForeverItems($this);
     }
     public function getValidTokens(): array
     {

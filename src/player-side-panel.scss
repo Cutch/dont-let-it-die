@@ -6,6 +6,9 @@
   position: relative;
   .equipment-item {
     text-decoration: underline;
+    &.equipment-hide {
+      text-decoration: unset;
+    }
   }
   .hindrance-item {
     text-decoration: underline;

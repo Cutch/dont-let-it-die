@@ -184,8 +184,16 @@ declare('bgagame.dontletitdie', Gamegui, {
       }
       playerSideContainer.querySelector(`.health .value`).innerHTML = `${character.health ?? 0}/${character.maxHealth ?? 0}`;
       playerSideContainer.querySelector(`.stamina .value`).innerHTML = `${character.stamina ?? 0}/${character.maxStamina ?? 0}`;
+
       playerSideContainer.querySelector(`.equipment .value`).innerHTML =
-        [...equipments, ...character.dayEvent, ...character.necklaces]
+        [
+          ...equipments,
+          ...character.dayEvent,
+          ...character.necklaces,
+          ...(gameData.foreverUseItems?.['hide-token'] && character.name == 'Loka'
+            ? [{ itemId: 'hide', name: `${_('Hide')} (${gameData.foreverUseItems['hide-token']})` }]
+            : []),
+        ]
           .map((d) => `<span class="equipment-item equipment-${d.itemId}">${_(d.name)}</span>`)
           .join(', ') || _('None');
       playerSideContainer.querySelector(`.hindrance .value`).innerHTML =
@@ -225,7 +233,7 @@ declare('bgagame.dontletitdie', Gamegui, {
             'beforeend',
             `<div id="player-${character.name}" class="player-card">
                 <div class="card-extra-container"></div>
-                <div class="card"><div class="first-player-marker"></div></div>
+                <div class="card"><div class="first-player-marker"></div><div class="extra-token"></div></div>
                 <div class="color-marker" style="background-color: #${character.playerColor}"></div>
                 <div class="character"><div class="cover"></div></div>
                 <div class="max-health max-marker"></div>
@@ -244,6 +252,12 @@ declare('bgagame.dontletitdie', Gamegui, {
           ? `5px solid #fff` //#${character.playerColor}
           : '';
         document.querySelector(`#player-${character.name} .first-player-marker`).style['display'] = character?.isFirst ? 'block' : 'none';
+
+        const extraTokenElem = document.querySelector(`#player-${character.name} .extra-token`);
+        extraTokenElem.innerHTML = '';
+        if (gameData.foreverUseItems?.['hide-token'] && character.name == 'Loka') {
+          this.updateResource('hide', extraTokenElem, gameData.foreverUseItems['hide-token']);
+        }
 
         document.querySelector(`#player-${character.name} .max-health.max-marker`).style = `left: ${Math.round(
           ((character.maxHealth ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale,

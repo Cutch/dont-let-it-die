@@ -50,7 +50,11 @@ class DLD_CharactersData
                     ],
                 ],
                 'onEncounterPost' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && $data['encounterHealth'] <= $data['characterDamage']) {
+                    if (
+                        $char['isActive'] &&
+                        $data['encounterHealth'] <= $data['characterDamage'] &&
+                        $data['characterRange'] >= $data['requiresRange']
+                    ) {
                         $data['stamina'] += 2;
                         $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => 2,
@@ -662,6 +666,9 @@ class DLD_CharactersData
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             $game->character->adjustActiveHealth(2);
                             $game->eventLog(clienttranslate('${character_name} healed by 2'));
+                            if (sizeof($game->actions->getValidActions()) == 0) {
+                                $game->nextState('playerTurn');
+                            }
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
@@ -1199,6 +1206,7 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Nanuk',
                 'slots' => ['weapon', 'tool'],
+                // Double Health from meat
                 'onEat' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         $data['health'] *= 2;
@@ -1220,6 +1228,84 @@ class DLD_CharactersData
                         );
                     }
                 },
+                // 1 FKP for Danger Cards Killed
+                'onEncounterPost' => function (Game $game, $char, &$data) {
+                    if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                        if ($game->adjustResource('fkp', 1)['changed'] > 0) {
+                            $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                                'count' => 1,
+                                'resource_type' => 'fkp',
+                            ]);
+                        }
+                    }
+                },
+                // Choose Meat, Hide Bone
+                'skills' => [
+                    'skill1' => [
+                        'type' => 'skill',
+                        'name' => clienttranslate('Take Meat'),
+                        'state' => ['interrupt'],
+                        'interruptState' => ['resolveEncounter'],
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                            if ($skill['id'] == $activatedSkill['id']) {
+                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                            }
+                        },
+                        'onEncounter' => function (Game $game, $skill, &$data) {
+                            if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                                $game->actInterrupt->addSkillInterrupt($skill);
+                            }
+                        },
+                        'requires' => function (Game $game, $skill) {
+                            $char = $game->character->getCharacterData($skill['characterId']);
+                            return $char['isActive'];
+                        },
+                    ],
+                    'skill2' => [
+                        'type' => 'skill',
+                        'name' => clienttranslate('Take Hide'),
+                        'state' => ['interrupt'],
+                        'interruptState' => ['resolveEncounter'],
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                            if ($skill['id'] == $activatedSkill['id']) {
+                                $data['data']['loot']['hide'] = $data['data']['willReceiveMeat'];
+                                $data['data']['willReceiveMeat'] = 0;
+                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                            }
+                        },
+                        'onEncounter' => function (Game $game, $skill, &$data) {
+                            if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                                $game->actInterrupt->addSkillInterrupt($skill);
+                            }
+                        },
+                        'requires' => function (Game $game, $skill) {
+                            $char = $game->character->getCharacterData($skill['characterId']);
+                            return $char['isActive'];
+                        },
+                    ],
+                    'skill3' => [
+                        'type' => 'skill',
+                        'name' => clienttranslate('Take Bone'),
+                        'state' => ['interrupt'],
+                        'interruptState' => ['resolveEncounter'],
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                            if ($skill['id'] == $activatedSkill['id']) {
+                                $data['data']['loot']['bone'] = $data['data']['willReceiveMeat'];
+                                $data['data']['willReceiveMeat'] = 0;
+                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                            }
+                        },
+                        'onEncounter' => function (Game $game, $skill, &$data) {
+                            if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                                $game->actInterrupt->addSkillInterrupt($skill);
+                            }
+                        },
+                        'requires' => function (Game $game, $skill) {
+                            $char = $game->character->getCharacterData($skill['characterId']);
+                            return $char['isActive'];
+                        },
+                    ],
+                ],
             ],
             'Nibna' => [
                 'type' => 'character',
@@ -1502,16 +1588,14 @@ class DLD_CharactersData
                         },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
-                                $interruptState = $game->actInterrupt->getState('stResolveEncounter');
-                                $damageTaken = $game->encounter->countDamageTaken($interruptState['data']);
+                                $damageTaken = $game->encounter->countDamageTaken($data['data']);
                                 $game->character->adjustHealth($skill['characterId'], $damageTaken);
                                 $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 1,
                                     'character_resource' => clienttranslate('Health'),
                                     'character_name' => 'Vog',
                                 ]);
-                                $interruptState['willTakeDamage'] = 0;
-                                $game->actInterrupt->setState('stResolveEncounter', $interruptState);
+                                $data['data']['willTakeDamage'] = 0;
                             }
                         },
                         'onUse' => function (Game $game, $skill) {
@@ -1721,7 +1805,7 @@ class DLD_CharactersData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            return $char['isActive'];
+                            return $char['isActive'] && $game->gameData->getResourceLeft('hide') > 0;
                         },
                     ],
                     'skill2' => [
@@ -1733,11 +1817,9 @@ class DLD_CharactersData
                             if ($skill['id'] == $activatedSkill['id']) {
                                 subtractPerForever('hide-token', $game);
 
-                                $interruptState = $game->actInterrupt->getState('stResolveEncounter');
-                                if ($interruptState['data']['willTakeDamage'] > 1) {
-                                    $interruptState['data']['willTakeDamage'] -= 1;
+                                if ($data['data']['willTakeDamage'] > 1) {
+                                    $data['data']['willTakeDamage'] -= 1;
                                 }
-                                $game->actInterrupt->setState('stResolveEncounter', $interruptState);
                             }
                         },
                         'onEncounterPre' => function (Game $game, $skill, &$data) {
@@ -1755,15 +1837,15 @@ class DLD_CharactersData
                         'type' => 'skill',
                         'name' => clienttranslate('+1 Resource'),
                         'state' => ['interrupt'],
-                        'interruptState' => ['playerTurn'],
+                        'interruptState' => ['drawCard'],
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                            $game->log('$interruptState', $skill['id'], $activatedSkill['id']);
                             if ($skill['id'] == $activatedSkill['id']) {
                                 subtractPerForever('hide-token', $game);
 
-                                $interruptState = $game->actInterrupt->getState('stDrawCard');
-                                $card = $interruptState['card'];
+                                $card = $data['data']['card'];
                                 if ($card['deckType'] == 'resource') {
-                                    $game->adjustResource($card['resourceType'], $card['count']);
+                                    $game->adjustResource($card['resourceType'], 1);
                                 }
                             }
                         },
