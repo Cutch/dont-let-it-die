@@ -75,12 +75,17 @@ class DLD_Undo
         $itemsData = json_encode($this->game->gameData->getItems());
         $characterData = json_encode($this->game->character->getAllCharacterData(true));
         $globalsData = json_encode($this->game->gameData->getAll());
+        $stateName = '';
+        try {
+            $stateName = $this->game->gamestate->state()['name'];
+        } catch (Exception $e) {
+        }
         $this->initialState = [
             'moveId' => $moveId,
             'itemsData' => $itemsData,
             'characterData' => $characterData,
             'globalsData' => $globalsData,
-            'stateName' => $this->game->gamestate->state()['name'],
+            'stateName' => $stateName,
         ];
     }
     public function saveState(): void

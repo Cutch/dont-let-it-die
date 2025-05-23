@@ -875,7 +875,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         'beforeend',
         `<div id="knowledge-${unlockSpot}" class="fkp" style="top: ${y * 1.2}px; left: ${x * 1.2}px;"></div>`,
       );
-      renderImage(`fkp-unlocked`, $(`knowledge-${unlockSpot}`), { scale: 2 / 1.2 });
+      renderImage(`fkp-unlocked`, $(`knowledge-${unlockSpot}`), { scale: 2 / 1.2, extraCss: 'fkp-unlocked' });
     });
 
     gameData.allUnlocks.forEach((unlockId) => {

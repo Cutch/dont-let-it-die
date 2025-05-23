@@ -40,6 +40,10 @@ export class Selector {
       this.showHideElem.style.display = 'none';
       this.selectorElem.innerHTML = '';
       this.screenName = null;
+      const fa = this.showHideElem.querySelector('.fa');
+      this.selectorElem.style.visibility = '';
+      fa.classList.add('fa-eye-slash');
+      fa.classList.remove('fa-eye');
     }
   }
   renderByHTML(html) {

@@ -245,12 +245,13 @@ class DLD_CharactersData
                             if ($char['isActive']) {
                                 // Shuffle it
                                 $game->gameData->set('state', ['id' => $skill['id']]);
-                                $game->selectionStates->initiateDeckSelection();
+                                $game->selectionStates->initiateDeckSelection($skill['id']);
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
                         },
                         'onDeckSelection' => function (Game $game, $skill, $data) {
-                            if ($game->gameData->get('state')['id'] == $skill['id']) {
+                            $state = $game->selectionStates->getState('deckSelection');
+                            if ($state['id'] == $skill['id']) {
                                 $game->decks->shuffleInDiscard($data['deck'], false);
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                 $game->eventLog(clienttranslate('${character_name} shuffled the ${deck} deck using their skill'), [
@@ -295,19 +296,16 @@ class DLD_CharactersData
                                 $game->gameData->getResource('bone') > 0;
                         },
                         'onNightDrawCard' => function (Game $game, $skill, $data) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
-                            if ($char['isActive']) {
-                                $game->actInterrupt->addSkillInterrupt($skill);
-                            }
+                            $game->actInterrupt->addSkillInterrupt($skill);
                         },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
-                                $char = $game->character->getCharacterData($skill['characterId']);
                                 usePerDay($skill['getPerDayKey']($game, $skill), $game);
                                 $game->adjustResource('bone', -1);
                                 $game->eventLog(clienttranslate('${character_name} re-draws the night event'));
                                 // TODO: Interrupt and Discard current night event
                                 $card = $game->decks->pickCard('night-event');
+                                $game->setActiveNightCard($card['id']);
                                 $data['state']['card'] = $card;
                                 $game->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
                                 $game->cardDrawEvent($card, 'night-event');
@@ -502,7 +500,9 @@ class DLD_CharactersData
                             $game->character->adjustActiveStamina(-2);
                             $game->character->adjustActiveHealth(2);
                             $game->eventLog(
-                                clienttranslate('gained ${count_1} ${character_resource_1}, lost ${count_2} ${character_resource_2}'),
+                                clienttranslate(
+                                    '${character_name} gained ${count_1} ${character_resource_1}, lost ${count_2} ${character_resource_2}'
+                                ),
                                 [
                                     'count_1' => 2,
                                     'character_resource_1' => clienttranslate('Health'),
@@ -570,7 +570,6 @@ class DLD_CharactersData
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $existingData = $game->actInterrupt->getState('actCraft');
                             if ($char['isActive'] && !$existingData) {
-                                $game->gameData->set('state', []);
                                 $game->selectionStates->initiateState(
                                     'resourceSelection',
                                     ['id' => $skill['id'], ...$data, 'title' => clienttranslate('Item Costs')],
@@ -584,20 +583,23 @@ class DLD_CharactersData
                             return $char['isActive'] && sizeof(array_filter($game->gameData->getResources())) > 0;
                         },
                         'onResourceSelection' => function (Game $game, $skill, &$data) {
-                            if ($game->gameData->get('state')['id'] == $skill['id']) {
+                            $selectionState = $game->selectionStates->getState('resourceSelection');
+                            if ($selectionState['id'] == $skill['id']) {
                                 $state = $game->actInterrupt->getState('actCraft');
-                                $maxChange = clamp(array_sum($state['data']['item']['cost']) - 2, 0, 2);
-                                if (array_key_exists($data['resourceType'], $state['data']['item']['cost'])) {
-                                    $state['data']['item']['cost'][$data['resourceType']] = max(
-                                        $state['data']['item']['cost'][$data['resourceType']] - $maxChange,
-                                        0
-                                    );
+                                if ($state) {
+                                    $maxChange = clamp(array_sum($state['data']['item']['cost']) - 2, 0, 2);
+                                    if (array_key_exists($data['resourceType'], $state['data']['item']['cost'])) {
+                                        $state['data']['item']['cost'][$data['resourceType']] = max(
+                                            $state['data']['item']['cost'][$data['resourceType']] - $maxChange,
+                                            0
+                                        );
+                                    }
+                                    $game->actInterrupt->setState('actCraft', $state);
                                 }
-                                $game->actInterrupt->setState('actCraft', $state);
                             }
                         },
                         'onResourceSelectionOptions' => function (Game $game, $skill, &$resources) {
-                            $state = $game->gameData->get('state');
+                            $state = $game->selectionStates->getState('resourceSelection');
                             if ($state['id'] == $skill['id']) {
                                 $resources = $state['item']['cost'];
                             }
@@ -942,15 +944,16 @@ class DLD_CharactersData
                         'onUse' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
-                                $game->gameData->set('state', ['id' => $skill['id']]);
                                 $game->selectionStates->initiateDeckSelection(
+                                    $skill['id'],
                                     array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames())
                                 );
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
                         },
                         'onDeckSelection' => function (Game $game, $skill, $data) {
-                            if ($game->gameData->get('state')['id'] == $skill['id']) {
+                            $state = $game->selectionStates->getState('deckSelection');
+                            if ($state['id'] == $skill['id']) {
                                 $game->markRandomness();
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                 $topCard = $game->decks->getDeck($data['deck'])->getCardOnTop('deck');
@@ -984,6 +987,7 @@ class DLD_CharactersData
                                 if ($count >= 2) {
                                     $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'move']);
                                     $game->selectionStates->initiateDeckSelection(
+                                        $skill['id'],
                                         array_filter(
                                             array_intersect(
                                                 ['explore', 'gather', 'forage', 'harvest', 'hunt'],
@@ -998,6 +1002,7 @@ class DLD_CharactersData
                                 } else {
                                     $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'place']);
                                     $game->selectionStates->initiateDeckSelection(
+                                        $skill['id'],
                                         array_filter(
                                             array_intersect(
                                                 ['explore', 'gather', 'forage', 'harvest', 'hunt'],
@@ -1013,7 +1018,7 @@ class DLD_CharactersData
                             }
                         },
                         'onDeckSelection' => function (Game $game, $skill, &$data) {
-                            $state = $game->gameData->get('state');
+                            $state = $game->selectionStates->getState('state');
                             if ($state['id'] == $skill['id']) {
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
 
@@ -1030,6 +1035,7 @@ class DLD_CharactersData
                                     ]);
                                     $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'place', 'cancellable' => false]);
                                     $game->selectionStates->initiateDeckSelection(
+                                        $skill['id'],
                                         array_filter(
                                             array_intersect(
                                                 ['explore', 'gather', 'forage', 'harvest', 'hunt'],
@@ -1134,7 +1140,6 @@ class DLD_CharactersData
                         'onUse' => function (Game $game, $skill, $data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
-                                $game->gameData->set('state', ['id' => $skill['id']]);
                                 $game->selectionStates->initiateState('resourceSelection', ['id' => $skill['id']], $char['id'], true);
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
@@ -1144,7 +1149,8 @@ class DLD_CharactersData
                             return $char['isActive'] && sizeof(array_filter($game->gameData->getResources())) > 0;
                         },
                         'onResourceSelection' => function (Game $game, $skill, &$data) {
-                            if ($game->gameData->get('state')['id'] == $skill['id']) {
+                            $state = $game->selectionStates->getState('resourceSelection');
+                            if ($state['id'] == $skill['id']) {
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                 $game->adjustResource($data['resourceType'], 1);
                                 $game->eventLog(clienttranslate('${character_name} copied 1 ${resource_type}'), [

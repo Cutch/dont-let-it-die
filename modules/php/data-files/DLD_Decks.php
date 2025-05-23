@@ -995,12 +995,10 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     $game->eventLog(clienttranslate('Actions outside of camp are harder tomorrow'));
                 },
-                'onGetValidActions' => function (Game $game, $nightCard, &$data) {
-                    $data['actDrawForage'] += 1;
-                    $data['actDrawExplore'] += 1;
-                    $data['actDrawHunt'] += 1;
-                    $data['actDrawGather'] += 1;
-                    $data['actDrawHarvest'] += 1;
+                'onGetActionCost' => function (Game $game, $char, &$data) {
+                    if (in_array($data['action'], ['actDrawForage', 'actDrawExplore', 'actDrawHunt', 'actDrawGather', 'actDrawHarvest'])) {
+                        $data['stamina'] += 1;
+                    }
                 },
             ],
             'night-event-9_14' => [

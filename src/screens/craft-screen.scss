@@ -2,7 +2,9 @@
   margin-top: 1rem;
   overflow: hidden;
   padding: 1rem;
-
+  .items {
+    gap: 1em 2em;
+  }
   #craft-items {
     background-color: #ffffff90;
     padding: 2rem;

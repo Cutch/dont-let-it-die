@@ -87,6 +87,9 @@
     position: relative;
     top: 1px;
   }
+  .fkp-unlocked {
+    pointer-events: none;
+  }
 }
 
 .action-button .dlid__stamina {

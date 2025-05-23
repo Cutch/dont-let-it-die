@@ -44,8 +44,11 @@ export class CraftScreen {
             <div class="token ${name}"></div>
           <div>`,
       );
-      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, withText: true, pos: 'insert' });
-
+      renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
+      this.game.addHelpTooltip({
+        node: elem.querySelector(`.token.${name}`),
+        tooltipText: name,
+      });
       elem.querySelector(`.token.${name} .image`).insertAdjacentHTML('beforeend', `<div class="counter dot dot--number">${count()}</div>`);
       addClickListener(elem.querySelector(`.token.${name}`), this.game.data[name].options.name, () => selectCallback(count));
       if (hasCost) document.querySelector(`#craft-screen .token.${name}`).classList.remove('disabled');

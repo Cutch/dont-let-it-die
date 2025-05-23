@@ -279,16 +279,14 @@ class DLD_SelectionStates
             $this->game->nextState($stateName);
         }
     }
-    public function initiateDeckSelection(?array $decks = null, ?string $title = null, $cancellable = true)
+    public function initiateDeckSelection(string $id, ?array $decks = null, ?string $title = null, $cancellable = true)
     {
         if ($decks == null) {
             $decks = $this->game->decks->getAllDeckNames();
         }
         $this->initiateState(
             'deckSelection',
-            [
-                'decks' => array_values($decks),
-            ],
+            ['id' => $id, 'decks' => array_values($decks)],
             $this->game->character->getTurnCharacterId(),
             $cancellable,
             $title

@@ -213,18 +213,20 @@ class DLD_Decks
     }
     public function shuffleInDiscard(string $deck, bool $notify = true): void
     {
-        $this->getDeck($deck)->moveAllCardsInLocation('discard', 'deck');
-        $this->getDeck($deck)->shuffle('deck');
-        unset($this->cachedData[$deck]);
-        $results = [
-            'deck' => $deck,
-            'deckName' => $this->getDeckName($deck),
-        ];
-        $this->game->getDecks($results);
-        if ($notify) {
-            $this->game->notify('shuffle', clienttranslate('The ${deckName} deck is out of cards, shuffling'), $results);
-        } else {
-            $this->game->notify('shuffle', '', $results);
+        if ($this->getDeck($deck)->countCardsByLocationArgs('discard') > 0) {
+            $this->getDeck($deck)->moveAllCardsInLocation('discard', 'deck');
+            $this->getDeck($deck)->shuffle('deck');
+            unset($this->cachedData[$deck]);
+            $results = [
+                'deck' => $deck,
+                'deckName' => $this->getDeckName($deck),
+            ];
+            $this->game->getDecks($results);
+            if ($notify) {
+                $this->game->notify('shuffle', clienttranslate('The ${deckName} deck is out of cards, shuffling'), $results);
+            } else {
+                $this->game->notify('shuffle', '', $results);
+            }
         }
     }
     public function pickCard(string $deck): array
