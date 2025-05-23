@@ -30,6 +30,7 @@ export default {
             },
             _('Health') + ': ' + 3,
             _('Damage') + ': ' + 4,
+            _('Cannot be blocked soothed or escaped'),
           ],
         },
         frame: {
@@ -69,6 +70,7 @@ export default {
             },
             _('Health') + ': ' + 1,
             _('Damage') + ': ' + 2,
+            _('Can only be killed with a range 2 weapon'),
           ],
         },
         frame: {
@@ -205,6 +207,7 @@ export default {
             },
             _('Health') + ': ' + 2,
             _('Damage') + ': ' + 3,
+            _('Instead of doing damage reduces your stamina'),
           ],
         },
         frame: {
@@ -225,6 +228,7 @@ export default {
             },
             _('Health') + ': ' + 2,
             _('Damage') + ': ' + 3,
+            _('Take a raw egg after killing'),
           ],
         },
         frame: {

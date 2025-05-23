@@ -45,6 +45,8 @@ class DLD_DecksData
                 'name' => clienttranslate('Pterodactyl'),
                 'health' => 3,
                 'damage' => 4,
+                'noEscape' => true,
+                // Cannot be blocked, soothed or escaped
             ],
             'explore-7_10' => [
                 'deck' => 'explore',
@@ -60,6 +62,8 @@ class DLD_DecksData
                 'name' => clienttranslate('Bat'),
                 'health' => 1,
                 'damage' => 2,
+                'requiresRange' => 2,
+                // Can only be killed with a range 2 weapon
             ],
             'explore-7_12' => [
                 'deck' => 'explore',
@@ -112,6 +116,8 @@ class DLD_DecksData
                 'name' => clienttranslate('Carnivorous Plant'),
                 'health' => 2,
                 'damage' => 3,
+                'damageStamina' => true,
+                // Instead of doing damage reduces your stamina
             ],
             'explore-7_7' => [
                 'deck' => 'explore',
@@ -120,6 +126,8 @@ class DLD_DecksData
                 'name' => clienttranslate('Dino'),
                 'health' => 2,
                 'damage' => 3,
+                // Take a raw egg after killing
+                'loot' => ['dino-egg' => 1],
             ],
             'explore-7_8' => [
                 'deck' => 'explore',
@@ -1035,7 +1043,7 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     $card1 = $game->decks->pickCard('hunt');
                     $card2 = $game->decks->pickCard('hunt');
-                    $game->eventLog(clienttranslate('Drew 2 from the ${deck} deck ${buttons}'), [
+                    $game->eventLog(clienttranslate('Draws 2 from the ${deck} deck ${buttons}'), [
                         'deck' => 'hunt',
                         'buttons' => notifyButtons([
                             ['name' => clienttranslate('Hunt'), 'dataId' => $card1['id'], 'dataType' => 'card'],

@@ -93,7 +93,7 @@ class DLD_ExpansionData
                             return ['notify' => false, 'nextState' => 'resolveEncounter'];
                         },
                         'onEncounterPost' => function (Game $game, $skill, &$data) {
-                            if ($data['encounterHealth'] <= $data['characterDamage']) {
+                            if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
                                 $game->eventLog(clienttranslate('${character_name} obtained a ${item_name} ${buttons}'), [
                                     'item_name' => clienttranslate('Shell Shield'),
                                     'buttons' => notifyButtons([
@@ -126,7 +126,7 @@ class DLD_ExpansionData
                             $damageTaken = $game->encounter->countDamageTaken($data);
                             $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
 
-                            if ($char['isActive'] && $damageTaken > 0) {
+                            if ($char['isActive'] && $damageTaken > 0 && !$data['noEscape']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },

@@ -964,7 +964,7 @@ class Game extends \Table
                     $_this->actions->spendActionCost('actInvestigateFire');
                 }
                 $_this->adjustResource('fkp', $data['roll']);
-                $this->eventLog(clienttranslate('${character_name} ${character_name} received ${count} ${resource_type}'), [
+                $this->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                     'count' => $data['roll'],
                     'resource_type' => 'fkp',
                 ]);
@@ -1319,7 +1319,7 @@ class Game extends \Table
                 if (!$data || !array_key_exists('onUse', $data) || $data['onUse'] != false) {
                     $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
                 }
-                $this->eventLog(clienttranslate('Drew night event ${buttons}'), [
+                $this->eventLog(clienttranslate('Draw night event ${buttons}'), [
                     'buttons' => notifyButtons([
                         ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'night-event'],
                     ]),

@@ -93,6 +93,9 @@ export class Deck {
   }
   async _drawCard(cardId, partial = false) {
     if (!this.partialDrawCard) {
+      if (!partial) {
+        this.isDrawing = true;
+      }
       await this.partialDraw(cardId);
     }
     if (!partial) {
@@ -121,11 +124,15 @@ export class Deck {
     await this.game.wait(1000);
     this.partialDrawCard = cardId;
   }
+  isAnimating() {
+    return this.isDrawing;
+  }
   async finishPartialDraw(cardId) {
     this.partialDrawCard = null;
     this.div.querySelector(`.flip-card`).classList.add('discard');
     await this.game.wait(1000);
     this.setDiscard(cardId);
+    this.isDrawing = false;
     this.div.querySelector('.flip-card').remove();
     this.drawing.splice(0, 1);
     if (this.drawing.length > 0) {

@@ -281,7 +281,7 @@ class DLD_ItemsData
                             $damageTaken = $game->encounter->countDamageTaken($data);
                             $char = $game->character->getCharacterData($skill['characterId']);
 
-                            if ($char['isActive'] && $damageTaken > 0) {
+                            if ($char['isActive'] && $damageTaken > 0 && !$data['noEscape']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
@@ -354,7 +354,7 @@ class DLD_ItemsData
                             $damageTaken = $game->encounter->countDamageTaken($data);
                             $char = $game->character->getCharacterData($skill['characterId']);
 
-                            if ($char['isActive'] && $damageTaken > 0) {
+                            if ($char['isActive'] && $damageTaken > 0 && !$data['noEscape']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
@@ -772,7 +772,12 @@ class DLD_ItemsData
                 'onEncounterPre' => function (Game $game, $item, &$data) {
                     $damageTaken = $game->encounter->countDamageTaken($data);
                     $char = $game->character->getCharacterData($item['characterId']);
-                    if ($char['isActive'] && $damageTaken > 0 && $game->rollFireDie($item['name'], $item['characterId']) == 1) {
+                    if (
+                        $char['isActive'] &&
+                        $damageTaken > 0 &&
+                        !$data['noEscape'] &&
+                        $game->rollFireDie($item['name'], $item['characterId']) == 1
+                    ) {
                         $data['willTakeDamage'] -= 1;
                     }
                 },
@@ -843,7 +848,7 @@ class DLD_ItemsData
                             $damageTaken = $game->encounter->countDamageTaken($data);
                             $char = $game->character->getCharacterData($skill['characterId']);
 
-                            if ($char['isActive'] && $damageTaken > 0) {
+                            if ($char['isActive'] && $damageTaken > 0 && !$data['noEscape']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },

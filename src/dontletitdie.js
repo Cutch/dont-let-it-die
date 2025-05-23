@@ -287,27 +287,31 @@ declare('bgagame.dontletitdie', Gamegui, {
         const weapon = equipments.find((d) => d.itemType === 'weapon');
         if (weapon) {
           renderedItems.push(weapon);
-          renderImage(weapon.id, document.querySelector(`#player-${character.name} > .${weapon.itemType}`), {
+          renderImage(weapon.id, document.querySelector(`#player-${character.name} > .weapon`), {
             scale: scale,
             pos: 'replace',
           });
-          addClickListener(document.querySelector(`#player-${character.name} > .${weapon.itemType}`), _(weapon.name), () => {
+          addClickListener(document.querySelector(`#player-${character.name} > .weapon`), _(weapon.name), () => {
             this.tooltip.show();
             renderImage(weapon.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-item', pos: 'replace' });
           });
+        } else {
+          document.querySelector(`#player-${character.name} > .weapon`).innerHTML = '';
         }
 
         const tool = equipments.find((d) => d.itemType === 'tool');
         if (tool) {
           renderedItems.push(tool);
-          renderImage(tool.id, document.querySelector(`#player-${character.name} > .${tool.itemType}`), {
+          renderImage(tool.id, document.querySelector(`#player-${character.name} > .tool`), {
             scale: scale,
             pos: 'replace',
           });
-          addClickListener(document.querySelector(`#player-${character.name} > .${tool.itemType}`), _(tool.name), () => {
+          addClickListener(document.querySelector(`#player-${character.name} > .tool`), _(tool.name), () => {
             this.tooltip.show();
             renderImage(tool.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-item', pos: 'replace' });
           });
+        } else {
+          document.querySelector(`#player-${character.name} > .tool`).innerHTML = '';
         }
         const item3 = equipments.find((d) => !renderedItems.includes(d));
         const extraContainerButtons = document.querySelector(`#player-${character.name} .card-extra-container`);
@@ -622,7 +626,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       if (!this.decks[deck] && gameData.decks[deck]) {
         const uppercaseDeck = deck[0].toUpperCase() + deck.slice(1);
         this.decks[deck] = new Deck(this, deck, gameData.decks[deck], document.querySelector(`.board > .${deck}`), 2);
-        this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
+        if (!this.decks[deck].isAnimating()) this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
         if (gameData.game.partials && gameData.game.partials[deck]) {
           this.decks[deck].drawCard(gameData.game.partials[deck].id, true);
         }
@@ -737,7 +741,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         if (!this.decks[deck]) {
           this.decks[deck] = new Deck(this, deck, gameData.decks[deck], eventDeckContainer.querySelector(`.${deck}`), scale, 'horizontal');
           if (gameData.decksDiscards[deck]?.name) {
-            this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+            if (!this.decks[deck].isAnimating()) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
           }
         } else {
           this.decks[deck].updateDeckCounts(gameData.decks[deck]);
@@ -757,7 +761,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     drawDecks.forEach(({ name: deck }) => {
       if (this.decks[deck] && gameData.decks[deck]) {
         if (gameData.decksDiscards[deck]?.name) {
-          this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+          if (!this.decks[deck].isAnimating()) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
         }
         this.decks[deck].updateMarker(gameData.decks[deck]);
       }

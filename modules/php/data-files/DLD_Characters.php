@@ -73,7 +73,7 @@ class DLD_CharactersData
                     }
                 },
                 'onEncounterPre' => function (Game $game, $char, &$data) {
-                    if ($char['isActive']) {
+                    if ($char['isActive'] && !$data['noEscape']) {
                         $data['escape'] = true;
                     }
                 },
@@ -126,8 +126,10 @@ class DLD_CharactersData
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $char = $game->character->getCharacterData($skill['characterId']);
                                 $game->eventLog(clienttranslate('${character_name} is re-rolling ${active_character_name}\'s fire die'), [
-                                    ...$char,
-                                    'active_character_name' => $game->character->getTurnCharacter()['character_name'],
+                                    'character_name' => $game->getCharacterHTML($char['character_name']),
+                                    'active_character_name' => $game->getCharacterHTML(
+                                        $game->character->getTurnCharacter()['character_name']
+                                    ),
                                 ]);
                                 $data['data']['roll'] = $game->rollFireDie($skill['name'], $char['character_name']);
                                 usePerDay($skill['getPerDayKey']($game, $skill), $game);
@@ -263,7 +265,7 @@ class DLD_CharactersData
                     ],
                 ],
                 'onEncounterPost' => function (Game $game, $char, $data) {
-                    if ($data['encounterHealth'] <= $data['characterDamage']) {
+                    if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
                         $data['stamina'] += 1;
 
                         $game->eventLog(clienttranslate('${character_name} gave 1 stamina to ${active_character_name}'), [
@@ -303,7 +305,7 @@ class DLD_CharactersData
                                 $char = $game->character->getCharacterData($skill['characterId']);
                                 usePerDay($skill['getPerDayKey']($game, $skill), $game);
                                 $game->adjustResource('bone', -1);
-                                $game->eventLog(clienttranslate('${character_name} re-drew the night event'));
+                                $game->eventLog(clienttranslate('${character_name} re-draws the night event'));
                                 // TODO: Interrupt and Discard current night event
                                 $card = $game->decks->pickCard('night-event');
                                 $data['state']['card'] = $card;
@@ -568,9 +570,13 @@ class DLD_CharactersData
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $existingData = $game->actInterrupt->getState('actCraft');
                             if ($char['isActive'] && !$existingData) {
-                                $game->gameData->set('state', ['id' => $skill['id'], ...$data, 'title' => clienttranslate('Item Costs')]);
-                                $game->nextState('resourceSelection');
-                                $data['interrupt'] = true;
+                                $game->gameData->set('state', []);
+                                $game->selectionStates->initiateState(
+                                    'resourceSelection',
+                                    ['id' => $skill['id'], ...$data, 'title' => clienttranslate('Item Costs')],
+                                    $char['id'],
+                                    true
+                                );
                             }
                         },
                         'requires' => function (Game $game, $skill) {
@@ -817,7 +823,7 @@ class DLD_CharactersData
                     }
                 },
                 'onEncounterPost' => function (Game $game, $char, &$data) {
-                    if ($data['encounterHealth'] <= $data['characterDamage']) {
+                    if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
                         if (
                             sizeof(
                                 array_filter($char['mentalHindrance'], function ($hindrance) {
@@ -1129,7 +1135,7 @@ class DLD_CharactersData
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
                                 $game->gameData->set('state', ['id' => $skill['id']]);
-                                $game->nextState('resourceSelection');
+                                $game->selectionStates->initiateState('resourceSelection', ['id' => $skill['id']], $char['id'], true);
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
                         },

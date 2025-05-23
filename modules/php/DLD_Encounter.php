@@ -51,7 +51,7 @@ class DLD_Encounter
             return 0;
         } elseif ($data['escape']) {
             return 0;
-        } elseif ($data['encounterHealth'] <= $data['characterDamage']) {
+        } elseif ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
             $damageTaken = 0;
             if ($data['characterRange'] > 1) {
                 $damageTaken = 0;
@@ -236,6 +236,10 @@ class DLD_Encounter
                     'escape' => false,
                     'soothe' => false,
                     'trap' => false,
+                    'requiresRange' => array_key_exists('requiresRange', $card) ? $card['requiresRange'] : 1,
+                    'noEscape' => array_key_exists('noEscape', $card) ? $card['noEscape'] : false,
+                    'damageStamina' => array_key_exists('damageStamina', $card) ? $card['damageStamina'] : false,
+                    'loot' => array_key_exists('loot', $card) ? $card['loot'] : [],
                     'characterRange' => $weapon['range'],
                     'characterDamage' => $weapon['damage'],
                     'willTakeDamage' => $card['damage'],
@@ -265,16 +269,24 @@ class DLD_Encounter
                     }
                     $damageTaken = $this->countDamageTaken($data);
                     $data['damageTaken'] = $damageTaken;
-                    if ($data['encounterHealth'] <= $data['characterDamage']) {
+                    if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
                         if ($damageTaken != 0) {
-                            $_this->character->adjustActiveHealth(-$damageTaken);
+                            if ($data['damageStamina']) {
+                                $_this->character->adjustActiveStamina(-$damageTaken);
+                            } else {
+                                $_this->character->adjustActiveHealth(-$damageTaken);
+                            }
                         }
                         if ($_this->character->getActiveHealth() != 0) {
                             $_this->adjustResource('meat', $data['willReceiveMeat']);
                             if ($damageTaken > 0) {
                                 $_this->eventLog(
-                                    '${character_name} defeated a ${name}, gained ${willReceiveMeat} meat and lost ${damageTaken} health',
-                                    [...$data, 'damageTaken' => $damageTaken]
+                                    '${character_name} defeated a ${name}, gained ${willReceiveMeat} meat and lost ${damageTaken} ${resource}',
+                                    [
+                                        ...$data,
+                                        'damageTaken' => $damageTaken,
+                                        'resource' => $data['damageStamina'] ? clienttranslate('Stamina') : clienttranslate('Health'),
+                                    ]
                                 );
                             } else {
                                 $_this->eventLog(
@@ -287,11 +299,18 @@ class DLD_Encounter
                         if ($damageTaken > 0) {
                             $_this->character->adjustActiveHealth(-$damageTaken);
                             $_this->eventLog(
-                                clienttranslate('${character_name} was attacked by a ${name} and lost ${damageTaken} health'),
-                                [...$data, 'damageTaken' => $damageTaken]
+                                clienttranslate('${character_name} was attacked by a ${name} and lost ${damageTaken} ${resource}'),
+                                [
+                                    ...$data,
+                                    'damageTaken' => $damageTaken,
+                                    'resource' => $data['damageStamina'] ? clienttranslate('Stamina') : clienttranslate('Health'),
+                                ]
                             );
                         } else {
-                            $_this->eventLog(clienttranslate('${character_name} was attacked by a ${name} but lost no health'), $data);
+                            $_this->eventLog(clienttranslate('${character_name} was attacked by a ${name} but lost no ${resource}'), [
+                                ...$data,
+                                'resource' => $data['damageStamina'] ? clienttranslate('Stamina') : clienttranslate('Health'),
+                            ]);
                         }
                     }
                 }
