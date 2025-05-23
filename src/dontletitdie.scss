@@ -52,17 +52,17 @@
     font-size: 20px;
     padding: 1rem;
     border-radius: 1rem;
-    min-width: 50vw;
-    max-width: 80vw;
     background-color: #fff;
     display: flex;
     gap: 1rem;
+    min-width: 350px;
+    max-width: 525px;
     align-items: flex-start;
+    .tooltip-text {
+      width: unset;
+    }
     > span {
       margin-right: 1rem;
-    }
-    @media (min-width: 768px) {
-      max-width: 525px;
     }
   }
   .label {
