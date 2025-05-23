@@ -457,8 +457,8 @@ class DLD_Actions
                 $this->skillActionCost('actUseSkill', null, $skill);
                 return $this->game->hooks->onCheckSkillRequirements($skill) &&
                     $this->checkRequirements($skill, $character) &&
-                    (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']) &&
-                    (!array_key_exists('health', $skill) || $health >= $skill['health']);
+                    (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']);
+                //  && (!array_key_exists('health', $skill) || $health >= $skill['health']);
             })
         );
     }
@@ -473,8 +473,8 @@ class DLD_Actions
                 $health = $character['health'];
                 $this->skillActionCost('actUseItem', null, $skill);
                 return $this->checkRequirements($skill, $character) &&
-                    (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']) &&
-                    (!array_key_exists('health', $skill) || $health >= $skill['health']);
+                    (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']);
+                // && (!array_key_exists('health', $skill) || $health >= $skill['health']);
             })
         );
     }
@@ -552,13 +552,14 @@ class DLD_Actions
     {
         return (!array_key_exists('getState', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['getState']())) &&
             (!array_key_exists('state', $actionObj) || in_array($this->game->gamestate->state()['name'], $actionObj['state'])) &&
+            // (!array_key_exists('interruptState', $actionObj)
+            //  ||
+            //     ($this->game->actInterrupt->getLatestInterruptState() &&
+            //         in_array(
+            //             $this->game->actInterrupt->getLatestInterruptState()['data']['currentState'],
+            //             $actionObj['interruptState']
+            //         ))) &&
             (!array_key_exists('interruptState', $actionObj) ||
-                ($this->game->actInterrupt->getLatestInterruptState() &&
-                    in_array(
-                        $this->game->actInterrupt->getLatestInterruptState()['data']['currentState'],
-                        $actionObj['interruptState']
-                    ))) &&
-            (!(array_key_exists('manuallyAdd', $actionObj) && $actionObj['manuallyAdd']) ||
                 ($this->game->actInterrupt->getLatestInterruptState() &&
                     in_array(
                         $actionObj['id'],
@@ -595,13 +596,13 @@ class DLD_Actions
         $cost = $this->getActionCost($action, $subAction);
         $this->game->hooks->onSpendActionCost($cost);
         $stamina = $character['stamina'];
-        $health = $character['health'];
+        // $health = $character['health'];
         if (array_key_exists('stamina', $cost) && $stamina < $cost['stamina']) {
             throw new BgaUserException(clienttranslate('Not enough stamina'));
         }
-        if (array_key_exists('health', $cost) && $health < $cost['health']) {
-            throw new BgaUserException(clienttranslate('Not enough health'));
-        }
+        // if (array_key_exists('health', $cost) && $health < $cost['health']) {
+        //     throw new BgaUserException(clienttranslate('Not enough health'));
+        // }
         if (!$this->checkRequirements($this->getAction($action, $subAction, ...$args))) {
             throw new BgaUserException(clienttranslate('Can\'t use this action'));
         }
@@ -620,15 +621,15 @@ class DLD_Actions
             // var_dump(json_encode($v));
             $actionCost = $this->getActionCost($v['id']);
             $stamina = $this->game->character->getActiveStamina();
-            $health = $this->game->character->getActiveHealth();
+            // $health = $this->game->character->getActiveHealth();
             // Rock only needs 1 stamina, this is in the hindrance expansion
             $alwaysShowCraft = $this->game->isValidExpansion('hindrance') && $v['id'] == 'actCraft';
             // var_dump(json_encode([$v['id']]));
             $this->game->hooks->onSpendActionCost($actionCost);
             return $this->checkRequirements($v) &&
                 (!array_key_exists('stamina', $actionCost) ||
-                    $stamina >= ($alwaysShowCraft ? min($actionCost['stamina'], 1) : $actionCost['stamina'])) &&
-                (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
+                    $stamina >= ($alwaysShowCraft ? min($actionCost['stamina'], 1) : $actionCost['stamina']));
+            //  && (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
         });
         $data = array_column(
             array_map(

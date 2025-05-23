@@ -16,10 +16,13 @@ class DLD_SelectionStates
         $this->game = $game;
     }
 
-    public function completeSelectionState(string|bool $nextState): void
+    public function completeSelectionState(array $data): void
     {
-        if ($nextState) {
-            $this->game->nextState($nextState);
+        if ($data['nextState']) {
+            $this->game->nextState($data['nextState']);
+        }
+        if (array_key_exists('isInterrupt', $data) && $data['isInterrupt']) {
+            $this->game->actInterrupt->completeInterrupt();
         }
         $this->initiatePendingState();
     }
@@ -42,7 +45,7 @@ class DLD_SelectionStates
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
-                $this->completeSelectionState($data['nextState']);
+                $this->completeSelectionState($data);
             }
         );
     }
@@ -58,9 +61,11 @@ class DLD_SelectionStates
         $data = [
             'resourceType' => $resourceType,
             'nextState' => $stateData['nextState'],
+            'isInterrupt' => $stateData['isInterrupt'],
         ];
+        $this->game->log('actSelectResource1', $data);
         $this->game->hooks->onResourceSelection($data);
-        $this->completeSelectionState($data['nextState']);
+        $this->completeSelectionState($data);
     }
     public function actSelectHindrance(#[JsonParam] array $data): void
     {
@@ -73,6 +78,7 @@ class DLD_SelectionStates
         $data = [
             'selections' => $data,
             'nextState' => $stateData['nextState'],
+            'isInterrupt' => $stateData['isInterrupt'],
         ];
         $this->game->hooks->onHindranceSelection($data);
 
@@ -93,9 +99,10 @@ class DLD_SelectionStates
         $data = [
             'cardId' => $cardId,
             'nextState' => $stateData['nextState'],
+            'isInterrupt' => $stateData['isInterrupt'],
         ];
         $this->game->hooks->onCardSelection($data);
-        $this->completeSelectionState($data['nextState']);
+        $this->completeSelectionState($data);
     }
     public function actSelectItem(?string $itemId = null, ?string $characterId = null): void
     {
@@ -110,9 +117,10 @@ class DLD_SelectionStates
             'itemId' => $itemId,
             'characterId' => $characterId,
             'nextState' => $stateData['nextState'],
+            'isInterrupt' => $stateData['isInterrupt'],
         ];
         $this->game->hooks->onItemSelection($data);
-        $this->completeSelectionState($data['nextState']);
+        $this->completeSelectionState($data);
     }
     public function actSelectDeck(?string $deckName = null): void
     {
@@ -126,9 +134,10 @@ class DLD_SelectionStates
         $data = [
             'deck' => $deckName,
             'nextState' => $stateData['nextState'],
+            'isInterrupt' => $stateData['isInterrupt'],
         ];
         $this->game->hooks->onDeckSelection($data);
-        $this->completeSelectionState($data['nextState']);
+        $this->completeSelectionState($data);
     }
     public function actSendToCamp(?int $sendToCampId = null): void
     {
@@ -171,7 +180,9 @@ class DLD_SelectionStates
         $this->game->log('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->game->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->game->markChanged('player');
-        $this->completeSelectionState('playerTurn');
+        $this->completeSelectionState([
+            'nextState' => 'playerTurn',
+        ]);
     }
     public function cancelState(?string $stateName): void
     {
@@ -255,7 +266,8 @@ class DLD_SelectionStates
         string $characterId,
         bool $cancellable = true,
         string $nextState = 'playerTurn',
-        ?string $title = null
+        ?string $title = null,
+        bool $isInterrupt = false
     ): void {
         if ($this->stateChanged || $this->stateToStateNameMapping() != null) {
             $pendingStates = $this->game->gameData->get('pendingStates') ?? [];
@@ -271,6 +283,7 @@ class DLD_SelectionStates
                 'title' => $title,
                 'currentPlayerId' => $playerId,
                 'nextState' => $nextState,
+                'isInterrupt' => $isInterrupt,
                 ...$state,
             ];
             $this->game->gameData->addMultiActiveCharacter($characterId, true);

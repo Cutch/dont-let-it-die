@@ -5,45 +5,49 @@ use Bga\Games\DontLetItDie\Game;
 use BgaUserException;
 
 if (!function_exists('getUsePerDay')) {
-    function getUsePerDay(string $itemId, $game)
+    function getUsePerDay(string $itemId, Game $game)
     {
         $dailyUseItems = $game->gameData->get('dailyUseItems');
         return array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] : 0;
     }
-    function usePerDay(string $itemId, $game)
+    function usePerDay(string $itemId, Game $game)
     {
         $dailyUseItems = $game->gameData->get('dailyUseItems');
         $dailyUseItems[$itemId] = array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] + 1 : 1;
         $game->gameData->set('dailyUseItems', $dailyUseItems);
     }
-    function subtractPerDay(string $itemId, $game)
+    function subtractPerDay(string $itemId, Game $game)
     {
         $dailyUseItems = $game->gameData->get('dailyUseItems');
         $dailyUseItems[$itemId] = array_key_exists($itemId, $dailyUseItems) ? $dailyUseItems[$itemId] - 1 : 0;
         $game->gameData->set('dailyUseItems', $dailyUseItems);
+        $game->markChanged('token');
     }
-    function getUsePerForever(string $itemId, $game)
+    function getUsePerForever(string $itemId, Game $game)
     {
         $foreverUseItems = $game->gameData->get('foreverUseItems');
         return array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] : 0;
     }
-    function usePerForever(string $itemId, $game)
+    function usePerForever(string $itemId, Game $game)
     {
         $foreverUseItems = $game->gameData->get('foreverUseItems');
         $foreverUseItems[$itemId] = array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] + 1 : 1;
         $game->gameData->set('foreverUseItems', $foreverUseItems);
+        $game->markChanged('token');
     }
-    function subtractPerForever(string $itemId, $game)
+    function subtractPerForever(string $itemId, Game $game)
     {
         $foreverUseItems = $game->gameData->get('foreverUseItems');
         $foreverUseItems[$itemId] = min(0, array_key_exists($itemId, $foreverUseItems) ? $foreverUseItems[$itemId] - 1 : 0);
         $game->gameData->set('foreverUseItems', $foreverUseItems);
+        $game->markChanged('token');
     }
-    function clearUsePerForever(string $itemId, $game)
+    function clearUsePerForever(string $itemId, Game $game)
     {
         $foreverUseItems = $game->gameData->get('foreverUseItems');
         $foreverUseItems[$itemId] = 0;
         $game->gameData->set('foreverUseItems', $foreverUseItems);
+        $game->markChanged('token');
     }
     function array_orderby()
     {

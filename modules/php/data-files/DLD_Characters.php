@@ -28,7 +28,6 @@ class DLD_CharactersData
                         'onUse' => function (Game $game, $skill) {
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             $game->character->adjustActiveStamina(2);
-                            $game->character->adjustActiveHealth(-2);
                             $game->eventLog(
                                 clienttranslate(
                                     '${character_name} gained ${count_1} ${character_resource_1}, lost ${count_2} ${character_resource_2}'
@@ -574,8 +573,13 @@ class DLD_CharactersData
                                     'resourceSelection',
                                     ['id' => $skill['id'], ...$data, 'title' => clienttranslate('Item Costs')],
                                     $char['id'],
+                                    true,
+                                    'playerTurn',
+                                    null,
                                     true
                                 );
+
+                                $data['interrupt'] = true;
                             }
                         },
                         'requires' => function (Game $game, $skill) {
@@ -1701,7 +1705,9 @@ class DLD_CharactersData
                     ]);
                 },
                 'onGetResourceMax' => function (Game $game, $char, &$data) {
-                    $data['maxCount'] -= getUsePerForever('hide-token', $game);
+                    if ($data['resourceType'] == 'hide') {
+                        $data['maxCount'] -= getUsePerForever('hide-token', $game);
+                    }
                 },
                 'skills' => [
                     'skill1' => [
@@ -1711,6 +1717,7 @@ class DLD_CharactersData
                         'stamina' => 2,
                         'onUse' => function (Game $game, $skill) {
                             usePerForever('hide-token', $game);
+                            $game->adjustResource('hide', -1);
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
@@ -1725,6 +1732,12 @@ class DLD_CharactersData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 subtractPerForever('hide-token', $game);
+
+                                $interruptState = $game->actInterrupt->getState('stResolveEncounter');
+                                if ($interruptState['data']['willTakeDamage'] > 1) {
+                                    $interruptState['data']['willTakeDamage'] -= 1;
+                                }
+                                $game->actInterrupt->setState('stResolveEncounter', $interruptState);
                             }
                         },
                         'onEncounterPre' => function (Game $game, $skill, &$data) {
@@ -1746,6 +1759,12 @@ class DLD_CharactersData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 subtractPerForever('hide-token', $game);
+
+                                $interruptState = $game->actInterrupt->getState('stDrawCard');
+                                $card = $interruptState['card'];
+                                if ($card['deckType'] == 'resource') {
+                                    $game->adjustResource($card['resourceType'], $card['count']);
+                                }
                             }
                         },
                         'onResolveDraw' => function (Game $game, $skill, &$data) {

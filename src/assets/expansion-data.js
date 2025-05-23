@@ -36,7 +36,7 @@ export default {
               title: _('Tame the beast'),
             },
             _(
-              "Out of nowhere a beast emerges from a bush and pounces on you! You do your best to fight it off, but it's far too quick and you are easily overwhelmed. Defeated and covered in slobber, you hold up your new wolf pup friend. Give him a name! He doesn't seem to want to leave your side. Set this card next to your character. Spend 2 Stamina, roll the Fire Die. On a blank, take 1 Damage, otherwise take 1 Rock, once per day.",
+              "Out of nowhere a beast emerges from a bush and pounces on you! You do your best to fight it off, but it's far too quick and you are easily overwhelmed. Defeated and covered in slobber, you hold up your new wolf pup friend. Give him a name! He doesn't seem to want to leave your side. Set this card next to your character. Spend 2 Stamina, roll the Fire Die. On a blank, take 1 Wood, otherwise take 1 Rock, once per day.",
             ),
           ],
         },

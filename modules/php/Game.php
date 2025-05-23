@@ -504,6 +504,7 @@ class Game extends \Table
                 $itemName = $data['itemName'];
                 $item = $data['item'];
                 $itemType = $data['itemType'];
+                $this->log('itemcost', $item['cost']);
                 foreach ($item['cost'] as $key => $value) {
                     if ($_this->adjustResource($key, -$value)['left'] > 0) {
                         throw new BgaUserException(clienttranslate('Missing resources'));
@@ -580,27 +581,27 @@ class Game extends \Table
     public function actDestroyItem(int $itemId): void
     {
         $this->destroyItem($itemId);
-        $this->completeAction();
+        // $this->completeAction();
     }
     public function actConfirmTradeItem(): void
     {
         $this->itemTrade->actConfirmTradeItem();
-        $this->completeAction();
+        // $this->completeAction();
     }
     public function actCancelTrade(): void
     {
         $this->itemTrade->actCancelTrade();
-        $this->completeAction();
+        // $this->completeAction();
     }
     public function actTradeDone(): void
     {
         $this->itemTrade->actTradeDone();
-        $this->completeAction();
+        // $this->completeAction();
     }
     public function actTradeItem(#[JsonParam] array $data): void
     {
         $this->itemTrade->actTradeItem($data);
-        $this->completeAction();
+        // $this->completeAction();
     }
     public function actTrade(#[JsonParam] array $data): void
     {
@@ -2312,8 +2313,8 @@ class Game extends \Table
     public function giveResources()
     {
         $this->gameData->setResources([
-            'fireWood' => 4,
-            'wood' => 4,
+            'fireWood' => 2,
+            'wood' => 2,
             'bone' => 6,
             'meat' => 4,
             'meat-cooked' => 4,
@@ -2411,6 +2412,14 @@ class Game extends \Table
         $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
             $data['stamina'] = $data['maxStamina'];
         });
+        $this->completeAction();
+    }
+    public function resetHealth()
+    {
+        $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
+            $data['health'] = $data['maxHealth'];
+        });
+        $this->completeAction();
     }
     public function lowHealth(?string $char = null)
     {
@@ -2420,6 +2429,7 @@ class Game extends \Table
         $this->character->updateCharacterData($char, function (&$data) {
             $data['health'] = 1;
         });
+        $this->completeAction();
     }
     public function maxCraftLevel()
     {
@@ -2429,6 +2439,7 @@ class Game extends \Table
     public function kill()
     {
         $this->character->adjustActiveHealth(-10);
+        $this->completeAction();
     }
     public function drawNightCard()
     {
@@ -2466,6 +2477,7 @@ class Game extends \Table
     public function shuffle()
     {
         $this->decks->shuffleInDiscard('gather', true);
+        $this->completeAction();
     }
     public function unlockAll()
     {
@@ -2493,6 +2505,7 @@ class Game extends \Table
         foreach (array_keys($notUnlocked) as $knowledgeId) {
             $this->unlockKnowledge($knowledgeId);
         }
+        $this->completeAction();
     }
     public function swapCharacter(string $char)
     {

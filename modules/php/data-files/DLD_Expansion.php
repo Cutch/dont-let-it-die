@@ -296,7 +296,6 @@ class DLD_ExpansionData
                         'state' => ['dayEvent'],
                         'health' => 2,
                         'onUse' => function (Game $game, $skill) {
-                            $game->character->adjustActiveHealth(-2);
                             return ['notify' => false];
                         },
                         'requires' => function (Game $game, $skill) {
@@ -860,7 +859,7 @@ class DLD_ExpansionData
                         $card['characterId'] == $game->character->getTurnCharacterId() &&
                         in_array($data['deck'], ['gather', 'hunt', 'harvest', 'forage'])
                     ) {
-                        if ($game->rollFireDie(clienttranslate('Day Event'), $game->character->getTurnCharacterId()) == 0) {
+                        if ($game->rollFireDie(clienttranslate('Forgetful'), $game->character->getTurnCharacterId()) == 0) {
                             $game->eventLog(clienttranslate('${character_name} forgot what they were doing'));
                             $data['spendActionCost'] = true;
                             $data['cancel'] = true;

@@ -24,6 +24,12 @@ export class ItemTradeScreen {
       if (!doc.classList.contains('selected')) doc.classList.add('selected');
     } else if (doc.classList.contains('selected')) doc.classList.remove('selected');
   }
+  clearSelection() {
+    this.selection = [];
+    document.querySelectorAll('#item-trade-screen .selected').forEach((d) => {
+      d.classList.remove('selected');
+    });
+  }
   updateSelection(character, equipment) {
     const query = `.character-${character?.name ?? null}.item-${equipment?.itemId ?? null}`;
     const index = this.selection.findIndex((d) => d.query === query);
@@ -50,10 +56,7 @@ export class ItemTradeScreen {
     }
   }
   update({ itemId1, itemId2, itemName1, itemName2, character1, character2, gameData }) {
-    document.querySelectorAll('#item-trade-screen .selected').forEach((d) => {
-      d.classList.remove('selected');
-    });
-    this.selection = [];
+    this.clearSelection();
     const tween = new Tweening(this.game, document.querySelector(`#item-trade-screen`));
     this.show(gameData);
     setTimeout(() => {
@@ -85,10 +88,7 @@ export class ItemTradeScreen {
     }
   }
   showConfirm(gameData) {
-    document.querySelectorAll('#item-trade-screen .selected').forEach((d) => {
-      d.classList.remove('selected');
-    });
-    this.selection = [];
+    this.clearSelection();
     this.getElem(gameData.trade1).classList.add('selected');
     this.getElem(gameData.trade2).classList.add('selected');
   }

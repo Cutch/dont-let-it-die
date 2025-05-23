@@ -57,7 +57,9 @@ class DLD_ActInterrupt
             } else {
                 $this->setState($functionName, $interruptData);
                 // Goto the skill screen
-                $this->game->nextState('interrupt');
+                if ($this->game->gamestate->state()['name'] === $currentState) {
+                    $this->game->nextState('interrupt');
+                }
             }
         } elseif (
             array_key_exists('cancelled', $existingData) &&
@@ -224,12 +226,22 @@ class DLD_ActInterrupt
             }
         }
         if ($changeState) {
-            // Check that the state change has not already handled the function call
-            if ($data && array_key_exists('functionName', $data) && $this->getState($data['functionName'])) {
-                $this->game->log('actInterrupt ' . $state['functionName'], $data['args']);
-                call_user_func([$this->game, $data['functionName']], ...$data['args']);
-                $this->game->log('actInterrupt changeState ', $data['functionName']);
-            }
+            $this->completeInterrupt();
+        }
+    }
+    public function completeInterrupt()
+    {
+        $state = $this->getLatestInterruptState();
+        if (!$state) {
+            return;
+        }
+        $this->game->log('completeInterrupt', ['action' => 'completeInterrupt', 'state' => $state]);
+        $data = $state['data'];
+        // Check that the state change has not already handled the function call
+        if ($data && array_key_exists('functionName', $data) && $this->getState($data['functionName'])) {
+            $this->game->log('actInterrupt ' . $state['functionName'], $data['args']);
+            call_user_func([$this->game, $data['functionName']], ...$data['args']);
+            $this->game->log('actInterrupt changeState ', $data['functionName']);
         }
     }
     public function onInterruptCancel()

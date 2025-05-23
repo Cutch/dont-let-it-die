@@ -833,7 +833,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       const playArea = $('game_play_area');
       playArea.insertAdjacentHTML(
         'beforeend',
-        `<div id="knowledge-container" class="dlid__container"><div class="board"><div class="selections"></div><div class="unlocked-tokens"></div></div></div>`,
+        `<div id="knowledge-container" class="dlid__container"><div class="board"><div class="upgrade-selections"></div><div class="unlocked-tokens"></div></div></div>`,
       );
       renderImage(`knowledge-tree-${this.difficulty}`, document.querySelector('#knowledge-container .board'), {
         pos: 'insert',
@@ -842,7 +842,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       knowledgeContainer = document.querySelector('#knowledge-container .unlocked-tokens');
     }
 
-    const selections = document.querySelector(`#knowledge-container .selections`);
+    const selections = document.querySelector(`#knowledge-container .upgrade-selections`);
     const upgradeData = getAllData()[`knowledge-tree-${this.difficulty}`].upgrades;
     selections.innerHTML = '';
     // Hindrance show new discoveries
@@ -1039,6 +1039,10 @@ declare('bgagame.dontletitdie', Gamegui, {
       case 'characterSelect':
         dojo.style('character-selector', 'display', 'none');
         dojo.style('game_play_area', 'display', '');
+        break;
+      case 'confirmTradePhase':
+      case 'waitTradePhase':
+        this.itemTradeScreen.clearSelection();
         break;
     }
   },
@@ -1313,21 +1317,25 @@ declare('bgagame.dontletitdie', Gamegui, {
           });
           break;
         case 'deckSelection':
-          this.statusBar.addActionButton(args.deckSelection?.title ? _(args.deckSelection.title) : _('Select Deck'), () => {
-            this.bgaPerformAction('actSelectDeck', { deckName: this.deckSelectionScreen.getSelectedId() }).then(() =>
-              this.deckSelectionScreen.hide(),
-            );
-          });
-          break;
-        case 'hindranceSelection':
           this.statusBar.addActionButton(
-            args.hindranceSelection?.button ? _(args.hindranceSelection.button) : _('Remove Hindrance'),
+            args.deckSelection?.title
+              ? _(args.deckSelection.title)
+              : args.selectionState?.title
+                ? _(args.selectionState.title)
+                : _('Select Deck'),
             () => {
-              this.bgaPerformAction('actSelectHindrance', { data: JSON.stringify(this.hindranceSelectionScreen.getSelected()) }).then(() =>
-                this.hindranceSelectionScreen.hide(),
+              this.bgaPerformAction('actSelectDeck', { deckName: this.deckSelectionScreen.getSelectedId() }).then(() =>
+                this.deckSelectionScreen.hide(),
               );
             },
           );
+          break;
+        case 'hindranceSelection':
+          this.statusBar.addActionButton(args.selectionState?.button ? _(args.selectionState.button) : _('Remove Hindrance'), () => {
+            this.bgaPerformAction('actSelectHindrance', { data: JSON.stringify(this.hindranceSelectionScreen.getSelected()) }).then(() =>
+              this.hindranceSelectionScreen.hide(),
+            );
+          });
           break;
         case 'characterSelection':
           this.statusBar.addActionButton(this.getActionMappings().actSelectCharacter, () => {
@@ -1547,7 +1555,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     await this.notificationWrapper(notification);
     if (isStudio()) console.log('notif_shuffle', notification);
     this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
-    return this.decks[notification.args.deck].shuffle();
+    return this.decks[notification.args.deck].shuffle(notification.args);
   },
   notif_updateGameData: async function (notification) {
     await this.notificationWrapper(notification);

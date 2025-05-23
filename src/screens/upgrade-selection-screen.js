@@ -15,8 +15,8 @@ export class UpgradeSelectionScreen {
         upgradeReplaceId: replace,
       });
       [
-        !replace.match(/^[0-9]/) && this.upgradeElem.querySelector(`.selections .fkp-spot.${replace}`),
-        !from.match(/^[0-9]/) && this.upgradeElem.querySelector(`.selections .fkp-spot.${from}`),
+        !replace.match(/^[0-9]/) && this.upgradeElem.querySelector(`.upgrade-selections .fkp-spot.${replace}`),
+        !from.match(/^[0-9]/) && this.upgradeElem.querySelector(`.upgrade-selections .fkp-spot.${from}`),
         document.querySelector(`#upgrades .items *[name="${from}"]`),
       ]
         .filter(Boolean)
@@ -35,7 +35,7 @@ export class UpgradeSelectionScreen {
     this.game.selector.hide('which-upgrade');
   }
   update(gameData) {
-    const selections = this.upgradeElem.querySelector(`.selections`);
+    const selections = this.upgradeElem.querySelector(`.upgrade-selections`);
     selections.innerHTML = '';
     const filled = Object.entries(gameData.upgrades).reduce((acc, [k, v]) => (v.replace ? { ...acc, [v.replace]: k } : acc), {});
 
@@ -105,7 +105,7 @@ export class UpgradeSelectionScreen {
         'beforeend',
         `<div id="upgrade-selection-screen" class="dlid__container">
             <div class="content">
-              <div class="board"><div class="selections"></div></div>
+              <div class="board"><div class="upgrade-selections"></div></div>
               <div id="upgrades" class="dlid__container"><h3>${_('New Discoveries')}</h3><div class="items"></div></div>
             </div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
