@@ -811,7 +811,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.tooltip = new Tooltip($('game_play_area_wrap'));
     this.setupCharacterSelections(gameData);
     this.setupBoard(gameData);
-    this.dice = new Dice($('board-container'));
+    this.dice = new Dice(this, $('board-container'));
     window.dice = this.dice;
     // this.dice.roll(5);
     // renderImage(`board`, playArea);
@@ -1492,7 +1492,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     dojo.subscribe('rollFireDie', this, 'notif_rollFireDie');
     dojo.subscribe('resetNotifications', this, 'notif_resetNotifications');
     this.notifqueue.setSynchronous('cardDrawn', 1000);
-    this.notifqueue.setSynchronous('rollFireDie', 1000);
+    this.notifqueue.setSynchronous('rollFireDie', 3250);
     this.notifqueue.setSynchronous('shuffle', 1500);
     this.notifqueue.setSynchronous('tokenUsed', 300);
     this.notifqueue.setSynchronous('updateGameData', 300);
@@ -1534,7 +1534,7 @@ declare('bgagame.dontletitdie', Gamegui, {
   notif_rollFireDie: async function (notification) {
     await this.notificationWrapper(notification);
     if (isStudio()) console.log('notif_rollFireDie', notification);
-    return this.dice.roll(notification.args.roll);
+    return this.dice.roll(notification.args);
   },
   notif_cardDrawn: async function (notification) {
     await this.notificationWrapper(notification);

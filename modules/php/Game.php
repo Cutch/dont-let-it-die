@@ -292,6 +292,7 @@ class Game extends \Table
                 $this->notify('rollFireDie', clienttranslate('${character_name} rolled a ${value} ${action_name}'), [
                     'value' => $data['value'] == 0 ? clienttranslate('blank') : $data['value'],
                     'character_name' => $this->getCharacterHTML($characterName),
+                    'characterId' => $characterName,
                     'roll' => $sideNum,
                     'action_name' => '(' . $actionName . ')',
                 ]);
