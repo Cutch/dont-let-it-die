@@ -477,6 +477,9 @@ foreach ($interruptableScreens as $stateId) {
     $machinestates[$stateId]['transitions'] = [...$machinestates[$stateId]['transitions'], ...$interruptScreens];
 }
 
+foreach ($interruptScreens as $interruptStateId) {
+    $machinestates[$interruptStateId]['transitions'] = [...$machinestates[$interruptStateId]['transitions'], ...$interruptScreens];
+}
 foreach ($interruptableScreenNames as $stateId => $stateName) {
     foreach ($interruptScreens as $interruptStateId) {
         $machinestates[$interruptStateId]['transitions'][$stateName] = $stateId;

@@ -966,6 +966,9 @@ declare('bgagame.dontletitdie', Gamegui, {
       case 'itemSelection':
         if (isActive) this.itemsScreen.show(args.args);
         break;
+      case 'eatSelection':
+        if (isActive) this.eatScreen.show(args.args);
+        break;
       case 'startHindrance':
         this.upgradeSelectionScreen.show(args.args);
         break;
@@ -1030,8 +1033,11 @@ declare('bgagame.dontletitdie', Gamegui, {
       case 'deckSelection':
         this.deckSelectionScreen.hide();
         break;
+      case 'eatSelection':
+        this.eatScreen.hide();
+        break;
       case 'itemSelection':
-        this.deckSelectionScreen.hide();
+        this.itemsScreen.hide();
         break;
       case 'whichWeapon':
         this.weaponScreen.hide();
@@ -1225,7 +1231,7 @@ declare('bgagame.dontletitdie', Gamegui, {
               } else if (actionId === 'actCook') {
                 this.clearActionButtons();
                 this.cookScreen.show(this.gamedatas);
-                this.statusBar.addActionButton(this.getActionMappings().actEat + `${suffix}`, () => {
+                this.statusBar.addActionButton(this.getActionMappings().actCook + `${suffix}`, () => {
                   if (!this.cookScreen.hasError()) {
                     this.bgaPerformAction('actCook', {
                       resourceType: this.cookScreen.getSelectedId(),
@@ -1301,7 +1307,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                       resourceType: this.eatScreen.getSelectedId(),
                     })
                       .then(() => {
-                        this.eatScreen.hide();
+                        if (this.gamedatas.gamestate.name !== 'eatSelection') this.eatScreen.hide();
                       })
                       .catch(console.error);
                   }
@@ -1347,6 +1353,15 @@ declare('bgagame.dontletitdie', Gamegui, {
               );
             },
           );
+          break;
+        case 'eatSelection':
+          this.statusBar.addActionButton(args.selectionState?.title ? _(args.selectionState.title) : _('Eat'), () => {
+            this.bgaPerformAction('actEat', {
+              resourceType: this.eatScreen.getSelectedId(),
+            }).then(() => {
+              this.eatScreen.hide();
+            });
+          });
           break;
         case 'hindranceSelection':
           this.statusBar.addActionButton(args.selectionState?.button ? _(args.selectionState.button) : _('Remove Hindrance'), () => {

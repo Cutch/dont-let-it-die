@@ -486,7 +486,7 @@ class Game extends \Table
                 }
                 $itemType = $_this->data->getItems()[$itemName]['itemType'];
                 $currentBuildings = $_this->gameData->get('buildings');
-                if ($itemType == 'building' && sizeof($currentBuildings) > 0) {
+                if ($itemType == 'building' && sizeof($currentBuildings) >= $this->getMaxBuildingCount()) {
                     throw new BgaUserException(clienttranslate('A building has already been crafted'));
                 }
                 $result = [];
@@ -677,6 +677,10 @@ class Game extends \Table
             func_get_args(),
             [$this->hooks, 'onEat'],
             function (Game $_this) use ($resourceType) {
+                if ($this->gamestate->state()['name'] == 'eatSelection') {
+                    $state = $this->selectionStates->getState('eatSelection');
+                    $_this->character->setSubmittingCharacterById($state['characterId']);
+                }
                 $this->actions->validateCanRunAction('actEat', null, $resourceType);
                 $tokenData = $this->data->getTokens()[$resourceType];
                 $data = ['type' => $resourceType, ...$tokenData['actEat'], 'tokenName' => $tokenData['name']];
@@ -1012,6 +1016,7 @@ class Game extends \Table
                 throw new BgaUserException(clienttranslate('All discoveries must replace an existing track discovery'));
             }
             $saveState = false;
+            $this->character->addExtraTime();
             $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'playerTurn');
         }
         $this->completeAction($saveState);

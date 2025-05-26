@@ -793,11 +793,31 @@ class DLD_CharactersData
                 'skills' => [
                     'skill1' => [
                         'type' => 'skill',
-                        'name' => clienttranslate('Heal 1 Health'),
+                        'name' => clienttranslate('Give 1 Health'),
                         'state' => ['playerTurn'],
                         'stamina' => 2,
+                        'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                            $state = $game->selectionStates->getState('characterSelection');
+                            if ($state && $state['id'] == $skill['characterId']) {
+                                $game->character->adjustHealth($data['characterId'], 1);
+                                $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
+                                    'count' => 1,
+                                    'character_resource' => clienttranslate('Health'),
+                                    'character_name' => $game->getCharacterHTML($data['characterId']),
+                                ]);
+                            }
+                        },
                         'onUse' => function (Game $game, $skill) {
-                            $game->eventLog(clienttranslate('${character_name} healed for 1 hp'));
+                            $game->selectionStates->initiateState(
+                                'characterSelection',
+                                [
+                                    'selectableCharacters' => $game->character->getAllCharacterIds(),
+                                    'id' => $skill['id'],
+                                ],
+                                $skill['characterId'],
+                                true,
+                                'playerTurn'
+                            );
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);

@@ -732,6 +732,9 @@ class DLD_ExpansionData
                 'name' => clienttranslate('Paranoid'),
                 // Always eat, this is not a hook, hooks are below
                 'handleEat' => function (Game $game, $card, &$data, ?string $preferType = null) {
+                    if (getUsePerDay($card['characterId'] . 'hindrance_2_3' . 'nauseous', $game) >= 1) {
+                        return;
+                    }
                     $variables = $game->gameData->getResources();
                     $array = $game->actions->getActionSelectable('actEat');
                     $array = array_values(
@@ -771,7 +774,10 @@ class DLD_ExpansionData
                                     'eatSelection',
                                     ['id' => $card['characterId']],
                                     $card['characterId'],
-                                    false
+                                    false,
+                                    '',
+                                    null,
+                                    true
                                 );
                             }
                         }
@@ -780,6 +786,7 @@ class DLD_ExpansionData
                 'onEatBefore' => function (Game $game, $card, &$data) {
                     if ($game->character->getSubmittingCharacterId() != $card['characterId']) {
                         $card['handleEat']($game, $card, $data, $data['type']);
+                        $data['interrupt'] = true;
                     }
                 },
                 'onCookAfter' => function (Game $game, $card, &$data) {

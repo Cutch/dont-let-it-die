@@ -229,7 +229,6 @@ class DLD_SelectionStates
             'selectionState' => $this->game->gameData->get($stateName),
             'character_name' => $this->game->getCharacterHTML(),
         ];
-        $this->game->log($this->game->gamestate->state()['name'], $stateName, $result);
         $this->game->getGameData($result);
         $this->game->getResources($result);
         if ($stateName === 'deckSelectionState') {
@@ -284,6 +283,7 @@ class DLD_SelectionStates
                 'cancellable' => $cancellable,
                 'title' => $title,
                 'currentPlayerId' => $playerId,
+                'characterId' => $characterId,
                 'nextState' => $nextState,
                 'isInterrupt' => $isInterrupt,
                 ...$state,
