@@ -841,8 +841,9 @@ class DLD_CharactersData
                             ) == 0
                         ) {
                             $game->character->adjustHealth($char['character_name'], 1);
-                            $game->eventLog(clienttranslate('${character_name} gained 1 health after the danger cards death'), [
-                                'character_name' => $game->getCharacterHTML($char['character_name']),
+                            $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
+                                'count' => 1,
+                                'character_resource' => clienttranslate('Health'),
                             ]);
                         }
                     }
@@ -1663,13 +1664,14 @@ class DLD_CharactersData
 
                                 $game->notify(
                                     'activeCharacter',
-                                    clienttranslate('${character_name_1} gave ${item_name} to ${character_name_2} ${buttons}'),
+                                    clienttranslate('${character_name_1} gave ${item_name} to ${character_name_2}'),
                                     [
                                         'character_name_1' => $game->getCharacterHTML($skill['characterId']),
                                         'character_name_2' => $game->getCharacterHTML($characterId),
-                                        'item_name' => $itemObj['name'],
-                                        'buttons' => notifyButtons([
-                                            ['name' => $game->data->getItems()[$itemId]['name'], 'dataId' => $itemId, 'dataType' => 'item'],
+                                        'item_name' => notifyTextButton([
+                                            'name' => $itemObj['name'],
+                                            'dataId' => $itemObj['id'],
+                                            'dataType' => 'item',
                                         ]),
                                     ]
                                 );

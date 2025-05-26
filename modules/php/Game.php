@@ -529,9 +529,8 @@ class Game extends \Table
                     $this->character->equipAndValidateEquipment($character['id'], $itemId);
                 }
                 $this->hooks->onCraftAfter($data);
-                $_this->eventLog(clienttranslate('${character_name} crafted a ${item_name} ${buttons}'), [
-                    'item_name' => $item['name'],
-                    'buttons' => notifyButtons([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
+                $_this->eventLog(clienttranslate('${character_name} crafted a ${item_name}'), [
+                    'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                 ]);
             }
         );
@@ -571,10 +570,11 @@ class Game extends \Table
         }
         $items = $this->gameData->getItems();
 
-        $this->notify('notify', clienttranslate('{item_name} destroyed ${buttons}'), [
-            'item_name' => $this->data->getItems()[$items[$itemId]]['name'],
-            'buttons' => notifyButtons([
-                ['name' => $this->data->getItems()[$items[$itemId]]['name'], 'dataId' => $itemId, 'dataType' => 'item'],
+        $this->notify('notify', clienttranslate('{item_name} destroyed'), [
+            'item_name' => notifyTextButton([
+                'name' => $this->data->getItems()[$items[$itemId]]['name'],
+                'dataId' => $itemId,
+                'dataType' => 'item',
             ]),
         ]);
     }
@@ -1187,15 +1187,14 @@ class Game extends \Table
                     ]);
                 } elseif ($card['deckType'] == 'encounter') {
                     // Change state and check for health/damage modifications
-                    $this->eventLog(
-                        clienttranslate('${character_name} encountered a ${name} (${health} health, ${damage} damage) ${buttons}'),
-                        [
-                            ...$card,
-                            'buttons' => notifyButtons([
-                                ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
-                            ]),
-                        ]
-                    );
+                    $this->eventLog(clienttranslate('${character_name} encountered a ${name} (${health} health, ${damage} damage)'), [
+                        ...$card,
+                        'name' => notifyTextButton([
+                            'name' => $card['name'],
+                            'dataId' => $card['id'],
+                            'dataType' => 'card',
+                        ]),
+                    ]);
                 } elseif ($card['deckType'] == 'nothing') {
                     if (!$this->isValidExpansion('mini-expansion')) {
                         $this->eventLog(clienttranslate('${character_name} did nothing ${buttons}'), [
@@ -1274,8 +1273,8 @@ class Game extends \Table
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
                 $card = $data['card'];
-                $this->eventLog(clienttranslate('Something unexpected happens, drawing a day event ${buttons}'), [
-                    'buttons' => notifyButtons([
+                $this->eventLog(clienttranslate('Something unexpected happens, drawing a ${day_event}'), [
+                    'day_event' => notifyButtons([
                         ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'day-event'],
                     ]),
                 ]);

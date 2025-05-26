@@ -136,10 +136,11 @@ class DLD_ExpansionData
                                 usePerForever($char['id'] . $skill['id'], $game);
                                 $data['data']['willTakeDamage'] = 0;
 
-                                $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage ${buttons}'), [
-                                    'item_name' => clienttranslate('Shell Shield'),
-                                    'buttons' => notifyButtons([
-                                        ['name' => clienttranslate('Shell Shield'), 'dataId' => 'day-event_1_1', 'dataType' => 'day-event'],
+                                $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage'), [
+                                    'item_name' => notifyTextButton([
+                                        'name' => clienttranslate('Shell Shield'),
+                                        'dataId' => 'day-event_1_1',
+                                        'dataType' => 'day-event',
                                     ]),
                                 ]);
                                 if (getUsePerForever($char['id'] . $skill['id'], $game) == 2) {
@@ -387,7 +388,6 @@ class DLD_ExpansionData
                                 $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 1,
                                     'character_resource' => clienttranslate('Health'),
-                                    'character_name' => $data['characterId'],
                                 ]);
                             }
                         },
@@ -428,7 +428,6 @@ class DLD_ExpansionData
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => 1,
                                     'character_resource' => clienttranslate('Health'),
-                                    'character_name' => $data['characterId'],
                                 ]);
                             }
                         },
@@ -848,7 +847,10 @@ class DLD_ExpansionData
                 },
                 'onInvestigateFire' => function (Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {
-                        $game->eventLog(clienttranslate('${character_name} is dumb'));
+                        $game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
+                            'acquireOrDropSentence' => $card['acquireSentence'],
+                            'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
+                        ]);
                         $data['roll'] -= 1;
                     }
                 },
@@ -885,13 +887,11 @@ class DLD_ExpansionData
                 // Can't trade
                 // Can't be healed by skills, going to handle this on the individual skills
                 'onItemTrade' => function (Game $game, $card, &$data) {
-                    if ($card['characterId'] == $game->character->getTurnCharacterId()) {
-                        if (
-                            (isset($data['trade1']['character']['id']) && $data['trade1']['character']['id'] == $card['characterId']) ||
-                            (isset($data['trade2']['character']['id']) && $data['trade2']['character']['id'] == $card['characterId'])
-                        ) {
-                            throw new BgaUserException(clienttranslate('Cannot trade with') . $card['characterId']);
-                        }
+                    if (
+                        (isset($data['trade1']['character']['id']) && $data['trade1']['character']['id'] == $card['characterId']) ||
+                        (isset($data['trade2']['character']['id']) && $data['trade2']['character']['id'] == $card['characterId'])
+                    ) {
+                        throw new BgaUserException(clienttranslate('Cannot trade with') . $card['characterId']);
                     }
                 },
             ],
@@ -944,7 +944,7 @@ class DLD_ExpansionData
                 'dropSentence' => clienttranslate('no longer has a'),
                 'name' => clienttranslate('Deep Wound'),
                 'onGetCharacterData' => function (Game $game, $card, &$data) {
-                    if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                    if ($card['characterId'] == $data['id']) {
                         $data['maxHealth'] = clamp($data['maxHealth'] - 1, 0, 10);
                     }
                 },
@@ -958,7 +958,7 @@ class DLD_ExpansionData
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Dehydrated'),
                 'onEncounterPre' => function (Game $game, $card, &$data) {
-                    if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                    if ($card['characterId'] == $game->character->getSubmittingCharacterId()) {
                         $data['willTakeDamage'] += 1;
                     }
                 },
@@ -972,7 +972,7 @@ class DLD_ExpansionData
                 'dropSentence' => clienttranslate('no longer has a'),
                 'name' => clienttranslate('Twisted Ankle'),
                 'onGetCharacterData' => function (Game $game, $card, &$data) {
-                    if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                    if ($card['characterId'] == $data['id']) {
                         $data['maxStamina'] = clamp($data['maxStamina'] - 1, 0, 10);
                     }
                 },
@@ -985,21 +985,25 @@ class DLD_ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Nauseous'),
+                // TODO how does this work with paranoid
                 'onGetValidActions' => function (Game $game, $card, &$data) {
                     if (
                         $card['characterId'] == $game->character->getTurnCharacterId() &&
-                        getUsePerDay($card['id'] . 'nauseous', $game) < 1
+                        getUsePerDay($card['characterId'] . $card['id'] . 'nauseous', $game) < 1
                     ) {
                         unset($data['actEat']);
                     }
                 },
                 'onEat' => function (Game $game, $card, &$data) {
                     if (
-                        $card['characterId'] == $game->character->getTurnCharacterId() &&
-                        getUsePerDay($card['id'] . 'nauseous', $game) < 1
+                        $card['characterId'] == $game->character->getSubmittingCharacterId() &&
+                        getUsePerDay($card['characterId'] . $card['id'] . 'nauseous', $game) < 1
                     ) {
-                        usePerDay($card['id'] . 'nauseous', $game);
-                        $game->eventLog(clienttranslate('${character_name} feels nauseous'));
+                        usePerDay($card['characterId'] . $card['id'] . 'nauseous', $game);
+                        $game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
+                            'acquireOrDropSentence' => $card['acquireSentence'],
+                            'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
+                        ]);
                     }
                 },
             ],
@@ -1012,7 +1016,7 @@ class DLD_ExpansionData
                 'dropSentence' => clienttranslate('no longer has'),
                 'name' => clienttranslate('Parasites'),
                 'onAdjustHealth' => function (Game $game, $card, &$data) {
-                    if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['change'] > 0) {
+                    if ($card['characterId'] == $data['characterId'] && $data['change'] > 0) {
                         $data['change'] -= 1;
                     }
                 },
@@ -1037,8 +1041,9 @@ class DLD_ExpansionData
                 'name' => clienttranslate('Diseased'),
                 'onMorning' => function (Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
-                        $game->character->adjustActiveHealth(-1);
+                        $game->character->adjustHealth($card['characterId'], -1);
                         $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
+                            'character_name' => $game->getCharacterHTML($data['characterId']),
                             'count' => 1,
                             'character_resource' => clienttranslate('Health'),
                         ]);
@@ -1055,7 +1060,11 @@ class DLD_ExpansionData
                 'name' => clienttranslate('Exhausted'),
                 'onMorningAfter' => function (Game $game, $card, &$data) {
                     $game->character->adjustStamina($game->character->getTurnCharacterId(), -2);
-                    $game->eventLog(clienttranslate('${character_name} is exhausted'));
+                    $game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
+                        'character_name' => $game->getCharacterHTML($data['characterId']),
+                        'acquireOrDropSentence' => $card['acquireSentence'],
+                        'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
+                    ]);
                 },
             ],
             'hindrance_2_8' => [
@@ -1082,7 +1091,10 @@ class DLD_ExpansionData
                 'name' => clienttranslate('Concussion'),
                 'onInvestigateFire' => function (Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {
-                        $game->eventLog(clienttranslate('${character_name} has a') . clienttranslate('Concussion'), []);
+                        $game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
+                            'acquireOrDropSentence' => $card['acquireSentence'],
+                            'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
+                        ]);
                         $data['roll'] -= 1;
                     }
                 },

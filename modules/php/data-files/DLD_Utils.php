@@ -63,18 +63,22 @@ if (!function_exists('addId')) {
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
+    function notifyTextButton(array $obj): string
+    {
+        $name = $obj['name'];
+        $dataId = $obj['dataId'];
+        $dataType = $obj['dataType'];
+        if (!array_search($dataType, ['character', 'item', 'hindrance', 'unlock', 'day-event', 'night-event', 'card'])) {
+            throw new Exception('Bad dataType');
+        }
+        return "<span class=\"dlid__log-button\" data-id=\"$dataId\" data-type=\"$dataType\">$name</span>";
+    }
     function notifyButtons($arr): string
     {
         return join(
             '',
             array_map(function ($obj) {
-                $name = $obj['name'];
-                $dataId = $obj['dataId'];
-                $dataType = $obj['dataType'];
-                if (!array_search($dataType, ['character', 'item', 'hindrance', 'unlock', 'day-event', 'night-event', 'card'])) {
-                    throw new Exception('Bad dataType');
-                }
-                return "<span class=\"dlid__log-button\" data-id=\"$dataId\" data-type=\"$dataType\">$name</span>";
+                return notifyTextButton($obj);
             }, $arr)
         );
     }

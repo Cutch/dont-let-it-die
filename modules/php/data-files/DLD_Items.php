@@ -222,11 +222,10 @@ class DLD_ItemsData
                         $game->gameData->setResource('fiber', $game->gameData->getResource('fiber') + 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type} ${buttons}'),
+                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
                             [
-                                'item_name' => $item['name'],
+                                'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                                 'resource_type' => $card['resourceType'],
-                                'buttons' => notifyButtons([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
                             ]
                         );
                     }
@@ -250,11 +249,10 @@ class DLD_ItemsData
                         $game->gameData->setResource('berry', $game->gameData->getResource('berry') + 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type} ${buttons}'),
+                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
                             [
-                                'item_name' => $item['name'],
+                                'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                                 'resource_type' => $card['resourceType'],
-                                'buttons' => notifyButtons([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
                             ]
                         );
                     }
@@ -306,14 +304,11 @@ class DLD_ItemsData
                                 usePerDay($char['id'] . $skill['id'], $game);
                                 $data['data']['willTakeDamage'] = 0;
 
-                                $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage ${buttons}'), [
-                                    'item_name' => clienttranslate('Bone Armor'),
-                                    'buttons' => notifyButtons([
-                                        [
-                                            'name' => $game->data->getItems()[$skill['itemId']]['name'],
-                                            'dataId' => $skill['itemId'],
-                                            'dataType' => 'item',
-                                        ],
+                                $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage'), [
+                                    'item_name' => notifyTextButton([
+                                        'name' => $game->data->getItems()[$skill['itemId']]['name'],
+                                        'dataId' => $skill['itemId'],
+                                        'dataType' => 'item',
                                     ]),
                                 ]);
                             }
@@ -379,14 +374,11 @@ class DLD_ItemsData
                                 usePerDay($char['id'] . $skill['id'], $game);
                                 $data['data']['willTakeDamage'] = 0;
 
-                                $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage ${buttons}'), [
-                                    'item_name' => clienttranslate('Hide Armor'),
-                                    'buttons' => notifyButtons([
-                                        [
-                                            'name' => $game->data->getItems()[$skill['itemId']]['name'],
-                                            'dataId' => $skill['itemId'],
-                                            'dataType' => 'item',
-                                        ],
+                                $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage'), [
+                                    'item_name' => notifyTextButton([
+                                        'name' => $game->data->getItems()[$skill['itemId']]['name'],
+                                        'dataId' => $skill['itemId'],
+                                        'dataType' => 'item',
                                     ]),
                                 ]);
                             }
@@ -453,11 +445,10 @@ class DLD_ItemsData
                         $game->gameData->setResource('wood', $game->gameData->getResource('wood') + 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type} ${buttons}'),
+                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
                             [
-                                'item_name' => $item['name'],
+                                'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                                 'resource_type' => $card['resourceType'],
-                                'buttons' => notifyButtons([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
                             ]
                         );
                     }
@@ -515,11 +506,10 @@ class DLD_ItemsData
                         $game->adjustResource('meat', 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type} ${buttons}'),
+                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
                             [
-                                'item_name' => $item['name'],
+                                'item_name' => notifyTextButton([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
                                 'resource_type' => $card['resourceType'],
-                                'buttons' => notifyButtons([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
                             ]
                         );
                     }
@@ -565,11 +555,10 @@ class DLD_ItemsData
                         $game->gameData->setResource('rock', $game->gameData->getResource('rock') + 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type} ${buttons}'),
+                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
                             [
-                                'item_name' => $item['name'],
+                                'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                                 'resource_type' => $card['resourceType'],
-                                'buttons' => notifyButtons([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
                             ]
                         );
                     }
@@ -915,6 +904,45 @@ class DLD_ItemsData
                     'fiber' => 3,
                     'hide' => 2,
                 ],
+                'skills' => [
+                    'skill1' => [
+                        'type' => 'skill',
+                        'state' => ['resolveEncounter'],
+                        'name' => clienttranslate('Give 1 Health'),
+                        'onEncounter' => function (Game $game, $skill, &$data) {
+                            $char = $game->character->getCharacterData($skill['characterId']);
+                            if ($char['isActive'] && in_array($skill['parentId'], $data['itemIdUsed'])) {
+                                $game->actInterrupt->addSkillInterrupt($skill);
+                                $game->selectionStates->initiateState(
+                                    'characterSelection',
+                                    [
+                                        'selectableCharacters' => $game->character->getAllCharacterIds(),
+                                        'id' => $skill['id'],
+                                        'cardId' => $data['cardId'],
+                                    ],
+                                    $skill['characterId'],
+                                    false,
+                                    'resolveEncounter',
+                                    true
+                                );
+                                $data['interrupt'] = true;
+                            }
+                        },
+                        'onCharacterSelection' => function (Game $game, $skill, &$data) {
+                            $state = $game->selectionStates->getState('characterSelection');
+                            if ($state && $state['id'] == $skill['id']) {
+                                $cardId = $state['cardId'];
+                                $game->character->adjustHealth($data['characterId'], 1);
+                                $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
+                                    'count' => 1,
+                                    'character_resource' => clienttranslate('Health'),
+                                    'character_name' => $game->getCharacterHTML($data['characterId']),
+                                ]);
+                                $game->decks->shuffleInCard($game->data->getDecks()[$cardId]['deck'], $cardId);
+                            }
+                        },
+                    ],
+                ],
             ],
             'fire-stick' => [
                 'type' => 'item',
@@ -1016,14 +1044,9 @@ class DLD_ItemsData
                 ],
                 'onUse' => function (Game $game, $item) {
                     $game->character->unequipEquipment($item['characterId'], [$item['id']]);
-                    $game->notify(
-                        'usedItem',
-                        clienttranslate('${character_name} used ${item_name} and lost their ${item_name} ${buttons}'),
-                        [
-                            'item_name' => $item['name'],
-                            'buttons' => notifyButtons([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
-                        ]
-                    );
+                    $game->notify('usedItem', clienttranslate('${character_name} used ${item_name} and lost their ${item_name}'), [
+                        'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
+                    ]);
                 },
             ],
             'bola' => [

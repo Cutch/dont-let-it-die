@@ -361,13 +361,10 @@ class DLD_Character
         });
         $this->game->decks->removeFromDeck($card['deck'], $card['id']);
         $this->game->hooks->onAcquireHindrance($card);
-        $this->game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName} ${buttons}'), [
+        $this->game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
             'acquireOrDropSentence' => $card['acquireSentence'],
-            'cardName' => $card['name'],
+            'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
             'character_name' => $this->game->getCharacterHTML($characterName),
-            'buttons' => notifyButtons([
-                ['name' => $this->game->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'hindrance'],
-            ]),
         ]);
     }
     public function removeHindrance(string $characterName, array $card): void
@@ -380,13 +377,10 @@ class DLD_Character
                 }
             );
         });
-        $this->game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName} ${buttons}'), [
+        $this->game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
             'acquireOrDropSentence' => $card['dropSentence'],
-            'cardName' => $card['name'],
+            'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
             'character_name' => $this->game->getCharacterHTML($characterName),
-            'buttons' => notifyButtons([
-                ['name' => $this->game->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'hindrance'],
-            ]),
         ]);
         $this->game->decks->addBackToDeck($card['deck'], $card['id']);
     }
