@@ -32,6 +32,11 @@ export class Deck {
       this.setDiscard(gameData.decksDiscards?.[gameData.deck]?.name);
       this.div.querySelector(`.shuffle-1`).classList.add('enable');
       this.div.querySelector(`.shuffle-2`).classList.add('enable');
+      if (this.partialCleanup) {
+        this.partialCleanup();
+        this.partialCleanup = null;
+        this.div.querySelector('.flip-card').remove();
+      }
       setTimeout(() => {
         this.div.querySelector(`.shuffle-1`).classList.remove('enable');
         this.div.querySelector(`.shuffle-2`).classList.remove('enable');
@@ -45,7 +50,10 @@ export class Deck {
     this.div.querySelector(`.discard-counter`).innerHTML = this.countData.discardCount;
   }
   setDiscard(cardId) {
-    if (this.cleanup) this.cleanup();
+    if (this.cleanup) {
+      this.cleanup();
+      this.cleanup = null;
+    }
     if (!cardId) {
       const { width, height } = getSpriteSize(`${this.deck}-back`, this.scale);
       this.div.querySelector(`.flipped-card`).innerHTML = `<div class="empty-discard" style="width: ${width}px;height: ${height}px;">${_(
@@ -121,14 +129,33 @@ export class Deck {
     renderImage(cardId, this.div.querySelector(`.flip-card-back`), { scale: this.scale, pos: 'replace' });
     await this.game.wait(100);
     this.div.querySelector(`.flip-card`).classList.add('flip');
+    this.div.querySelector(`.flip-card`).classList.add('partial');
     await this.game.wait(1000);
     this.partialDrawCard = cardId;
+    this.partialCleanup = addClickListener(this.div.querySelector(`.flip-card`), cardId, () => {
+      this.game.tooltip.show();
+      const {
+        frame: { w, h },
+        rotate,
+      } = getAllData()[cardId];
+
+      renderImage(cardId, this.game.tooltip.renderByElement(), {
+        withText: true,
+        scale: (rotate ? h : w) < 300 ? 1 : 2,
+        pos: 'replace',
+      });
+    });
   }
   isAnimating() {
     return this.isDrawing;
   }
   async finishPartialDraw(cardId) {
+    if (this.partialCleanup) {
+      this.partialCleanup();
+      this.partialCleanup = null;
+    }
     this.partialDrawCard = null;
+    this.div.querySelector(`.flip-card`).classList.remove('partial');
     this.div.querySelector(`.flip-card`).classList.add('discard');
     await this.game.wait(1000);
     this.setDiscard(cardId);

@@ -406,7 +406,7 @@ export default {
             _('Item Type') + ': ' + _('Weapon'),
             _('Damage:') + ' X',
             _('Range') + ': ' + 1,
-            _("Roll the Fire Die before fighting a Danger!~ card, this roll value is the Fire Stick's damage"),
+            _("Roll the Fire Die before fighting a Danger! card, this roll value is the Fire Stick's damage"),
             _('You may spend up to 3 FKP tokens to increase X by 1 per FXP for 1 combat'),
           ],
         },

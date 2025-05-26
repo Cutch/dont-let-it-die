@@ -924,13 +924,13 @@ class DLD_ItemsData
                 'name' => clienttranslate('Fire Stick'),
                 'itemType' => 'weapon',
                 'range' => 1,
-                'damage' => 1,
+                'damage' => 0,
                 // 'character' => 'Rex',
                 'cost' => [],
                 'onEncounterPre' => function (Game $game, $item, &$data) {
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive']) {
-                        $data['characterDamage'] = $game->rollFireDie($item['name'], $item['characterId']);
+                        $data['characterDamage'] += $game->rollFireDie($item['name'], $item['characterId']);
                     }
                 },
                 'skills' => [
@@ -947,6 +947,7 @@ class DLD_ItemsData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->adjustResource('fkp', -1);
+                                $data['data']['characterDamage'] += 1;
                                 clearItemSkills($data['skills'], $skill['itemId']);
                             }
                         },
@@ -968,6 +969,7 @@ class DLD_ItemsData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->adjustResource('fkp', -2);
+                                $data['data']['characterDamage'] += 2;
                                 clearItemSkills($data['skills'], $skill['itemId']);
                             }
                         },
@@ -989,6 +991,7 @@ class DLD_ItemsData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->adjustResource('fkp', -3);
+                                $data['data']['characterDamage'] += 3;
                                 clearItemSkills($data['skills'], $skill['itemId']);
                             }
                         },

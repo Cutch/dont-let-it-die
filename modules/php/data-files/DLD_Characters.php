@@ -50,11 +50,7 @@ class DLD_CharactersData
                     ],
                 ],
                 'onEncounterPost' => function (Game $game, $char, &$data) {
-                    if (
-                        $char['isActive'] &&
-                        $data['encounterHealth'] <= $data['characterDamage'] &&
-                        $data['characterRange'] >= $data['requiresRange']
-                    ) {
+                    if ($char['isActive'] && $game->encounter->$game->encounter->killCheck($data)) {
                         $data['stamina'] += 2;
                         $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => 2,
@@ -269,7 +265,7 @@ class DLD_CharactersData
                     ],
                 ],
                 'onEncounterPost' => function (Game $game, $char, $data) {
-                    if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                    if ($game->encounter->killCheck($data)) {
                         $data['stamina'] += 1;
 
                         $game->eventLog(clienttranslate('${character_name} gave 1 stamina to ${active_character_name}'), [
@@ -836,7 +832,7 @@ class DLD_CharactersData
                     }
                 },
                 'onEncounterPost' => function (Game $game, $char, &$data) {
-                    if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                    if ($game->encounter->killCheck($data)) {
                         if (
                             sizeof(
                                 array_filter($char['mentalHindrance'], function ($hindrance) {
@@ -970,8 +966,11 @@ class DLD_CharactersData
                                 $topCard = $game->decks->getDeck($data['deck'])->getCardOnTop('deck');
                                 $card = $game->decks->getCard($topCard['type_arg']);
                                 $game->cardDrawEvent($card, $data['deck'], ['partial' => true]);
-                                $game->eventLog(clienttranslate('${character_name} viewed the top card'), [
+                                $game->eventLog(clienttranslate('${character_name} viewed the top card ${buttons}'), [
                                     'deck' => $game->decks->getDeckName($data['deck']),
+                                    'buttons' => notifyButtons([
+                                        ['name' => $game->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
+                                    ]),
                                 ]);
                             }
                         },
@@ -995,45 +994,38 @@ class DLD_CharactersData
                                         return in_array('trap', $tokens[$deckName]);
                                     })
                                 );
+                                $decks = array_filter(
+                                    array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
+                                    function ($deckName) use ($tokens) {
+                                        return array_key_exists($deckName, $tokens) && in_array('trap', $tokens[$deckName]);
+                                    }
+                                );
                                 if ($count >= 2) {
-                                    $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'move']);
                                     $game->selectionStates->initiateDeckSelection(
                                         $skill['id'],
-                                        array_filter(
-                                            array_intersect(
-                                                ['explore', 'gather', 'forage', 'harvest', 'hunt'],
-                                                $game->decks->getAllDeckNames()
-                                            ),
-                                            function ($deckName) use ($tokens) {
-                                                return array_key_exists($deckName, $tokens) && in_array('trap', $tokens[$deckName]);
-                                            }
-                                        ),
-                                        clienttranslate('Remove Token')
+                                        $decks,
+                                        clienttranslate('Remove Token'),
+                                        true,
+                                        ['type' => 'move']
                                     );
                                 } else {
-                                    $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'place']);
-                                    $game->selectionStates->initiateDeckSelection(
-                                        $skill['id'],
-                                        array_filter(
-                                            array_intersect(
-                                                ['explore', 'gather', 'forage', 'harvest', 'hunt'],
-                                                $game->decks->getAllDeckNames()
-                                            ),
-                                            function ($deckName) use ($tokens) {
-                                                return !array_key_exists($deckName, $tokens) || !in_array('trap', $tokens[$deckName]);
-                                            }
-                                        )
-                                    );
+                                    $game->selectionStates->initiateDeckSelection($skill['id'], $decks, null, true, ['type' => 'place']);
                                 }
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
                         },
                         'onDeckSelection' => function (Game $game, $skill, &$data) {
-                            $state = $game->selectionStates->getState('state');
+                            $state = $game->selectionStates->getState('deckSelection');
                             if ($state['id'] == $skill['id']) {
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
 
                                 $tokens = $game->gameData->get('tokens') ?? [];
+                                $decks = array_filter(
+                                    array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
+                                    function ($deckName) use ($tokens) {
+                                        return array_key_exists($deckName, $tokens) && in_array('trap', $tokens[$deckName]);
+                                    }
+                                );
                                 if ($state['type'] == 'move') {
                                     $tokens[$data['deck']] = array_values(
                                         array_filter($tokens[$data['deck']], function ($token) {
@@ -1044,21 +1036,7 @@ class DLD_CharactersData
                                     $game->eventLog(clienttranslate('${character_name} removed a trap from ${deck}'), [
                                         'deck' => $game->decks->getDeckName($data['deck']),
                                     ]);
-                                    $game->gameData->set('state', ['id' => $skill['id'], 'type' => 'place', 'cancellable' => false]);
-                                    $game->selectionStates->initiateDeckSelection(
-                                        $skill['id'],
-                                        array_filter(
-                                            array_intersect(
-                                                ['explore', 'gather', 'forage', 'harvest', 'hunt'],
-                                                $game->decks->getAllDeckNames()
-                                            ),
-                                            function ($deck) use ($tokens) {
-                                                return !array_key_exists($deck, $tokens) || !in_array('trap', $tokens[$deck]);
-                                            }
-                                        ),
-                                        null,
-                                        false
-                                    );
+                                    $game->selectionStates->initiateDeckSelection($skill['id'], $decks, null, false, ['type' => 'place']);
                                     $data['nextState'] = false;
                                 } else {
                                     if (!array_key_exists($data['deck'], $tokens)) {
@@ -1086,15 +1064,17 @@ class DLD_CharactersData
                         'interruptState' => ['drawCard'],
                         'onResolveDrawPre' => function (Game $game, $skill, &$data) {
                             $card = $data['card'];
-                            $char = $game->character->getCharacterData($skill['characterId']);
                             $tokens = $game->gameData->get('tokens') ?? [];
                             $count = sizeof(
                                 array_filter(array_keys($tokens ?? []), function ($deck) use ($tokens) {
                                     return in_array('trap', $tokens[$deck]);
                                 })
                             );
-                            if ($char['isActive'] && $card['deckType'] == 'encounter' && $count > 0) {
-                                $game->actInterrupt->addSkillInterrupt($skill);
+                            if ($card['deckType'] == 'encounter' && $count > 0) {
+                                $value = $game->rollFireDie(clienttranslate('Trap'), $game->character->getSubmittingCharacterId());
+                                if ($value >= $card['health']) {
+                                    $game->actInterrupt->addSkillInterrupt($skill);
+                                }
                             }
                         },
                         'onUse' => function (Game $game, $skill) {
@@ -1230,7 +1210,7 @@ class DLD_CharactersData
                 },
                 // 1 FKP for Danger Cards Killed
                 'onEncounterPost' => function (Game $game, $char, &$data) {
-                    if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                    if ($game->encounter->killCheck($data)) {
                         if ($game->adjustResource('fkp', 1)['changed'] > 0) {
                             $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 1,
@@ -1252,7 +1232,7 @@ class DLD_CharactersData
                             }
                         },
                         'onEncounter' => function (Game $game, $skill, &$data) {
-                            if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                            if ($game->encounter->killCheck($data)) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
@@ -1274,7 +1254,7 @@ class DLD_CharactersData
                             }
                         },
                         'onEncounter' => function (Game $game, $skill, &$data) {
-                            if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                            if ($game->encounter->killCheck($data)) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
@@ -1296,7 +1276,7 @@ class DLD_CharactersData
                             }
                         },
                         'onEncounter' => function (Game $game, $skill, &$data) {
-                            if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                            if ($game->encounter->killCheck($data)) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
@@ -1710,21 +1690,32 @@ class DLD_CharactersData
                 'stamina' => '6',
                 'name' => 'Cali',
                 'slots' => ['weapon', 'tool'],
-                // Guess is handled on the FE
+                // Assign Paranoid
                 'onCharacterChoose' => function (Game $game, $char, &$data) {
                     if ($data['id'] == $char['id']) {
                         $game->character->addHindrance($char['id'], $game->decks->getCard('hindrance_1_4'));
                     }
                 },
+                // Investigate Fire Cost 2
                 'onGetActionCostPre' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['action'] == 'actInvestigateFire') {
                         $data['stamina'] = min($data['stamina'], 2);
                     }
                 },
+                // Guess is handled on the FE, if correct take double else 0
+                'onInvestigateFire' => function (Game $game, $char, &$data) {
+                    if ($char['isActive']) {
+                        if ($data['originalRoll'] == $data['guess']) {
+                            $data['roll'] *= 2;
+                        } else {
+                            $data['roll'] = 0;
+                        }
+                    }
+                },
                 'skills' => [
                     'skill1' => [
                         'type' => 'skill',
-                        'name' => clienttranslate('Double Healing'),
+                        'name' => clienttranslate('Double Healing'), // If Cooked
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
@@ -1736,7 +1727,7 @@ class DLD_CharactersData
                         'onEat' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
                             if ($char['isActive']) {
-                                if (str_contains('-cooked', $data['type'])) {
+                                if (str_contains($data['type'], '-cooked')) {
                                     $game->actInterrupt->addSkillInterrupt($skill);
                                 }
                             }
@@ -1748,7 +1739,7 @@ class DLD_CharactersData
                     ],
                     'skill2' => [
                         'type' => 'skill',
-                        'name' => clienttranslate('+1 Max Health'),
+                        'name' => clienttranslate('+1 Max Health'), // If Cooked
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
@@ -1762,7 +1753,7 @@ class DLD_CharactersData
                         'onEat' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
                             if ($char['isActive']) {
-                                if (str_contains('-cooked', $data['type'])) {
+                                if (str_contains($data['type'], '-cooked')) {
                                     $game->actInterrupt->addSkillInterrupt($skill);
                                 }
                             }

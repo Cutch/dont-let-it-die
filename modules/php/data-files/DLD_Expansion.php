@@ -93,7 +93,7 @@ class DLD_ExpansionData
                             return ['notify' => false, 'nextState' => 'resolveEncounter'];
                         },
                         'onEncounterPost' => function (Game $game, $skill, &$data) {
-                            if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                            if ($game->encounter->killCheck($data)) {
                                 $game->eventLog(clienttranslate('${character_name} obtained a ${item_name} ${buttons}'), [
                                     'item_name' => clienttranslate('Shell Shield'),
                                     'buttons' => notifyButtons([
@@ -731,8 +731,8 @@ class DLD_ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Paranoid'),
-                // Always eat
-                'onHandleEat' => function (Game $game, $card, &$data, ?string $preferType = null) {
+                // Always eat, this is not a hook, hooks are below
+                'handleEat' => function (Game $game, $card, &$data, ?string $preferType = null) {
                     $variables = $game->gameData->getResources();
                     $array = $game->actions->getActionSelectable('actEat');
                     $array = array_values(
@@ -763,27 +763,34 @@ class DLD_ExpansionData
                         foreach ($array as $v) {
                             $hinderedCharacter = $game->character->getCharacterData($card['characterId'], true);
                             if ($hinderedCharacter['health'] != $hinderedCharacter['maxHealth']) {
-                                $prevCharacterId = $game->character->getSubmittingCharacterId();
-                                $game->character->setSubmittingCharacterById($card['characterId']);
-                                $game->actEat($v['id']);
-                                $game->character->setSubmittingCharacterById($prevCharacterId);
+                                // $prevCharacterId = $game->character->getSubmittingCharacterId();
+                                // $game->character->setSubmittingCharacterById($card['characterId']);
+                                // $game->actEat($v['id']);
+                                // $game->character->setSubmittingCharacterById($prevCharacterId);
+
+                                $game->selectionStates->initiateState(
+                                    'eatSelection',
+                                    ['id' => $card['characterId']],
+                                    $card['characterId'],
+                                    false
+                                );
                             }
                         }
                     }
                 },
                 'onEatBefore' => function (Game $game, $card, &$data) {
                     if ($game->character->getSubmittingCharacterId() != $card['characterId']) {
-                        $card['onHandleEat']($game, $card, $data, $data['type']);
+                        $card['handleEat']($game, $card, $data, $data['type']);
                     }
                 },
                 'onCookAfter' => function (Game $game, $card, &$data) {
-                    $card['onHandleEat']($game, $card, $data);
+                    $card['handleEat']($game, $card, $data);
                 },
                 'onResolveDraw' => function (Game $game, $card, &$data) {
-                    $card['onHandleEat']($game, $card, $data);
+                    $card['handleEat']($game, $card, $data);
                 },
                 'onPlayerTurn' => function (Game $game, $card, &$data) {
-                    $card['onHandleEat']($game, $card, $data);
+                    $card['handleEat']($game, $card, $data);
                 },
             ],
             'hindrance_1_5' => [

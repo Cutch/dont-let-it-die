@@ -45,13 +45,17 @@ class DLD_Encounter
             $this->game->nextState('playerTurn');
         }
     }
+    public function killCheck(array $data)
+    {
+        return $data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange'];
+    }
     public function countDamageTaken($data)
     {
         if ($data['soothe']) {
             return 0;
         } elseif ($data['escape']) {
             return 0;
-        } elseif ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+        } elseif ($this->killCheck($data)) {
             $damageTaken = 0;
             if ($data['characterRange'] > 1) {
                 $damageTaken = 0;
@@ -229,6 +233,12 @@ class DLD_Encounter
                             return $id != 'both' && $id != 'none';
                         })
                     ),
+                    'itemIdUsed' =>
+                        sizeof($weapon['itemIds']) == 0
+                            ? []
+                            : ($weapon['itemIds'][0] == 'both'
+                                ? [$weapons[0]['id'], $weapons[1]['id']]
+                                : [$weapons[0]['id']]),
                     'deck' => $deck,
                     'name' => $card['name'],
                     'encounterDamage' => $card['damage'], // Unused, maybe in logging
@@ -280,7 +290,7 @@ class DLD_Encounter
                         );
                     }
                     $data['damageTaken'] = $damageTaken;
-                    if ($data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange']) {
+                    if ($this->killCheck($data)) {
                         // Killed
                         if ($damageTaken != 0) {
                             if ($data['damageStamina']) {

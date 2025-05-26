@@ -2442,6 +2442,11 @@ class Game extends \Table
         $this->character->adjustActiveHealth(-10);
         $this->completeAction();
     }
+    public function killChar($character)
+    {
+        $this->character->adjustHealth($character, -10);
+        $this->completeAction();
+    }
     public function drawNightCard()
     {
         $this->gameData->setResources([

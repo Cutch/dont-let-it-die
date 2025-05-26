@@ -216,6 +216,8 @@ class DLD_SelectionStates
             return 'itemSelectionState'; // Check
         } elseif ($stateName == 'resourceSelection') {
             return 'resourceSelectionState';
+        } elseif ($stateName == 'eatSelection') {
+            return 'eatSelectionState';
         }
         return null;
     }
@@ -292,16 +294,22 @@ class DLD_SelectionStates
             $this->game->nextState($stateName);
         }
     }
-    public function initiateDeckSelection(string $id, ?array $decks = null, ?string $title = null, $cancellable = true)
-    {
+    public function initiateDeckSelection(
+        string $id,
+        ?array $decks = null,
+        ?string $title = null,
+        $cancellable = true,
+        array $extraArgs = []
+    ) {
         if ($decks == null) {
             $decks = $this->game->decks->getAllDeckNames();
         }
         $this->initiateState(
             'deckSelection',
-            ['id' => $id, 'decks' => array_values($decks)],
+            [...$extraArgs, 'id' => $id, 'decks' => array_values($decks)],
             $this->game->character->getTurnCharacterId(),
             $cancellable,
+            'playerTurn',
             $title
         );
     }

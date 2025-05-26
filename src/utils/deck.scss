@@ -127,6 +127,9 @@
 }
 .flip-card {
   pointer-events: none;
+  &.partial {
+    pointer-events: unset;
+  }
 }
 /* This container is needed to position the front and back side */
 .flip-card-inner {

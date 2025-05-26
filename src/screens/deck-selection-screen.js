@@ -31,7 +31,7 @@ export class DeckSelectionScreen {
         'beforeend',
         `<div id="deck-selection-screen" class="dlid__container">
             <div id="deck-selection-screen" class="dlid__container"><h3>${
-              gameData.game.deckSelection?.title ?? _('Select a Deck')
+              gameData.selectionState?.title ?? _('Select a Deck')
             }</h3><div class="decks"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
@@ -58,7 +58,7 @@ export class DeckSelectionScreen {
       renderImage(name + '-back', elem.querySelector(`.token.${name}`), { scale: deckScaling[name] ?? 1, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), getAllData()[name + '-back'].options.name, () => selectCallback());
     };
-    gameData.game.deckSelection.decks.forEach((deckName) => {
+    gameData.selectionState.decks.forEach((deckName) => {
       renderItem(deckName, deckSelectionElem, () => {
         if (this.itemSelected) {
           document.querySelector(`#deck-selection-screen .token.${this.itemSelected} .card`).style['outline'] = '';

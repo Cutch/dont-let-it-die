@@ -361,9 +361,9 @@ class DLD_Character
         });
         $this->game->decks->removeFromDeck($card['deck'], $card['id']);
         $this->game->hooks->onAcquireHindrance($card);
-        $this->game->eventLog(clienttranslate('${character_name} ${acquireSentence} ${name} ${buttons}'), [
-            'acquireSentence' => $card['acquireSentence'],
-            'name' => $card['name'],
+        $this->game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName} ${buttons}'), [
+            'acquireOrDropSentence' => $card['acquireSentence'],
+            'cardName' => $card['name'],
             'character_name' => $this->game->getCharacterHTML($characterName),
             'buttons' => notifyButtons([
                 ['name' => $this->game->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'hindrance'],
@@ -380,8 +380,8 @@ class DLD_Character
                 }
             );
         });
-        $this->game->eventLog(clienttranslate('${character_name} no longer ${dropSentence} ${cardName} ${buttons}'), [
-            'dropSentence' => $card['dropSentence'],
+        $this->game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName} ${buttons}'), [
+            'acquireOrDropSentence' => $card['dropSentence'],
             'cardName' => $card['name'],
             'character_name' => $this->game->getCharacterHTML($characterName),
             'buttons' => notifyButtons([
