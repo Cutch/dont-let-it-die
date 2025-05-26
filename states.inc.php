@@ -48,38 +48,91 @@
 */
 
 //    !! It is not a good idea to modify this file when a game is running !!
+$gameSetup = 1;
+$characterSelect = 2;
+$startHindrance = 3;
+$eatSelection = 9;
+$playerTurn = 10;
+$drawCard = 11;
+$tooManyItems = 12;
+$deckSelection = 13;
+$resourceSelection = 14;
+$nextCharacter = 15;
+$characterSelection = 16;
+$cardSelection = 17;
+$hindranceSelection = 18;
+$itemSelection = 19;
+$resolveEncounter = 20;
+$postEncounter = 21;
+$interrupt = 22;
+$whichWeapon = 23;
+$dayEvent = 24;
+$dinnerPhase = 27;
+$dinnerPhasePost = 28;
+$dinnerPhasePrivate = 29;
+$nightPhase = 30;
+$nightDrawCard = 31;
+$morningPhase = 50;
+$tradePhase = 60;
+$tradePhaseActions = 61;
+$confirmTradePhase = 62;
+$waitTradePhase = 63;
+$changeZombiePlayer = 97;
+$gameEnd = 99;
+
+$interruptScreens = [
+    'eatSelection' => $eatSelection,
+    'drawCard' => $drawCard,
+    'tooManyItems' => $tooManyItems,
+    'deckSelection' => $deckSelection,
+    'resourceSelection' => $resourceSelection,
+    'characterSelection' => $characterSelection,
+    'hindranceSelection' => $hindranceSelection,
+    'itemSelection' => $itemSelection,
+    'interrupt' => $interrupt,
+    'cardSelection' => $cardSelection,
+];
 
 $machinestates = [
     // The initial state. Please do not modify.
 
-    1 => [
+    $gameSetup => [
         'name' => 'gameSetup',
         'description' => '',
         'type' => 'manager',
         'action' => 'stGameSetup',
-        'transitions' => ['' => 2],
+        'transitions' => ['' => $characterSelect],
     ],
-    2 => [
+    $characterSelect => [
         'name' => 'characterSelect',
         'description' => clienttranslate('Waiting for other players'),
         'descriptionmyturn' => clienttranslate('Select a Character'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionCount',
         'possibleactions' => ['actChooseCharacters', 'actCharacterClicked'],
-        'transitions' => ['playerTurn' => 10, 'startHindrance' => 3],
+        'transitions' => ['playerTurn' => $playerTurn, 'startHindrance' => $startHindrance],
         'action' => 'stSelectCharacter',
     ],
-    3 => [
+    $startHindrance => [
         'name' => 'startHindrance',
         'description' => clienttranslate('Waiting for other players'),
         'descriptionmyturn' => clienttranslate('Place Discoveries'),
         'type' => 'multipleactiveplayer',
         'args' => 'argStartHindrance',
         'possibleactions' => ['actMoveDiscovery', 'actDone'],
-        'transitions' => ['playerTurn' => 10],
+        'transitions' => ['playerTurn' => $playerTurn],
         'action' => 'stStartHindrance',
     ],
-    10 => [
+    $eatSelection => [
+        'name' => 'eatSelection',
+        'description' => clienttranslate('Other characters are eating'),
+        'descriptionmyturn' => clienttranslate('Selecting a food'),
+        'type' => 'multipleactiveplayer',
+        'args' => 'argSelectionState',
+        'possibleactions' => ['actEat', 'actCancel'],
+        'transitions' => ['playerTurn' => $playerTurn],
+    ],
+    $playerTurn => [
         'name' => 'playerTurn',
         'description' => clienttranslate('${character_name} is playing'),
         'descriptionmyturn' => clienttranslate('${character_name} can'),
@@ -108,21 +161,13 @@ $machinestates = [
             'actUndo',
         ],
         'transitions' => [
-            'endGame' => 99,
-            'drawCard' => 11,
-            'tooManyItems' => 12,
-            'deckSelection' => 13,
-            'resourceSelection' => 14,
-            'endTurn' => 15,
-            'characterSelection' => 16,
-            'hindranceSelection' => 18,
-            'itemSelection' => 19,
-            'interrupt' => 22,
-            'cardSelection' => 17,
-            'changeZombiePlayer' => 97,
+            'endGame' => $gameEnd,
+            'drawCard' => $drawCard,
+            'endTurn' => $nextCharacter,
+            'changeZombiePlayer' => $changeZombiePlayer,
         ],
     ],
-    11 => [
+    $drawCard => [
         'name' => 'drawCard',
         'description' => clienttranslate('Drawing Card'),
         'descriptionmyturn' => clienttranslate('Drawing Card'),
@@ -130,86 +175,93 @@ $machinestates = [
         'args' => 'argDrawCard',
         'action' => 'stDrawCard',
         'transitions' => [
-            'endGame' => 99,
-            'resolveEncounter' => 20,
-            'playerTurn' => 10,
-            'drawCard' => 11,
-            'interrupt' => 22,
-            'dayEvent' => 24,
+            'endGame' => $gameEnd,
+            'resolveEncounter' => $resolveEncounter,
+            'playerTurn' => $playerTurn,
+            'drawCard' => $drawCard,
+            'dayEvent' => $dayEvent,
         ],
     ],
-    12 => [
+    $tooManyItems => [
         'name' => 'tooManyItems',
         'description' => clienttranslate('Other characters are selecting an item'),
         'descriptionmyturn' => clienttranslate('Selecting an item'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSendToCamp'],
-        'transitions' => ['playerTurn' => 10],
+        'transitions' => ['playerTurn' => $playerTurn],
     ],
-    13 => [
+    $deckSelection => [
         'name' => 'deckSelection',
         'description' => clienttranslate('Other characters are selecting a deck'),
         'descriptionmyturn' => clienttranslate('Selecting a deck'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectDeck', 'actCancel'],
-        'transitions' => ['playerTurn' => 10, 'deckSelection' => 13],
+        'transitions' => ['playerTurn' => $playerTurn, 'deckSelection' => $deckSelection],
     ],
-    14 => [
+    $resourceSelection => [
         'name' => 'resourceSelection',
         'description' => clienttranslate('Other characters are selecting a resource'),
         'descriptionmyturn' => clienttranslate('Selecting a resource'),
         'type' => 'multipleactiveplayer',
         'args' => 'argResourceSelection',
         'possibleactions' => ['actSelectResource', 'actCancel'],
-        'transitions' => ['playerTurn' => 10, 'interrupt' => 22],
+        'transitions' => ['playerTurn' => $playerTurn],
     ],
-    15 => [
+    $nextCharacter => [
         'name' => 'nextCharacter',
         'description' => '',
         'type' => 'game',
         'action' => 'stNextCharacter',
         'updateGameProgression' => true,
-        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'dinnerPhase' => 27],
+        'transitions' => ['endGame' => $gameEnd, 'playerTurn' => $playerTurn, 'dinnerPhase' => $dinnerPhase],
     ],
-    16 => [
+    $characterSelection => [
         'name' => 'characterSelection',
         'description' => clienttranslate('Other characters are selecting a character'),
         'descriptionmyturn' => clienttranslate('Selecting a character'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectCharacter', 'actCancel'],
-        'transitions' => ['playerTurn' => 10, 'tradePhase' => 60, 'morningPhase' => 50, 'interrupt' => 22],
+        'transitions' => [
+            'playerTurn' => $playerTurn,
+            'tradePhase' => $tradePhase,
+            'morningPhase' => $morningPhase,
+        ],
     ],
-    17 => [
+    $cardSelection => [
         'name' => 'cardSelection',
         'description' => clienttranslate('Other characters are selecting a card'),
         'descriptionmyturn' => clienttranslate('Selecting a card'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectCard', 'actCancel'],
-        'transitions' => ['playerTurn' => 10, 'morningPhase' => 50, 'interrupt' => 22],
+        'transitions' => ['playerTurn' => $playerTurn, 'morningPhase' => $morningPhase],
     ],
-    18 => [
+    $hindranceSelection => [
         'name' => 'hindranceSelection',
         'description' => clienttranslate('Other characters are selecting a hindrance'),
         'descriptionmyturn' => clienttranslate('Selecting a hindrance'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectHindrance', 'actCancel'],
-        'transitions' => ['playerTurn' => 10, 'nightPhase' => 30, 'characterSelection' => 16, 'morningPhase' => 50, 'interrupt' => 22],
+        'transitions' => [
+            'playerTurn' => $playerTurn,
+            'nightPhase' => $nightPhase,
+            'morningPhase' => $morningPhase,
+        ],
     ],
-    19 => [
+    $itemSelection => [
         'name' => 'itemSelection',
         'description' => clienttranslate('Other characters are selecting an item'),
         'descriptionmyturn' => clienttranslate('Selecting an item'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectItem', 'actCancel'],
-        'transitions' => ['playerTurn' => 10, 'nightPhase' => 30, 'interrupt' => 22],
+        'transitions' => ['playerTurn' => $playerTurn, 'nightPhase' => $nightPhase],
     ],
-    20 => [
+    $resolveEncounter => [
         'name' => 'resolveEncounter',
         'description' => clienttranslate('Resolving Encounter'),
         'descriptionmyturn' => clienttranslate('Resolving Encounter'),
@@ -217,9 +269,13 @@ $machinestates = [
         'action' => 'stResolveEncounter',
         'args' => 'argResolveEncounter',
         'possibleactions' => ['actChooseResource', 'actUseItem'],
-        'transitions' => ['endGame' => 99, 'postEncounter' => 21, 'interrupt' => 22, 'whichWeapon' => 23],
+        'transitions' => [
+            'endGame' => $gameEnd,
+            'postEncounter' => $postEncounter,
+            'whichWeapon' => $whichWeapon,
+        ],
     ],
-    21 => [
+    $postEncounter => [
         'name' => 'postEncounter',
         'description' => clienttranslate('Resolving Encounter'),
         'descriptionmyturn' => clienttranslate('Resolving Encounter'),
@@ -227,9 +283,14 @@ $machinestates = [
         'action' => 'stPostEncounter',
         'args' => 'argPostEncounter',
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
-        'transitions' => ['endGame' => 99, 'playerTurn' => 10, 'drawCard' => 11, 'changeZombiePlayer' => 97],
+        'transitions' => [
+            'endGame' => $gameEnd,
+            'playerTurn' => $playerTurn,
+            'drawCard' => $drawCard,
+            'changeZombiePlayer' => $changeZombiePlayer,
+        ],
     ],
-    22 => [
+    $interrupt => [
         'name' => 'interrupt',
         'description' => clienttranslate('Other players are looking at their skills'),
         'descriptionmyturn' => clienttranslate('Looking at skills'),
@@ -238,31 +299,32 @@ $machinestates = [
         'args' => 'argInterrupt',
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => [
-            'endGame' => 99,
-            'playerTurn' => 10,
-            'drawCard' => 11,
-            'resourceSelection' => 14,
-            'endTurn' => 15,
-            'characterSelection' => 16,
-            'cardSelection' => 17,
-            'hindranceSelection' => 18,
-            'resolveEncounter' => 20,
-            'postEncounter' => 21,
-            'nightDrawCard' => 31,
-            'morningPhase' => 50,
-            'tradePhase' => 60,
+            'endGame' => $gameEnd,
+            'eatSelection' => $eatSelection,
+            'playerTurn' => $playerTurn,
+            'drawCard' => $drawCard,
+            'resourceSelection' => $resourceSelection,
+            'endTurn' => $nextCharacter,
+            'characterSelection' => $characterSelection,
+            'cardSelection' => $cardSelection,
+            'hindranceSelection' => $hindranceSelection,
+            'resolveEncounter' => $resolveEncounter,
+            'postEncounter' => $postEncounter,
+            'nightDrawCard' => $nightDrawCard,
+            'morningPhase' => $morningPhase,
+            'tradePhase' => $tradePhase,
         ],
     ],
-    23 => [
+    $whichWeapon => [
         'name' => 'whichWeapon',
         'description' => clienttranslate('${character_name} is selecting a weapon'),
         'descriptionmyturn' => clienttranslate('Choose your weapon'),
         'type' => 'activeplayer',
         'args' => 'argWhichWeapon',
         'possibleactions' => ['actChooseWeapon'],
-        'transitions' => ['resolveEncounter' => 20, 'changeZombiePlayer' => 97],
+        'transitions' => ['resolveEncounter' => $resolveEncounter, 'changeZombiePlayer' => $changeZombiePlayer],
     ],
-    24 => [
+    $dayEvent => [
         'name' => 'dayEvent',
         'description' => clienttranslate('${character_name} is resolving an event'),
         'descriptionmyturn' => clienttranslate('What do you do'),
@@ -271,20 +333,14 @@ $machinestates = [
         'args' => 'argDayEvent',
         'possibleactions' => ['actUseSkill', 'actUseItem'],
         'transitions' => [
-            'endGame' => 99,
-            'playerTurn' => 10,
-            'drawCard' => 11,
-            'deckSelection' => 13,
-            'resourceSelection' => 14,
-            'interrupt' => 22,
-            'characterSelection' => 16,
-            'cardSelection' => 17,
-            'hindranceSelection' => 18,
-            'resolveEncounter' => 20,
-            'changeZombiePlayer' => 97,
+            'endGame' => $gameEnd,
+            'playerTurn' => $playerTurn,
+            'drawCard' => $drawCard,
+            'resolveEncounter' => $resolveEncounter,
+            'changeZombiePlayer' => $changeZombiePlayer,
         ],
     ],
-    27 => [
+    $dinnerPhase => [
         'name' => 'dinnerPhase',
         'description' => clienttranslate('Waiting for everyone to eat'),
         'descriptionmyturn' => clienttranslate('It\'s dinner time'),
@@ -292,20 +348,20 @@ $machinestates = [
         'action' => 'stDinnerPhase',
         // 'args' => 'argDinnerPhase',
         'possibleactions' => [],
-        'transitions' => ['dinnerPhasePost' => 28, 'nightPhase' => 30],
-        'initialprivate' => 29,
+        'transitions' => ['dinnerPhasePost' => $dinnerPhasePost, 'nightPhase' => $nightPhase],
+        'initialprivate' => $dinnerPhasePrivate,
     ],
-    28 => [
+    $dinnerPhasePost => [
         'name' => 'dinnerPhasePost',
         'description' => clienttranslate('Waiting for everyone to eat'),
         'descriptionmyturn' => clienttranslate('It\'s dinner time'),
         'type' => 'activeplayer',
         'action' => 'stDinnerPhasePost',
         'possibleactions' => [],
-        'transitions' => ['nightPhase' => 30, 'changeZombiePlayer' => 97],
-        'initialprivate' => 29,
+        'transitions' => ['nightPhase' => $nightPhase, 'changeZombiePlayer' => $changeZombiePlayer],
+        'initialprivate' => $dinnerPhasePrivate,
     ],
-    29 => [
+    $dinnerPhasePrivate => [
         'name' => 'dinnerPhasePrivate',
         'description' => clienttranslate('Waiting for everyone to eat'),
         'descriptionmyturn' => clienttranslate('It\'s dinner time'),
@@ -313,7 +369,7 @@ $machinestates = [
         'args' => 'argDinnerPhase',
         'possibleactions' => ['actEat', 'actDone'],
     ],
-    30 => [
+    $nightPhase => [
         'name' => 'nightPhase',
         'description' => clienttranslate('It\'s night time'),
         'descriptionmyturn' => clienttranslate('It\'s night time'),
@@ -321,9 +377,12 @@ $machinestates = [
         'action' => 'stNightPhase',
         // 'args' => 'argNightPhase',
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
-        'transitions' => ['endGame' => 99, 'hindranceSelection' => 18, 'itemSelection' => 19, 'interrupt' => 22, 'nightDrawCard' => 31],
+        'transitions' => [
+            'endGame' => $gameEnd,
+            'nightDrawCard' => $nightDrawCard,
+        ],
     ],
-    31 => [
+    $nightDrawCard => [
         'name' => 'nightDrawCard',
         'description' => clienttranslate('Drawing Night Card'),
         'descriptionmyturn' => clienttranslate('Drawing Night Card'),
@@ -332,26 +391,13 @@ $machinestates = [
         'action' => 'stNightDrawCard',
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
         'transitions' => [
-            'endGame' => 99,
-            'morningPhase' => 50,
-            'hindranceSelection' => 18,
-            'itemSelection' => 19,
-            'interrupt' => 22,
-            'nightPhase' => 30,
-            'nightDrawCard' => 31,
-            'nightPhasePost' => 32,
+            'endGame' => $gameEnd,
+            'morningPhase' => $morningPhase,
+            'nightPhase' => $nightPhase,
+            'nightDrawCard' => $nightDrawCard,
         ],
     ],
-    // 32 => [
-    //     'name' => 'nightPhasePost',
-    //     'description' => clienttranslate('It\'s night time'),
-    //     'descriptionmyturn' => clienttranslate('It\'s night time'),
-    //     'type' => 'activeplayer',
-    //     'action' => 'stNightPhasePost',
-    //     'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
-    //     'transitions' => ['endGame' => 99, 'morningPhase' => 50, 'interrupt' => 22],
-    // ],
-    50 => [
+    $morningPhase => [
         'name' => 'morningPhase',
         'description' => clienttranslate('Morning has arrived'),
         'descriptionmyturn' => clienttranslate('Morning has arrived'),
@@ -359,56 +405,50 @@ $machinestates = [
         'action' => 'stMorningPhase',
         'updateGameProgression' => true,
         'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
-        'transitions' => ['endGame' => 99, 'tradePhase' => 60, 'characterSelection' => 16, 'morningPhasePost' => 51, 'interrupt' => 22],
+        'transitions' => [
+            'endGame' => $gameEnd,
+            'tradePhase' => $tradePhase,
+        ],
     ],
-    // 51 => [
-    //     'name' => 'morningPhasePost',
-    //     'description' => clienttranslate('Morning has arrived'),
-    //     'descriptionmyturn' => clienttranslate('Morning has arrived'),
-    //     'type' => 'activeplayer',
-    //     'action' => 'stMorningPhasePost',
-    //     'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
-    //     'transitions' => ['endGame' => 99, 'tradePhase' => 60, 'interrupt' => 22],
-    // ],
-    60 => [
+    $tradePhase => [
         'name' => 'tradePhase',
         'description' => clienttranslate('Waiting for others to trade Items'),
         'descriptionmyturn' => clienttranslate('Trade Items'),
         'type' => 'multipleactiveplayer',
         'action' => 'stTradePhase',
         'args' => 'argTradePhase',
-        'initialprivate' => 61,
+        'initialprivate' => $tradePhaseActions,
         'possibleactions' => [],
-        'transitions' => ['nextCharacter' => 15],
+        'transitions' => ['nextCharacter' => $nextCharacter],
     ],
-    61 => [
+    $tradePhaseActions => [
         'name' => 'tradePhaseActions',
         'descriptionmyturn' => clienttranslate('Trade Items'),
         'type' => 'private',
         'action' => 'stTradePhaseWait',
         'args' => 'argTradePhaseActions',
         'possibleactions' => ['actTradeItem', 'actTradeDone'],
-        'transitions' => ['confirmTradePhase' => 62, 'waitTradePhase' => 63],
+        'transitions' => ['confirmTradePhase' => $confirmTradePhase, 'waitTradePhase' => $waitTradePhase],
     ],
-    62 => [
+    $confirmTradePhase => [
         'name' => 'confirmTradePhase',
         'descriptionmyturn' => clienttranslate('Confirm Trade'),
         'type' => 'private',
         // 'action' => 'stTradePhaseWait',
         'args' => 'argConfirmTradePhase',
         'possibleactions' => ['actConfirmTradeItem', 'actCancelTrade'],
-        'transitions' => ['tradePhaseActions' => 61],
+        'transitions' => ['tradePhaseActions' => $tradePhaseActions],
     ],
-    63 => [
+    $waitTradePhase => [
         'name' => 'waitTradePhase',
         'descriptionmyturn' => clienttranslate('Waiting for Trade Confirmation'),
         'type' => 'private',
         // 'action' => 'stTradePhaseWait',
         'args' => 'argWaitTradePhase',
         'possibleactions' => [],
-        'transitions' => ['tradePhaseActions' => 61],
+        'transitions' => ['tradePhaseActions' => $tradePhaseActions],
     ],
-    97 => [
+    $changeZombiePlayer => [
         'name' => 'changeZombiePlayer',
         'descriptionmyturn' => clienttranslate('Waiting for other players'),
         'type' => 'game',
@@ -416,7 +456,7 @@ $machinestates = [
     ],
     // Final state.
     // Please do not modify (and do not overload action/args methods).
-    98 => [
+    $gameEnd => [
         'name' => 'gameEnd',
         'description' => clienttranslate('End of game'),
         'descriptionmyturn' => clienttranslate('End of game'),
@@ -427,5 +467,18 @@ $machinestates = [
 ];
 
 foreach ($machinestates as $key => $state) {
-    $machinestates[97]['transitions'][$state['name']] = $key;
+    $machinestates[$changeZombiePlayer]['transitions'][$state['name']] = $key;
+}
+
+$interruptableScreens = [$dayEvent, $resolveEncounter, $postEncounter, $nightPhase, $nightDrawCard, $morningPhase, $drawCard, $playerTurn];
+$interruptableScreenNames = [];
+foreach ($interruptableScreens as $stateId) {
+    $interruptableScreenNames[$stateId] = $machinestates[$stateId]['name'];
+    $machinestates[$stateId]['transitions'] = [...$machinestates[$stateId]['transitions'], ...$interruptScreens];
+}
+
+foreach ($interruptableScreenNames as $stateId => $stateName) {
+    foreach ($interruptScreens as $interruptStateId) {
+        $machinestates[$interruptStateId]['transitions'][$stateName] = $stateId;
+    }
 }
