@@ -107,24 +107,29 @@ class DLD_Hooks
                         $object['requires']($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4));
             });
         }
-        // Pre
-        if (!array_key_exists('suffix', $args) || $args['suffix'] == 'Pre') {
+        if (!array_key_exists('postOnly', $args) || !$args['postOnly']) {
+            // Pre
+            if (!array_key_exists('suffix', $args) || $args['suffix'] == 'Pre') {
+                foreach ($hooks as $object) {
+                    if (array_key_exists($functionName . 'Pre', $object)) {
+                        $object[$functionName . 'Pre']($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
+                    }
+                }
+            }
+            // Normal
             foreach ($hooks as $object) {
-                if (array_key_exists($functionName . 'Pre', $object)) {
-                    $object[$functionName . 'Pre']($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
+                if ($functionName == 'onUseHerb') {
+                    $this->game->log('hooks', array_key_exists($functionName, $object), $object);
+                }
+                if (array_key_exists($functionName, $object)) {
+                    $object[$functionName]($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
                 }
             }
         }
-        // Normal
-        foreach ($hooks as $object) {
-            if ($functionName == 'onUseHerb') {
-                $this->game->log('hooks', array_key_exists($functionName, $object), $object);
-            }
-            if (array_key_exists($functionName, $object)) {
-                $object[$functionName]($this->game, [...$object, ...$args], $data1, $data2, $data3, $data4);
-            }
-        }
         // Post
+        // if ($functionName == 'onEncounter') {
+        //     throw new BgaUserException(json_encode($args));
+        // }
         if (!array_key_exists('suffix', $args) || $args['suffix'] == 'Post') {
             foreach ($hooks as $object) {
                 if (array_key_exists($functionName . 'Post', $object)) {
@@ -293,6 +298,11 @@ class DLD_Hooks
         return $data;
     }
     function onCardSelection(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onEatSelection(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;

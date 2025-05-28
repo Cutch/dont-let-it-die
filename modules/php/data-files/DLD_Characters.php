@@ -734,8 +734,8 @@ class DLD_CharactersData
                     }
                 },
                 'onInvestigateFire' => function (Game $game, $char, &$data) {
-                    $char = $game->character->getCharacterData($char['characterId']);
-                    if (!$char['isActive']) {
+                    $char = $game->character->getCharacterData($char['id']);
+                    if ($char['isActive']) {
                         $roll2 = $game->rollFireDie($char['character_name']);
                         $data['roll'] += $roll2;
                     }
@@ -1986,7 +1986,7 @@ class DLD_CharactersData
                         'damage' => 1,
                         'onInvestigateFire' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            if ($char['isActive']) {
+                            if ($char['isActive'] && $data['roll'] < 3) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
@@ -2011,7 +2011,7 @@ class DLD_CharactersData
                         ]);
                     }
                 },
-                'onInvestigateFire' => function (Game $game, $char, &$data) {
+                'onInvestigateFirePost' => function (Game $game, $char, &$data) {
                     if ($data['roll'] == 3) {
                         $game->character->updateCharacterData($char['id'], function (&$data) {
                             $data['modifiedMaxStamina'] += 1;

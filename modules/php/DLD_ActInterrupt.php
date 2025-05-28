@@ -53,6 +53,7 @@ class DLD_ActInterrupt
             if (sizeof($interruptData['skills']) == 0 && !$interrupt) {
                 $this->game->log('exitHook', 'not interrupted', $currentState, 'noSkill');
                 // No skills can activate
+                $res = $hook($data, ['postOnly' => true]);
                 $endCallback($this->game, false, $data, ...$args);
             } else {
                 $this->setState($functionName, $interruptData);

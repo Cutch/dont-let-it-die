@@ -49,6 +49,25 @@ class DLD_SelectionStates
             }
         );
     }
+    public function actSelectEat(?string $resourceType = null): void
+    {
+        // $this->game->character->addExtraTime();
+        if (!$resourceType) {
+            throw new BgaUserException(clienttranslate('Select a Resource'));
+        }
+        $stateData = $this->getState(null);
+        $this->game->character->setSubmittingCharacterById($stateData['characterId']);
+        $stateData['selectedResourceType'] = $resourceType;
+        $this->setState(null, $stateData);
+        $data = [
+            'resourceType' => $resourceType,
+            'nextState' => $stateData['nextState'],
+            'isInterrupt' => $stateData['isInterrupt'],
+        ];
+        $this->game->hooks->onEatSelection($data);
+        $this->game->actEat($resourceType);
+        $this->completeSelectionState($data);
+    }
     public function actSelectResource(?string $resourceType = null): void
     {
         // $this->game->character->addExtraTime();
@@ -233,6 +252,9 @@ class DLD_SelectionStates
         $this->game->getResources($result);
         if ($stateName === 'deckSelectionState') {
             $this->game->getDecks($result);
+        }
+        if ($stateName === 'eatSelection') {
+            $this->game->getItemData($result);
         }
         return $result;
     }

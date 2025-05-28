@@ -733,7 +733,7 @@ class DLD_ExpansionData
                 // Always eat, this is not a hook, hooks are below
                 'handleEat' => function (Game $game, $card, &$data, ?string $preferType = null) {
                     if (getUsePerDay($card['characterId'] . 'hindrance_2_3' . 'nauseous', $game) >= 1) {
-                        return;
+                        return false;
                     }
                     $variables = $game->gameData->getResources();
                     $array = $game->actions->getActionSelectable('actEat');
@@ -762,31 +762,31 @@ class DLD_ExpansionData
                         }
                     }
                     if (sizeof($array) > 0) {
-                        foreach ($array as $v) {
-                            $hinderedCharacter = $game->character->getCharacterData($card['characterId'], true);
-                            if ($hinderedCharacter['health'] != $hinderedCharacter['maxHealth']) {
-                                // $prevCharacterId = $game->character->getSubmittingCharacterId();
-                                // $game->character->setSubmittingCharacterById($card['characterId']);
-                                // $game->actEat($v['id']);
-                                // $game->character->setSubmittingCharacterById($prevCharacterId);
+                        $hinderedCharacter = $game->character->getCharacterData($card['characterId'], true);
+                        if ($hinderedCharacter['health'] != $hinderedCharacter['maxHealth']) {
+                            // $prevCharacterId = $game->character->getSubmittingCharacterId();
+                            // $game->character->setSubmittingCharacterById($card['characterId']);
+                            // $game->actEat($v['id']);
+                            // $game->character->setSubmittingCharacterById($prevCharacterId);
 
-                                $game->selectionStates->initiateState(
-                                    'eatSelection',
-                                    ['id' => $card['characterId']],
-                                    $card['characterId'],
-                                    false,
-                                    '',
-                                    null,
-                                    true
-                                );
-                            }
+                            $game->selectionStates->initiateState(
+                                'eatSelection',
+                                ['id' => $card['characterId']],
+                                $card['characterId'],
+                                false,
+                                $game->gamestate->state()['name'],
+                                null,
+                                true
+                            );
+                            return true;
                         }
                     }
                 },
                 'onEatBefore' => function (Game $game, $card, &$data) {
                     if ($game->character->getSubmittingCharacterId() != $card['characterId']) {
-                        $card['handleEat']($game, $card, $data, $data['type']);
-                        $data['interrupt'] = true;
+                        if ($card['handleEat']($game, $card, $data, $data['type'])) {
+                            $data['interrupt'] = true;
+                        }
                     }
                 },
                 'onCookAfter' => function (Game $game, $card, &$data) {
@@ -996,7 +996,7 @@ class DLD_ExpansionData
                 'onGetValidActions' => function (Game $game, $card, &$data) {
                     if (
                         $card['characterId'] == $game->character->getTurnCharacterId() &&
-                        getUsePerDay($card['characterId'] . $card['id'] . 'nauseous', $game) < 1
+                        getUsePerDay($card['characterId'] . $card['id'] . 'nauseous', $game) >= 1
                     ) {
                         unset($data['actEat']);
                     }

@@ -1356,7 +1356,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           break;
         case 'eatSelection':
           this.statusBar.addActionButton(args.selectionState?.title ? _(args.selectionState.title) : _('Eat'), () => {
-            this.bgaPerformAction('actEat', {
+            this.bgaPerformAction('actSelectEat', {
               resourceType: this.eatScreen.getSelectedId(),
             }).then(() => {
               this.eatScreen.hide();

@@ -677,11 +677,8 @@ class Game extends \Table
             func_get_args(),
             [$this->hooks, 'onEat'],
             function (Game $_this) use ($resourceType) {
-                if ($this->gamestate->state()['name'] == 'eatSelection') {
-                    $state = $this->selectionStates->getState('eatSelection');
-                    $_this->character->setSubmittingCharacterById($state['characterId']);
-                }
                 $this->actions->validateCanRunAction('actEat', null, $resourceType);
+
                 $tokenData = $this->data->getTokens()[$resourceType];
                 $data = ['type' => $resourceType, ...$tokenData['actEat'], 'tokenName' => $tokenData['name']];
                 $this->hooks->onEatBefore($data);
@@ -964,7 +961,6 @@ class Game extends \Table
             function (Game $_this) use ($guess) {
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
-                $_this->eventLog(clienttranslate('${character_name} investigated the fire'));
                 $roll = $_this->rollFireDie(clienttranslate('Investigate Fire'), $character['character_name']);
                 return ['roll' => $roll, 'originalRoll' => $roll, 'guess' => $guess];
             },
@@ -1116,6 +1112,10 @@ class Game extends \Table
     public function actSelectCharacter(?string $characterId = null): void
     {
         $this->selectionStates->actSelectCharacter($characterId);
+    }
+    public function actSelectEat(?string $resourceType = null): void
+    {
+        $this->selectionStates->actSelectEat($resourceType);
     }
     public function actSelectResource(?string $resourceType = null): void
     {

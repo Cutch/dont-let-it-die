@@ -129,7 +129,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('Selecting a food'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
-        'possibleactions' => ['actEat', 'actCancel'],
+        'possibleactions' => ['actSelectEat', 'actCancel'],
         'transitions' => ['playerTurn' => $playerTurn],
     ],
     $playerTurn => [
