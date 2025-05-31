@@ -504,7 +504,6 @@ class Game extends \Table
                 $itemName = $data['itemName'];
                 $item = $data['item'];
                 $itemType = $data['itemType'];
-                $this->log('itemcost', $item['cost']);
                 foreach ($item['cost'] as $key => $value) {
                     if ($_this->adjustResource($key, -$value)['left'] > 0) {
                         throw new BgaUserException(clienttranslate('Missing resources'));
@@ -670,8 +669,11 @@ class Game extends \Table
         $this->setLastAction('actUseHerb');
         $this->completeAction();
     }
-    public function actEat(string $resourceType): void
+    public function actEat(?string $resourceType = null): void
     {
+        if (!$resourceType) {
+            throw new BgaUserException(clienttranslate('Select a Resource'));
+        }
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),
@@ -681,7 +683,6 @@ class Game extends \Table
 
                 $tokenData = $this->data->getTokens()[$resourceType];
                 $data = ['type' => $resourceType, ...$tokenData['actEat'], 'tokenName' => $tokenData['name']];
-                $this->hooks->onEatBefore($data);
                 return $data;
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
@@ -1117,6 +1118,10 @@ class Game extends \Table
     {
         $this->selectionStates->actSelectEat($resourceType);
     }
+    public function _actSelectEat(?string $resourceType = null, array $selectionState): void
+    {
+        $this->selectionStates->_actSelectEat($resourceType, $selectionState);
+    }
     public function actSelectResource(?string $resourceType = null): void
     {
         $this->selectionStates->actSelectResource($resourceType);
@@ -1142,7 +1147,7 @@ class Game extends \Table
         $this->actions->clearDayEvent();
         // if (!$this->actInterrupt->checkForInterrupt()) {
         $char = $this->character->getTurnCharacter();
-        $this->hooks->onPlayerTurn($char);
+        // $this->hooks->onPlayerTurn($char);
         if ($char['isActive'] && $char['incapacitated']) {
             $this->eventLog(clienttranslate('${character_name} is incapacitated'));
             $this->endTurn();
@@ -1377,7 +1382,7 @@ class Game extends \Table
             PHP_EOL,
             array_map(
                 function ($d) {
-                    return '   ' .
+                    return '&nbsp;&nbsp;&nbsp;&nbsp;' .
                         preg_replace('/Bga\\\\Games\\\\[^\\\\]+\\\\/', '', preg_replace('/#.*modules\\/(.*\d\\)): (.*)/', '$1: $2', $d));
                 },
                 array_filter($stack, function ($d) {
@@ -2030,6 +2035,7 @@ class Game extends \Table
     {
         if ($saveState) {
             $this->undo->saveState();
+            $this->incStat(1, 'actions_used', $this->character->getSubmittingCharacter()['playerId']);
         }
         if ($this->changed['token']) {
             $result = [];
@@ -2072,7 +2078,8 @@ class Game extends \Table
 
             $this->notify('updateKnowledgeTree', '', ['gameData' => $result]);
         }
-        if ($this->gamestate->state()['name'] != 'characterSelect') {
+        if (!in_array($this->gamestate->state()['name'], ['characterSelect'])) {
+            //, 'interrupt'
             $availableUnlocks = $this->data->getValidKnowledgeTree();
             $result = [
                 'tradeRatio' => $this->getTradeRatio(),
@@ -2204,6 +2211,7 @@ class Game extends \Table
         $this->initStat('table', 'day_number', 1);
         $this->initStat('player', 'damage_done', 0);
         $this->initStat('player', 'health_lost', 0);
+        $this->initStat('player', 'actions_used', 0);
         $this->initStat('player', 'stamina_used', 0);
         $this->initStat('player', 'resources_collected', 0);
         $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);

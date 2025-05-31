@@ -18,10 +18,12 @@ class DLD_SelectionStates
 
     public function completeSelectionState(array $data): void
     {
+        $isInterrupt = array_key_exists('isInterrupt', $data) && $data['isInterrupt'];
         if ($data['nextState']) {
+            $this->game->character->setSubmittingCharacterById(null);
             $this->game->nextState($data['nextState']);
         }
-        if (array_key_exists('isInterrupt', $data) && $data['isInterrupt']) {
+        if ($isInterrupt) {
             $this->game->actInterrupt->completeInterrupt();
         }
         $this->initiatePendingState();
@@ -56,17 +58,60 @@ class DLD_SelectionStates
             throw new BgaUserException(clienttranslate('Select a Resource'));
         }
         $stateData = $this->getState(null);
-        $this->game->character->setSubmittingCharacterById($stateData['characterId']);
         $stateData['selectedResourceType'] = $resourceType;
         $this->setState(null, $stateData);
         $data = [
             'resourceType' => $resourceType,
             'nextState' => $stateData['nextState'],
             'isInterrupt' => $stateData['isInterrupt'],
+            'characterId' => $stateData['characterId'],
         ];
         $this->game->hooks->onEatSelection($data);
-        $this->game->actEat($resourceType);
-        $this->completeSelectionState($data);
+        $this->_actSelectEat($resourceType, $data);
+    }
+    public function _actSelectEat(?string $resourceType = null, array $selectionState)
+    {
+        $this->game->character->setSubmittingCharacterById($selectionState['characterId']);
+        $this->game->actInterrupt->interruptableFunction(
+            __FUNCTION__,
+            func_get_args(),
+            [$this->game->hooks, 'onEat'],
+            function (Game $_this) use ($resourceType, $selectionState) {
+                $this->game->actions->validateCanRunAction('actEat', null, $resourceType);
+
+                $tokenData = $this->game->data->getTokens()[$resourceType];
+                $data = [
+                    'type' => $resourceType,
+                    ...$tokenData['actEat'],
+                    'tokenName' => $tokenData['name'],
+                    'selectionState' => $selectionState,
+                ];
+                return $data;
+            },
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                if (array_key_exists('health', $data)) {
+                    $this->game->character->adjustActiveHealth($data['health']);
+                }
+                if (array_key_exists('stamina', $data)) {
+                    $this->game->character->adjustActiveStamina($data['stamina']);
+                }
+                $left = $this->game->adjustResource($data['type'], -$data['count'])['left'];
+                if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
+                    if ($left == 0) {
+                        $this->game->notify(
+                            'notify',
+                            !array_key_exists('stamina', $data)
+                                ? clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health')
+                                : clienttranslate(
+                                    '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
+                                ),
+                            [...$data, 'token_name' => $data['tokenName']]
+                        );
+                    }
+                }
+                $this->completeSelectionState($data['selectionState']);
+            }
+        );
     }
     public function actSelectResource(?string $resourceType = null): void
     {
@@ -82,7 +127,6 @@ class DLD_SelectionStates
             'nextState' => $stateData['nextState'],
             'isInterrupt' => $stateData['isInterrupt'],
         ];
-        $this->game->log('actSelectResource1', $data);
         $this->game->hooks->onResourceSelection($data);
         $this->completeSelectionState($data);
     }
@@ -243,10 +287,11 @@ class DLD_SelectionStates
     public function argSelectionState(): array
     {
         $stateName = $this->stateToStateNameMapping();
+        $state = $this->getState();
         $result = [
             'actions' => [],
             'selectionState' => $this->game->gameData->get($stateName),
-            'character_name' => $this->game->getCharacterHTML(),
+            'character_name' => $this->game->getCharacterHTML($state['characterId']),
         ];
         $this->game->getGameData($result);
         $this->game->getResources($result);
@@ -263,7 +308,7 @@ class DLD_SelectionStates
         $stateName = $this->stateToStateNameMapping();
         $this->cancelState($stateName);
     }
-    public function getState(?string $stateName): array
+    public function getState(?string $stateName = null): array
     {
         $stateNameState = $this->stateToStateNameMapping($stateName);
         return $this->game->gameData->get($stateNameState);

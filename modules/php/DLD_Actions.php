@@ -74,7 +74,7 @@ class DLD_Actions
                 },
             ],
             'actEat' => [
-                'state' => ['playerTurn', 'dinnerPhase'],
+                'state' => ['playerTurn', 'eatSelection', 'dinnerPhase'],
                 'stamina' => 0,
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {
@@ -444,7 +444,7 @@ class DLD_Actions
     public function getAvailableSkills(): array
     {
         $skills = $this->getSkills();
-        return array_values(
+        $skills = array_values(
             array_filter($skills, function ($skill) {
                 $character = $this->game->character->getCharacterData(
                     array_key_exists('characterId', $skill) && !array_key_exists('global', $skill)
@@ -452,7 +452,7 @@ class DLD_Actions
                         : $this->game->character->getTurnCharacterId()
                 );
                 $stamina = $character['stamina'];
-                $health = $character['health'];
+                // $health = $character['health'];
 
                 $this->skillActionCost('actUseSkill', null, $skill);
                 return $this->game->hooks->onCheckSkillRequirements($skill) &&
@@ -461,6 +461,7 @@ class DLD_Actions
                 //  && (!array_key_exists('health', $skill) || $health >= $skill['health']);
             })
         );
+        return $skills;
     }
 
     public function getAvailableItemSkills(): array
@@ -470,7 +471,7 @@ class DLD_Actions
         return array_values(
             array_filter($skills, function ($skill) use ($character) {
                 $stamina = $character['stamina'];
-                $health = $character['health'];
+                // $health = $character['health'];
                 $this->skillActionCost('actUseItem', null, $skill);
                 return $this->checkRequirements($skill, $character) &&
                     (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']);

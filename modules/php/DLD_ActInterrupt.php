@@ -24,6 +24,7 @@ class DLD_ActInterrupt
         callable $endCallback
     ) {
         $entireState = $this->getEntireState();
+        $originalFunctionName = $functionName;
         $existingData = $this->getState($functionName);
         if (!$existingData) {
             // First time calling
@@ -32,8 +33,11 @@ class DLD_ActInterrupt
             if ($data === null) {
                 return;
             }
+            $data['functionName'] = $functionName;
+            $data['isOriginalFunction'] = $originalFunctionName == $functionName;
             $res = $hook($data, ['suffix' => 'Pre']);
-            $interrupt = $res && array_key_exists('interrupt', $res);
+            $interrupt = $res && array_key_exists('interrupt', $res) && $res['interrupt'];
+            $cancel = $res && array_key_exists('cancel', $res) && $res['cancel'];
             $interruptData = [
                 'data' => $data,
                 'functionName' => $functionName,
@@ -42,8 +46,10 @@ class DLD_ActInterrupt
                 'skills' => $this->activatableSkills,
                 'stateNumber' => sizeof($entireState) + 1,
             ];
-            $this->game->log($functionName, $data, $res, $interruptData, $interrupt);
             $this->activatableSkills = [];
+            if ($cancel) {
+                return;
+            }
             // if($this->game->gamestate->state()['name'] != $currentState){
             //     // If we moved to a selection screen, we will need to call the hook again after, and finalize the function
 
@@ -51,7 +57,7 @@ class DLD_ActInterrupt
             // }
             // else
             if (sizeof($interruptData['skills']) == 0 && !$interrupt) {
-                $this->game->log('exitHook', 'not interrupted', $currentState, 'noSkill');
+                $this->game->log('exitHook noSkill', 'not interrupted', $currentState);
                 // No skills can activate
                 $res = $hook($data, ['postOnly' => true]);
                 $endCallback($this->game, false, $data, ...$args);
@@ -67,14 +73,14 @@ class DLD_ActInterrupt
             sizeof($existingData['skills']) ==
                 sizeof(
                     array_filter($existingData['skills'], function ($s) {
-                        return array_key_exists('cancellable', $s);
+                        return array_key_exists('cancellable', $s) && $s['cancellable'];
                     })
                 )
         ) {
             $this->setState($functionName, null);
         } elseif (!array_key_exists('activated', $existingData)) {
             $this->setState($functionName, ['activated' => true, ...$existingData]);
-            $this->game->log('exitHook', 'finalize', $functionName, $this->game->gamestate->state()['name'], $existingData);
+            $this->game->log('exitHook finalize', $functionName, $this->game->gamestate->state()['name'], $existingData);
             // Don't need to re-check for interrupts
             $hook($existingData['data'], ['suffix' => 'Post']);
             // Calling after skill screen
@@ -314,6 +320,15 @@ class DLD_ActInterrupt
             $this->game->hooks->reconnectHooks($skill, $this->game->character->getSkill($skill['id'])['skill']);
         });
 
+        $this->game->log(
+            'interrupt skills',
+            $this->game->actions->wrapSkills(
+                array_filter($data['skills'], function ($skill) {
+                    return $skill['type'] == 'skill';
+                }),
+                'actUseSkill'
+            )
+        );
         return [
             ...$data,
             'character_name' => $this->game->getCharacterHTML(),

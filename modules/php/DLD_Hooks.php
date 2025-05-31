@@ -237,11 +237,6 @@ class DLD_Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onEatBefore(&$data, array $args = [])
-    {
-        $this->callHooks(__FUNCTION__, $args, $data);
-        return $data;
-    }
     function onGetEatData(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);

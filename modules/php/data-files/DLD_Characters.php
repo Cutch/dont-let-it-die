@@ -1739,31 +1739,32 @@ class DLD_CharactersData
                         'type' => 'skill',
                         'name' => clienttranslate('Double Healing'), // If Cooked
                         'state' => ['interrupt'],
-                        'interruptState' => ['playerTurn'],
+                        'interruptState' => ['playerTurn', 'eatSelection'],
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $this->clearCharacterSkills($data['skills'], $skill['characterId']);
                                 $data['data']['health'] *= 2;
                             }
                         },
+                        'onUse' => function (Game $game, $skill) {
+                            $skill['sendNotification']();
+                        },
                         'onEat' => function (Game $game, $skill, &$data) {
-                            $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
-                            if ($char['isActive']) {
+                            if ($game->character->getSubmittingCharacterId() == $skill['characterId']) {
                                 if (str_contains($data['type'], '-cooked')) {
                                     $game->actInterrupt->addSkillInterrupt($skill);
                                 }
                             }
                         },
                         'requires' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
-                            return $char['isActive'];
+                            return $game->character->getSubmittingCharacterId() == $skill['characterId'];
                         },
                     ],
                     'skill2' => [
                         'type' => 'skill',
                         'name' => clienttranslate('+1 Max Health'), // If Cooked
                         'state' => ['interrupt'],
-                        'interruptState' => ['playerTurn'],
+                        'interruptState' => ['playerTurn', 'eatSelection'],
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $this->clearCharacterSkills($data['skills'], $skill['characterId']);
@@ -1772,17 +1773,18 @@ class DLD_CharactersData
                                 });
                             }
                         },
+                        'onUse' => function (Game $game, $skill) {
+                            $skill['sendNotification']();
+                        },
                         'onEat' => function (Game $game, $skill, &$data) {
-                            $char = $game->character->getCharacterData($game->character->getSubmittingCharacterId());
-                            if ($char['isActive']) {
+                            if ($game->character->getSubmittingCharacterId() == $skill['characterId']) {
                                 if (str_contains($data['type'], '-cooked')) {
                                     $game->actInterrupt->addSkillInterrupt($skill);
                                 }
                             }
                         },
                         'requires' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
-                            return $char['isActive'];
+                            return $game->character->getSubmittingCharacterId() == $skill['characterId'];
                         },
                     ],
                 ],
@@ -1852,7 +1854,7 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['drawCard'],
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
-                            $game->log('$interruptState', $skill['id'], $activatedSkill['id']);
+                            // $game->log('$interruptState', $skill['id'], $activatedSkill['id']);
                             if ($skill['id'] == $activatedSkill['id']) {
                                 subtractPerForever('hide-token', $game);
 

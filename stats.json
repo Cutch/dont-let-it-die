@@ -26,6 +26,11 @@
             "id": 13,
             "name": "Health Lost",
             "type": "int"
+        },
+        "actions_used": {
+            "id": 14,
+            "name": "Actions Used",
+            "type": "int"
         }
     }
 }

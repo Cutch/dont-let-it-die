@@ -405,7 +405,7 @@ class DLD_Character
         }
         $this->game->log('submittingCharacter: ', $action, $subAction, $this->submittingCharacter);
     }
-    public function setSubmittingCharacterById(string $characterId): void
+    public function setSubmittingCharacterById(?string $characterId): void
     {
         $this->submittingCharacter = $characterId;
     }

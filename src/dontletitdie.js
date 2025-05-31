@@ -1119,7 +1119,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
           .forEach((action) => {
             const actionId = action.action;
-
+            if (stateName == 'eatSelection') return;
             if (stateName !== 'playerTurn') {
               if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
                 return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
@@ -1307,7 +1307,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                       resourceType: this.eatScreen.getSelectedId(),
                     })
                       .then(() => {
-                        if (this.gamedatas.gamestate.name !== 'eatSelection') this.eatScreen.hide();
+                        if (this.gamedatas.gamestate.name !== 'eatSelection' || !this.isActive()) this.eatScreen.hide();
                       })
                       .catch(console.error);
                   }

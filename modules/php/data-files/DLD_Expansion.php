@@ -776,16 +776,17 @@ class DLD_ExpansionData
                                 false,
                                 $game->gamestate->state()['name'],
                                 null,
-                                true
+                                false // No interrupt as eat is cancelled
                             );
                             return true;
                         }
                     }
                 },
-                'onEatBefore' => function (Game $game, $card, &$data) {
-                    if ($game->character->getSubmittingCharacterId() != $card['characterId']) {
+                'onEat' => function (Game $game, $card, &$data) {
+                    if ($game->character->getSubmittingCharacterId() != $card['characterId'] && $data['functionName'] == 'actEat') {
                         if ($card['handleEat']($game, $card, $data, $data['type'])) {
                             $data['interrupt'] = true;
+                            $data['cancel'] = true;
                         }
                     }
                 },
@@ -995,13 +996,13 @@ class DLD_ExpansionData
                 // TODO how does this work with paranoid
                 'onGetValidActions' => function (Game $game, $card, &$data) {
                     if (
-                        $card['characterId'] == $game->character->getTurnCharacterId() &&
+                        $card['characterId'] == $game->character->getSubmittingCharacterId() &&
                         getUsePerDay($card['characterId'] . $card['id'] . 'nauseous', $game) >= 1
                     ) {
                         unset($data['actEat']);
                     }
                 },
-                'onEat' => function (Game $game, $card, &$data) {
+                'onEatPost' => function (Game $game, $card, &$data) {
                     if (
                         $card['characterId'] == $game->character->getSubmittingCharacterId() &&
                         getUsePerDay($card['characterId'] . $card['id'] . 'nauseous', $game) < 1
