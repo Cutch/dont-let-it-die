@@ -736,7 +736,7 @@ class DLD_CharactersData
                 'onInvestigateFire' => function (Game $game, $char, &$data) {
                     $char = $game->character->getCharacterData($char['id']);
                     if ($char['isActive']) {
-                        $roll2 = $game->rollFireDie($char['character_name']);
+                        $roll2 = $game->rollFireDie(clienttranslate('Investigate Fire'), $char['character_name']);
                         $data['roll'] += $roll2;
                     }
                 },
@@ -748,10 +748,15 @@ class DLD_CharactersData
                         'stamina' => 2,
                         'onUse' => function (Game $game, $skill) {
                             $skill['sendNotification']();
-                            $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                'count' => $game->rollFireDie($skill['name']),
-                                'resource_type' => 'fish',
-                            ]);
+                            $roll = $game->rollFireDie($skill['name']);
+                            if ($roll > 0) {
+                                if ($game->adjustResource('fish', $roll)['changed'] != 0) {
+                                    $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                                        'count' => $roll,
+                                        'resource_type' => 'fish',
+                                    ]);
+                                }
+                            }
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);

@@ -11,6 +11,7 @@ class DLD_Undo
 {
     private Game $game;
     private array $initialState;
+    private array $extraTablesList = ['stats', 'nightevent', 'dayevent', 'physicalhindrance', 'mentalhindrance'];
     private ?int $savedMoveId = null;
     private bool $actionWasCleared = false;
     public function __construct(Game $game)
@@ -38,6 +39,7 @@ class DLD_Undo
         $itemTable = json_decode($undoState['itemTable'], true);
         $characterTable = json_decode($undoState['characterTable'], true);
         $globalsTable = json_decode($undoState['globalsTable'], true);
+        $extraTables = json_decode($undoState['extraTables'], true);
         foreach ($characterTable as $k => $v) {
             $this->game->character->_updateCharacterData($v['id'], $v);
         }
@@ -50,6 +52,10 @@ class DLD_Undo
             }
         }
         $this->game->gameData->setItems($itemTable);
+        foreach ($this->extraTablesList as $table) {
+            $this->game::DbQuery("DELETE FROM `$table` where 1 = 1");
+            $this->game::DbQuery(buildInsertQuery($table, $extraTables[$table]));
+        }
         $this->game->markChanged('token');
         $this->game->markChanged('player');
         $this->game->markChanged('knowledge');
@@ -75,6 +81,11 @@ class DLD_Undo
         $itemsData = json_encode($this->game->gameData->getItems());
         $characterData = json_encode($this->game->character->getAllCharacterData(true));
         $globalsData = json_encode($this->game->gameData->getAll());
+        $extraTablesData = [];
+        foreach ($this->extraTablesList as $table) {
+            $extraTablesData[$table] = $this->game->getCollectionFromDB("select * from $table");
+        }
+        $extraTables = json_encode($extraTablesData);
         $stateName = '';
         try {
             $stateName = $this->game->gamestate->state()['name'];
@@ -85,6 +96,7 @@ class DLD_Undo
             'itemsData' => $itemsData,
             'characterData' => $characterData,
             'globalsData' => $globalsData,
+            'extraTables' => $extraTables,
             'stateName' => $stateName,
         ];
     }
@@ -104,9 +116,11 @@ class DLD_Undo
             $itemsData = $this->initialState['itemsData'];
             $characterData = $this->initialState['characterData'];
             $globalsData = $this->initialState['globalsData'];
+            $extraTables = $this->initialState['extraTables'];
             $this->savedMoveId = $moveId;
             $this->game::DbQuery(
-                "INSERT INTO `undoState` (`character_name`, `gamelog_move_id`, `itemTable`, `characterTable`, `globalsTable`) VALUES ('$char', $moveId, '$itemsData', '$characterData', '$globalsData')"
+                'INSERT INTO `undoState` (`character_name`, `gamelog_move_id`, `itemTable`, `characterTable`, `globalsTable`, `extraTables`) VALUES ' .
+                    "('$char', $moveId, '$itemsData', '$characterData', '$globalsData', '$extraTables')"
             );
         }
     }

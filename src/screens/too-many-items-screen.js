@@ -38,7 +38,7 @@ export class TooManyItemsScreen {
     tmiElem.innerHTML = '';
     const renderItem = (name, itemId, elem, selectCallback) => {
       elem.insertAdjacentHTML('beforeend', `<div class="token id${itemId}"></div>`);
-      renderImage(name, document.querySelector(`#too-many-items-screen .token.id${itemId}`), { scale: 1, pos: 'insert' });
+      renderImage(name, document.querySelector(`#too-many-items-screen .token.id${itemId}`), { scale: 2, pos: 'insert' });
       addClickListener(
         document.querySelector(`#too-many-items-screen .token.id${itemId}`),
         this.game.data[name].options.name,

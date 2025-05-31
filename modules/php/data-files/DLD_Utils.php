@@ -82,4 +82,15 @@ if (!function_exists('addId')) {
             }, $arr)
         );
     }
+    function buildInsertQuery(string $table, array $data)
+    {
+        $keys = [];
+        $values = [];
+        foreach ($data as $key => $value) {
+            array_push($keys, "`{$key}`");
+            array_push($values, "'{$value}'");
+        }
+        $values = implode(',', $values);
+        return "INSERT INTO `$table` VALUES ({$values})";
+    }
 }

@@ -107,7 +107,7 @@ class DLD_ItemTrade
                 })
             );
             if ($itemId2) {
-                $result = $this->game->character->getItemValidations((int) $itemId2, $trade1['character'], $itemId1);
+                $result = $this->game->character->getItemValidations((int) $itemId2, $trade1['character'], (int) $itemId1);
                 $hasOpenSlots = $result['hasOpenSlots'];
                 $hasDuplicateTool = $result['hasDuplicateTool'];
 
@@ -197,7 +197,7 @@ class DLD_ItemTrade
             })
         );
         if ($itemId1) {
-            $result = $this->game->character->getItemValidations((int) $itemId1, $trade2['character'], $itemId2);
+            $result = $this->game->character->getItemValidations((int) $itemId1, $trade2['character'], (int) $itemId2);
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
             if ($trade2['character']['id'] == 'Sig') {
@@ -212,7 +212,7 @@ class DLD_ItemTrade
             array_push($characterItems2, $itemId1);
         }
         if ($itemId2) {
-            $result = $this->game->character->getItemValidations((int) $itemId2, $trade1['character'], $itemId1);
+            $result = $this->game->character->getItemValidations((int) $itemId2, $trade1['character'], (int) $itemId1);
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
 

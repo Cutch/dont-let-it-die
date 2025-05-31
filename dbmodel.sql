@@ -121,5 +121,7 @@ CREATE TABLE IF NOT EXISTS `undoState` (
     `itemTable` text DEFAULT '',
     `characterTable` text DEFAULT '',
     `globalsTable` text DEFAULT '',
+    `decksTable` text DEFAULT '',
+    `statsTable` text DEFAULT '',
     PRIMARY KEY (`undo_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;

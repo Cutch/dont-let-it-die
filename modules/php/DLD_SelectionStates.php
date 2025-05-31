@@ -399,7 +399,7 @@ class DLD_SelectionStates
             'hindranceSelection',
             ['id' => $id, 'characters' => $characters, 'button' => $button],
             $this->game->character->getTurnCharacterId(),
-            false
+            true
         );
     }
 }
