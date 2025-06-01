@@ -452,13 +452,13 @@ class DLD_Actions
                         : $this->game->character->getTurnCharacterId()
                 );
                 $stamina = $character['stamina'];
-                // $health = $character['health'];
+                $health = $character['health'];
 
                 $this->skillActionCost('actUseSkill', null, $skill);
                 return $this->game->hooks->onCheckSkillRequirements($skill) &&
                     $this->checkRequirements($skill, $character) &&
-                    (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']);
-                //  && (!array_key_exists('health', $skill) || $health >= $skill['health']);
+                    (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']) &&
+                    (!array_key_exists('healthAsStamina', $skill) || !array_key_exists('health', $skill) || $health >= $skill['health']);
             })
         );
         return $skills;
@@ -471,11 +471,11 @@ class DLD_Actions
         return array_values(
             array_filter($skills, function ($skill) use ($character) {
                 $stamina = $character['stamina'];
-                // $health = $character['health'];
+                $health = $character['health'];
                 $this->skillActionCost('actUseItem', null, $skill);
                 return $this->checkRequirements($skill, $character) &&
-                    (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']);
-                // && (!array_key_exists('health', $skill) || $health >= $skill['health']);
+                    (!array_key_exists('stamina', $skill) || $stamina >= $skill['stamina']) &&
+                    (!array_key_exists('healthAsStamina', $skill) || !array_key_exists('health', $skill) || $health >= $skill['health']);
             })
         );
     }
@@ -530,6 +530,9 @@ class DLD_Actions
         }
         if (array_key_exists('name', $actionCost)) {
             $skill['name'] = $actionCost['name'];
+        }
+        if (array_key_exists('healthAsStamina', $actionCost)) {
+            $skill['healthAsStamina'] = $actionCost['healthAsStamina'];
         }
     }
     public function wrapSkills(array $skills, string $action): array
@@ -622,15 +625,16 @@ class DLD_Actions
             // var_dump(json_encode($v));
             $actionCost = $this->getActionCost($v['id']);
             $stamina = $this->game->character->getActiveStamina();
-            // $health = $this->game->character->getActiveHealth();
+            $health = $this->game->character->getActiveHealth();
             // Rock only needs 1 stamina, this is in the hindrance expansion
             $alwaysShowCraft = $this->game->isValidExpansion('hindrance') && $v['id'] == 'actCraft';
-            // var_dump(json_encode([$v['id']]));
             $this->game->hooks->onSpendActionCost($actionCost);
             return $this->checkRequirements($v) &&
                 (!array_key_exists('stamina', $actionCost) ||
-                    $stamina >= ($alwaysShowCraft ? min($actionCost['stamina'], 1) : $actionCost['stamina']));
-            //  && (!array_key_exists('health', $actionCost) || $health >= $actionCost['health']);
+                    $stamina >= ($alwaysShowCraft ? min($actionCost['stamina'], 1) : $actionCost['stamina'])) &&
+                (!array_key_exists('healthAsStamina', $actionCost) ||
+                    !array_key_exists('health', $actionCost) ||
+                    $health >= $actionCost['health']);
         });
         $data = array_column(
             array_map(

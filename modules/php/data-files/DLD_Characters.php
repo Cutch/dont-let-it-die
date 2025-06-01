@@ -21,6 +21,7 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'name' => clienttranslate('Gain 2 Stamina'),
                         'health' => 2,
+                        'healthAsStamina' => true,
                         'perDay' => 1,
                         'getPerDayKey' => function (Game $game, $skill) {
                             return $skill['characterId'];
@@ -1340,6 +1341,7 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'name' => clienttranslate('Heal everyone else for 1 hp'),
                         'health' => 2,
+                        'healthAsStamina' => true,
                         'onUse' => function (Game $game, $skill, $data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
@@ -1964,6 +1966,18 @@ class DLD_CharactersData
                         ]);
                     }
                 },
+                'onGetActionCost' => function (Game $game, $char, &$data) {
+                    if ($char['id'] == $game->character->getSubmittingCharacterId()) {
+                        if (array_key_exists('stamina', $data) && $data['stamina'] > 0) {
+                            $diff = $game->character->getActiveStamina() - $data['stamina'];
+                            if ($diff < 0) {
+                                $data['stamina'] += $diff;
+                                $data['health'] = (array_key_exists('health', $data) ? $data['health'] : 0) - $diff;
+                                $data['healthAsStamina'] = true;
+                            }
+                        }
+                    }
+                },
                 // TODO: Can spend health as if it was stamina (Needs testing)
                 'onSpendActionCost' => function (Game $game, $char, &$data) {
                     if ($char['id'] == $game->character->getSubmittingCharacterId()) {
@@ -1972,6 +1986,7 @@ class DLD_CharactersData
                             if ($diff < 0) {
                                 $data['stamina'] += $diff;
                                 $data['health'] = (array_key_exists('health', $data) ? $data['health'] : 0) - $diff;
+                                $data['healthAsStamina'] = true;
                             }
                         }
                     }

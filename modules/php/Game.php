@@ -282,6 +282,7 @@ class Game extends \Table
         } elseif ($rand > 1) {
             $value = 1;
         }
+        $value = 0;
         $notificationSent = false;
         $data = [
             'value' => $value,
@@ -970,10 +971,12 @@ class Game extends \Table
                     $_this->actions->spendActionCost('actInvestigateFire');
                 }
                 $_this->adjustResource('fkp', $data['roll']);
-                $this->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                    'count' => $data['roll'],
-                    'resource_type' => 'fkp',
-                ]);
+                if ($data['roll'] > 0) {
+                    $this->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                        'count' => $data['roll'],
+                        'resource_type' => 'fkp',
+                    ]);
+                }
             }
         );
         $this->setLastAction('actInvestigateFire');
@@ -2339,7 +2342,7 @@ class Game extends \Table
             'berry' => 4,
             'berry-cooked' => 4,
             'rock' => 6,
-            'stew' => 3,
+            'stew' => 1,
             'fiber' => 6,
             'hide' => 8,
             'trap' => 0,

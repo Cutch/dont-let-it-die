@@ -82,15 +82,26 @@ if (!function_exists('addId')) {
             }, $arr)
         );
     }
-    function buildInsertQuery(string $table, array $data)
+    function buildInsertQuery(string $table, array $rows)
     {
         $keys = [];
-        $values = [];
-        foreach ($data as $key => $value) {
+        foreach ($rows[0] as $key => $value) {
             array_push($keys, "`{$key}`");
-            array_push($values, "'{$value}'");
         }
+        $values = [];
+        foreach ($rows as $row) {
+            $v = [];
+            foreach ($row as $value) {
+                if ($value == null) {
+                    array_push($v, 'NULL');
+                } else {
+                    array_push($v, "'{$value}'");
+                }
+            }
+            array_push($values, '(' . implode(',', $v) . ')');
+        }
+        $keys = implode(',', $keys);
         $values = implode(',', $values);
-        return "INSERT INTO `$table` VALUES ({$values})";
+        return "INSERT INTO `$table` ($keys) VALUES $values";
     }
 }
