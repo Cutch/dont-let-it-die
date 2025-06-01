@@ -105,8 +105,8 @@ $machinestates = [
     ],
     $characterSelect => [
         'name' => 'characterSelect',
-        'description' => clienttranslate('${character_name} is selecting a character'),
-        'descriptionmyturn' => clienttranslate('${character_name} Select a Character'),
+        'description' => clienttranslate('Others are selecting a character'),
+        'descriptionmyturn' => clienttranslate('Select a Character'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionCount',
         'possibleactions' => ['actChooseCharacters', 'actCharacterClicked'],

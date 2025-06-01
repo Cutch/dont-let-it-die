@@ -83,7 +83,7 @@ class DLD_Undo
         $globalsData = json_encode($this->game->gameData->getAll());
         $extraTablesData = [];
         foreach ($this->extraTablesList as $table) {
-            $extraTablesData[$table] = $this->game->getCollectionFromDB("select * from $table");
+            $extraTablesData[$table] = array_values($this->game->getCollectionFromDB("select * from $table"));
         }
         $extraTables = json_encode($extraTablesData);
         $stateName = '';

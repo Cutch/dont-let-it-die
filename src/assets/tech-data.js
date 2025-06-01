@@ -266,7 +266,7 @@ export default {
           },
         },
         frame: {
-          y: 3372,
+          y: 2173,
           x: 1,
           w: 948,
           h: 722,
