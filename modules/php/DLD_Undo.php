@@ -113,10 +113,10 @@ class DLD_Undo
                 $this->game::DbQuery('DELETE FROM `undoState` where gamelog_move_id=' . $this->savedMoveId);
             }
             $moveId = $this->initialState['moveId'];
-            $itemsData = $this->initialState['itemsData'];
-            $characterData = $this->initialState['characterData'];
-            $globalsData = $this->initialState['globalsData'];
-            $extraTables = $this->initialState['extraTables'];
+            $itemsData = $this->game::escapeStringForDB($this->initialState['itemsData']);
+            $characterData = $this->game::escapeStringForDB($this->initialState['characterData']);
+            $globalsData = $this->game::escapeStringForDB($this->initialState['globalsData']);
+            $extraTables = $this->game::escapeStringForDB($this->initialState['extraTables']);
             $this->savedMoveId = $moveId;
             $this->game::DbQuery(
                 'INSERT INTO `undoState` (`character_name`, `gamelog_move_id`, `itemTable`, `characterTable`, `globalsTable`, `extraTables`) VALUES ' .

@@ -729,7 +729,7 @@ class Game extends \Table
         $this->setLastAction('actAddWood');
         $this->completeAction();
     }
-    public function actUseSkill(string $skillId, ?string $optionValue = null): void
+    public function actUseSkill(string $skillId): void
     {
         if ($this->gamestate->state()['name'] == 'playerTurn') {
             $this->setLastAction('actUseSkill');
@@ -738,7 +738,7 @@ class Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onUseSkill'],
-            function (Game $_this) use ($skillId, $optionValue) {
+            function (Game $_this) use ($skillId) {
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 // $this->character->addExtraTime();
                 $_this->actions->validateCanRunAction('actUseSkill', $skillId);
@@ -746,7 +746,6 @@ class Game extends \Table
                 $skill = $res['skill'];
                 $character = $res['character'];
                 $_this->character->setSubmittingCharacter(null);
-                $skill['optionValue'] = $optionValue;
                 return [
                     'skillId' => $skillId,
                     'skill' => $skill,
@@ -755,11 +754,10 @@ class Game extends \Table
                     'nextState' => $this->gamestate->state()['name'] == 'dayEvent' ? 'playerTurn' : false,
                 ];
             },
-            function (Game $_this, bool $finalizeInterrupt, $data) use ($optionValue) {
+            function (Game $_this, bool $finalizeInterrupt, $data) {
                 $skill = $data['skill'];
                 $character = $data['character'];
                 $skillId = $data['skillId'];
-                $skill['optionValue'] = $optionValue;
                 $_this->hooks->reconnectHooks($skill, $_this->character->getSkill($skillId)['skill']);
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 $notificationSent = false;
@@ -770,7 +768,7 @@ class Game extends \Table
                     $notificationSent = true;
                 };
                 if ($_this->gamestate->state()['name'] == 'interrupt') {
-                    $_this->actInterrupt->actInterrupt($skillId, $optionValue);
+                    $_this->actInterrupt->actInterrupt($skillId);
                     $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                     $skill['sendNotification']();
                 }
@@ -1001,7 +999,9 @@ class Game extends \Table
         } elseif ($stateName == 'tradePhase') {
             $this->nextState('playerTurn');
         } elseif ($stateName == 'interrupt') {
-            $this->actInterrupt->onInterruptCancel();
+            if (!$this->actInterrupt->onInterruptCancel()) {
+                $this->nextState('playerTurn');
+            }
         } elseif ($stateName == 'dinnerPhase') {
             $saveState = false;
             $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'nightPhase');
@@ -1116,6 +1116,10 @@ class Game extends \Table
     public function actSelectCharacter(?string $characterId = null): void
     {
         $this->selectionStates->actSelectCharacter($characterId);
+    }
+    public function actSelectButton(?string $buttonValue = null): void
+    {
+        $this->selectionStates->actSelectButton($buttonValue);
     }
     public function actSelectEat(?string $resourceType = null): void
     {
@@ -2339,8 +2343,8 @@ class Game extends \Table
             'herb' => 4,
             'dino-egg' => 4,
             'dino-egg-cooked' => 4,
-            'berry' => 4,
-            'berry-cooked' => 4,
+            'berry' => 3,
+            'berry-cooked' => 2,
             'rock' => 6,
             'stew' => 1,
             'fiber' => 6,

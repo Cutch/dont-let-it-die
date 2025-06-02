@@ -23,7 +23,7 @@ class DLD_CharactersData
                         'health' => 2,
                         'healthAsStamina' => true,
                         'perDay' => 1,
-                        'getPerDayKey' => function (Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'];
                         },
                         'onUse' => function (Game $game, $skill) {
@@ -113,7 +113,7 @@ class DLD_CharactersData
                         'interruptState' => ['playerTurn'],
                         'manuallyAdd' => true,
                         'perDay' => 1,
-                        'getPerDayKey' => function (Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . $skill['id'];
                         },
                         'onInvestigateFire' => function (Game $game, $skill, &$data) {
@@ -145,7 +145,7 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'cancellable' => true,
                         'perDay' => 1,
-                        'getPerDayKey' => function (Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . 'stamina';
                         },
                         'onGetActionCost' => function (Game $game, $skill, &$data) {
@@ -182,7 +182,7 @@ class DLD_CharactersData
                         'manuallyAdd' => true,
                         'cancellable' => true,
                         'perDay' => 1,
-                        'getPerDayKey' => function (Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . 'stamina'; // This should match skill 2
                         },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
@@ -288,7 +288,7 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['nightPhase', 'nightDrawCard'],
                         'perDay' => 1,
-                        'getPerDayKey' => function (Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . $skill['id'];
                         },
                         'requires' => function (Game $game, $skill) {
@@ -492,7 +492,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('Gain 2 Health'),
                         'stamina' => 2,
                         'perDay' => 1,
-                        'getPerDayKey' => function (Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . $skill['id'];
                         },
                         'onUse' => function (Game $game, $skill) {
@@ -541,11 +541,10 @@ class DLD_CharactersData
                         'name' => clienttranslate('Gain 1 Wood'),
                         'stamina' => 2,
                         'perDay' => 1,
-                        'getPerDayKey' => function (Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . $skill['id'];
                         },
                         'onUse' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             $game->character->adjustActiveStamina(-2);
                             $game->adjustResource('wood', 1);
@@ -656,7 +655,7 @@ class DLD_CharactersData
                         'stamina' => 0,
                         'perDay' => 1,
                         'state' => ['postEncounter'],
-                        'getPerDayKey' => function (Game $game, $skill) {
+                        'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . $skill['id'];
                         },
                         'onUse' => function (Game $game, $skill) {
@@ -671,7 +670,7 @@ class DLD_CharactersData
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive'] && $char['health'] < $char['maxHealth']) {
                                 $state = $game->gameData->get('encounterState');
-                                if ($state['encounterHealth'] <= $state['characterDamage']) {
+                                if ($game->encounter->killCheck($state)) {
                                     return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
                                 }
                             }
@@ -685,8 +684,9 @@ class DLD_CharactersData
                 'stamina' => '4',
                 'name' => 'River',
                 'slots' => ['weapon', 'tool'],
-                'getPerDayKey' => function (Game $game, $char, &$data) {
-                    return [$char['id']];
+                'characterSkillName' => clienttranslate('Free Investigate Fire Action'),
+                'getPerDayKey' => function (Game $game, $char): string {
+                    return $char['id'];
                 },
                 'onGetActionCost' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && $data['action'] == 'actInvestigateFire' && getUsePerDay($char['id'], $game) < 1) {
@@ -782,18 +782,30 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Tara',
                 'slots' => ['weapon', 'tool'],
-                'getPerDayKey' => function (Game $game, $char, &$data) {
-                    return [$char['id'] . 'skillonEat'];
+                'characterSkillName' => clienttranslate('Gain 2 Stamina'),
+                'getPerDayKey' => function (Game $game, $char): string {
+                    return $char['id'] . 'skillonEat';
                 },
                 'onEat' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && getUsePerDay($char['id'] . 'skillonEat', $game) < 1) {
+                    if ($char['isActive'] && getUsePerDay($char['getPerDayKey']($game, $char), $game) < 1) {
                         $data['stamina'] = 2;
-                        usePerDay($char['id'] . 'skillonEat', $game);
+                        usePerDay($char['getPerDayKey']($game, $char), $game);
                     }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && getUsePerDay($char['id'] . 'skillonEat', $game) < 1) {
+                    if ($char['isActive'] && getUsePerDay($char['getPerDayKey']($game, $char), $game) < 1) {
                         $data['stamina'] = 2;
+                    }
+                },
+                'onDraw' => function (Game $game, $char, &$data) {
+                    $card = $data['card'];
+                    if ($char['isActive'] && $card['deck'] == 'forage') {
+                        if ($game->adjustResource('berry', 1)['changed'] > 0) {
+                            $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                                'count' => 1,
+                                'resource_type' => 'berry',
+                            ]);
+                        }
                     }
                 },
                 'skills' => [
@@ -804,7 +816,7 @@ class DLD_CharactersData
                         'stamina' => 2,
                         'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
-                            if ($state && $state['id'] == $skill['characterId']) {
+                            if ($state && $state['id'] == $skill['id']) {
                                 $game->character->adjustHealth($data['characterId'], 1);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => 1,
@@ -838,8 +850,9 @@ class DLD_CharactersData
                 'stamina' => '3',
                 'name' => 'Nirv',
                 'slots' => ['weapon', 'tool'],
-                'getPerDayKey' => function (Game $game, $char, &$data) {
-                    return [$char['id'] . 'skillonDraw'];
+                'characterSkillName' => clienttranslate('Free Gather Action'),
+                'getPerDayKey' => function (Game $game, $char): string {
+                    return $char['id'] . 'skillonDraw';
                 },
                 'onNight' => function (Game $game, $char, &$data) {
                     if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
@@ -1321,8 +1334,9 @@ class DLD_CharactersData
                 'name' => 'Nibna',
                 'startsWith' => 'bag',
                 'slots' => ['weapon', 'tool'],
-                'getPerDayKey' => function (Game $game, $char, &$data) {
-                    return [$char['id']];
+                'characterSkillName' => clienttranslate('Double Healing'),
+                'getPerDayKey' => function (Game $game, $char): string {
+                    return $char['id'];
                 },
                 'onEat' => function (Game $game, $char, &$data) {
                     if ($char['isActive'] && getUsePerDay($char['id'], $game) < 1) {
@@ -1492,57 +1506,78 @@ class DLD_CharactersData
                         'type' => 'skill',
                         'state' => ['playerTurn'],
                         'name' => clienttranslate('Eat Stew'),
-                        'stamina' => 1,
+                        'stamina' => 0,
+                        'global' => true,
                         'skillOptions' => [],
-                        'getSkillOptions' => function (Game $game, $skill, &$data) {
-                            $skillOptions = &$data['skillOptions'];
-                            $char = $game->character->getCharacterData($skill['characterId']);
-                            if (array_key_exists('getPerDayKey', $char)) {
-                                array_push($skillOptions, ['name' => clienttranslate('Character Skill'), 'value' => 'char']);
-                            }
-                            foreach (array_values($char['skills']) as $skill) {
-                                if (array_key_exists('getPerDayKey', $skill)) {
-                                    array_push($skillOptions, ['name' => $skill['name'], 'value' => $skill['id']]);
+                        'onButtonSelection' => function (Game $game, $skill, $data) {
+                            $state = $game->selectionStates->getState('buttonSelection');
+                            if ($state && $state['id'] == $skill['id']) {
+                                $char = $game->character->getSubmittingCharacter(true);
+                                if ($data['buttonValue'] == 'char') {
+                                    subtractPerDay($char['getPerDayKey']($game, $char), $game);
+                                } else {
+                                    $res = $game->character->getSkill($data['buttonValue'])['skill'];
+                                    subtractPerDay($res['getPerDayKey']($game, $res), $game);
                                 }
+                                $game->adjustResource('stew', -1);
+                                usePerDay($char['id'] . 'eatstew', $game);
                             }
-                        },
-                        'onUse' => function (Game $game, $skill, $data) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
-                            $skillId = $skill['optionValue'];
-                            if ($skillId == 'char') {
-                                subtractPerDay($char['getPerDayKey']($game, $char), $game);
-                            } else {
-                                $res = $game->character->getSkill($skillId)['skill'];
-                                subtractPerDay($res['getPerDayKey']($game, $res), $game);
-                            }
-                            $game->adjustResource('stew', -1);
                         },
                         'onUseSkill' => function (Game $game, $skill, &$data) {
                             if ($data['skillId'] == $skill['id']) {
-                                $turnChar = $game->character->getTurnCharacterId();
-                                $skill['characterId'] = $turnChar;
+                                $char = $game->character->getSubmittingCharacter();
+                                // $skill['characterId'] = $game->character->getSubmittingCharacterId();
                                 // $char = $game->character->getCharacterData($skill['characterId']);
-                                $game->actInterrupt->addSkillInterrupt($skill);
+                                // $game->actInterrupt->addSkillInterrupt($skill);
+                                $skillOptions = [];
+                                if (array_key_exists('getPerDayKey', $char)) {
+                                    array_push($skillOptions, ['name' => $char['characterSkillName'], 'value' => 'char']);
+                                }
+                                foreach (array_values($char['skills']) as $s) {
+                                    if (array_key_exists('getPerDayKey', $s)) {
+                                        array_push($skillOptions, ['name' => $s['name'], 'value' => $s['id']]);
+                                    }
+                                }
+
+                                $game->selectionStates->initiateState(
+                                    'buttonSelection',
+                                    [
+                                        'items' => $skillOptions,
+                                        'id' => $skill['id'],
+                                    ],
+                                    $char['id'],
+                                    false
+                                );
                             }
                         },
                         'requires' => function (Game $game, $skill) {
+                            $char = $game->character->getSubmittingCharacter(true);
+                            // $game->log(
+                            //     'stew requires',
+                            //     array_key_exists('getPerDayKey', $char) ? $char['getPerDayKey']($game, $char) : null,
+                            //     array_key_exists('getPerDayKey', $char),
+                            //     array_key_exists('getPerDayKey', $char) && getUsePerDay($char['getPerDayKey']($game, $char), $game) > 0
+                            // );
+                            if (getUsePerDay($char['id'] . 'eatstew', $game) >= 1) {
+                                return false;
+                            }
                             if ($game->gameData->getResource('stew') == 0) {
                                 return false;
                             }
-                            $char = $game->character->getCharacterData($skill['characterId']);
                             if (array_key_exists('getPerDayKey', $char)) {
                                 if (getUsePerDay($char['getPerDayKey']($game, $char), $game) > 0) {
                                     return true;
                                 }
                             }
-                            foreach (array_values($char['skills']) as $skill) {
-                                if (array_key_exists('getPerDayKey', $skill)) {
-                                    if (getUsePerDay($skill['getPerDayKey']($game, $skill), $game) > 0) {
-                                        return true;
+                            if (array_key_exists('skills', $char)) {
+                                foreach (array_values($char['skills']) as $skill) {
+                                    if (array_key_exists('getPerDayKey', $skill)) {
+                                        if (getUsePerDay($skill['getPerDayKey']($game, $skill), $game) > 0) {
+                                            return true;
+                                        }
                                     }
                                 }
                             }
-
                             return false;
                         },
                     ],

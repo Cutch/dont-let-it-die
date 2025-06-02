@@ -952,8 +952,8 @@ declare('bgagame.dontletitdie', Gamegui, {
   onEnteringState: function (stateName, args = {}) {
     args.args = args.args ?? {};
     args.args['gamestate'] = { name: stateName };
-    if (args.args.gameData) {
-      this.updateGameDatas(args.args.gameData);
+    if (args.args) {
+      this.updateGameDatas(args.args);
     }
     const isActive = this.isActive();
     if (isStudio())
@@ -1099,17 +1099,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     const actions = args?.actions;
     // this.currentActions = actions;
     const isActive = this.isActive();
-    if (isStudio())
-      console.log(
-        'onUpdateActionButtons',
-        isActive,
-        this.getActivePlayers(),
-        gameui.isPlayerActive(),
-        this.player_id,
-        args,
-        actions,
-        stateName,
-      );
+    if (isStudio()) console.log(args);
     if (isActive && stateName && actions != null) {
       this.clearActionButtons();
 
@@ -1124,12 +1114,9 @@ declare('bgagame.dontletitdie', Gamegui, {
               if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
                 return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
                   (skill) => {
-                    (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
-                      skill.skillOption = skillOption;
-                      const suffix = this.getActionSuffixHTML(skill);
-                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
-                        return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
-                      });
+                    const suffix = this.getActionSuffixHTML(skill);
+                    this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
+                      return this.bgaPerformAction(actionId, { skillId: skill.id });
                     });
                   },
                 );
@@ -1165,12 +1152,9 @@ declare('bgagame.dontletitdie', Gamegui, {
                 this.clearActionButtons();
                 Object.values(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills).forEach(
                   (skill) => {
-                    (skill.skillOptions?.length ? skill.skillOptions : [null]).forEach((skillOption) => {
-                      skill.skillOption = skillOption;
-                      const suffix = this.getActionSuffixHTML(skill);
-                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
-                        return this.bgaPerformAction(actionId, { skillId: skill.id, optionValue: skillOption?.value });
-                      });
+                    const suffix = this.getActionSuffixHTML(skill);
+                    this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
+                      return this.bgaPerformAction(actionId, { skillId: skill.id });
                     });
                   },
                 );
@@ -1398,6 +1382,13 @@ declare('bgagame.dontletitdie', Gamegui, {
             );
           });
           break;
+        case 'buttonSelection':
+          this.gamedatas.selectionState?.items?.forEach(({ name, value }) => {
+            this.statusBar.addActionButton(_(name), () => {
+              this.bgaPerformAction('actSelectButton', { buttonValue: value });
+            });
+          });
+          break;
         case 'itemSelection':
           this.statusBar.addActionButton(_('Select Item'), () => {
             this.bgaPerformAction('actSelectItem', { ...this.itemsScreen.getSelection() }).then(() => this.itemsScreen.hide());
@@ -1452,7 +1443,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           if (isActive) this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
           break;
       }
-      if (args.cancellable === true)
+      if (args.cancellable === true || args.selectionState?.cancellable === true)
         this.statusBar.addActionButton(
           _('Cancel'),
           () => {

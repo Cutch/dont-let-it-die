@@ -512,10 +512,6 @@ class DLD_Actions
         $this->game->hooks->onGetActionCost($actionCost);
 
         $skill['action'] = $actionCost['action'];
-        // var_dump($skill);
-        if (array_key_exists('getSkillOptions', $skill)) {
-            $skill['getSkillOptions']($this->game, $skill, $skill);
-        }
         if (array_key_exists('stamina', $actionCost)) {
             $skill['stamina'] = $actionCost['stamina'];
         }

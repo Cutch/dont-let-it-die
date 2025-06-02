@@ -51,6 +51,7 @@
 $gameSetup = 1;
 $characterSelect = 2;
 $startHindrance = 3;
+$buttonSelection = 8;
 $eatSelection = 9;
 $playerTurn = 10;
 $drawCard = 11;
@@ -81,6 +82,7 @@ $changeZombiePlayer = 97;
 $gameEnd = 99;
 
 $interruptScreens = [
+    'buttonSelection' => $buttonSelection,
     'eatSelection' => $eatSelection,
     'drawCard' => $drawCard,
     'tooManyItems' => $tooManyItems,
@@ -130,6 +132,15 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectEat', 'actEat', 'actCancel'],
+        'transitions' => ['playerTurn' => $playerTurn],
+    ],
+    $buttonSelection => [
+        'name' => 'buttonSelection',
+        'description' => clienttranslate('${character_name} is making a selection'),
+        'descriptionmyturn' => clienttranslate('${character_name} Make a Selection'),
+        'type' => 'multipleactiveplayer',
+        'args' => 'argSelectionState',
+        'possibleactions' => ['actSelectButton', 'actCancel'],
         'transitions' => ['playerTurn' => $playerTurn],
     ],
     $playerTurn => [

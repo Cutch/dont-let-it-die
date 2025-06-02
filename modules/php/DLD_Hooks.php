@@ -302,6 +302,11 @@ class DLD_Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
+    function onButtonSelection(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
     function onResourceSelection(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);

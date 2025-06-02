@@ -155,7 +155,7 @@ class DLD_Character
         $characterData['maxHealth'] = $underlyingCharacterData['health'] + $characterData['modifiedMaxHealth'];
 
         array_walk($underlyingCharacterData, function ($v, $k) use (&$characterData) {
-            if (str_starts_with($k, 'on') || in_array($k, ['slots', 'skills'])) {
+            if (str_starts_with($k, 'on') || in_array($k, ['slots', 'skills']) || $k == 'getPerDayKey' || $k == 'characterSkillName') {
                 $characterData[$k] = $v;
             }
         });
