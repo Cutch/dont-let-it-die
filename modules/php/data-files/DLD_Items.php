@@ -606,6 +606,7 @@ class DLD_ItemsData
                                     $deck = $existingData['data']['deck'];
                                     $card1 = $existingData['data']['card'];
                                     $card2 = $game->decks->pickCard($deck);
+                                    $game->incStat(1, 'cards_drawn', $game->character->getSubmittingCharacter()['playerId']);
                                     $data['interrupt'] = true;
                                     $game->selectionStates->initiateState(
                                         'cardSelection',
@@ -932,9 +933,9 @@ class DLD_ItemsData
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['id']) {
                                 $cardId = $state['cardId'];
-                                $game->character->adjustHealth($data['characterId'], 1);
+                                $change = $game->character->adjustHealth($data['characterId'], 1);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                    'count' => 1,
+                                    'count' => $change,
                                     'character_resource' => clienttranslate('Health'),
                                     'character_name' => $game->getCharacterHTML($data['characterId']),
                                 ]);

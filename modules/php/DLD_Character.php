@@ -607,6 +607,14 @@ class DLD_Character
         $this->game->hooks->onAdjustHealth($hookData);
         $data['health'] = clamp($data['health'] + $hookData['change'], 0, $data['maxHealth']);
         $prev = $data['health'] - $prev;
+
+        if ($prev < 0) {
+            $this->game->incStat(-$prev, 'health_lost', $this->getCharacterData($characterName)['playerId']);
+        }
+        if ($prev > 0) {
+            $this->game->incStat($prev, 'health_gained', $this->getCharacterData($characterName)['playerId']);
+        }
+
         if ($data['health'] == 0 && !$data['incapacitated']) {
             $this->game->eventLog(clienttranslate('${character_name} is incapacitated'), [
                 'character_name' => $this->game->getCharacterHTML($characterName),

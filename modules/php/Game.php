@@ -688,10 +688,10 @@ class Game extends \Table
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 if (array_key_exists('health', $data)) {
-                    $this->character->adjustActiveHealth($data['health']);
+                    $data['health'] = $this->character->adjustActiveHealth($data['health']);
                 }
                 if (array_key_exists('stamina', $data)) {
-                    $this->character->adjustActiveStamina($data['stamina']);
+                    $data['stamina'] = $this->character->adjustActiveStamina($data['stamina']);
                 }
                 $left = $this->adjustResource($data['type'], -$data['count'])['left'];
                 if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
@@ -768,9 +768,9 @@ class Game extends \Table
                     $notificationSent = true;
                 };
                 if ($_this->gamestate->state()['name'] == 'interrupt') {
+                    $skill['sendNotification']();
                     $_this->actInterrupt->actInterrupt($skillId);
                     $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
-                    $skill['sendNotification']();
                 }
                 if (!array_key_exists('interruptState', $skill) || (in_array('interrupt', $skill['state']) && $finalizeInterrupt)) {
                     // var_dump(json_encode([array_key_exists('onUse', $skill)]));
@@ -930,6 +930,7 @@ class Game extends \Table
                 $this->hooks->onActDraw($data);
                 $card = [];
                 if (!$data['cancel']) {
+                    $this->incStat(1, 'cards_drawn', $this->character->getSubmittingCharacter()['playerId']);
                     $card = $this->decks->pickCard($deck);
                     $this->eventLog(clienttranslate('${character_name} draws from the ${deck} deck'), [
                         'deck' => $this->decks->getDeckName($deck),
@@ -2085,8 +2086,7 @@ class Game extends \Table
 
             $this->notify('updateKnowledgeTree', '', ['gameData' => $result]);
         }
-        if (!in_array($this->gamestate->state()['name'], ['characterSelect'])) {
-            //, 'interrupt'
+        if (!in_array($this->gamestate->state()['name'], ['characterSelect', 'interrupt'])) {
             $availableUnlocks = $this->data->getValidKnowledgeTree();
             $result = [
                 'tradeRatio' => $this->getTradeRatio(),
@@ -2218,9 +2218,11 @@ class Game extends \Table
         $this->initStat('table', 'day_number', 1);
         $this->initStat('player', 'damage_done', 0);
         $this->initStat('player', 'health_lost', 0);
+        $this->initStat('player', 'health_gained', 0);
         $this->initStat('player', 'actions_used', 0);
         $this->initStat('player', 'stamina_used', 0);
         $this->initStat('player', 'resources_collected', 0);
+        $this->initStat('player', 'cards_drawn', 0);
         $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         $this->reloadPlayersBasicInfos();
 

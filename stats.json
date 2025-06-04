@@ -31,6 +31,16 @@
             "id": 14,
             "name": "Actions Used",
             "type": "int"
+        },
+        "health_gained": {
+            "id": 15,
+            "name": "Health Gained",
+            "type": "int"
+        },
+        "cards_drawn": {
+            "id": 16,
+            "name": "Cards Drawn",
+            "type": "int"
         }
     }
 }

@@ -341,9 +341,9 @@ class DLD_CharactersData
                 // If using an herb to clear a physical hindrance gain a health
                 'onUseHerb' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
-                        $game->character->adjustHealth($char['id'], 1);
+                        $change = $game->character->adjustHealth($char['id'], 1);
                         $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                            'count' => 1,
+                            'count' => $change,
                             'character_resource' => clienttranslate('Health'),
                         ]);
                     }
@@ -817,9 +817,9 @@ class DLD_CharactersData
                         'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['id']) {
-                                $game->character->adjustHealth($data['characterId'], 1);
+                                $change = $game->character->adjustHealth($data['characterId'], 1);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                    'count' => 1,
+                                    'count' => $change,
                                     'character_resource' => clienttranslate('Health'),
                                     'character_name' => $game->getCharacterHTML($data['characterId']),
                                 ]);
@@ -879,9 +879,9 @@ class DLD_CharactersData
                                 })
                             ) == 0
                         ) {
-                            $game->character->adjustHealth($char['character_name'], 1);
+                            $change = $game->character->adjustHealth($char['character_name'], 1);
                             $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                'count' => 1,
+                                'count' => $change,
                                 'character_resource' => clienttranslate('Health'),
                             ]);
                         }
@@ -1200,9 +1200,9 @@ class DLD_CharactersData
                             $value = $game->rollFireDie($skill['name'], $skill['characterId']);
                             usePerDay($skill['id'], $game);
                             if ($value == 0) {
-                                $game->character->getActiveStamina(2);
+                                $change = $game->character->getActiveStamina(2);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                    'count' => 2,
+                                    'count' => $change,
                                     'character_resource' => clienttranslate('Stamina'),
                                 ]);
                             } else {
@@ -1389,6 +1389,7 @@ class DLD_CharactersData
                 'slots' => ['weapon'],
                 'onDraw' => function (Game $game, $char, &$data) {
                     $card = $data['card'];
+                    $game->log('onDraw check', $char['isActive'], $card);
                     if ($char['isActive'] && $card['type'] == 'berry') {
                         if ($game->character->adjustActiveHealth(1) == 1) {
                             $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
@@ -1419,11 +1420,12 @@ class DLD_CharactersData
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->adjustResource($data['data']['card']['resourceType'], $data['data']['card']['count']);
                                 $game->eventLog(clienttranslate('${character_name} doubled the resources they found'));
+                                return ['notify' => false];
                             }
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            return $char['isActive'];
+                            return $char['isActive'] && $char['stamina'] >= $skill['stamina'];
                         },
                     ],
                 ],
@@ -1605,40 +1607,49 @@ class DLD_CharactersData
                         'name' => clienttranslate('Take Damage'),
                         'state' => ['interrupt'],
                         // 'interruptState' => ['playerTurn'],
-                        'interruptState' => ['drawCard'],
+                        'interruptState' => ['resolveEncounter'],
                         'health' => 0,
                         'onGetActionCost' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            $interruptState = $game->actInterrupt->getState('actUseSkill');
+                            $interruptState = $game->actInterrupt->getState('stResolveEncounter');
+                            // $game->log('$interruptState', $interruptState);
                             if (
                                 !$char['isActive'] &&
                                 $data['action'] == 'actUseSkill' &&
                                 $data['subAction'] == $skill['id'] &&
                                 $interruptState &&
-                                array_key_exists('data', $interruptState) &&
-                                $interruptState['data']['skillId'] == $skill['id']
+                                array_key_exists('skills', $interruptState) &&
+                                sizeof(
+                                    array_filter($interruptState['skills'], function ($d) {
+                                        return $d['id'];
+                                    })
+                                ) > 0
                             ) {
                                 $damageTaken = $game->encounter->countDamageTaken($interruptState['data']);
                                 $data['health'] = $damageTaken;
+                                // $interruptState['data']['willTakeDamage'] = 0;
+                                // $game->actInterrupt->setState('stResolveEncounter', $interruptState);
                             }
                         },
                         'onEncounterPre' => function (Game $game, $skill, &$data) {
                             $damageTaken = $game->encounter->countDamageTaken($data);
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            if (!$char['isActive'] && $damageTaken > 0) {
+                            if (!$char['isActive'] && $damageTaken > 0 && !$data['damageStamina']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                            // $game->log('stResolveEncounter onInterrupt', $skill, $activatedSkill, $data);
                             if ($skill['id'] == $activatedSkill['id']) {
+                                $data['data']['damagedCharacter'] = $skill['characterId'];
                                 $damageTaken = $game->encounter->countDamageTaken($data['data']);
-                                $game->character->adjustHealth($skill['characterId'], $damageTaken);
+                                $change = $game->character->adjustHealth($skill['characterId'], -$damageTaken);
                                 $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
-                                    'count' => 1,
+                                    'count' => -$change,
                                     'character_resource' => clienttranslate('Health'),
-                                    'character_name' => 'Vog',
+                                    'character_name' => $game->getCharacterHTML($skill['characterId']),
                                 ]);
-                                $data['data']['willTakeDamage'] = 0;
+                                // $data['data']['willTakeDamage'] = 0;
                             }
                         },
                         'onUse' => function (Game $game, $skill) {
@@ -1944,14 +1955,16 @@ class DLD_CharactersData
                     'skill1' => [
                         'type' => 'skill',
                         'state' => ['playerTurn'],
-                        'name' => str_replace('${name}', 'Tooth', clienttranslate('Pet ${name}')),
+                        'name' => clienttranslate('Pet Tooth'),
                         'stamina' => 2,
                         'global' => true,
                         'onUse' => function (Game $game, $skill) {
+                            $skill['sendNotification']();
                             // $game->character->adjustStamina($game->character->getTurnCharacterId(), -2);
-                            $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
+
+                            $change = $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
                             $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                'count' => 1,
+                                'count' => $change,
                                 'character_resource' => clienttranslate('Health'),
                             ]);
                             // return ['spendActionCost' => false];
@@ -1993,7 +2006,7 @@ class DLD_CharactersData
                 'onUnlock' => function (Game $game, $char, &$data) {
                     if ($data['id'] == 'relaxation') {
                         // $game->log('relaxation', $data, $char);
-                        $game->character->adjustHealth($char['id'], 10);
+                        $game->character->adjustHealth($char['id'], 20);
                         $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => clienttranslate('full'),
                             'character_resource' => clienttranslate('Health'),
@@ -2083,7 +2096,7 @@ class DLD_CharactersData
                 'stamina' => '5',
                 'name' => 'Yurt',
                 'slots' => ['weapon', 'tool'],
-                'onCraft' => function (Game $game, $char, &$data) {
+                'onCraftPost' => function (Game $game, $char, &$data) {
                     // Choose tribe member to gain 1 hp or 1 stamina
                     // $data['interrupt'] = true;
                     $game->selectionStates->initiateState(
@@ -2094,6 +2107,7 @@ class DLD_CharactersData
                         ],
                         $char['id'],
                         false,
+                        'playerTurn',
                         clienttranslate('Give Character 1 Health or Stamina')
                     );
                     // $game->actInterrupt->addSkillInterrupt($skill);
@@ -2111,9 +2125,9 @@ class DLD_CharactersData
                                 $game->character->setSubmittingCharacter('actUseSkill', $activatedSkill['id']);
                                 $this->clearCharacterSkills($data['skills'], $skill['characterId']);
                                 $state = $game->selectionStates->getState('characterSelection');
-                                $game->character->adjustHealth($state['selectedCharacterId'], 1);
+                                $change = $game->character->adjustHealth($state['selectedCharacterId'], 1);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                    'count' => 1,
+                                    'count' => $change,
                                     'character_resource' => clienttranslate('Health'),
                                     'character_name' => $state['selectedCharacterId'],
                                 ]);
@@ -2123,23 +2137,6 @@ class DLD_CharactersData
                         'requires' => function (Game $game, $skill) {
                             return true;
                         },
-                        // 'onCraft' => function (Game $game, $skill, &$data) {
-                        // Choose tribe member to gain 1 hp or 1 stamina
-                        // $data['interrupt'] = true;
-                        // $game->selectionStates->initiateState(
-                        //     'characterSelection',
-                        //     [
-                        //         'selectableCharacters' => $game->character->getAllCharacterIds(),
-                        //         'id' => $skill['characterId'] . 'craft',
-                        //     ],
-                        //     $skill['characterId'],
-                        //     false,
-                        //     null
-                        // );
-                        // $game->actInterrupt->addSkillInterrupt($skill);
-                        // $char = $game->character->getCharacterData($skill['characterId']);
-                        // $game->actInterrupt->addSkillInterrupt($char['skills']['Yurtskill2']);
-                        // },
                         'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['characterId'] . 'craft') {
@@ -2157,9 +2154,9 @@ class DLD_CharactersData
                                 $game->character->setSubmittingCharacter('actUseSkill', $activatedSkill['id']);
                                 $this->clearCharacterSkills($data['skills'], $skill['characterId']);
                                 $state = $game->selectionStates->getState('characterSelection');
-                                $game->character->adjustStamina($state['selectedCharacterId'], 1);
+                                $change = $game->character->adjustStamina($state['selectedCharacterId'], 1);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                    'count' => 1,
+                                    'count' => $change,
                                     'character_resource' => clienttranslate('Stamina'),
                                     'character_name' => $state['selectedCharacterId'],
                                 ]);

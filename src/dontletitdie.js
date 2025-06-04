@@ -413,6 +413,20 @@ declare('bgagame.dontletitdie', Gamegui, {
   updateResources: async function (gameData) {
     if (!gameData || !gameData.resourcesAvailable) return;
     const promises = [];
+    const resourcesForDisplay = this.getResourcesForDisplay(gameData);
+
+    let sideTokenContainer = document.querySelector(`#token-container .resources`);
+    if (!sideTokenContainer) {
+      $('player_boards').insertAdjacentHTML(
+        'beforeend',
+        `<div id="token-container" class="player-board"><div class="resource-title">Resources</div><div class="resources"></div></div>`,
+      );
+      sideTokenContainer = document.querySelector(`#token-container .resources`);
+    }
+    sideTokenContainer.innerHTML = '';
+    resourcesForDisplay
+      .filter((elem) => !elem.includes('trap') && gameData.resources[elem] > 0)
+      .forEach((name) => this.updateResource(name, sideTokenContainer, gameData.resources[name] ?? 0, { scale: 4 }));
 
     // Shared Resource Pool
     let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
@@ -424,7 +438,6 @@ declare('bgagame.dontletitdie', Gamegui, {
       sharedElem = document.querySelector(`#shared-resource-container .tokens`);
     }
     sharedElem.innerHTML = '';
-    const resourcesForDisplay = this.getResourcesForDisplay(gameData);
     resourcesForDisplay
       .filter((elem) => !elem.includes('trap'))
       .forEach((name) => this.updateResource(name, sharedElem, gameData.resources[name] ?? 0));
@@ -543,7 +556,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     // }
     await Promise.all(promises);
   },
-  updateResource: function (name, elem, count, { warn = false } = {}) {
+  updateResource: function (name, elem, count, { warn = false, scale = 2 } = {}) {
     elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"><div class="counter dot dot--number">${count}</div></div>`);
     if (warn) {
       this.addHelpTooltip({
@@ -554,7 +567,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         iconCSS: 'fa fa-fire dld-warning',
       });
     }
-    renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
+    renderImage(name, elem.querySelector(`.token.${name}`), { scale, pos: 'insert' });
   },
   updateItems: function (gameData) {
     let campElem = document.querySelector(`#camp-items-container .items`);

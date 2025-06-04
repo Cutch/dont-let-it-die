@@ -322,9 +322,9 @@ class DLD_ExpansionData
                         'name' => clienttranslate('The only good snake'),
                         'state' => ['dayEvent'],
                         'onUse' => function (Game $game, $skill) {
-                            $game->character->adjustActiveStamina(2);
+                            $change = $game->character->adjustActiveStamina(2);
                             $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                'count' => 2,
+                                'count' => $change,
                                 'character_resource' => clienttranslate('Stamina'),
                             ]);
                             return ['notify' => false];
@@ -419,15 +419,17 @@ class DLD_ExpansionData
                         'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['id']) {
-                                $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
-                                $game->character->adjustHealth($data['characterId'], 1);
+                                $change1 = $game->character->adjustHealth($game->character->getTurnCharacterId(), 1);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                    'count' => 1,
+                                    'count' => $change1,
                                     'character_resource' => clienttranslate('Health'),
+                                    'character_name' => $game->getCharacterHTML($game->character->getTurnCharacterId()),
                                 ]);
+                                $change2 = $game->character->adjustHealth($data['characterId'], 1);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                                    'count' => 1,
+                                    'count' => $change2,
                                     'character_resource' => clienttranslate('Health'),
+                                    'character_name' => $game->getCharacterHTML($data['characterId']),
                                 ]);
                             }
                         },

@@ -149,3 +149,17 @@
     position: absolute;
   }
 }
+
+#token-container {
+  .resource-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+    padding: 0 0.25rem;
+  }
+  .resources {
+    display: flex;
+    gap: 10px 16px;
+    flex-flow: wrap;
+    padding: 10px 4px;
+  }
+}

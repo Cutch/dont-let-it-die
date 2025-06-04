@@ -108,10 +108,10 @@ class DLD_SelectionStates
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 if (array_key_exists('health', $data)) {
-                    $this->game->character->adjustActiveHealth($data['health']);
+                    $data['health'] = $this->game->character->adjustActiveHealth($data['health']);
                 }
                 if (array_key_exists('stamina', $data)) {
-                    $this->game->character->adjustActiveStamina($data['stamina']);
+                    $data['stamina'] = $this->game->character->adjustActiveStamina($data['stamina']);
                 }
                 $left = $this->game->adjustResource($data['type'], -$data['count'])['left'];
                 if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {

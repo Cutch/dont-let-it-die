@@ -66,6 +66,7 @@ class DLD_ActInterrupt
                 // Goto the skill screen
                 if ($this->game->gamestate->state()['name'] === $currentState) {
                     $this->game->nextState('interrupt');
+                    $this->game->completeAction(false);
                 }
             }
         } elseif (
@@ -311,21 +312,21 @@ class DLD_ActInterrupt
         }
         $data = $state['data'];
         $this->game->getAllPlayers($data);
-        $this->game->log('argInterrupt', ['action' => 'argInterrupt', 'state' => $data]);
+        // $this->game->log('argInterrupt', ['action' => 'argInterrupt', 'state' => $data]);
 
         array_walk($data['skills'], function (&$skill) {
             $this->game->hooks->reconnectHooks($skill, $this->game->character->getSkill($skill['id'])['skill']);
         });
 
-        $this->game->log(
-            'interrupt skills',
-            $this->game->actions->wrapSkills(
-                array_filter($data['skills'], function ($skill) {
-                    return $skill['type'] == 'skill';
-                }),
-                'actUseSkill'
-            )
-        );
+        // $this->game->log(
+        //     'interrupt skills',
+        //     $this->game->actions->wrapSkills(
+        //         array_filter($data['skills'], function ($skill) {
+        //             return $skill['type'] == 'skill';
+        //         }),
+        //         'actUseSkill'
+        //     )
+        // );
         return [
             ...$data,
             'character_name' => $this->game->getCharacterHTML(),

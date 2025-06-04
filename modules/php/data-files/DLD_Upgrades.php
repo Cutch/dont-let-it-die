@@ -400,9 +400,9 @@ class DLD_UpgradesData
                     $state = $game->selectionStates->getState('characterSelection');
                     if ($state && $state['id'] == $unlock['id']) {
                         $aboveMax = $state['aboveMax'];
-                        $game->character->adjustHealth($data['characterId'], $aboveMax);
+                        $change = $game->character->adjustHealth($data['characterId'], $aboveMax);
                         $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
-                            'count' => $aboveMax,
+                            'count' => $change,
                             'character_resource' => clienttranslate('Health'),
                         ]);
                     }
@@ -549,7 +549,7 @@ class DLD_UpgradesData
                 'name' => clienttranslate('Meditation'),
                 'unlockCost' => 5,
                 'onUse' => function (Game $game, $unlock) {
-                    $game->character->adjustAllHealth(10);
+                    $game->character->adjustAllHealth(20);
                     $game->notify('tree', clienttranslate('Everyone gained ${count} ${character_resource}'), [
                         'count' => clienttranslate('full'),
                         'character_resource' => clienttranslate('Health'),
