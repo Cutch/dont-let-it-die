@@ -128,19 +128,24 @@ declare('bgagame.dontletitdie', Gamegui, {
       */
   updatePlayers: function (gameData) {
     // If character selection, keep removing characters
-    if (gameData.gamestate?.name === 'characterSelect') document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
+    if (gameData.gamestate?.name === 'characterSelect' || this.refreshCharacters) {
+      document.querySelectorAll('.character-side-container').forEach((el) => el.remove());
+      this.refreshCharacters = false;
+    }
     const scale = 3;
-    Object.values(gameData?.characters ?? this.selectedCharacters).forEach((character, i) => {
-      // Player side board
-      const playerPanel = this.getPlayerPanelElement(character.playerId);
-      const equipments = character.equipment;
-      const hindrance = [...character.physicalHindrance, ...character.mentalHindrance];
-      const characterSideId = `player-side-${character.playerId}-${character.name}`;
-      const playerSideContainer = $(characterSideId);
-      if (!playerSideContainer) {
-        playerPanel.insertAdjacentHTML(
-          'beforeend',
-          `<div id="${characterSideId}" class="character-side-container">
+    Object.values(gameData?.characters ?? this.selectedCharacters)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach((character, i) => {
+        // Player side board
+        const playerPanel = this.getPlayerPanelElement(character.playerId);
+        const equipments = character.equipment;
+        const hindrance = [...character.physicalHindrance, ...character.mentalHindrance];
+        const characterSideId = `player-side-${character.playerId}-${character.name}`;
+        const playerSideContainer = $(characterSideId);
+        if (!playerSideContainer) {
+          playerPanel.insertAdjacentHTML(
+            'beforeend',
+            `<div id="${characterSideId}" class="character-side-container">
             <div class="character-name">${character.name}<span class="first-player-marker"></span></div>
             <div class="health line"><div class="fa fa-heart"></div><span class="label">${_(
               'Health',
@@ -156,82 +161,84 @@ declare('bgagame.dontletitdie', Gamegui, {
             }"><div class="fa fa-ban"></div><span class="label">${_('Hindrance')}: </span><span class="value"></span></div>
             <div class="character-image"></div>
           </div>`,
-        );
-        renderImage('skull', document.querySelector(`#${characterSideId} .first-player-marker`), {
-          scale: 20,
-          pos: 'replace',
-          card: false,
-          css: 'side-panel-skull',
-        });
-        playerSideContainer = $(characterSideId);
-        addClickListener(playerSideContainer.querySelector(`.character-name`), character.name, () => {
-          this.tooltip.show();
-          renderImage(character.name, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
-        });
-        renderImage(character.name, playerSideContainer.querySelector(`.character-image`), {
-          scale: 3,
-          overridePos: {
-            x: 0.2,
-            y: 0.16,
-            w: 0.8,
-            h: 0.45,
-          },
-        });
-        addClickListener(playerSideContainer.querySelector(`.character-image`), character.name, () => {
-          this.tooltip.show();
-          renderImage(character.name, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
-        });
-      }
-      playerSideContainer.querySelector(`.health .value`).innerHTML = `${character.health ?? 0}/${character.maxHealth ?? 0}`;
-      playerSideContainer.querySelector(`.stamina .value`).innerHTML = `${character.stamina ?? 0}/${character.maxStamina ?? 0}`;
+          );
+          if (gameData.gamestate?.name !== 'characterSelect')
+            renderImage('skull', document.querySelector(`#${characterSideId} .first-player-marker`), {
+              scale: 20,
+              pos: 'replace',
+              card: false,
+              css: 'side-panel-skull',
+            });
+          playerSideContainer = $(characterSideId);
+          addClickListener(playerSideContainer.querySelector(`.character-name`), character.name, () => {
+            this.tooltip.show();
+            renderImage(character.name, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
+          });
+          renderImage(character.name, playerSideContainer.querySelector(`.character-image`), {
+            scale: 3,
+            overridePos: {
+              x: 0.2,
+              y: 0.16,
+              w: 0.8,
+              h: 0.45,
+            },
+          });
+          addClickListener(playerSideContainer.querySelector(`.character-image`), character.name, () => {
+            this.tooltip.show();
+            renderImage(character.name, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
+          });
+        }
+        playerSideContainer.querySelector(`.health .value`).innerHTML = `${character.health ?? 0}/${character.maxHealth ?? 0}`;
+        playerSideContainer.querySelector(`.stamina .value`).innerHTML = `${character.stamina ?? 0}/${character.maxStamina ?? 0}`;
 
-      playerSideContainer.querySelector(`.equipment .value`).innerHTML =
-        [
-          ...equipments,
-          ...character.dayEvent,
-          ...character.necklaces,
-          ...(gameData.foreverUseItems?.['hide-token'] && character.name == 'Loka'
-            ? [{ itemId: 'hide', name: `${_('Hide')} (${gameData.foreverUseItems['hide-token']})` }]
-            : []),
-        ]
-          .map((d) => `<span class="equipment-item equipment-${d.itemId}">${_(d.name)}</span>`)
-          .join(', ') || _('None');
-      playerSideContainer.querySelector(`.hindrance .value`).innerHTML =
-        hindrance.map((d) => `<span class="hindrance-item hindrance-${d.id}">${_(d.name)}</span>`).join(', ') || _('None');
-      playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
-      [...equipments, ...character.dayEvent, ...character.necklaces].forEach((d) => {
-        addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), _(d.name), () => {
-          this.tooltip.show();
-          renderImage(d.id, this.tooltip.renderByElement(), {
-            withText: true,
-            type: 'tooltip-item',
-            pos: 'replace',
-            rotate: d.rotate,
-            centered: true,
+        playerSideContainer.querySelector(`.equipment .value`).innerHTML =
+          [
+            ...equipments,
+            ...character.dayEvent,
+            ...character.necklaces,
+            ...(gameData.foreverUseItems?.['hide-token'] && character.name == 'Loka'
+              ? [{ itemId: 'hide', name: `${_('Hide')} (${gameData.foreverUseItems['hide-token']})` }]
+              : []),
+          ]
+            .map((d) => `<span class="equipment-item equipment-${d.itemId}">${_(d.name)}</span>`)
+            .join(', ') || _('None');
+        playerSideContainer.querySelector(`.hindrance .value`).innerHTML =
+          hindrance.map((d) => `<span class="hindrance-item hindrance-${d.id}">${_(d.name)}</span>`).join(', ') || _('None');
+        if (gameData.gamestate?.name !== 'characterSelect')
+          playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
+        [...equipments, ...character.dayEvent, ...character.necklaces].forEach((d) => {
+          addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), _(d.name), () => {
+            this.tooltip.show();
+            renderImage(d.id, this.tooltip.renderByElement(), {
+              withText: true,
+              type: 'tooltip-item',
+              pos: 'replace',
+              rotate: d.rotate,
+              centered: true,
+            });
           });
         });
-      });
-      hindrance.forEach((d) => {
-        addClickListener(playerSideContainer.querySelector(`.hindrance-${d.id}`), _(d.name), () => {
-          this.tooltip.show();
-          renderImage(d.id, this.tooltip.renderByElement(), {
-            withText: true,
-            type: 'tooltip-hindrance',
-            pos: 'replace',
-            rotate: d.rotate,
-            centered: true,
+        hindrance.forEach((d) => {
+          addClickListener(playerSideContainer.querySelector(`.hindrance-${d.id}`), _(d.name), () => {
+            this.tooltip.show();
+            renderImage(d.id, this.tooltip.renderByElement(), {
+              withText: true,
+              type: 'tooltip-hindrance',
+              pos: 'replace',
+              rotate: d.rotate,
+              centered: true,
+            });
           });
         });
-      });
 
-      document.querySelector(`#${characterSideId} .first-player-marker`).style['display'] = character?.isFirst ? 'inline-block' : 'none';
-      // Player main board
-      if (gameData.gamestate.name !== 'characterSelect') {
-        const container = $(`player-container-${Math.floor(i / 2) + 1}`);
-        if (container && !$(`player-${character.name}`)) {
-          container.insertAdjacentHTML(
-            'beforeend',
-            `<div id="player-${character.name}" class="player-card">
+        document.querySelector(`#${characterSideId} .first-player-marker`).style['display'] = character?.isFirst ? 'inline-block' : 'none';
+        // Player main board
+        if (gameData.gamestate.name !== 'characterSelect') {
+          const container = $(`player-container-${Math.floor(i / 2) + 1}`);
+          if (container && !$(`player-${character.name}`)) {
+            container.insertAdjacentHTML(
+              'beforeend',
+              `<div id="player-${character.name}" class="player-card">
                 <div class="card-extra-container"></div>
                 <div class="card"><div class="first-player-marker"></div><div class="extra-token"></div></div>
                 <div class="color-marker" style="background-color: #${character.playerColor}"></div>
@@ -243,155 +250,155 @@ declare('bgagame.dontletitdie', Gamegui, {
                 <div class="weapon" style="top: ${(60 * 4) / scale}px;left: ${(125 * 4) / scale}px"></div>
                 <div class="tool" style="top: ${(60 * 4) / scale}px;left: ${(242.5 * 4) / scale}px"></div>
               </div>`,
-          );
-          // <div class="slot3" style="top: ${(80 * 4) / scale}px;left: ${(183 * 4) / scale}px"></div>
-          renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), { scale, pos: 'insert' });
-          renderImage('skull', document.querySelector(`#player-${character.name} .first-player-marker`), { scale: 8, pos: 'replace' });
-        }
-        document.querySelector(`#player-${character.name} .card`).style['outline'] = character?.isActive
-          ? `5px solid #fff` //#${character.playerColor}
-          : '';
-        document.querySelector(`#player-${character.name} .first-player-marker`).style['display'] = character?.isFirst ? 'block' : 'none';
-
-        const extraTokenElem = document.querySelector(`#player-${character.name} .extra-token`);
-        extraTokenElem.innerHTML = '';
-        if (gameData.foreverUseItems?.['hide-token'] && character.name == 'Loka') {
-          this.updateResource('hide', extraTokenElem, gameData.foreverUseItems['hide-token']);
-        }
-
-        document.querySelector(`#player-${character.name} .max-health.max-marker`).style = `left: ${Math.round(
-          ((character.maxHealth ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale,
-        )}px;top: ${Math.round((10 * 4) / scale)}px`;
-        document.querySelector(`#player-${character.name} .health.marker`).style = `background-color: #${character.playerColor};left: ${
-          Math.round(((character.health ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale) + 2
-        }px;top: ${Math.round((10 * 4) / scale) + 2 + (character.health == 0 ? (3 * 4) / scale : 0)}px`;
-        document.querySelector(`#player-${character.name} .max-stamina.max-marker`).style = `left: ${Math.round(
-          ((character.maxStamina ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale,
-        )}px;top: ${Math.round((34.5 * 4) / scale)}px`;
-        document.querySelector(`#player-${character.name} .stamina.marker`).style = `background-color: #${character.playerColor};left: ${
-          Math.round(((character.stamina ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale) + 2
-        }px;top: ${Math.round((34.5 * 4) / scale) + 2 - (character.stamina == 0 ? (3 * 4) / scale : 0)}px`;
-        const characterElem = document.querySelector(`#player-${character.name} > .character`);
-        renderImage(character.name, characterElem, { scale, pos: 'replace' });
-        addClickListener(characterElem, character.name, () => {
-          this.tooltip.show();
-          renderImage(character.name, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
-        });
-        const coverElem = document.createElement('div');
-        characterElem.appendChild(coverElem);
-        // const coverElem = characterElem.querySelector(`.cover`);
-        coverElem.classList.add('cover');
-        if (character.incapacitated) {
-          if ((character.health ?? 0) > 0) {
-            coverElem.innerHTML = _('Recovering');
-            if (!coverElem.classList.contains('healing')) coverElem.classList.add('healing');
-          } else if (!coverElem.classList.contains('incapacitated')) {
-            coverElem.innerHTML = _('Incapacitated');
-            coverElem.classList.add('incapacitated');
+            );
+            // <div class="slot3" style="top: ${(80 * 4) / scale}px;left: ${(183 * 4) / scale}px"></div>
+            renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), { scale, pos: 'insert' });
+            renderImage('skull', document.querySelector(`#player-${character.name} .first-player-marker`), { scale: 8, pos: 'replace' });
           }
-        } else {
-          if ((character.health ?? 0) > 0) {
-            if (coverElem.classList.contains('healing')) coverElem.classList.remove('healing');
-          } else if (coverElem.classList.contains('incapacitated')) {
-            coverElem.classList.remove('incapacitated');
+          document.querySelector(`#player-${character.name} .card`).style['outline'] = character?.isActive
+            ? `5px solid #fff` //#${character.playerColor}
+            : '';
+          document.querySelector(`#player-${character.name} .first-player-marker`).style['display'] = character?.isFirst ? 'block' : 'none';
+
+          const extraTokenElem = document.querySelector(`#player-${character.name} .extra-token`);
+          extraTokenElem.innerHTML = '';
+          if (gameData.foreverUseItems?.['hide-token'] && character.name == 'Loka') {
+            this.updateResource('hide', extraTokenElem, gameData.foreverUseItems['hide-token']);
           }
-        }
 
-        const renderedItems = [];
-        const weapon = equipments.find((d) => d.itemType === 'weapon');
-        if (weapon) {
-          renderedItems.push(weapon);
-          renderImage(weapon.id, document.querySelector(`#player-${character.name} > .weapon`), {
-            scale: scale,
-            pos: 'replace',
-          });
-          addClickListener(document.querySelector(`#player-${character.name} > .weapon`), _(weapon.name), () => {
+          document.querySelector(`#player-${character.name} .max-health.max-marker`).style = `left: ${Math.round(
+            ((character.maxHealth ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale,
+          )}px;top: ${Math.round((10 * 4) / scale)}px`;
+          document.querySelector(`#player-${character.name} .health.marker`).style = `background-color: #${character.playerColor};left: ${
+            Math.round(((character.health ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale) + 2
+          }px;top: ${Math.round((10 * 4) / scale) + 2 + (character.health == 0 ? (3 * 4) / scale : 0)}px`;
+          document.querySelector(`#player-${character.name} .max-stamina.max-marker`).style = `left: ${Math.round(
+            ((character.maxStamina ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale,
+          )}px;top: ${Math.round((34.5 * 4) / scale)}px`;
+          document.querySelector(`#player-${character.name} .stamina.marker`).style = `background-color: #${character.playerColor};left: ${
+            Math.round(((character.stamina ?? 0) * 20.85 * 4) / scale + (126.5 * 4) / scale) + 2
+          }px;top: ${Math.round((34.5 * 4) / scale) + 2 - (character.stamina == 0 ? (3 * 4) / scale : 0)}px`;
+          const characterElem = document.querySelector(`#player-${character.name} > .character`);
+          renderImage(character.name, characterElem, { scale, pos: 'replace' });
+          addClickListener(characterElem, character.name, () => {
             this.tooltip.show();
-            renderImage(weapon.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-item', pos: 'replace' });
+            renderImage(character.name, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-character', pos: 'replace' });
           });
-        } else {
-          document.querySelector(`#player-${character.name} > .weapon`).innerHTML = '';
-        }
+          const coverElem = document.createElement('div');
+          characterElem.appendChild(coverElem);
+          // const coverElem = characterElem.querySelector(`.cover`);
+          coverElem.classList.add('cover');
+          if (character.incapacitated) {
+            if ((character.health ?? 0) > 0) {
+              coverElem.innerHTML = _('Recovering');
+              if (!coverElem.classList.contains('healing')) coverElem.classList.add('healing');
+            } else if (!coverElem.classList.contains('incapacitated')) {
+              coverElem.innerHTML = _('Incapacitated');
+              coverElem.classList.add('incapacitated');
+            }
+          } else {
+            if ((character.health ?? 0) > 0) {
+              if (coverElem.classList.contains('healing')) coverElem.classList.remove('healing');
+            } else if (coverElem.classList.contains('incapacitated')) {
+              coverElem.classList.remove('incapacitated');
+            }
+          }
 
-        const tool = equipments.find((d) => d.itemType === 'tool');
-        if (tool) {
-          renderedItems.push(tool);
-          renderImage(tool.id, document.querySelector(`#player-${character.name} > .tool`), {
-            scale: scale,
-            pos: 'replace',
-          });
-          addClickListener(document.querySelector(`#player-${character.name} > .tool`), _(tool.name), () => {
-            this.tooltip.show();
-            renderImage(tool.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-item', pos: 'replace' });
-          });
-        } else {
-          document.querySelector(`#player-${character.name} > .tool`).innerHTML = '';
-        }
-        const item3 = equipments.find((d) => !renderedItems.includes(d));
-        const extraContainerButtons = document.querySelector(`#player-${character.name} .card-extra-container`);
-        extraContainerButtons.innerHTML = '';
-        extraContainerButtons.insertAdjacentHTML(
-          'beforeend',
-          `<div class="card-extra-equipment">${_('Extra Equipment')} (<span>0</span>)</div>
+          const renderedItems = [];
+          const weapon = equipments.find((d) => d.itemType === 'weapon');
+          if (weapon) {
+            renderedItems.push(weapon);
+            renderImage(weapon.id, document.querySelector(`#player-${character.name} > .weapon`), {
+              scale: scale,
+              pos: 'replace',
+            });
+            addClickListener(document.querySelector(`#player-${character.name} > .weapon`), _(weapon.name), () => {
+              this.tooltip.show();
+              renderImage(weapon.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-item', pos: 'replace' });
+            });
+          } else {
+            document.querySelector(`#player-${character.name} > .weapon`).innerHTML = '';
+          }
+
+          const tool = equipments.find((d) => d.itemType === 'tool');
+          if (tool) {
+            renderedItems.push(tool);
+            renderImage(tool.id, document.querySelector(`#player-${character.name} > .tool`), {
+              scale: scale,
+              pos: 'replace',
+            });
+            addClickListener(document.querySelector(`#player-${character.name} > .tool`), _(tool.name), () => {
+              this.tooltip.show();
+              renderImage(tool.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-item', pos: 'replace' });
+            });
+          } else {
+            document.querySelector(`#player-${character.name} > .tool`).innerHTML = '';
+          }
+          const item3 = equipments.find((d) => !renderedItems.includes(d));
+          const extraContainerButtons = document.querySelector(`#player-${character.name} .card-extra-container`);
+          extraContainerButtons.innerHTML = '';
+          extraContainerButtons.insertAdjacentHTML(
+            'beforeend',
+            `<div class="card-extra-equipment">${_('Extra Equipment')} (<span>0</span>)</div>
               <div class="card-hindrance">${_('Hindrance')} (<span>0</span>)</div>`,
-        );
-        // if (item3) {
-        //   renderedItems.push(item3);
-        //   renderImage(item3.id, document.querySelector(`#player-${character.name} > .slot3`), {
-        //     scale: scale / 2,
-        //     pos: 'replace',
-        //   });
-        //   addClickListener(document.querySelector(`#player-${character.name} > .slot3`), item3.name, () => {
-        //     this.tooltip.show();
-        //     renderImage(item3.id, this.tooltip.renderByElement(), {withText: true,  type: 'tooltip-item', pos: 'replace' });
-        //   });
-        // }
-        const extraEquipmentElem = extraContainerButtons.querySelector(`.card-extra-equipment`);
-        extraEquipmentElem.style['display'] = !!item3 || character.dayEvent.length > 0 || character.necklaces.length > 0 ? `` : 'none';
-        extraEquipmentElem.querySelector('span').innerHTML = (!!item3 ? 1 : 0) + character.dayEvent.length + character.necklaces.length;
-        addClickListener(extraEquipmentElem, _('Extra Equipment'), () => {
-          this.tooltip.show();
-          if (item3)
-            renderImage(item3.id, this.tooltip.renderByElement(), {
-              withText: true,
-              type: 'tooltip-item',
-              pos: 'append',
-              rotate: item3.rotate,
-              centered: true,
-            });
-          [...character.dayEvent, ...character.necklaces].forEach((dayEvent) => {
-            renderImage(dayEvent.id, this.tooltip.renderByElement(), {
-              withText: true,
-              type: 'tooltip-item',
-              pos: 'append',
-              rotate: dayEvent.rotate,
-              centered: true,
+          );
+          // if (item3) {
+          //   renderedItems.push(item3);
+          //   renderImage(item3.id, document.querySelector(`#player-${character.name} > .slot3`), {
+          //     scale: scale / 2,
+          //     pos: 'replace',
+          //   });
+          //   addClickListener(document.querySelector(`#player-${character.name} > .slot3`), item3.name, () => {
+          //     this.tooltip.show();
+          //     renderImage(item3.id, this.tooltip.renderByElement(), {withText: true,  type: 'tooltip-item', pos: 'replace' });
+          //   });
+          // }
+          const extraEquipmentElem = extraContainerButtons.querySelector(`.card-extra-equipment`);
+          extraEquipmentElem.style['display'] = !!item3 || character.dayEvent.length > 0 || character.necklaces.length > 0 ? `` : 'none';
+          extraEquipmentElem.querySelector('span').innerHTML = (!!item3 ? 1 : 0) + character.dayEvent.length + character.necklaces.length;
+          addClickListener(extraEquipmentElem, _('Extra Equipment'), () => {
+            this.tooltip.show();
+            if (item3)
+              renderImage(item3.id, this.tooltip.renderByElement(), {
+                withText: true,
+                type: 'tooltip-item',
+                pos: 'append',
+                rotate: item3.rotate,
+                centered: true,
+              });
+            [...character.dayEvent, ...character.necklaces].forEach((dayEvent) => {
+              renderImage(dayEvent.id, this.tooltip.renderByElement(), {
+                withText: true,
+                type: 'tooltip-item',
+                pos: 'append',
+                rotate: dayEvent.rotate,
+                centered: true,
+              });
             });
           });
-        });
 
-        const hindranceElem = extraContainerButtons.querySelector(`.card-hindrance`);
-        hindranceElem.style['display'] = this.expansions.includes('hindrance') && hindrance.length > 0 ? `` : 'none';
-        hindranceElem.querySelector('span').innerHTML = hindrance.length;
-        addClickListener(hindranceElem, _('Hindrance'), () => {
-          this.tooltip.show();
-          character.physicalHindrance.forEach((hindrance) => {
-            renderImage(hindrance.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-hindrance', pos: 'append' });
+          const hindranceElem = extraContainerButtons.querySelector(`.card-hindrance`);
+          hindranceElem.style['display'] = this.expansions.includes('hindrance') && hindrance.length > 0 ? `` : 'none';
+          hindranceElem.querySelector('span').innerHTML = hindrance.length;
+          addClickListener(hindranceElem, _('Hindrance'), () => {
+            this.tooltip.show();
+            character.physicalHindrance.forEach((hindrance) => {
+              renderImage(hindrance.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-hindrance', pos: 'append' });
+            });
+            character.mentalHindrance.forEach((hindrance) => {
+              renderImage(hindrance.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-hindrance', pos: 'append' });
+            });
           });
-          character.mentalHindrance.forEach((hindrance) => {
-            renderImage(hindrance.id, this.tooltip.renderByElement(), { withText: true, type: 'tooltip-hindrance', pos: 'append' });
-          });
-        });
-        const displayContainer = !hindranceElem.style['display'] || !extraEquipmentElem.style['display'];
-        extraContainerButtons.style['display'] = displayContainer ? `` : 'none';
-        const cardElem = document.querySelector(`#player-${character.name}`);
-        if (displayContainer) {
-          if (!cardElem.classList.contains('has-card-extra-container')) cardElem.classList.add('has-card-extra-container');
-        } else {
-          if (cardElem.classList.contains('has-card-extra-container')) cardElem.classList.remove('has-card-extra-container');
+          const displayContainer = !hindranceElem.style['display'] || !extraEquipmentElem.style['display'];
+          extraContainerButtons.style['display'] = displayContainer ? `` : 'none';
+          const cardElem = document.querySelector(`#player-${character.name}`);
+          if (displayContainer) {
+            if (!cardElem.classList.contains('has-card-extra-container')) cardElem.classList.add('has-card-extra-container');
+          } else {
+            if (cardElem.classList.contains('has-card-extra-container')) cardElem.classList.remove('has-card-extra-container');
+          }
         }
-      }
-    });
+      });
   },
   enableClick: function (elem) {
     if (elem.classList.contains('disabled')) {
@@ -419,14 +426,14 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (!sideTokenContainer) {
       $('player_boards').insertAdjacentHTML(
         'beforeend',
-        `<div id="token-container" class="player-board"><div class="resource-title">Resources</div><div class="resources"></div></div>`,
+        `<div id="token-container" class="player-board"><div class="resource-title">${_('Resources')}</div><div class="resources"></div></div>`,
       );
       sideTokenContainer = document.querySelector(`#token-container .resources`);
     }
     sideTokenContainer.innerHTML = '';
-    resourcesForDisplay
-      .filter((elem) => !elem.includes('trap') && gameData.resources[elem] > 0)
-      .forEach((name) => this.updateResource(name, sideTokenContainer, gameData.resources[name] ?? 0, { scale: 4 }));
+    const sideResources = resourcesForDisplay.filter((elem) => !elem.includes('trap') && gameData.resources[elem] > 0);
+    sideResources.forEach((name) => this.updateResource(name, sideTokenContainer, gameData.resources[name] ?? 0, { scale: 4 }));
+    if (sideResources.length === 0) sideTokenContainer.innerHTML = _('None');
 
     // Shared Resource Pool
     let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
@@ -651,7 +658,6 @@ declare('bgagame.dontletitdie', Gamegui, {
     renderImage(`board`, document.querySelector(`#board-container > .board`), { scale: 2, pos: 'insert' });
     decks.forEach(({ name: deck }) => {
       if (!this.decks[deck] && gameData.decks[deck]) {
-        const uppercaseDeck = deck[0].toUpperCase() + deck.slice(1);
         this.decks[deck] = new Deck(this, deck, gameData.decks[deck], document.querySelector(`.board > .${deck}`), 2);
         if (!this.decks[deck].isAnimating()) this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
         if (gameData.game.partials && gameData.game.partials[deck]) {
@@ -1076,6 +1082,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       case 'characterSelect':
         dojo.style('character-selector', 'display', 'none');
         dojo.style('game_play_area', 'display', '');
+        this.refreshCharacters = true;
         break;
       case 'confirmTradePhase':
       case 'waitTradePhase':
