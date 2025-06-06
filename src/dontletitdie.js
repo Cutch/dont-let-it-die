@@ -456,8 +456,8 @@ declare('bgagame.dontletitdie', Gamegui, {
 
     const firewoodElem = document.querySelector(`#fire-pit .fire-wood`);
     firewoodElem.innerHTML = '';
-    this.updateResource('wood', firewoodElem, gameData.resources['fireWood'] ?? 0, {
-      warn: (gameData.resources['fireWood'] ?? 0) < (gameData['fireWoodCost'] ?? 0),
+    this.updateResource('wood', firewoodElem, this.gamedatas.resources['fireWood'] ?? 0, {
+      warn: (this.gamedatas.resources['fireWood'] ?? 0) < (this.gamedatas['fireWoodCost'] ?? 0),
     });
     // Available Resource Pool
     let availableElem = document.querySelector(`#discoverable-container .tokens`);
@@ -671,9 +671,9 @@ declare('bgagame.dontletitdie', Gamegui, {
       .getElementById('game_play_area')
       .insertAdjacentHTML(
         'beforeend',
-        `<div id="board-container" class="dlid__container"><div class="board"><div class="buildings"></div>${decks
+        `<div id="board-track-wrapper"><div id="board-container" class="dlid__container"><div class="board"><div class="buildings"></div>${decks
           .map((d) => `<div class="${d.name}"></div>`)
-          .join('')}</div></div>`,
+          .join('')}</div></div></div>`,
       );
 
     renderImage(`board`, document.querySelector(`#board-container > .board`), { scale: 2, pos: 'insert' });
@@ -690,6 +690,26 @@ declare('bgagame.dontletitdie', Gamegui, {
 
     this.updateTrack(gameData);
     this.updateResources(gameData);
+    document.getElementById('game_play_area').insertAdjacentHTML(
+      'beforeend',
+      `<div id="day-popup" class="day-popup"><div id="day-text">
+        <i class="fa fa-sun-o day-background" aria-hidden="true"></i>
+        <i class="fa fa-cloud day-background-cloud" aria-hidden="true"></i>
+        <span></span></div></div>`,
+    );
+  },
+  showDayTracker: async function () {
+    const elem = $('day-text');
+    elem.querySelector('span').innerText = _('Day') + ' ' + this.gamedatas.game.day;
+    const anim = dojo.fx.chain([
+      dojo.fadeIn({ node: elem, duration: 500 }),
+      dojo.animateProperty({
+        node: elem,
+        duration: 1000,
+      }),
+      dojo.fadeOut({ node: elem, duration: 500 }),
+    ]);
+    await this.bgaPlayDojoAnimation(anim);
   },
   setupCharacterSelections: function (gameData) {
     const playArea = $('game_play_area');
@@ -758,7 +778,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       { name: 'physical-hindrance', expansion: 'hindrance', scale: 3 },
     ].filter((d) => this.expansions.includes(d.expansion));
     if (!trackContainer) {
-      const playArea = $('game_play_area');
+      const playArea = $('board-track-wrapper');
       playArea.insertAdjacentHTML(
         'beforeend',
         `<div id="track-container" class="dlid__container"><div id="event-deck-container">${decks
@@ -1045,7 +1065,15 @@ declare('bgagame.dontletitdie', Gamegui, {
         break;
       case 'tradeSelect':
       case 'tradePhase':
-        this.itemTradeScreen.show(args.args);
+        if (this.leftMorningPhase == 'morning') {
+          this.showDayTracker();
+          setTimeout(() => {
+            if (this.leftMorningPhase != 'skip') {
+              this.itemTradeScreen.show(args.args);
+            }
+            this.leftMorningPhase = null;
+          }, 3000);
+        }
         break;
       case 'confirmTradePhase':
       case 'waitTradePhase':
@@ -1068,7 +1096,8 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (isStudio()) console.log('Leaving state: ' + stateName);
     switch (stateName) {
       case 'morningPhase':
-        await this.wait(500);
+        this.leftMorningPhase = 'morning';
+        // await this.wait(500);
         break;
       case 'startHindrance':
         this.upgradeSelectionScreen.hide();
@@ -1101,6 +1130,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         this.tooManyItemsScreen.hide();
         break;
       case 'tradePhase':
+        this.leftMorningPhase = 'skip';
         this.itemTradeScreen.hide();
         break;
       case 'characterSelect':

@@ -7,15 +7,16 @@ export class Dice {
     this.div = div;
     this.queue = [];
     this.isRolling = false;
-    let html = `<div id="dice-container" class="dice-container"><div id='dice' class="dice">`;
+    let html = `<div id="dice-container" class="dice-container"><div id='dice-mover' class="dice-mover"><div id='dice-base' class="dice-base"></div><div id='dice' class="dice">`;
     for (let i = 1; i <= 6; i++) {
       html += `<div class="side-wrapper ${sideNames[i - 1]}"><div class="side">`;
       html += `<div class="image"></div>`;
       html += `</div></div>`;
     }
-    html += `</div><div id="dice-container-character"></div></div>`;
+    html += `</div></div><div id="dice-container-character"></div></div>`;
     this.div.insertAdjacentHTML('beforeend', html);
     this.container = $('dice-container');
+    this.diceBase = $('dice-mover');
     this.dice = $('dice');
     this.dice.addEventListener('animationEnd', () => {
       this.dice.style.animationPlayState = 'paused';
@@ -27,9 +28,8 @@ export class Dice {
     this.dice.style['transition'] = 'transform 1s, left 1s, top 1s';
     this.dice.style.animationPlayState = 'running';
     this.dice.classList.add('show-' + args.roll);
-    this.dice.style['left'] = '33%';
-    this.dice.style['top'] = '33%';
-    console.log(args);
+    this.diceBase.style['left'] = '20%';
+    this.diceBase.style['top'] = '20%';
     //gameui.dice.roll({args:{roll:1, characterId: 'Mabe'}});
     if (args.characterId) {
       renderImage(args.characterId, $('dice-container-character'), {
@@ -51,8 +51,8 @@ export class Dice {
         this.container.style['visibility'] = 'hidden';
         $('dice-container-character').innerHTML = '';
         this.dice.style['transition'] = 'unset';
-        this.dice.style['left'] = '66%';
-        this.dice.style['top'] = '66%';
+        this.diceBase.style['left'] = '80%';
+        this.diceBase.style['top'] = '80%';
         for (let i = 1; i <= 6; i++) {
           this.dice.classList.remove('show-' + i);
         }

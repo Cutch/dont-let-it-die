@@ -1593,9 +1593,9 @@ class Game extends \Table
     }
     public function win()
     {
-        $eloMapping = [5, 10, 15, 25];
+        $eloMapping = [5, 10, 12, 15];
 
-        $trackEloMapping = [10, 20];
+        $trackEloMapping = [0, 5];
         $score = $eloMapping[$this->gameData->get('difficulty')] + $trackEloMapping[$this->gameData->get('trackDifficulty')];
         $this->DbQuery("UPDATE player SET player_score={$score} WHERE 1=1");
         $this->nextState('endGame');
@@ -1612,10 +1612,10 @@ class Game extends \Table
             func_get_args(),
             [$this->hooks, 'onMorning'],
             function (Game $_this) {
+                $woodNeeded = $this->getFirewoodCost();
                 $day = $this->gameData->get('day');
                 $day += 1;
                 $this->gameData->set('day', $day);
-                $woodNeeded = $this->getFirewoodCost();
                 $fireWood = $this->gameData->get('fireWood');
                 if (array_key_exists('allowFireWoodAddition', $this->gameData->get('morningState') ?? []) && $fireWood < $woodNeeded) {
                     $missingWood = $woodNeeded - $fireWood;

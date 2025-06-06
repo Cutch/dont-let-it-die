@@ -18,55 +18,46 @@ export class Tooltip {
 
     addClickListener(gamePlayAreaElem.querySelector('.tooltip-overlay .close'), 'Close', this.handleClick);
   }
-  // handleEscapeKey = (e) => {
-  //   if (e.key === 'Escape') {
-  //     if (!e.defaultPrevented) {
-  //       this.hide();
-  //       e.preventDefault();
-  //       e.stopPropagation();
-  //       return false;
-  //     }
-  //   }
-  // };
+  handleEscapeKey = (e) => {
+    if (e.key === 'Escape') {
+      this.hide();
+    }
+  };
   handleClick = () => {
     this.hide();
   };
-  // handleClickOutside = (e) => {
-  //   if (!this.isScrolling) {
-  //     console.log(this.tooltipElem.parentNode, e.defaultPrevented);
-  //     if (!e.defaultPrevented) {
-  //       this.hide();
-  //       e.preventDefault();
-  //       e.stopPropagation();
-  //     }
-  //     return false;
-  //   }
-  // };
-  // scroll = () => {
-  //   this.isScrolling = true;
-  //   clearTimeout(this.scrollTimeout);
+  handleClickOutside = () => {
+    if (!this.isScrolling) {
+      this.hide();
+    }
+  };
+  scroll = () => {
+    this.isScrolling = true;
+    clearTimeout(this.scrollTimeout);
 
-  //   this.scrollTimeout = setTimeout(() => {
-  //     this.isScrolling = false;
-  //   }, 500); // Adjust the timeout duration as needed
-  // };
+    this.scrollTimeout = setTimeout(() => {
+      this.isScrolling = false;
+    }, 500); // Adjust the timeout duration as needed
+  };
   show() {
     this.tooltipElem.style.display = '';
     document.body.style.overflow = 'hidden';
     setTimeout(() => {
-      // document.addEventListener('click', this.handleClickOutside);
-      // document.addEventListener('keydown', this.handleEscapeKey);
-      // this.tooltipElem.addEventListener('scroll', this.scroll);
+      document.addEventListener('click', this.handleClickOutside);
+      document.addEventListener('keydown', this.handleEscapeKey);
+      this.tooltipElem.addEventListener('scroll', this.scroll);
     }, 0);
   }
   hide() {
-    // document.removeEventListener('click', this.handleClickOutside);
-    // document.removeEventListener('keydown', this.handleEscapeKey);
-    // this.tooltipElem.removeEventListener('scroll', this.scroll);
-    this.tooltipElem.style.display = 'none';
-    this.tooltipBody.innerHTML = '';
-    const objects = [...document.querySelectorAll('.tooltip-overlay')];
-    if (objects.filter((d) => d.style.display != 'none').length == 0) document.body.style.overflow = '';
+    if (!this.tooltipBody.querySelector('.tooltip-overlay:not([style*="display: none"])')) {
+      document.removeEventListener('click', this.handleClickOutside);
+      document.removeEventListener('keydown', this.handleEscapeKey);
+      this.tooltipElem.removeEventListener('scroll', this.scroll);
+      this.tooltipElem.style.display = 'none';
+      this.tooltipBody.innerHTML = '';
+      const objects = [...document.querySelectorAll('.tooltip-overlay')];
+      if (objects.filter((d) => d.style.display != 'none').length == 0) document.body.style.overflow = '';
+    }
   }
   renderByHTML(html) {
     this.tooltipBody.innerHTML = html;

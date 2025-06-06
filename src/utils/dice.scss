@@ -24,19 +24,35 @@
     height: 7rem;
   }
 }
-.dice {
-  width: 10em;
-  height: 10em;
-  transform-style: preserve-3d;
+.dice-mover {
   transition:
     transform 1s,
     left 1s,
     top 1s;
+  position: relative;
+  top: 80%;
+  left: 80%;
+  width: 10em;
+  height: 10em;
+}
+.dice-base {
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 30px 16px black;
+  border-radius: 50%;
+  border-radius: 50%;
+  width: 10em;
+  height: 10em;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.dice {
+  width: 10em;
+  height: 10em;
+  transform-style: preserve-3d;
   transform: translate(-50%, -50%) rotateX(0) rotateZ(0);
 
   position: relative;
-  top: 66%;
-  left: 66%;
 
   &.show-1 {
     transform: translate(-50%, -50%) rotateX(720deg) rotateZ(-720deg);
