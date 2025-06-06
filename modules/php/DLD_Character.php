@@ -324,7 +324,8 @@ class DLD_Character
                     'itemType' => $itemType,
                     'items' => [...$existingItems, ['name' => $itemName, 'itemId' => $itemId]],
                 ],
-                $character['id']
+                $character['id'],
+                false
             );
         }
     }

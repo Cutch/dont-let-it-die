@@ -433,7 +433,12 @@ declare('bgagame.dontletitdie', Gamegui, {
     sideTokenContainer.innerHTML = '';
     const sideResources = resourcesForDisplay.filter((elem) => !elem.includes('trap') && gameData.resources[elem] > 0);
     sideResources.forEach((name) => this.updateResource(name, sideTokenContainer, gameData.resources[name] ?? 0, { scale: 4 }));
-    if (sideResources.length === 0) sideTokenContainer.innerHTML = _('None');
+    if (sideResources.length === 0) {
+      sideTokenContainer.classList.add('no-resource');
+      sideTokenContainer.innerHTML = _('None');
+    } else {
+      sideTokenContainer.classList.remove('no-resource');
+    }
 
     // Shared Resource Pool
     let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
@@ -1203,13 +1208,9 @@ declare('bgagame.dontletitdie', Gamegui, {
                   { color: 'secondary' },
                 );
               } else if (actionId === 'actTradeItem') {
-                // if (!this.itemTradeScreen.hasError()) {
                 this.bgaPerformAction('actTradeItem', {
                   data: JSON.stringify(this.itemTradeScreen.getTrade()),
-                }).catch(console.error);
-                // .then(() => this.itemTradeScreen.hide())
-                // .catch(console.error);
-                // }
+                });
               } else if (actionId === 'actCraft') {
                 this.clearActionButtons();
                 this.craftScreen.show(this.gamedatas);
@@ -1338,6 +1339,16 @@ declare('bgagame.dontletitdie', Gamegui, {
             });
           });
       }
+      const addSelectionCancelButton = () => {
+        if (isActive && this.gamedatas.selectionState?.cancellable === true)
+          this.statusBar.addActionButton(
+            _('Cancel'),
+            () => {
+              this.bgaPerformAction('actCancel').then(() => this.selector.hide());
+            },
+            { color: 'secondary' },
+          );
+      };
       switch (stateName) {
         case 'startHindrance':
           this.statusBar.addActionButton(_('Done'), () => {
@@ -1352,54 +1363,46 @@ declare('bgagame.dontletitdie', Gamegui, {
                 ? _(args.selectionState.title)
                 : _('Select Deck'),
             () => {
-              this.bgaPerformAction('actSelectDeck', { deckName: this.deckSelectionScreen.getSelectedId() }).then(() =>
-                this.deckSelectionScreen.hide(),
-              );
+              this.bgaPerformAction('actSelectDeck', { deckName: this.deckSelectionScreen.getSelectedId() });
             },
           );
+          addSelectionCancelButton();
           break;
         case 'eatSelection':
           this.statusBar.addActionButton(args.selectionState?.title ? _(args.selectionState.title) : _('Eat'), () => {
             this.bgaPerformAction('actSelectEat', {
               resourceType: this.eatScreen.getSelectedId(),
-            }).then(() => {
-              this.eatScreen.hide();
             });
           });
+          addSelectionCancelButton();
           break;
         case 'hindranceSelection':
           this.statusBar.addActionButton(args.selectionState?.button ? _(args.selectionState.button) : _('Remove Hindrance'), () => {
-            this.bgaPerformAction('actSelectHindrance', { data: JSON.stringify(this.hindranceSelectionScreen.getSelected()) }).then(() =>
-              this.hindranceSelectionScreen.hide(),
-            );
+            this.bgaPerformAction('actSelectHindrance', { data: JSON.stringify(this.hindranceSelectionScreen.getSelected()) });
           });
+          addSelectionCancelButton();
           break;
         case 'characterSelection':
           this.statusBar.addActionButton(this.getActionMappings().actSelectCharacter, () => {
-            this.bgaPerformAction('actSelectCharacter', { characterId: this.characterSelectionScreen.getSelectedId() }).then(() =>
-              this.characterSelectionScreen.hide(),
-            );
+            this.bgaPerformAction('actSelectCharacter', { characterId: this.characterSelectionScreen.getSelectedId() });
           });
+          addSelectionCancelButton();
           break;
         case 'cardSelection':
           this.statusBar.addActionButton(this.getActionMappings().actSelectCard, () => {
-            this.bgaPerformAction('actSelectCard', { cardId: this.cardSelectionScreen.getSelectedId() }).then(() =>
-              this.cardSelectionScreen.hide(),
-            );
+            this.bgaPerformAction('actSelectCard', { cardId: this.cardSelectionScreen.getSelectedId() });
           });
+          addSelectionCancelButton();
           break;
         case 'resourceSelection':
           this.statusBar.addActionButton(_('Select Resource'), () => {
-            this.bgaPerformAction('actSelectResource', { resourceType: this.tokenScreen.getSelectedId() }).then(() =>
-              this.tokenScreen.hide(),
-            );
+            this.bgaPerformAction('actSelectResource', { resourceType: this.tokenScreen.getSelectedId() });
           });
+          addSelectionCancelButton();
           break;
         case 'tooManyItems':
           this.statusBar.addActionButton(_('Send to Camp'), () => {
-            this.bgaPerformAction('actSendToCamp', { sendToCampId: this.tooManyItemsScreen.getSelectedId() }).then(() =>
-              this.tooManyItemsScreen.hide(),
-            );
+            this.bgaPerformAction('actSendToCamp', { sendToCampId: this.tooManyItemsScreen.getSelectedId() });
           });
           break;
         case 'buttonSelection':
@@ -1408,15 +1411,18 @@ declare('bgagame.dontletitdie', Gamegui, {
               this.bgaPerformAction('actSelectButton', { buttonValue: value });
             });
           });
+          addSelectionCancelButton();
           break;
         case 'itemSelection':
           this.statusBar.addActionButton(_('Select Item'), () => {
-            this.bgaPerformAction('actSelectItem', { ...this.itemsScreen.getSelection() }).then(() => this.itemsScreen.hide());
+            this.bgaPerformAction('actSelectItem', { ...this.itemsScreen.getSelection() });
           });
+          addSelectionCancelButton();
           break;
+
         case 'whichWeapon':
           this.statusBar.addActionButton(_('Confirm'), () =>
-            this.bgaPerformAction('actChooseWeapon', { weaponId: this.weaponScreen.getSelectedId() }).then(() => this.weaponScreen.hide()),
+            this.bgaPerformAction('actChooseWeapon', { weaponId: this.weaponScreen.getSelectedId() }),
           );
           break;
         case 'tradePhase':
@@ -1456,21 +1462,30 @@ declare('bgagame.dontletitdie', Gamegui, {
           if (isActive) {
             if (this.gamedatas.canUndo)
               this.statusBar.addActionButton(_('Undo'), () => this.bgaPerformAction('actUndo'), { color: 'secondary' });
-            this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
+            this.statusBar.addActionButton(
+              _('End Turn'),
+              () => this.confirmationDialog(_('End Turn'), () => this.bgaPerformAction('actEndTurn')),
+              { color: 'secondary' },
+            );
           }
           break;
         default:
-          if (isActive) this.statusBar.addActionButton(_('End Turn'), () => this.bgaPerformAction('actEndTurn'), { color: 'secondary' });
+          if (isActive)
+            this.statusBar.addActionButton(
+              _('End Turn'),
+              () => this.confirmationDialog(_('End Turn'), () => this.bgaPerformAction('actEndTurn')),
+              { color: 'secondary' },
+            );
           break;
       }
-      if (args.cancellable === true || args.selectionState?.cancellable === true)
-        this.statusBar.addActionButton(
-          _('Cancel'),
-          () => {
-            this.bgaPerformAction('actCancel').then(() => this.selector.hide());
-          },
-          { color: 'secondary' },
-        );
+      // if (isActive && this.gamedatas.cancellable === true)
+      //   this.statusBar.addActionButton(
+      //     _('Cancel'),
+      //     () => {
+      //       this.bgaPerformAction('actCancel').then(() => this.selector.hide());
+      //     },
+      //     { color: 'secondary' },
+      //   );
     }
   },
 
@@ -1520,7 +1535,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     //   // onStart: (notifName, msg, args) => $('pagemaintitletext').innerHTML = `${_('Animation for:')} ${msg}`,
     //   // onEnd: (notifName, msg, args) => $('pagemaintitletext').innerHTML = '',
     // });
-
+    // dojo.subscribe('startSelection', this, 'notif_startSelection');
     dojo.subscribe('characterClicked', this, 'notif_characterClicked');
     dojo.subscribe('updateCharacterData', this, 'notif_updateCharacterData');
     dojo.subscribe('updateGameData', this, 'notif_updateGameData');
@@ -1568,6 +1583,11 @@ declare('bgagame.dontletitdie', Gamegui, {
       this.updateGameDatas(notification.args.gameData);
     }
   },
+  // notif_startSelection: async function (notification) {
+  //   await this.notificationWrapper(notification);
+  //   if (isStudio()) console.log('notif_startSelection', notification);
+  //   this.onEnteringState(notification.args.stateName, notification.args.gameData);
+  // },
   notif_resetNotifications: async function (notification) {
     await this.notificationWrapper(notification);
     const lastMoveId = parseInt(notification.args.moveId, 10);

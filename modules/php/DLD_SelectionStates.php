@@ -19,6 +19,7 @@ class DLD_SelectionStates
     public function completeSelectionState(array $data): void
     {
         $isInterrupt = array_key_exists('isInterrupt', $data) && $data['isInterrupt'];
+
         if ($data['nextState']) {
             $this->game->character->setSubmittingCharacterById(null);
             $this->game->nextState($data['nextState']);
@@ -355,11 +356,15 @@ class DLD_SelectionStates
         bool $cancellable = true,
         string $nextState = 'playerTurn',
         ?string $title = null,
-        bool $isInterrupt = false
+        bool $isInterrupt = false,
+        bool $isPendingState = false
     ): void {
         if ($this->stateChanged || $this->stateToStateNameMapping() != null) {
             $pendingStates = $this->game->gameData->get('pendingStates') ?? [];
-            array_push($pendingStates, func_get_args());
+            // WARNING: Update if args change
+            $args = [$stateName, $state, $characterId, $cancellable, $nextState, $title, $isInterrupt, $isPendingState];
+            $args[sizeof($args) - 1] = true;
+            array_push($pendingStates, $args);
             $this->game->gameData->set('pendingStates', $pendingStates);
         } else {
             $this->stateChanged = true;
@@ -373,6 +378,7 @@ class DLD_SelectionStates
                 'characterId' => $characterId,
                 'nextState' => $nextState,
                 'isInterrupt' => $isInterrupt,
+                'isPendingState' => $isPendingState,
                 ...$state,
             ];
             $this->game->gameData->addMultiActiveCharacter($characterId, true);
@@ -400,7 +406,7 @@ class DLD_SelectionStates
             $title
         );
     }
-    public function initiateHindranceSelection(string $id, ?array $characters = null, ?string $button = null)
+    public function initiateHindranceSelection(string $id, ?array $characters = null, ?string $button = null, ?bool $cancellable = true)
     {
         if ($characters == null) {
             $characters = [$this->game->character->getTurnCharacterId()];
@@ -419,7 +425,7 @@ class DLD_SelectionStates
             'hindranceSelection',
             ['id' => $id, 'characters' => $characters, 'button' => $button],
             $this->game->character->getTurnCharacterId(),
-            true
+            $cancellable
         );
     }
 }

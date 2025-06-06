@@ -77,7 +77,7 @@ namespace Bga\GameFramework\Actions\Types {
             public ?bool $alphanum = true, 
         ) {}
     
-        public function getValue(string $paramName): mixed { return []; }    
+        public function getValue(string $paramName): mixed { return []; }
     }
 }
 

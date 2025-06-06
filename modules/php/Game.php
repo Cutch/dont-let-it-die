@@ -863,14 +863,10 @@ class Game extends \Table
     public function actDrawGather(): void
     {
         $this->actDraw('gather');
-        $this->setLastAction('actDrawGather');
-        $this->completeAction();
     }
     public function actDrawForage(): void
     {
         $this->actDraw('forage');
-        $this->setLastAction('actDrawForage');
-        $this->completeAction();
     }
     public function actDrawHarvest(): void
     {
@@ -893,8 +889,6 @@ class Game extends \Table
             throw new BgaUserException(clienttranslate('The equipped tool can\'t be used for harvesting'));
         }
         $this->actDraw('harvest');
-        $this->setLastAction('actDrawHarvest');
-        $this->completeAction();
     }
     public function actDrawHunt(): void
     {
@@ -908,14 +902,10 @@ class Game extends \Table
             throw new BgaUserException(clienttranslate('You need a weapon to hunt'));
         }
         $this->actDraw('hunt');
-        $this->setLastAction('actDrawHunt');
-        $this->completeAction();
     }
     public function actDrawExplore(): void
     {
         $this->actDraw('explore');
-        $this->setLastAction('actDrawExplore');
-        $this->completeAction();
     }
     public function actDraw(string $deck): void
     {
@@ -950,6 +940,7 @@ class Game extends \Table
                 }
             }
         );
+        $this->setLastAction($deck);
         $this->completeAction();
     }
     public function actInvestigateFire(?int $guess = null): void
@@ -2051,7 +2042,7 @@ class Game extends \Table
 
             $this->notify('tokenUsed', '', ['gameData' => $result]);
         }
-        if ($this->changed['player']) {
+        if ($this->changed['player'] || $this->changed['knowledge']) {
             $result = [
                 'activeCharacter' => $this->character->getTurnCharacterId(),
                 'activePlayer' => $this->character->getTurnCharacterId(),

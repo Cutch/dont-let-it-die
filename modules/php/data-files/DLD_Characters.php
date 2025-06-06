@@ -1034,22 +1034,40 @@ class DLD_CharactersData
                                         return in_array('trap', $tokens[$deckName]);
                                     })
                                 );
-                                $decks = array_filter(
-                                    array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
-                                    function ($deckName) use ($tokens) {
-                                        return array_key_exists($deckName, $tokens) && in_array('trap', $tokens[$deckName]);
-                                    }
-                                );
                                 if ($count >= 2) {
+                                    $decks = array_filter(
+                                        array_intersect(
+                                            ['explore', 'gather', 'forage', 'harvest', 'hunt'],
+                                            $game->decks->getAllDeckNames()
+                                        ),
+                                        function ($deckName) use ($tokens) {
+                                            return array_key_exists($deckName, $tokens) && in_array('trap', $tokens[$deckName]);
+                                        }
+                                    );
                                     $game->selectionStates->initiateDeckSelection(
                                         $skill['id'],
                                         $decks,
-                                        clienttranslate('Remove Token'),
+                                        clienttranslate('Remove Trap'),
                                         true,
                                         ['type' => 'move']
                                     );
                                 } else {
-                                    $game->selectionStates->initiateDeckSelection($skill['id'], $decks, null, true, ['type' => 'place']);
+                                    $decks = array_filter(
+                                        array_intersect(
+                                            ['explore', 'gather', 'forage', 'harvest', 'hunt'],
+                                            $game->decks->getAllDeckNames()
+                                        ),
+                                        function ($deckName) use ($tokens) {
+                                            return !array_key_exists($deckName, $tokens) || !in_array('trap', $tokens[$deckName]);
+                                        }
+                                    );
+                                    $game->selectionStates->initiateDeckSelection(
+                                        $skill['id'],
+                                        $decks,
+                                        clienttranslate('Place Trap'),
+                                        true,
+                                        ['type' => 'place']
+                                    );
                                 }
                                 return ['spendActionCost' => false, 'notify' => false];
                             }
@@ -1057,16 +1075,9 @@ class DLD_CharactersData
                         'onDeckSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('deckSelection');
                             if ($state['id'] == $skill['id']) {
-                                $game->actions->spendActionCost('actUseSkill', $skill['id']);
-
                                 $tokens = $game->gameData->get('tokens') ?? [];
-                                $decks = array_filter(
-                                    array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames()),
-                                    function ($deckName) use ($tokens) {
-                                        return array_key_exists($deckName, $tokens) && in_array('trap', $tokens[$deckName]);
-                                    }
-                                );
                                 if ($state['type'] == 'move') {
+                                    $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                     $tokens[$data['deck']] = array_values(
                                         array_filter($tokens[$data['deck']], function ($token) {
                                             return $token != 'trap';
@@ -1076,8 +1087,23 @@ class DLD_CharactersData
                                     $game->eventLog(clienttranslate('${character_name} removed a trap from ${deck}'), [
                                         'deck' => $game->decks->getDeckName($data['deck']),
                                     ]);
-                                    $game->selectionStates->initiateDeckSelection($skill['id'], $decks, null, false, ['type' => 'place']);
-                                    $data['nextState'] = false;
+                                    $decks = array_filter(
+                                        array_intersect(
+                                            ['explore', 'gather', 'forage', 'harvest', 'hunt'],
+                                            $game->decks->getAllDeckNames()
+                                        ),
+                                        function ($deckName) use ($tokens) {
+                                            return !array_key_exists($deckName, $tokens) || !in_array('trap', $tokens[$deckName]);
+                                        }
+                                    );
+                                    $game->selectionStates->initiateDeckSelection(
+                                        $skill['id'],
+                                        $decks,
+                                        clienttranslate('Place Trap'),
+                                        false,
+                                        ['type' => 'place']
+                                    );
+                                    // $data['nextState'] = false;
                                 } else {
                                     if (!array_key_exists($data['deck'], $tokens)) {
                                         $tokens[$data['deck']] = [];
@@ -2129,7 +2155,7 @@ class DLD_CharactersData
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => $change,
                                     'character_resource' => clienttranslate('Health'),
-                                    'character_name' => $state['selectedCharacterId'],
+                                    'character_name' => $game->getCharacterHTML($state['selectedCharacterId']),
                                 ]);
                                 $data['nextState'] = 'playerTurn';
                             }
@@ -2158,7 +2184,7 @@ class DLD_CharactersData
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => $change,
                                     'character_resource' => clienttranslate('Stamina'),
-                                    'character_name' => $state['selectedCharacterId'],
+                                    'character_name' => $game->getCharacterHTML($state['selectedCharacterId']),
                                 ]);
                                 $data['nextState'] = 'playerTurn';
                             }

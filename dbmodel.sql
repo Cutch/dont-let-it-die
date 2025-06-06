@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS `undoState` (
     `undo_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `character_name` varchar(10) NOT NULL,
     `gamelog_move_id` int(10) unsigned NULL,
+    `pending` int(1) UNSIGNED DEFAULT 0,
     `itemTable` text DEFAULT '',
     `characterTable` text DEFAULT '',
     `globalsTable` text DEFAULT '',

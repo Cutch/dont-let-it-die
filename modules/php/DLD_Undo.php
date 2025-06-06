@@ -29,7 +29,7 @@ class DLD_Undo
         }
         $char = $this->game->character->getTurnCharacterId();
         $undoState = $this->game->getFromDB(
-            'SELECT * FROM `undoState` a INNER JOIN (SELECT max(undo_id) max_last_id FROM `undoState`) b WHERE b.max_last_id = a.undo_id'
+            'SELECT * FROM `undoState` a INNER JOIN (SELECT max(undo_id) max_last_id FROM `undoState`) b WHERE pending OR b.max_last_id = a.undo_id'
         );
         $storedCharacterId = $undoState['character_name'];
         if ($char != $storedCharacterId) {
@@ -60,7 +60,10 @@ class DLD_Undo
         $this->game->markChanged('player');
         $this->game->markChanged('knowledge');
         $this->game->markChanged('actions');
-        $this->game::DbQuery("DELETE FROM `undoState` where undo_id = $undoId");
+        $this->game::DbQuery("DELETE FROM `undoState` where pending OR undo_id = $undoId");
+        $currentState = $this->game->gamestate->state()['name'];
+        $this->game->nextState('undo');
+        $this->game->nextState($currentState);
         $this->game->completeAction(false);
     }
 
@@ -110,7 +113,7 @@ class DLD_Undo
             $char == $this->game->character->getSubmittingCharacterId()
         ) {
             if ($this->savedMoveId != null) {
-                $this->game::DbQuery('DELETE FROM `undoState` where gamelog_move_id=' . $this->savedMoveId);
+                $this->game::DbQuery('DELETE FROM `undoState` where pending OR gamelog_move_id=' . $this->savedMoveId);
             }
             $moveId = $this->initialState['moveId'];
             $itemsData = $this->game::escapeStringForDB($this->initialState['itemsData']);
@@ -118,20 +121,35 @@ class DLD_Undo
             $globalsData = $this->game::escapeStringForDB($this->initialState['globalsData']);
             $extraTables = $this->game::escapeStringForDB($this->initialState['extraTables']);
             $this->savedMoveId = $moveId;
+
+            $pending = 'false';
+            if ($this->game->gamestate->state()['name'] != 'playerTurn') {
+                $pending = 'true';
+            }
             $this->game::DbQuery(
-                'INSERT INTO `undoState` (`character_name`, `gamelog_move_id`, `itemTable`, `characterTable`, `globalsTable`, `extraTables`) VALUES ' .
-                    "('$char', $moveId, '$itemsData', '$characterData', '$globalsData', '$extraTables')"
+                'INSERT INTO `undoState` (`character_name`, `gamelog_move_id`, `pending`, `itemTable`, `characterTable`, `globalsTable`, `extraTables`) VALUES ' .
+                    "('$char', $moveId, $pending, '$itemsData', '$characterData', '$globalsData', '$extraTables')"
             );
+        }
+        if (
+            !$this->actionWasCleared &&
+            $this->initialState &&
+            $this->initialState['stateName'] != 'playerTurn' &&
+            $char == $this->game->character->getSubmittingCharacterId()
+        ) {
+            if ($this->game->gamestate->state()['name'] != 'playerTurn') {
+                $this->game::DbQuery('UPDATE `undoState` SET pending=false WHERE pending=true');
+            }
         }
     }
 
     public function clearUndoHistory(): void
     {
-        $this->game::DbQuery('DELETE FROM `undoState` WHERE undo_id > 0');
+        $this->game::DbQuery('DELETE FROM `undoState` WHERE pending OR undo_id > 0');
         $this->actionWasCleared = true;
     }
     public function canUndo(): bool
     {
-        return $this->game->getFromDB('SELECT count(1) as `count` FROM `undoState`', true)['count'] > 0;
+        return $this->game->getFromDB('SELECT count(1) as `count` FROM `undoState` WHERE NOT pending', true)['count'] > 0;
     }
 }

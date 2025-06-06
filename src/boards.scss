@@ -161,5 +161,9 @@
     gap: 10px 16px;
     flex-flow: wrap;
     padding: 10px 4px;
+    &.no-resource {
+      padding: 2px 4px;
+      font-size: 14px;
+    }
   }
 }

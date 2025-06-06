@@ -78,6 +78,7 @@ $tradePhase = 60;
 $tradePhaseActions = 61;
 $confirmTradePhase = 62;
 $waitTradePhase = 63;
+$undo = 96;
 $changeZombiePlayer = 97;
 $gameEnd = 99;
 
@@ -93,6 +94,7 @@ $interruptScreens = [
     'itemSelection' => $itemSelection,
     'interrupt' => $interrupt,
     'cardSelection' => $cardSelection,
+    'undo' => $undo,
 ];
 
 $machinestates = [
@@ -178,6 +180,12 @@ $machinestates = [
             'changeZombiePlayer' => $changeZombiePlayer,
         ],
     ],
+    $undo => [
+        'name' => 'undo',
+        'descriptionmyturn' => clienttranslate('Waiting'),
+        'type' => 'game',
+        'transitions' => [],
+    ],
     $drawCard => [
         'name' => 'drawCard',
         'description' => clienttranslate('Drawing Card'),
@@ -205,7 +213,7 @@ $machinestates = [
     $deckSelection => [
         'name' => 'deckSelection',
         'description' => clienttranslate('${character_name} is selecting a deck'),
-        'descriptionmyturn' => clienttranslate('${character_name}  a deck'),
+        'descriptionmyturn' => clienttranslate('${character_name} a deck'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionState',
         'possibleactions' => ['actSelectDeck', 'actCancel'],
