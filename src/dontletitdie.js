@@ -1701,5 +1701,6 @@ declare('bgagame.dontletitdie', Gamegui, {
     await this.notificationWrapper(notification);
     if (isStudio()) console.log('notif_tokenUsed', notification);
     this.updateResources(notification.args.gameData);
+    this.updateItems(notification.args.gameData);
   },
 });

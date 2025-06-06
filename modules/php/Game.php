@@ -2040,6 +2040,7 @@ class Game extends \Table
         if ($this->changed['token']) {
             $result = [];
             $this->getResources($result);
+            $this->getItemData($result);
 
             $this->notify('tokenUsed', '', ['gameData' => $result]);
         }
