@@ -1,59 +1,72 @@
 import { addClickListener } from './clickable';
-
 export class Tooltip {
   constructor(gamePlayAreaElem) {
     gamePlayAreaElem.insertAdjacentHTML(
       'beforeend',
-      `<div id="tooltip-overlay">
+      `<div class="tooltip-overlay">
+      <div class="scroll-overlay">
         <div class="close"><i class="fa fa-times fa-2x" aria-hidden="true"></i></div>
         <div class="inner">
           <div class="body">
         </div>
-      </div></div>`,
+        </div></div></div>`,
     );
-    this.tooltipElem = $('tooltip-overlay');
-    this.tooltipBody = document.querySelector('#tooltip-overlay .body');
+    this.tooltipElem = gamePlayAreaElem.querySelector('.tooltip-overlay');
+    this.tooltipBody = gamePlayAreaElem.querySelector('.tooltip-overlay .body');
     this.isScrolling = false;
-
     this.hide();
 
-    addClickListener(document.querySelector('#tooltip-overlay .close'), 'Close', this.handleClick);
+    addClickListener(gamePlayAreaElem.querySelector('.tooltip-overlay .close'), 'Close', this.handleClick);
   }
-  handleEscapeKey = (e) => {
-    if (e.key === 'Escape') {
-      this.hide();
-    }
-  };
+  // handleEscapeKey = (e) => {
+  //   if (e.key === 'Escape') {
+  //     if (!e.defaultPrevented) {
+  //       this.hide();
+  //       e.preventDefault();
+  //       e.stopPropagation();
+  //       return false;
+  //     }
+  //   }
+  // };
   handleClick = () => {
     this.hide();
   };
-  handleClickOutside = () => {
-    if (!this.isScrolling) this.hide();
-  };
-  scroll = () => {
-    this.isScrolling = true;
-    clearTimeout(this.scrollTimeout);
+  // handleClickOutside = (e) => {
+  //   if (!this.isScrolling) {
+  //     console.log(this.tooltipElem.parentNode, e.defaultPrevented);
+  //     if (!e.defaultPrevented) {
+  //       this.hide();
+  //       e.preventDefault();
+  //       e.stopPropagation();
+  //     }
+  //     return false;
+  //   }
+  // };
+  // scroll = () => {
+  //   this.isScrolling = true;
+  //   clearTimeout(this.scrollTimeout);
 
-    this.scrollTimeout = setTimeout(() => {
-      this.isScrolling = false;
-    }, 500); // Adjust the timeout duration as needed
-  };
+  //   this.scrollTimeout = setTimeout(() => {
+  //     this.isScrolling = false;
+  //   }, 500); // Adjust the timeout duration as needed
+  // };
   show() {
     this.tooltipElem.style.display = '';
     document.body.style.overflow = 'hidden';
     setTimeout(() => {
-      document.addEventListener('click', this.handleClickOutside);
-      document.addEventListener('keydown', this.handleEscapeKey);
-      this.tooltipElem.addEventListener('scroll', this.scroll);
+      // document.addEventListener('click', this.handleClickOutside);
+      // document.addEventListener('keydown', this.handleEscapeKey);
+      // this.tooltipElem.addEventListener('scroll', this.scroll);
     }, 0);
   }
   hide() {
-    document.removeEventListener('click', this.handleClickOutside);
-    document.removeEventListener('keydown', this.handleEscapeKey);
-    this.tooltipElem.removeEventListener('scroll', this.scroll);
+    // document.removeEventListener('click', this.handleClickOutside);
+    // document.removeEventListener('keydown', this.handleEscapeKey);
+    // this.tooltipElem.removeEventListener('scroll', this.scroll);
     this.tooltipElem.style.display = 'none';
     this.tooltipBody.innerHTML = '';
-    document.body.style.overflow = '';
+    const objects = [...document.querySelectorAll('.tooltip-overlay')];
+    if (objects.filter((d) => d.style.display != 'none').length == 0) document.body.style.overflow = '';
   }
   renderByHTML(html) {
     this.tooltipBody.innerHTML = html;

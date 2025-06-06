@@ -1,3 +1,4 @@
+import dojo from 'dojo';
 export default {
   getData: () => ({
     sprites: {
@@ -16,10 +17,12 @@ export default {
             { title: _('Morning Phase') },
             _('Remove (Wood Count) from fire pit'),
             _('Increase Day Count +1'),
-            _('Each character takes 1 Damage'),
+            dojo.string.substitute(_('Each character takes ${count} Damage'), {
+              count: 1,
+            }),
             _('Refresh up to max stamina'),
             _('Trade items as desired'),
-            _('Pass first player token to the left'),
+            _('Pass the first player token'),
           ],
         },
         frame: {
@@ -36,10 +39,12 @@ export default {
             { title: _('Morning Phase') },
             _('Remove (Wood Count) from fire pit'),
             _('Increase Day Count +1'),
-            _('Each character takes 1 Damage'),
+            dojo.string.substitute(_('Each character takes ${count} Damage'), {
+              count: 2,
+            }),
             _('Refresh up to max stamina'),
             _('Trade items as desired'),
-            _('Pass first player token to the left'),
+            _('Pass the first player token'),
           ],
         },
         frame: {

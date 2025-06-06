@@ -1,4 +1,4 @@
-#tooltip-overlay {
+.tooltip-overlay {
   position: fixed;
   top: 0px;
   bottom: 0;
@@ -10,10 +10,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: auto;
+  .scroll-overlay {
+    overflow: auto;
+    height: 100vh;
+  }
   .inner {
     position: relative;
-    margin-top: 60px;
+    margin: 60px 0;
   }
   .body {
     display: flex;

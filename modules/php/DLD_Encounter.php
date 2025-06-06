@@ -307,7 +307,7 @@ class DLD_Encounter
                                     '${character_name} defeated a ${name}, gained ${willReceiveMeat} meat and lost ${damageTaken} ${resource}',
                                     [
                                         ...$data,
-                                        'damageTaken' => $change,
+                                        'damageTaken' => -$change,
                                         'resource' => $data['damageStamina'] ? clienttranslate('Stamina') : clienttranslate('Health'),
                                     ]
                                 );
@@ -332,7 +332,7 @@ class DLD_Encounter
                                 clienttranslate('${character_name} was attacked by a ${name} and lost ${damageTaken} ${resource}'),
                                 [
                                     ...$data,
-                                    'damageTaken' => $change,
+                                    'damageTaken' => -$change,
                                     'resource' => $data['damageStamina'] ? clienttranslate('Stamina') : clienttranslate('Health'),
                                 ]
                             );

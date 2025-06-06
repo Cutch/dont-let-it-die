@@ -1685,7 +1685,8 @@ class Game extends \Table
                 $this->notify('morningPhase', clienttranslate('The fire pit used ${amount} wood'), [
                     'amount' => $woodNeeded,
                 ]);
-                if ($this->adjustResource('fireWood', -$woodNeeded)['left'] > 0) {
+                $change = $this->adjustResource('fireWood', -$woodNeeded);
+                if ($change['left'] != 0) {
                     $this->lose();
                 }
                 $this->hooks->onMorningAfter($data);
@@ -2077,7 +2078,7 @@ class Game extends \Table
 
             $this->notify('updateKnowledgeTree', '', ['gameData' => $result]);
         }
-        if (!in_array($this->gamestate->state()['name'], ['characterSelect', 'interrupt'])) {
+        if (!in_array($this->gamestate->state()['name'], ['characterSelect', 'interrupt', 'dinnerPhasePrivate', 'dinnerPhase'])) {
             $availableUnlocks = $this->data->getValidKnowledgeTree();
             $result = [
                 'tradeRatio' => $this->getTradeRatio(),
@@ -2156,6 +2157,16 @@ class Game extends \Table
             'expansion' => $this->getExpansion(),
             'difficulty' => $this->getDifficulty(),
             'trackDifficulty' => $this->getTrackDifficulty(),
+            'allItems' => array_values(
+                array_map(
+                    function ($d) {
+                        return $d['id'];
+                    },
+                    array_filter($this->data->getItems(), function ($d) {
+                        return $d['type'] == 'item';
+                    })
+                )
+            ),
             ...$this->getArgsData(),
         ];
         $this->getAllPlayers($result);

@@ -616,9 +616,25 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (!availableElem) {
       $('game_play_area').insertAdjacentHTML(
         'beforeend',
-        `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div></div>`,
+        `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div><div id="items-see-all">${_('See all Craftable Items')}</div></div>`,
       );
       availableElem = document.querySelector(`#items-container .items`);
+      addClickListener($('items-see-all'), 'See All', () => {
+        this.tooltip.show();
+        const innerTooltip = new Tooltip(this.tooltip.renderByElement());
+        const renderItem = (name, elem) => {
+          elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"></div>`);
+          renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'replace' });
+          this.addHelpTooltip({
+            node: elem.querySelector(`.token.${name}`),
+            tooltipText: name,
+            tooltipElem: innerTooltip,
+          });
+        };
+        this.gamedatas.allItems.forEach((name) => {
+          renderItem(name, this.tooltip.renderByElement());
+        });
+      });
     }
     availableElem.innerHTML = '';
     const keys = Object.keys(gameData.availableEquipment);
@@ -687,6 +703,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       .forEach((characterName) => {
         renderImage(characterName, elem, { scale: 2, pos: 'append' });
         addClickListener(elem.querySelector(`.${characterName}`), characterName, () => {
+          const saved = [...this.mySelectedCharacters];
           const i = this.mySelectedCharacters.indexOf(characterName);
           if (i >= 0) {
             // Remove selection
@@ -701,6 +718,8 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.bgaPerformAction('actCharacterClicked', {
             character1: this.mySelectedCharacters?.[0],
             character2: this.mySelectedCharacters?.[1],
+          }).catch(() => {
+            this.mySelectedCharacters = saved;
           });
         });
         this.addHelpTooltip({
@@ -1122,7 +1141,6 @@ declare('bgagame.dontletitdie', Gamegui, {
   onUpdateActionButtons: async function (stateName, args) {
     this.updateGameDatas(args);
     const actions = args?.actions;
-    // this.currentActions = actions;
     const isActive = this.isActive();
     if (isStudio()) console.log(args);
     if (isActive && stateName && actions != null) {
@@ -1312,7 +1330,8 @@ declare('bgagame.dontletitdie', Gamegui, {
                       resourceType: this.eatScreen.getSelectedId(),
                     })
                       .then(() => {
-                        if (this.gamedatas.gamestate.name !== 'eatSelection' || !this.isActive()) this.eatScreen.hide();
+                        this.eatScreen.hide();
+                        this.onUpdateActionButtons(stateName, args);
                       })
                       .catch(console.error);
                   }
@@ -1489,7 +1508,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     }
   },
 
-  addHelpTooltip: function ({ node, text = '', tooltipText = '', iconCSS }) {
+  addHelpTooltip: function ({ node, text = '', tooltipText = '', iconCSS, tooltipElem = this.tooltip }) {
     // game.addTooltip(id, helpString, actionString);
     if (!node.querySelector('.tooltip')) {
       node.insertAdjacentHTML(
@@ -1501,8 +1520,8 @@ declare('bgagame.dontletitdie', Gamegui, {
         node.querySelector('.tooltip'),
         'Tooltip',
         () => {
-          this.tooltip.show();
-          this.tooltip
+          tooltipElem.show();
+          tooltipElem
             .renderByElement()
             .insertAdjacentHTML(
               'beforeend',

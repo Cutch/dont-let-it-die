@@ -93,7 +93,6 @@ class DLD_ItemTrade
         ];
         $this->game->hooks->onItemTrade($hookData);
         if ($sendToCamp) {
-            $this->game->log('$sendToCamp', $trade1, $trade2);
             $itemId1 = array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null;
             $itemId2 = array_key_exists('itemId', $trade2) ? $trade2['itemId'] : null;
 
@@ -111,8 +110,8 @@ class DLD_ItemTrade
                 $hasOpenSlots = $result['hasOpenSlots'];
                 $hasDuplicateTool = $result['hasDuplicateTool'];
 
-                if ($trade1['character']['id'] == 'Sig') {
-                    throw new BgaUserException(clienttranslate('Sig cannot obtain items from trade'));
+                if (in_array($trade1['character']['id'], ['Sig', 'Tooth'])) {
+                    throw new BgaUserException(clienttranslate('Tribe member cannot obtain items from trade'));
                 }
                 if (!$hasOpenSlots) {
                     throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
@@ -200,8 +199,8 @@ class DLD_ItemTrade
             $result = $this->game->character->getItemValidations((int) $itemId1, $trade2['character'], (int) $itemId2);
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
-            if ($trade2['character']['id'] == 'Sig') {
-                throw new BgaUserException(clienttranslate('Sig cannot obtain items from trade'));
+            if (in_array($trade2['character']['id'], ['Sig', 'Tooth'])) {
+                throw new BgaUserException(clienttranslate('Tribe member cannot obtain items from trade'));
             }
             if (!$hasOpenSlots) {
                 throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
@@ -216,8 +215,8 @@ class DLD_ItemTrade
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
 
-            if ($trade1['character']['id'] == 'Sig') {
-                throw new BgaUserException(clienttranslate('Sig cannot obtain items from trade'));
+            if (in_array($trade1['character']['id'], ['Sig', 'Tooth'])) {
+                throw new BgaUserException(clienttranslate('Tribe member cannot obtain items from trade'));
             }
             if (!$hasOpenSlots) {
                 throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
