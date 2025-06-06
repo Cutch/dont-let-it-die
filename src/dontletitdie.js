@@ -443,7 +443,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     // Shared Resource Pool
     let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
     if (!sharedElem) {
-      $('game_play_area').insertAdjacentHTML(
+      $('board-resource-wrapper').insertAdjacentHTML(
         'beforeend',
         `<div id="shared-resource-container" class="dlid__container"><h3>${_('Shared Resources')}</h3><div class="tokens"></div></div>`,
       );
@@ -462,7 +462,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     // Available Resource Pool
     let availableElem = document.querySelector(`#discoverable-container .tokens`);
     if (!availableElem) {
-      $('game_play_area').insertAdjacentHTML(
+      $('board-resource-wrapper').insertAdjacentHTML(
         'beforeend',
         `<div id="discoverable-container" class="dlid__container"><h3>${_('Discoverable Resources')}</h3><div class="tokens"></div></div>`,
       );
@@ -671,9 +671,9 @@ declare('bgagame.dontletitdie', Gamegui, {
       .getElementById('game_play_area')
       .insertAdjacentHTML(
         'beforeend',
-        `<div id="board-track-wrapper"><div id="board-container" class="dlid__container"><div class="board"><div class="buildings"></div>${decks
+        `<div id="board-track-wrapper"><div id="board-resource-wrapper"><div id="board-container" class="dlid__container"><div class="board"><div class="buildings"></div>${decks
           .map((d) => `<div class="${d.name}"></div>`)
-          .join('')}</div></div></div>`,
+          .join('')}</div></div></div></div>`,
       );
 
     renderImage(`board`, document.querySelector(`#board-container > .board`), { scale: 2, pos: 'insert' });

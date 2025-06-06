@@ -3,7 +3,9 @@
   gap: 1rem;
   align-items: center;
   justify-content: center;
-  flex-flow: row wrap;
+  @media screen and (max-width: 1798px) {
+    flex-flow: row wrap;
+  }
   // flex-flow: column;
   #track-container {
     margin: 0 1rem 1rem;
@@ -71,6 +73,7 @@
   gap: 1em;
   flex-flow: row wrap;
   justify-content: center;
+  margin: 1rem;
 }
 .token {
   position: relative;
@@ -118,7 +121,10 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
-  flex-flow: row wrap;
+
+  // @media screen and (max-width: 1798px) {
+  //   flex-flow: row wrap;
+  // }
 }
 #track-marker {
   border-radius: 50%;

@@ -373,7 +373,7 @@ class DLD_UpgradesData
                 'disabled' => true,
                 'onAdjustHealth' => function (Game $game, $unlock, &$data) {
                     if ($data['change']) {
-                        $aboveMax = $data['health'] + $data['change'] - $data['maxHealth'];
+                        $aboveMax = $data['currentHealth'] + $data['change'] - $data['maxHealth'];
                         if ($aboveMax > 0) {
                             $currentCharacter = $game->character->getTurnCharacterId();
                             $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
