@@ -54,7 +54,9 @@ class DLD_Undo
         $this->game->gameData->setItems($itemTable);
         foreach ($this->extraTablesList as $table) {
             $this->game::DbQuery("DELETE FROM `$table` where 1 = 1");
-            $this->game::DbQuery(buildInsertQuery($table, $extraTables[$table]));
+            if (sizeof($extraTables[$table]) > 0) {
+                $this->game::DbQuery(buildInsertQuery($table, $extraTables[$table]));
+            }
         }
         $this->game->markChanged('token');
         $this->game->markChanged('player');

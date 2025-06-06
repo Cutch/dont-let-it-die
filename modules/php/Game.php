@@ -282,7 +282,6 @@ class Game extends \Table
         } elseif ($rand > 1) {
             $value = 1;
         }
-        $value = 0;
         $notificationSent = false;
         $data = [
             'value' => $value,

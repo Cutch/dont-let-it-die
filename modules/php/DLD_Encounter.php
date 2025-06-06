@@ -38,7 +38,7 @@ class DLD_Encounter
 
         $encounterState = $this->game->gameData->get('encounterState');
 
-        if ($encounterState['damageTaken'] > 0) {
+        if ($encounterState['damageTaken'] > 0 && $this->game->isValidExpansion('hindrance')) {
             $this->game->checkHindrance(true, $encounterState['damagedCharacter']);
         }
         if (sizeof($validActions) == 0) {

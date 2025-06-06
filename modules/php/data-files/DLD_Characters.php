@@ -497,7 +497,6 @@ class DLD_CharactersData
                         },
                         'onUse' => function (Game $game, $skill) {
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
-                            $game->character->adjustActiveStamina(-2);
                             $game->character->adjustActiveHealth(2);
                             $game->eventLog(
                                 clienttranslate(
@@ -546,7 +545,6 @@ class DLD_CharactersData
                         },
                         'onUse' => function (Game $game, $skill) {
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
-                            $game->character->adjustActiveStamina(-2);
                             $game->adjustResource('wood', 1);
                             $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 1,
