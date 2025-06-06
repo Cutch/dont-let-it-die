@@ -457,7 +457,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     const firewoodElem = document.querySelector(`#fire-pit .fire-wood`);
     firewoodElem.innerHTML = '';
     this.updateResource('wood', firewoodElem, this.gamedatas.resources['fireWood'] ?? 0, {
-      warn: (this.gamedatas.resources['fireWood'] ?? 0) < (this.gamedatas['fireWoodCost'] ?? 0),
+      warn: (this.gamedatas.resources['fireWood'] ?? 0) <= (this.gamedatas['fireWoodCost'] ?? 0),
     });
     // Available Resource Pool
     let availableElem = document.querySelector(`#discoverable-container .tokens`);
@@ -1033,7 +1033,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         if (isActive) this.eatScreen.show(args.args);
         break;
       case 'startHindrance':
-        this.upgradeSelectionScreen.show(args.args);
+        this.upgradeSelectionScreen.show(this.player_id == args.active_player, args.args);
         break;
       case 'deckSelection':
         if (isActive) this.deckSelectionScreen.show(args.args);

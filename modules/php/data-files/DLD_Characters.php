@@ -117,7 +117,7 @@ class DLD_CharactersData
                             return $skill['characterId'] . $skill['id'];
                         },
                         'onInvestigateFire' => function (Game $game, $skill, &$data) {
-                            if ($data['roll'] < 3 && getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1) {
+                            if ($data['originalRoll'] < 3 && getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1) {
                                 // If kara is not the character, and the roll is not the max
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }

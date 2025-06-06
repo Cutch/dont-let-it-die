@@ -24,6 +24,12 @@ if (!function_exists('getUsePerDay')) {
         $game->markChanged('token');
         $game->markChanged('player');
     }
+    function resetPerDay(Game $game)
+    {
+        $game->gameData->set('dailyUseItems', []);
+        $game->markChanged('token');
+        $game->markChanged('player');
+    }
     function getUsePerForeverItems(Game $game)
     {
         return $game->gameData->get('foreverUseItems');

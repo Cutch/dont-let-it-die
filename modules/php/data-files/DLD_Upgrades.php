@@ -146,7 +146,7 @@ class DLD_UpgradesData
                         },
                     ],
                 ],
-                'onInvestigateFire' => function (Game $game, $skill, &$data) {
+                'onInvestigateFirePost' => function (Game $game, $skill, &$data) {
                     $char = $game->character->getTurnCharacterId();
                     if (getUsePerDay($char . '12-B', $game) == 1) {
                         usePerDay($char . '12-B', $game);
@@ -653,7 +653,8 @@ class DLD_UpgradesData
                         ],
                         $game->character->getFirstCharacter(),
                         false,
-                        'tradePhase'
+                        'tradePhase',
+                        clienttranslate('Choose First Player')
                     );
                 },
                 'onCharacterSelection' => function (Game $game, $unlock, &$data) {

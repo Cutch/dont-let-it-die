@@ -1636,6 +1636,7 @@ class Game extends \Table
                     'day' => $day,
                 ]);
                 $this->setStat($day, 'day_number');
+                resetPerDay($this);
                 if ($day == 14) {
                     $this->lose();
                 }
