@@ -406,8 +406,13 @@ class DLD_SelectionStates
             $title
         );
     }
-    public function initiateHindranceSelection(string $id, ?array $characters = null, ?string $button = null, ?bool $cancellable = true)
-    {
+    public function initiateHindranceSelection(
+        string $id,
+        ?array $characters = null,
+        ?string $button = null,
+        ?bool $cancellable = true,
+        ?string $nextState = 'playerTurn'
+    ) {
         if ($characters == null) {
             $characters = [$this->game->character->getTurnCharacterId()];
         }
@@ -425,7 +430,8 @@ class DLD_SelectionStates
             'hindranceSelection',
             ['id' => $id, 'characters' => $characters, 'button' => $button],
             $this->game->character->getTurnCharacterId(),
-            $cancellable
+            $cancellable,
+            $nextState
         );
     }
 }

@@ -130,24 +130,27 @@ class DLD_ItemsData
                         'state' => ['interrupt'],
                         'interruptState' => ['morningPhase'],
                         'perDay' => 1,
-                        'global' => true,
-                        'onMorning' => function (Game $game, $skill, &$data) {
-                            $game->actInterrupt->addSkillInterrupt($skill);
-                        },
-                        'onUse' => function (Game $game, $skill, &$data) {
-                            $game->selectionStates->initiateHindranceSelection(
-                                $skill['id'],
+                        'onMorningAfter' => function (Game $game, $skill, &$data) {
+                            $data['nextState'] = false;
+                            $characters = array_values(
                                 array_map(
                                     function ($d) {
-                                        return $d['id'];
+                                        return ['physicalHindrance' => $d['physicalHindrance'], 'characterId' => $d['id']];
                                     },
                                     array_filter($game->character->getAllCharacterData(false), function ($d) {
                                         return sizeof($d['physicalHindrance']) > 0;
                                     })
                                 )
                             );
-                            $data['interrupt'] = true;
-                            return ['notify' => false, 'nextState' => false, 'interrupt' => true, 'spendActionCost' => false];
+
+                            $game->selectionStates->initiateState(
+                                'hindranceSelection',
+                                ['id' => $skill['id'], 'characters' => $characters, 'button' => null],
+                                $game->character->getFirstCharacter(),
+                                false,
+                                'tradePhase',
+                                $skill['name']
+                            );
                         },
                         'onHindranceSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('hindranceSelection');
@@ -183,15 +186,16 @@ class DLD_ItemsData
                                     throw new BgaUserException(clienttranslate('Up to 2 hindrances can be removed'));
                                 }
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
-                                $data['nextState'] = 'playerTurn';
                             }
                         },
                         'requires' => function (Game $game, $skill) {
-                            return sizeof(
-                                array_filter($game->character->getAllCharacterData(false), function ($d) {
-                                    return sizeof($d['physicalHindrance']) > 0;
-                                })
-                            ) > 0;
+                            $char = $game->character->getTurnCharacter(false);
+                            return $char['isActive'] &&
+                                sizeof(
+                                    array_filter($game->character->getAllCharacterData(false), function ($d) {
+                                        return sizeof($d['physicalHindrance']) > 0;
+                                    })
+                                ) > 0;
                         },
                     ],
                 ],

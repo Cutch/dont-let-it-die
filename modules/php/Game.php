@@ -1601,16 +1601,18 @@ class Game extends \Table
                 if (array_key_exists('allowFireWoodAddition', $this->gameData->get('morningState') ?? []) && $fireWood < $woodNeeded) {
                     $missingWood = $woodNeeded - $fireWood;
                     $wood = $this->gameData->get('wood');
-                    $this->gameData->setResource('fireWood', min($fireWood + $missingWood, $this->gameData->getResourceMax('wood')));
-                    $this->gameData->setResource('wood', max($wood - $missingWood, 0));
-                    $this->notify(
-                        'notify',
-                        clienttranslate('During the night the tribe quickly added ${woodNeeded} ${token_name} to the fire'),
-                        [
-                            'woodNeeded' => $woodNeeded,
-                            'token_name' => 'wood',
-                        ]
-                    );
+                    if ($wood >= $missingWood) {
+                        $this->gameData->setResource('fireWood', min($fireWood + $missingWood, $this->gameData->getResourceMax('wood')));
+                        $this->gameData->setResource('wood', max($wood - $missingWood, 0));
+                        $this->notify(
+                            'notify',
+                            clienttranslate('During the night the tribe quickly added ${woodNeeded} ${token_name} to the fire'),
+                            [
+                                'woodNeeded' => $woodNeeded,
+                                'token_name' => 'wood',
+                            ]
+                        );
+                    }
                 }
 
                 $this->setStat($day, 'day_number');

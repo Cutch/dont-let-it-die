@@ -640,7 +640,7 @@ class DLD_UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Cooperation'),
                 'unlockCost' => 5,
-                'onMorningAfter' => function (Game $game, $unlock, &$data) {
+                'onMorningAfterPost' => function (Game $game, $unlock, &$data) {
                     $data['nextState'] = false;
 
                     $game->selectionStates->initiateState(

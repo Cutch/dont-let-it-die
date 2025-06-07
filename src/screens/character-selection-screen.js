@@ -44,7 +44,7 @@ export class CharacterSelectionScreen {
             <div class="token ${characterName}"></div>
           <div>`,
       );
-      renderImage(characterName, elem.querySelector(`.token.${characterName}`), { scale: 1.5, pos: 'insert' });
+      renderImage(characterName, elem.querySelector(`.token.${characterName}`), { scale: 2, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${characterName}`), characterName, () => selectCallback());
       this.game.addHelpTooltip({
         node: elem.querySelector(`.token.${characterName}`),

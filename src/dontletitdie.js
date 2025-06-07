@@ -651,10 +651,11 @@ declare('bgagame.dontletitdie', Gamegui, {
     addClickListener(elem.querySelector(`.token.${name}`), name, () => {
       this.tooltip.show();
       renderImage(name, this.tooltip.renderByElement(), { withText: true, pos: 'insert', type: 'tooltip-item' });
-      this.tooltip
-        .renderByElement()
-        .querySelector(`.image`)
-        .insertAdjacentHTML('beforeend', `<div class="counter dot dot--number">${count}</div>`);
+      if (count != null)
+        this.tooltip
+          .renderByElement()
+          .querySelector(`.image`)
+          .insertAdjacentHTML('beforeend', `<div class="counter dot dot--number">${count}</div>`);
     });
   },
   setupBoard: function (gameData) {
@@ -1062,17 +1063,21 @@ declare('bgagame.dontletitdie', Gamegui, {
         this.updateItems(args.args);
         this.updateKnowledgeTree(args.args);
         this.updateTrack(args.args);
+
+        if (this.leftTradePhase) this.showDayTracker();
         break;
       case 'tradeSelect':
       case 'tradePhase':
+        this.leftTradePhase = false;
         if (this.leftMorningPhase == 'morning') {
-          this.showDayTracker();
           setTimeout(() => {
             if (this.leftMorningPhase != 'skip') {
               this.itemTradeScreen.show(args.args);
             }
             this.leftMorningPhase = null;
           }, 3000);
+        } else if (!this.leftMorningPhase) {
+          this.itemTradeScreen.show(args.args);
         }
         break;
       case 'confirmTradePhase':
@@ -1132,6 +1137,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       case 'tradePhase':
         this.leftMorningPhase = 'skip';
         this.itemTradeScreen.hide();
+        this.leftTradePhase = true;
         break;
       case 'characterSelect':
         dojo.style('character-selector', 'display', 'none');
