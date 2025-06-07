@@ -919,16 +919,19 @@ class Game extends \Table
                 $this->hooks->onActDraw($data);
                 $card = [];
                 if (!$data['cancel']) {
+                    $this->gameData->set('tempDeckDiscard', $this->decks->getDecksData()['decksDiscards']);
                     $this->incStat(1, 'cards_drawn', $this->character->getSubmittingCharacter()['playerId']);
                     $card = $this->decks->pickCard($deck);
                     $this->eventLog(clienttranslate('${character_name} draws from the ${deck} deck'), [
                         'deck' => $this->decks->getDeckName($deck),
                     ]);
                 }
+
                 return ['deck' => $deck, 'card' => [...$card], ...$data];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
-                extract($data);
+                $deck = $data['deck'];
+                $card = $data['card'];
                 if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
                     $_this->actions->spendActionCost('actDraw' . ucfirst($deck));
                 }
@@ -1322,20 +1325,6 @@ class Game extends \Table
             }
         );
     }
-    // public function stNightPhasePost()
-    // {
-    //     $this->actInterrupt->interruptableFunction(
-    //         __FUNCTION__,
-    //         func_get_args(),
-    //         [$this->hooks, 'onNightPost'],
-    //         function (Game $_this) {
-    //             return [];
-    //         },
-    //         function (Game $_this, bool $finalizeInterrupt, $data) {
-    //             $this->nextState('morningPhase');
-    //         }
-    //     );
-    // }
 
     public function argSelectionCount(): array
     {
@@ -1379,6 +1368,12 @@ class Game extends \Table
     public function argPlayerState(): array
     {
         $result = [...$this->getArgsData()];
+
+        $decksDiscards = $this->gameData->get('tempDeckDiscard');
+        if ($decksDiscards) {
+            $result['decksDiscards'] = $decksDiscards;
+            $this->gameData->set('tempDeckDiscard', null);
+        }
         return $result;
     }
     public function argDayEvent(): array
@@ -1508,22 +1503,8 @@ class Game extends \Table
             $this->gamestate->initializePrivateStateForAllActivePlayers();
         } else {
             $this->notify('playerTurn', clienttranslate('The tribe skipped dinner as there is nothing to eat'));
-            $this->nextState('dinnerPhasePost');
+            $this->nextState('nightPhase');
         }
-    }
-    public function stDinnerPhasePost()
-    {
-        $this->actInterrupt->interruptableFunction(
-            __FUNCTION__,
-            func_get_args(),
-            [$this->hooks, 'onDinnerPhasePost'],
-            function (Game $_this) {
-                return [];
-            },
-            function (Game $_this, bool $finalizeInterrupt, $data) {
-                $this->nextState('nightPhase');
-            }
-        );
     }
     public function stSelectCharacter()
     {
@@ -1684,20 +1665,6 @@ class Game extends \Table
             }
         );
     }
-    // public function stMorningPhasePost()
-    // {
-    //     $this->actInterrupt->interruptableFunction(
-    //         __FUNCTION__,
-    //         func_get_args(),
-    //         [$this->hooks, 'onMorningPost'],
-    //         function (Game $_this) {
-    //             return [];
-    //         },
-    //         function (Game $_this, bool $finalizeInterrupt, $data) {
-    //             $this->nextState('tradePhase');
-    //         }
-    //     );
-    // }
     public function stTradePhase()
     {
         $this->itemTrade->stTradePhase();

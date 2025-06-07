@@ -246,7 +246,7 @@ export default {
           text: [
             { title: _('Shelter') },
             _('Item Type') + ': ' + _('Building'),
-            _('You do not take the 1 hp damage during the morning time phase'),
+            _('You do not take the health damage during the morning phase'),
           ],
         },
         frame: { x: 1314, y: 1320, w: 438, h: 438 },

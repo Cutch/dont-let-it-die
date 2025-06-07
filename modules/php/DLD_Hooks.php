@@ -181,11 +181,6 @@ class DLD_Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onMorningPost(&$data, array $args = [])
-    {
-        $this->callHooks(__FUNCTION__, $args, $data);
-        return $data;
-    }
     function onMorningAfter(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
@@ -196,11 +191,6 @@ class DLD_Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    // function onNightPost(&$data, array $args = [])
-    // {
-    //     $this->callHooks(__FUNCTION__, $args, $data);
-    //     return $data;
-    // }
     function onNightDrawCard(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
@@ -399,11 +389,6 @@ class DLD_Hooks
         return $data;
     }
     function onPlayerTurn(&$data, array $args = [])
-    {
-        $this->callHooks(__FUNCTION__, $args, $data);
-        return $data;
-    }
-    function onDinnerPhasePost(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;

@@ -627,7 +627,8 @@ class DLD_ItemsData
                                             'cards' => [$card1, $card2],
                                             'id' => $skill['id'],
                                         ],
-                                        $game->character->getTurnCharacterId()
+                                        $game->character->getTurnCharacterId(),
+                                        false
                                     );
                                 }
                             }

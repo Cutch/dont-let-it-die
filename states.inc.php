@@ -69,7 +69,6 @@ $interrupt = 22;
 $whichWeapon = 23;
 $dayEvent = 24;
 $dinnerPhase = 27;
-$dinnerPhasePost = 28;
 $dinnerPhasePrivate = 29;
 $nightPhase = 30;
 $nightDrawCard = 31;
@@ -366,16 +365,6 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'action' => 'stDinnerPhase',
         // 'args' => 'argDinnerPhase',
-        'possibleactions' => [],
-        'transitions' => ['dinnerPhasePost' => $dinnerPhasePost, 'nightPhase' => $nightPhase],
-        'initialprivate' => $dinnerPhasePrivate,
-    ],
-    $dinnerPhasePost => [
-        'name' => 'dinnerPhasePost',
-        'description' => clienttranslate('Waiting for everyone to eat'),
-        'descriptionmyturn' => clienttranslate('It\'s dinner time'),
-        'type' => 'activeplayer',
-        'action' => 'stDinnerPhasePost',
         'possibleactions' => [],
         'transitions' => ['nightPhase' => $nightPhase, 'changeZombiePlayer' => $changeZombiePlayer],
         'initialprivate' => $dinnerPhasePrivate,
