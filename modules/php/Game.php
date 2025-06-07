@@ -2065,9 +2065,11 @@ class Game extends \Table
                 'upgrades' => $this->gameData->get('upgrades'),
                 'unlocks' => $this->gameData->get('unlocks'),
                 'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
+                    $knowledgeObj = $this->data->getKnowledgeTree()[$id];
                     return [
                         'id' => $id,
-                        'name' => $this->data->getKnowledgeTree()[$id]['name'],
+                        'name' => $knowledgeObj['name'],
+                        'name_suffix' => array_key_exists('name_suffix', $knowledgeObj) ? $knowledgeObj['name_suffix'] : '',
                         'unlockCost' => $availableUnlocks[$id]['unlockCost'],
                     ];
                 }, array_keys($availableUnlocks)),
@@ -2120,9 +2122,11 @@ class Game extends \Table
             'allUnlocks' => array_keys($allUnlocks),
             'unlocks' => $this->gameData->get('unlocks'),
             'availableUnlocks' => array_map(function ($id) use ($availableUnlocks) {
+                $knowledgeObj = $this->data->getKnowledgeTree()[$id];
                 return [
                     'id' => $id,
-                    'name' => $this->data->getKnowledgeTree()[$id]['name'],
+                    'name' => $knowledgeObj['name'],
+                    'name_suffix' => array_key_exists('name_suffix', $knowledgeObj) ? $knowledgeObj['name_suffix'] : '',
                     'unlockCost' => $availableUnlocks[$id]['unlockCost'],
                 ];
             }, array_keys($availableUnlocks)),
@@ -2355,7 +2359,7 @@ class Game extends \Table
             'fiber' => 6,
             'hide' => 8,
             'trap' => 0,
-            'fkp' => 40,
+            'fkp' => 20,
             'gem-y' => 1,
             'gem-b' => 1,
             'gem-p' => 1,

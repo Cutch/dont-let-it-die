@@ -20,12 +20,15 @@ export class Dice {
     this.dice = $('dice');
     this.dice.addEventListener('animationEnd', () => {
       this.dice.style.animationPlayState = 'paused';
+      this.diceBase.style.animationPlayState = 'paused';
     });
   }
   _roll({ args, callback }) {
     this.isRolling = true;
     this.container.style['visibility'] = 'unset';
-    this.dice.style['transition'] = 'transform 1s, left 1s, top 1s';
+    this.dice.style['transition'] = 'transform 1s';
+    this.diceBase.style['transition'] = 'left 1s, top 1s';
+    this.diceBase.style.animationPlayState = 'running';
     this.dice.style.animationPlayState = 'running';
     this.dice.classList.add('show-' + args.roll);
     this.diceBase.style['left'] = '20%';
@@ -51,6 +54,7 @@ export class Dice {
         this.container.style['visibility'] = 'hidden';
         $('dice-container-character').innerHTML = '';
         this.dice.style['transition'] = 'unset';
+        this.diceBase.style['transition'] = 'unset';
         this.diceBase.style['left'] = '80%';
         this.diceBase.style['top'] = '80%';
         for (let i = 1; i <= 6; i++) {

@@ -1150,6 +1150,7 @@ declare('bgagame.dontletitdie', Gamegui, {
   //
   getActionSuffixHTML: function (action) {
     let suffix = '';
+    if (action['name_suffix']) suffix += ` ${action['name_suffix']}`;
     if (action['skillOption']) suffix += ` (${_(action['skillOption'].name)})`;
     else if (action['character'] != null && !action['global']) suffix += ` (${action['character']})`;
     else if (action['characterId'] != null && !action['global']) suffix += ` (${action['characterId']})`;

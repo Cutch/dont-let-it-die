@@ -493,6 +493,9 @@ class DLD_ItemsData
                 'onEat' => function (Game $game, $item, &$data) {
                     $data['health'] += 2;
                 },
+                'onGetEatData' => function (Game $game, $item, &$data) {
+                    $data['health'] += 2;
+                },
             ],
             'carving-knife' => [
                 'type' => 'item',
@@ -634,7 +637,7 @@ class DLD_ItemsData
                                         return $card['id'] != $data['cardId'];
                                     })
                                 )[0];
-                                $game->cardDrawEvent($discardCard, $state['deck']);
+                                $game->cardDrawEvent($discardCard, $discardCard['deck']);
 
                                 $drawState = $game->actInterrupt->getState('actDraw');
                                 $drawState['data']['card'] = $game->decks->getCard($data['cardId']);
