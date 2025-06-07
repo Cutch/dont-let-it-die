@@ -359,13 +359,7 @@ class DLD_ActInterrupt
         $state = $this->getLatestInterruptState();
         $data = $state['data'];
         $characterIds = $this->getSkillsCharacterIds($data['skills']);
-        // if (sizeof($characterIds) == 0) {
-        //     array_push($characterIds, $this->game->character->getTurnCharacter()['id']);
-        // }
-        // var_dump(json_encode([$characterIds, 'stInterrupt', $data['skills']]));
-        foreach ($characterIds as $k => $v) {
-            $this->game->gameData->addMultiActiveCharacter($v);
-        }
+        $this->game->gameData->setMultiActiveCharacter($characterIds, true);
         $changeState = false;
         if (sizeof($characterIds) == 0) {
             $this->game->nextState($data['currentState']);

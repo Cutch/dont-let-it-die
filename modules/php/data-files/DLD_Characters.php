@@ -111,7 +111,6 @@ class DLD_CharactersData
                         'name' => clienttranslate('Re-Roll'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
-                        'manuallyAdd' => true,
                         'perDay' => 1,
                         'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . $skill['id'];
@@ -179,7 +178,6 @@ class DLD_CharactersData
                         'name' => clienttranslate('Give 2 Stamina'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
-                        'manuallyAdd' => true,
                         'cancellable' => true,
                         'perDay' => 1,
                         'getPerDayKey' => function (Game $game, $skill): string {

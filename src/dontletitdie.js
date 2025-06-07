@@ -1173,7 +1173,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.updateGameDatas(args);
     const actions = args?.actions;
     const isActive = this.isActive();
-    if (isStudio()) console.log(args);
+    if (isStudio()) console.log('onUpdateActionButtons', isActive, args);
     if (isActive && stateName && actions != null) {
       this.clearActionButtons();
 

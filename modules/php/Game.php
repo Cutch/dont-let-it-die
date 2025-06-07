@@ -1152,25 +1152,6 @@ class Game extends \Table
         }
         // }
     }
-    public function stPostActionPhase()
-    {
-        $interrupted = false;
-        $this->actInterrupt->interruptableFunction(
-            __FUNCTION__,
-            func_get_args(),
-            [$this->hooks, 'onPostActionPhase'],
-            function (Game $_this) use (&$interrupted) {
-                $interrupted = true;
-                return [];
-            },
-            function (Game $_this, bool $finalizeInterrupt, $data) use (&$interrupted) {
-                $interrupted = false;
-                $this->nextState('morningPhase');
-            }
-        );
-        if ($interrupted) {
-        }
-    }
     public function stDrawCard()
     {
         $this->actInterrupt->interruptableFunction(
@@ -1632,9 +1613,6 @@ class Game extends \Table
                     );
                 }
 
-                $this->notify('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
-                    'day' => $day,
-                ]);
                 $this->setStat($day, 'day_number');
                 resetPerDay($this);
                 if ($day == 14) {
@@ -1653,6 +1631,7 @@ class Game extends \Table
                     'woodNeeded' => $woodNeeded,
                     'changeOrder' => true,
                     'nextState' => 'tradePhase',
+                    'day' => $day,
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
@@ -1689,6 +1668,9 @@ class Game extends \Table
                 if ($change['left'] != 0) {
                     $this->lose();
                 }
+                $this->notify('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
+                    'day' => $data['day'],
+                ]);
                 $this->hooks->onMorningAfter($data);
                 $this->actions->resetTurnActions();
                 if ($data['changeOrder']) {

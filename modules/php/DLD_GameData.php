@@ -261,6 +261,33 @@ class DLD_GameData
         }
         return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, 'playerTurn', true);
     }
+    public function setMultiActiveCharacter(array $characterIds, bool $exclusive = false): bool
+    {
+        $activateCharacters = $this->getAllMultiActiveCharacterIds();
+        if ($exclusive) {
+            $activateCharacters = array_filter($activateCharacters, function ($d) use ($characterIds) {
+                return in_array($d, $characterIds);
+            });
+        }
+        foreach ($characterIds as $k => $characterId) {
+            if (!in_array($characterId, $activateCharacters)) {
+                array_push($activateCharacters, $characterId);
+                $this->game->giveExtraTime($this->game->character->getCharacterData($characterId)['playerId']);
+            }
+        }
+        $this->set('activateCharacters', $activateCharacters);
+
+        $activePlayerIds = array_unique(
+            array_map(function ($c) {
+                return $this->game->character->getCharacterData($c)['playerId'];
+            }, $activateCharacters)
+        );
+
+        if (sizeof($activePlayerIds) == 0) {
+            $this->game->character->setSubmittingCharacter(null);
+        }
+        return $this->game->gamestate->setPlayersMultiactive($activePlayerIds, 'playerTurn', true);
+    }
     public function removeMultiActiveCharacter(string $characterId, string $state): bool
     {
         $activateCharacters = $this->getAllMultiActiveCharacterIds();
