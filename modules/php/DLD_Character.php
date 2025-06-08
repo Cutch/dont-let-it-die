@@ -58,9 +58,12 @@ class DLD_Character
         $data['hindrance'] =
             join(
                 ',',
-                array_map(function ($hindrance) {
-                    return $hindrance['id'];
-                }, $data['physicalHindrance'] + $data['mentalHindrance'])
+                array_map(
+                    function ($hindrance) {
+                        return $hindrance['id'];
+                    },
+                    [...$data['physicalHindrance'], ...$data['mentalHindrance']]
+                )
             ) ?? '';
         $data['day_event'] =
             join(

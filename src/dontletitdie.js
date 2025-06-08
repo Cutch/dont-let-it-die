@@ -1198,10 +1198,10 @@ declare('bgagame.dontletitdie', Gamegui, {
       // Add test action buttons in the action status bar, simulating a card click:
       if (actions) {
         const colorLookup = {
-          actSpendFKP: 'darkgray',
-          actAddWood: 'darkgray',
-          actRevive: 'darkgray',
-          actEat: 'darkgray',
+          // actSpendFKP: 'darkgray',
+          // actAddWood: 'darkgray',
+          // actRevive: 'darkgray',
+          // actEat: 'darkgray',
           actUseSkill: 'green',
           actUseItem: 'green',
         };

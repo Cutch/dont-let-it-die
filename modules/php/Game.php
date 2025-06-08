@@ -2506,4 +2506,10 @@ class Game extends \Table
     {
         $this->characterSelection->test_swapCharacter($char);
     }
+    public function hinder()
+    {
+        $char = $this->character->getSubmittingCharacter()['id'];
+        $this->checkHindrance(true, $char);
+        $this->completeAction();
+    }
 }
