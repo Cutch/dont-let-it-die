@@ -706,7 +706,7 @@ class DLD_CharactersData
                     }
                 },
                 'onGetActionSelectable' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && $data['action'] == 'actEat') {
+                    if ($data['characterId'] == $char['id'] && $data['action'] == 'actEat') {
                         $data['selectable'] = array_filter(
                             $data['selectable'],
                             function ($v, $k) {
@@ -1260,7 +1260,7 @@ class DLD_CharactersData
                     }
                 },
                 'onGetActionSelectable' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && $data['action'] == 'actEat') {
+                    if ($data['characterId'] == $char['id'] && $data['action'] == 'actEat') {
                         $data['selectable'] = array_filter(
                             $data['selectable'],
                             function ($v, $k) {

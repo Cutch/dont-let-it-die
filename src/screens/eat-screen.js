@@ -16,9 +16,9 @@ export class EatScreen {
   hide() {
     this.game.selector.hide('eat');
   }
-  show(gameData) {
+  show(gameData, eatableFoods = null) {
     this.foodSelected = null;
-    let eatableFoods = this.game.gamedatas.eatableFoods;
+    eatableFoods = eatableFoods ?? this.game.gamedatas.eatableFoods;
     if (this.game.gamedatas.characters && !this.game.gamedatas.characters.some((d) => d.name === 'Sig')) {
       eatableFoods = eatableFoods.filter((d) => !d['id'].includes('fish'));
     }
@@ -69,7 +69,7 @@ export class EatScreen {
     eatableFoods.forEach((food, i) => {
       const available = this.game.gamedatas.resources[food['id']];
       const requires = food['count'];
-      if (available > requires) {
+      if (available >= requires) {
         renderResource(food, eatElem, () => {
           if (this.foodSelected) {
             document.querySelector(`#eat-screen .token-block.${this.foodSelected}`).style['outline'] = '';

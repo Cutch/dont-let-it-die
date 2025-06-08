@@ -479,11 +479,12 @@ class DLD_Actions
             })
         );
     }
-    public function getActionSelectable(string $actionId, ?string $subActionId = null)
+    public function getActionSelectable(string $actionId, ?string $subActionId = null, ?string $characterId = null)
     {
         $data = [
             'action' => $actionId,
             'selectable' => $this->getAction($actionId, $subActionId)['selectable']($this->game),
+            'characterId' => $characterId ?? $this->game->character->getTurnCharacterId(),
         ];
         return $this->game->hooks->onGetActionSelectable($data)['selectable'];
     }

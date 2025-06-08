@@ -1476,19 +1476,29 @@ class Game extends \Table
     }
     public function argDinnerPhase($playerId)
     {
+        $characters = $this->character->getAllCharacterDataForPlayer($playerId);
         $actions = array_map(function ($char) {
             return [
                 'action' => 'actEat',
                 'character' => $char['character_name'],
                 'type' => 'action',
             ];
-        }, $this->character->getAllCharacterDataForPlayer($playerId));
+        }, $characters);
         $result = [
             'actions' => $actions,
+            'dinnerEatableFoods' => [],
         ];
         $this->getItemData($result);
         $this->getGameData($result);
         $this->getResources($result);
+
+        foreach ($characters as $char) {
+            $result['dinnerEatableFoods'][$char['id']] = array_map(function ($eatable) {
+                $data = [...$eatable['actEat'], 'id' => $eatable['id']];
+                $this->hooks->onGetEatData($data);
+                return $data;
+            }, $this->actions->getActionSelectable('actEat', null, $char['id']));
+        }
         return $result;
     }
     public function stDinnerPhase()
