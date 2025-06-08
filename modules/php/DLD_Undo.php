@@ -29,7 +29,7 @@ class DLD_Undo
         }
         $char = $this->game->character->getTurnCharacterId();
         $undoState = $this->game->getFromDB(
-            'SELECT * FROM `undoState` a INNER JOIN (SELECT max(undo_id) max_last_id FROM `undoState`) b WHERE pending OR b.max_last_id = a.undo_id'
+            'SELECT * FROM `undoState` a INNER JOIN (SELECT max(undo_id) max_last_id FROM `undoState`) b WHERE b.max_last_id = a.undo_id'
         );
         $storedCharacterId = $undoState['character_name'];
         if ($char != $storedCharacterId) {

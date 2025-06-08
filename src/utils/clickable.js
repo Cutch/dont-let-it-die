@@ -22,6 +22,9 @@ export const addClickListener = function (elem, name, callback, addPadding = fal
   elem.role = 'button';
   elem['aria-label'] = name;
   return () => {
+    elem.classList.remove('clickable');
+    elem.classList.remove('clickable-padding');
+    elem.tabIndex = '';
     elem.removeEventListener('click', click);
     elem.removeEventListener('keydown', keydown);
   };

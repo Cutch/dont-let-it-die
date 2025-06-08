@@ -112,6 +112,7 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'perDay' => 1,
+                        'random' => true,
                         'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . $skill['id'];
                         },
@@ -286,6 +287,7 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['nightPhase', 'nightDrawCard'],
                         'perDay' => 1,
+                        'random' => true,
                         'getPerDayKey' => function (Game $game, $skill): string {
                             return $skill['characterId'] . $skill['id'];
                         },
@@ -984,6 +986,7 @@ class DLD_CharactersData
                         'name' => clienttranslate('View Top Card'),
                         'state' => ['playerTurn'],
                         'stamina' => 2,
+                        'random' => true,
                         'onUse' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive']) {
@@ -1217,6 +1220,7 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'name' => clienttranslate('Roll Low Health Die'),
                         'perDay' => 1,
+                        'random' => true,
                         'onUse' => function (Game $game, $skill) {
                             $skill['sendNotification']();
                             $value = $game->rollFireDie($skill['name'], $skill['characterId']);
@@ -2076,6 +2080,7 @@ class DLD_CharactersData
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'damage' => 1,
+                        'random' => true,
                         'onInvestigateFire' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive'] && $data['roll'] < 3) {

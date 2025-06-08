@@ -455,7 +455,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       .forEach((name) => this.updateResource(name, sharedElem, gameData.resources[name] ?? 0));
 
     const firewoodElem = document.querySelector(`#fire-pit .fire-wood`);
-    firewoodElem.innerHTML = '';
+    firewoodElem.innerHTML = '<div class="action-cost" style="display:none"></div>';
     this.updateResource('wood', firewoodElem, this.gamedatas.resources['fireWood'] ?? 0, {
       warn: (this.gamedatas.resources['fireWood'] ?? 0) <= (this.gamedatas['fireWoodCost'] ?? 0),
     });
@@ -496,12 +496,13 @@ declare('bgagame.dontletitdie', Gamegui, {
         promises.push(
           this.tweening.addTween(
             firewoodElem.querySelector(`.token.wood`),
-            availableElem.querySelector(`.token.wood`),
+            sharedElem.querySelector(`.token.wood`),
             'wood',
             2,
             prevResources['fireWood'] - gameData.resources['fireWood'],
           ),
         );
+        gameData.resources['wood']--;
       }
     }
     resourcesForDisplay.forEach((name) => {
@@ -801,7 +802,10 @@ declare('bgagame.dontletitdie', Gamegui, {
 
       trackContainer
         .querySelector(`.track-${this.trackDifficulty}`)
-        .insertAdjacentHTML('beforeend', `<div id="fire-pit" class="fire-pit"><div class="fire-wood"></div></div>`);
+        .insertAdjacentHTML(
+          'beforeend',
+          `<div id="fire-pit" class="fire-pit"><div class="fire-wood"><div class="action-cost" style="display:none"></div></div></div>`,
+        );
       renderImage(`fire`, $('fire-pit'), { scale: 4, pos: 'insert' });
     }
     // const firewoodElem = document.querySelector(`#fire-pit .fire-wood`);
@@ -1064,7 +1068,10 @@ declare('bgagame.dontletitdie', Gamegui, {
         this.updateKnowledgeTree(args.args);
         this.updateTrack(args.args);
 
-        if (this.leftTradePhase) this.showDayTracker();
+        if (this.leftTradePhase) {
+          this.leftTradePhase = false;
+          this.showDayTracker();
+        }
         break;
       case 'tradeSelect':
       case 'tradePhase':
@@ -1075,7 +1082,7 @@ declare('bgagame.dontletitdie', Gamegui, {
               this.itemTradeScreen.show(args.args);
             }
             this.leftMorningPhase = null;
-          }, 3000);
+          }, 500);
         } else if (!this.leftMorningPhase) {
           this.itemTradeScreen.show(args.args);
         }
@@ -1163,6 +1170,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (action['stamina'] != null) suffix += ` <i class="fa fa-bolt dlid__stamina"></i> ${action['stamina']}`;
     if (action['health'] != null) suffix += ` <i class="fa fa-heart dlid__health"></i> ${action['health']}`;
     if (action['unlockCost'] != null) suffix += ` <i class="fa fa-graduation-cap dlid__fkp"></i> ${action['unlockCost']}`;
+    if (action['random'] != null) suffix += ` <i class="fa6 fa6-solid fa6-dice-d6 dlid__dice"></i>`;
     if (action['perDay'] != null)
       suffix += ` <i class="fa fa-sun-o dlid__sun"></i> ` + _('${remaining} left').replace(/\$\{remaining\}/, action['perDay']);
     if (action['perForever'] != null)
@@ -1174,6 +1182,10 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.removeActionButtons();
     this.clickListeners.forEach((clear) => clear());
     this.clickListeners = [];
+    document.querySelectorAll(`.action-cost`).forEach((d) => {
+      d.innerHTML = '';
+      d.style.display = 'none';
+    });
   },
   onUpdateActionButtons: async function (stateName, args) {
     this.updateGameDatas(args);
@@ -1185,6 +1197,14 @@ declare('bgagame.dontletitdie', Gamegui, {
 
       // Add test action buttons in the action status bar, simulating a card click:
       if (actions) {
+        const colorLookup = {
+          actSpendFKP: 'darkgray',
+          actAddWood: 'darkgray',
+          actRevive: 'darkgray',
+          actEat: 'darkgray',
+          actUseSkill: 'green',
+          actUseItem: 'green',
+        };
         actions
           .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
           .forEach((action) => {
@@ -1203,6 +1223,10 @@ declare('bgagame.dontletitdie', Gamegui, {
               }
             }
             if (actionId === 'actAddWood') {
+              const elemCost = document.querySelector(`#fire-pit .fire-wood .action-cost`);
+              const suffix = this.getActionSuffixHTML(action);
+              elemCost.innerHTML = suffix;
+              elemCost.style.display = '';
               this.clickListeners.push(
                 addClickListener(document.querySelector(`#fire-pit .fire-wood`), 'Add Fire Wood', () => {
                   this.bgaPerformAction(`actAddWood`);
@@ -1211,6 +1235,10 @@ declare('bgagame.dontletitdie', Gamegui, {
             } else if (['actDrawGather', 'actDrawForage', 'actDrawHarvest', 'actDrawHunt', 'actDrawExplore'].includes(actionId)) {
               const uppercaseDeck = actionId.slice(7);
 
+              const elemCost = document.querySelector(`.board .${uppercaseDeck.toLowerCase()}-back .action-cost`);
+              const suffix = this.getActionSuffixHTML(action);
+              elemCost.innerHTML = suffix;
+              elemCost.style.display = '';
               this.clickListeners.push(
                 addClickListener(document.querySelector(`.board .${uppercaseDeck.toLowerCase()}-back`), `${uppercaseDeck} Deck`, () => {
                   this.bgaPerformAction(`actDraw${uppercaseDeck}`);
@@ -1218,181 +1246,161 @@ declare('bgagame.dontletitdie', Gamegui, {
               );
             }
             const suffix = this.getActionSuffixHTML(action);
-            return this.statusBar.addActionButton(`${this.getActionMappings()[actionId]}${suffix}`, () => {
-              if (actionId === 'actSpendFKP') {
-                this.clearActionButtons();
-                Object.values(this.gamedatas.availableUnlocks).forEach((unlock) => {
-                  const suffix = this.getActionSuffixHTML(unlock);
-                  this.statusBar.addActionButton(`${_(unlock.name)}${suffix}`, () => {
-                    return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
-                  });
-                });
-                this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
-              } else if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
-                this.clearActionButtons();
-                Object.values(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills).forEach(
-                  (skill) => {
-                    const suffix = this.getActionSuffixHTML(skill);
-                    this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
-                      return this.bgaPerformAction(actionId, { skillId: skill.id });
+            return this.statusBar.addActionButton(
+              `${this.getActionMappings()[actionId]}${suffix}`,
+              () => {
+                if (actionId === 'actSpendFKP') {
+                  this.clearActionButtons();
+                  Object.values(this.gamedatas.availableUnlocks).forEach((unlock) => {
+                    const suffix = this.getActionSuffixHTML(unlock);
+                    this.statusBar.addActionButton(`${_(unlock.name)}${suffix}`, () => {
+                      return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
                     });
-                  },
-                );
-                this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
-              } else if (actionId === 'actTrade') {
-                this.clearActionButtons();
-                this.tradeScreen.show(this.gamedatas);
-                this.statusBar.addActionButton(this.getActionMappings().actTradeItem + `${suffix}`, () => {
-                  if (!this.tradeScreen.hasError()) {
-                    this.bgaPerformAction('actTrade', {
-                      data: JSON.stringify({
-                        offered: this.tradeScreen.getOffered(),
-                        requested: this.tradeScreen.getRequested(),
-                      }),
-                    })
-                      .then(() => this.tradeScreen.hide())
-                      .catch(console.error);
-                  }
-                });
-                this.statusBar.addActionButton(
-                  _('Cancel'),
-                  () => {
-                    this.onUpdateActionButtons(stateName, args);
-                    this.tradeScreen.hide();
-                  },
-                  { color: 'secondary' },
-                );
-              } else if (actionId === 'actTradeItem') {
-                this.bgaPerformAction('actTradeItem', {
-                  data: JSON.stringify(this.itemTradeScreen.getTrade()),
-                });
-              } else if (actionId === 'actCraft') {
-                this.clearActionButtons();
-                this.craftScreen.show(this.gamedatas);
-                this.statusBar.addActionButton(this.getActionMappings().actCraft + `${suffix}`, () => {
-                  if (!this.craftScreen.hasError()) {
-                    this.bgaPerformAction('actCraft', {
-                      itemName: this.craftScreen.getSelectedId(),
-                    })
-                      .then(() => {
-                        this.craftScreen.hide();
-                      })
-                      .catch(console.error);
-                  }
-                });
-                this.statusBar.addActionButton(
-                  _('Cancel'),
-                  () => {
-                    this.onUpdateActionButtons(stateName, args);
-                    this.craftScreen.hide();
-                  },
-                  { color: 'secondary' },
-                );
-              } else if (actionId === 'actCook') {
-                this.clearActionButtons();
-                this.cookScreen.show(this.gamedatas);
-                this.statusBar.addActionButton(this.getActionMappings().actCook + `${suffix}`, () => {
-                  if (!this.cookScreen.hasError()) {
-                    this.bgaPerformAction('actCook', {
-                      resourceType: this.cookScreen.getSelectedId(),
-                    })
-                      .then(() => {
-                        this.cookScreen.hide();
-                      })
-                      .catch(console.error);
-                  }
-                });
-                this.statusBar.addActionButton(
-                  _('Cancel'),
-                  () => {
-                    this.onUpdateActionButtons(stateName, args);
-                    this.cookScreen.hide();
-                  },
-                  { color: 'secondary' },
-                );
-              } else if (actionId === 'actRevive') {
-                this.clearActionButtons();
-                this.reviveScreen.show(this.gamedatas);
-                this.statusBar.addActionButton(this.getActionMappings().actRevive + `${suffix}`, () => {
-                  if (!this.reviveScreen.hasError()) {
-                    const { characterSelected, foodSelected } = this.reviveScreen.getSelected();
-                    this.bgaPerformAction('actRevive', {
-                      character: characterSelected,
-                      food: foodSelected,
-                    })
-                      .then(() => {
-                        this.reviveScreen.hide();
-                      })
-                      .catch(console.error);
-                  }
-                });
-                this.statusBar.addActionButton(
-                  _('Cancel'),
-                  () => {
-                    this.onUpdateActionButtons(stateName, args);
-                    this.reviveScreen.hide();
-                  },
-                  { color: 'secondary' },
-                );
-              }
-              // else if (actionId === 'actUseHerb') {
-              //   this.clearActionButtons();
-              //   this.eatScreen.show(args);
-              //   this.statusBar.addActionButton(this.getActionMappings().actUseHerb + `${suffix}`, () => {
-              //     if (!this.eatScreen.hasError()) {
-              //       this.bgaPerformAction('actEat', {
-              //         resourceType: this.eatScreen.getSelectedId(),
-              //       })
-              //         .then(() => {
-              //           this.eatScreen.hide();
-              //         })
-              //         .catch(console.error);
-              //     }
-              //   });
-              //   this.statusBar.addActionButton(
-              //     _('Cancel'),
-              //     () => {
-              //       this.onUpdateActionButtons(stateName, args);
-              //       this.eatScreen.hide();
-              //     },
-              //     { color: 'secondary' },
-              //   );
-              // }
-              else if (actionId === 'actEat') {
-                this.clearActionButtons();
-                this.eatScreen.show(this.gamedatas, action.character && this.gamedatas.dinnerEatableFoods[action.character]);
-                this.statusBar.addActionButton(_('Eat') + `${suffix}`, () => {
-                  if (!this.eatScreen.hasError()) {
-                    this.bgaPerformAction('actEat', {
-                      resourceType: this.eatScreen.getSelectedId(),
-                    })
-                      .then(() => {
-                        this.eatScreen.hide();
-                        this.onUpdateActionButtons(stateName, args);
-                      })
-                      .catch(console.error);
-                  }
-                });
-                this.statusBar.addActionButton(
-                  _('Cancel'),
-                  () => {
-                    this.onUpdateActionButtons(stateName, args);
-                    this.eatScreen.hide();
-                  },
-                  { color: 'secondary' },
-                );
-              } else if (actionId === 'actInvestigateFire' && this.gamedatas.activeCharacter === 'Cali') {
-                this.clearActionButtons();
-                [0, 1, 2, 3].forEach((i) => {
-                  this.statusBar.addActionButton(`${_('Guess')} ${i}`, () => {
-                    return this.bgaPerformAction(actionId, { guess: i });
                   });
-                });
-                this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
-              } else {
-                return this.bgaPerformAction(actionId);
-              }
-            });
+                  this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
+                } else if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
+                  this.clearActionButtons();
+                  Object.values(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills).forEach(
+                    (skill) => {
+                      const suffix = this.getActionSuffixHTML(skill);
+                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
+                        return this.bgaPerformAction(actionId, { skillId: skill.id });
+                      });
+                    },
+                  );
+                  this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
+                } else if (actionId === 'actTrade') {
+                  this.clearActionButtons();
+                  this.tradeScreen.show(this.gamedatas);
+                  this.statusBar.addActionButton(this.getActionMappings().actTradeItem + `${suffix}`, () => {
+                    if (!this.tradeScreen.hasError()) {
+                      this.bgaPerformAction('actTrade', {
+                        data: JSON.stringify({
+                          offered: this.tradeScreen.getOffered(),
+                          requested: this.tradeScreen.getRequested(),
+                        }),
+                      })
+                        .then(() => this.tradeScreen.hide())
+                        .catch(console.error);
+                    }
+                  });
+                  this.statusBar.addActionButton(
+                    _('Cancel'),
+                    () => {
+                      this.onUpdateActionButtons(stateName, args);
+                      this.tradeScreen.hide();
+                    },
+                    { color: 'secondary' },
+                  );
+                } else if (actionId === 'actTradeItem') {
+                  this.bgaPerformAction('actTradeItem', {
+                    data: JSON.stringify(this.itemTradeScreen.getTrade()),
+                  });
+                } else if (actionId === 'actCraft') {
+                  this.clearActionButtons();
+                  this.craftScreen.show(this.gamedatas);
+                  this.statusBar.addActionButton(this.getActionMappings().actCraft + `${suffix}`, () => {
+                    if (!this.craftScreen.hasError()) {
+                      this.bgaPerformAction('actCraft', {
+                        itemName: this.craftScreen.getSelectedId(),
+                      })
+                        .then(() => {
+                          this.craftScreen.hide();
+                        })
+                        .catch(console.error);
+                    }
+                  });
+                  this.statusBar.addActionButton(
+                    _('Cancel'),
+                    () => {
+                      this.onUpdateActionButtons(stateName, args);
+                      this.craftScreen.hide();
+                    },
+                    { color: 'secondary' },
+                  );
+                } else if (actionId === 'actCook') {
+                  this.clearActionButtons();
+                  this.cookScreen.show(this.gamedatas);
+                  this.statusBar.addActionButton(this.getActionMappings().actCook + `${suffix}`, () => {
+                    if (!this.cookScreen.hasError()) {
+                      this.bgaPerformAction('actCook', {
+                        resourceType: this.cookScreen.getSelectedId(),
+                      })
+                        .then(() => {
+                          this.cookScreen.hide();
+                        })
+                        .catch(console.error);
+                    }
+                  });
+                  this.statusBar.addActionButton(
+                    _('Cancel'),
+                    () => {
+                      this.onUpdateActionButtons(stateName, args);
+                      this.cookScreen.hide();
+                    },
+                    { color: 'secondary' },
+                  );
+                } else if (actionId === 'actRevive') {
+                  this.clearActionButtons();
+                  this.reviveScreen.show(this.gamedatas);
+                  this.statusBar.addActionButton(this.getActionMappings().actRevive + `${suffix}`, () => {
+                    if (!this.reviveScreen.hasError()) {
+                      const { characterSelected, foodSelected } = this.reviveScreen.getSelected();
+                      this.bgaPerformAction('actRevive', {
+                        character: characterSelected,
+                        food: foodSelected,
+                      })
+                        .then(() => {
+                          this.reviveScreen.hide();
+                        })
+                        .catch(console.error);
+                    }
+                  });
+                  this.statusBar.addActionButton(
+                    _('Cancel'),
+                    () => {
+                      this.onUpdateActionButtons(stateName, args);
+                      this.reviveScreen.hide();
+                    },
+                    { color: 'secondary' },
+                  );
+                } else if (actionId === 'actEat') {
+                  this.clearActionButtons();
+                  this.eatScreen.show(this.gamedatas, action.character && this.gamedatas.dinnerEatableFoods[action.character]);
+                  this.statusBar.addActionButton(_('Eat') + `${suffix}`, () => {
+                    if (!this.eatScreen.hasError()) {
+                      this.bgaPerformAction('actEat', {
+                        resourceType: this.eatScreen.getSelectedId(),
+                      })
+                        .then(() => {
+                          this.eatScreen.hide();
+                          this.onUpdateActionButtons(stateName, args);
+                        })
+                        .catch(console.error);
+                    }
+                  });
+                  this.statusBar.addActionButton(
+                    _('Cancel'),
+                    () => {
+                      this.onUpdateActionButtons(stateName, args);
+                      this.eatScreen.hide();
+                    },
+                    { color: 'secondary' },
+                  );
+                } else if (actionId === 'actInvestigateFire' && this.gamedatas.activeCharacter === 'Cali') {
+                  this.clearActionButtons();
+                  [0, 1, 2, 3].forEach((i) => {
+                    this.statusBar.addActionButton(`${_('Guess')} ${i}`, () => {
+                      return this.bgaPerformAction(actionId, { guess: i });
+                    });
+                  });
+                  this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
+                } else {
+                  return this.bgaPerformAction(actionId);
+                }
+              },
+              stateName === 'playerTurn' ? { classes: 'bgabutton_' + (colorLookup[actionId] ?? 'blue') } : null,
+            );
           });
       }
       const addSelectionCancelButton = () => {
@@ -1475,7 +1483,6 @@ declare('bgagame.dontletitdie', Gamegui, {
           });
           addSelectionCancelButton();
           break;
-
         case 'whichWeapon':
           this.statusBar.addActionButton(_('Confirm'), () =>
             this.bgaPerformAction('actChooseWeapon', { weaponId: this.weaponScreen.getSelectedId() }),

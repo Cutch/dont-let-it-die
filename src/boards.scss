@@ -14,6 +14,39 @@
     margin: 0 auto 1rem;
   }
 }
+.clickable {
+  .action-cost {
+    position: absolute;
+    bottom: 0px;
+    right: -12px;
+    z-index: 1;
+    // background: white;
+    color: #fff;
+    background: #4871b6;
+    border: 1px solid #37578c;
+    padding: 1px 7px;
+    border-radius: 10px;
+
+    .dlid__stamina {
+      color: #ffff00;
+    }
+    .dlid__health {
+      color: #ff0000;
+    }
+    .dlid__fkp {
+      color: #00ff16;
+    }
+    .dlid__dice {
+      color: #fff;
+    }
+    // .dlid__sun {
+    //   color: #ffff00;
+    // }
+    // .dlid__forever {
+    //   color: #ff8800;
+    // }
+  }
+}
 #board-container {
   position: relative;
 }

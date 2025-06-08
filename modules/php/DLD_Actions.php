@@ -15,6 +15,7 @@ class DLD_Actions
             'actRevive' => [
                 'state' => ['playerTurn'],
                 'type' => 'action',
+                'stamina' => 0,
                 'requires' => function (Game $game, $action) {
                     $variables = $game->gameData->getResources();
                     $array = $this->getActionSelectable($action['id']);
@@ -200,14 +201,17 @@ class DLD_Actions
             'actDrawGather' => [
                 'state' => ['playerTurn'],
                 'stamina' => 2,
+                'random' => true,
             ],
             'actDrawForage' => [
                 'state' => ['playerTurn'],
                 'stamina' => 2,
+                'random' => true,
             ],
             'actDrawHarvest' => [
                 'state' => ['playerTurn'],
                 'stamina' => 3,
+                'random' => true,
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {
                     return sizeof(
@@ -220,6 +224,7 @@ class DLD_Actions
             'actDrawHunt' => [
                 'state' => ['playerTurn'],
                 'stamina' => 3,
+                'random' => true,
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {
                     return sizeof(
@@ -232,6 +237,7 @@ class DLD_Actions
             'actDrawExplore' => [
                 'state' => ['playerTurn'],
                 'stamina' => 4,
+                'random' => true,
                 'type' => 'action',
                 'expansion' => 'hindrance',
             ],
@@ -270,6 +276,7 @@ class DLD_Actions
             'actInvestigateFire' => [
                 'state' => ['playerTurn'],
                 'stamina' => 3,
+                'random' => true,
             ],
             'actUseSkill' => [
                 'getState' => function () {
@@ -509,6 +516,7 @@ class DLD_Actions
             'perDay' => array_key_exists('perDay', $skill) ? $skill['perDay'] : null,
             'perForever' => array_key_exists('perForever', $skill) ? $skill['perForever'] : null,
             'name' => array_key_exists('name', $skill) ? $skill['name'] : null,
+            'random' => array_key_exists('random', $skill) ? $skill['random'] : null,
         ];
         $this->game->hooks->onGetActionCost($actionCost);
 
@@ -524,6 +532,9 @@ class DLD_Actions
         }
         if (array_key_exists('perForever', $actionCost)) {
             $skill['perForever'] = $actionCost['perForever'];
+        }
+        if (array_key_exists('random', $actionCost)) {
+            $skill['random'] = $actionCost['random'];
         }
         if (array_key_exists('name', $actionCost)) {
             $skill['name'] = $actionCost['name'];

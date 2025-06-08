@@ -20,7 +20,10 @@ export class Deck {
     renderImage(`${this.deck}-back`, this.div.querySelector(`.shuffle-2`), { scale: this.scale, pos: 'replace' });
     this.div
       .querySelector(`.${this.deck}-back`)
-      .insertAdjacentHTML('beforeend', `<div class="deck-counter dot dot--number counter">${this.countData.count}</div>`);
+      .insertAdjacentHTML(
+        'beforeend',
+        `<div class="deck-counter dot dot--number counter">${this.countData.count}</div><div class="action-cost"></div>`,
+      );
     this.drawing = [];
     this.partialDrawCard = null;
     this.topDiscard = null;
