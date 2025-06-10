@@ -147,6 +147,7 @@ declare('bgagame.dontletitdie', Gamegui, {
             'beforeend',
             `<div id="${characterSideId}" class="character-side-container">
             <div class="character-name">${character.name}<span class="first-player-marker"></span></div>
+            <div class="status line"></div>
             <div class="health line"><div class="fa fa-heart"></div><span class="label">${_(
               'Health',
             )}: </span><span class="value"></span></div>
@@ -159,7 +160,7 @@ declare('bgagame.dontletitdie', Gamegui, {
             <div class="hindrance line" style="${
               this.expansions.includes('hindrance') ? '' : 'display:none'
             }"><div class="fa fa-ban"></div><span class="label">${_('Hindrance')}: </span><span class="value"></span></div>
-            <div class="character-image"></div>
+            <div class="character-image"><div class="cover"></div></div>
           </div>`,
           );
           if (gameData.gamestate?.name !== 'characterSelect')
@@ -190,6 +191,25 @@ declare('bgagame.dontletitdie', Gamegui, {
         }
         playerSideContainer.querySelector(`.health .value`).innerHTML = `${character.health ?? 0}/${character.maxHealth ?? 0}`;
         playerSideContainer.querySelector(`.stamina .value`).innerHTML = `${character.stamina ?? 0}/${character.maxStamina ?? 0}`;
+        const healthLine = playerSideContainer.querySelector(`.status`);
+        if (character.incapacitated) {
+          if ((character.health ?? 0) > 0) {
+            healthLine.innerHTML = _('Recovering');
+            if (!healthLine.classList.contains('healing')) healthLine.classList.add('healing');
+          } else if (!healthLine.classList.contains('incapacitated')) {
+            healthLine.innerHTML = _('Incapacitated');
+            healthLine.classList.add('incapacitated');
+          }
+        } else {
+          if ((character.health ?? 0) > 0) {
+            if (healthLine.classList.contains('healing')) {
+              healthLine.innerHTML = '';
+              healthLine.classList.remove('healing');
+            }
+          } else if (healthLine.classList.contains('incapacitated')) {
+            healthLine.classList.remove('incapacitated');
+          }
+        }
 
         playerSideContainer.querySelector(`.equipment .value`).innerHTML =
           [
@@ -740,6 +760,8 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.bgaPerformAction('actCharacterClicked', {
             character1: this.mySelectedCharacters?.[0],
             character2: this.mySelectedCharacters?.[1],
+            character3: this.mySelectedCharacters?.[2],
+            character4: this.mySelectedCharacters?.[3],
           }).catch(() => {
             this.mySelectedCharacters = saved;
           });
