@@ -96,12 +96,12 @@ class DLD_CharactersData
                 'name' => 'Kara',
                 'slots' => ['weapon', 'tool'],
                 'onEat' => function (Game $game, $char, &$data) {
-                    if ($char['isActive']) {
+                    if ($data['characterId'] == $char['id']) {
                         $data['health'] *= 2;
                     }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    if ($char['isActive']) {
+                    if ($data['characterId'] == $char['id']) {
                         $data['health'] *= 2;
                     }
                 },
@@ -136,7 +136,8 @@ class DLD_CharactersData
                             }
                         },
                         'requires' => function (Game $game, $skill) {
-                            return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
+                            $char = $game->character->getCharacterData($skill['characterId']);
+                            return !$char['incapacitated'] && getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
                         },
                     ],
                     'skill2' => [
@@ -150,7 +151,12 @@ class DLD_CharactersData
                         },
                         'onGetActionCost' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            if (!$char['isActive'] && $data['action'] == 'actUseSkill' && $data['subAction'] == $skill['id']) {
+                            if (
+                                !$char['incapacitated'] &&
+                                !$char['isActive'] &&
+                                $data['action'] == 'actUseSkill' &&
+                                $data['subAction'] == $skill['id']
+                            ) {
                                 $data['perDay'] = 1 - getUsePerDay($skill['getPerDayKey']($game, $skill), $game);
                             }
                         },
@@ -169,7 +175,8 @@ class DLD_CharactersData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            return !$char['isActive'] &&
+                            return !$char['incapacitated'] &&
+                                !$char['isActive'] &&
                                 getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
                                 !in_array('night-event-8_11', $game->getActiveNightCardIds());
                         },
@@ -193,6 +200,7 @@ class DLD_CharactersData
                             $char = $game->character->getCharacterData($skill['characterId']);
                             $interruptState = $game->actInterrupt->getState('actUseSkill');
                             if (
+                                !$char['incapacitated'] &&
                                 !$char['isActive'] &&
                                 $data['action'] == 'actUseSkill' &&
                                 $data['subAction'] == $skill['id'] &&
@@ -220,7 +228,9 @@ class DLD_CharactersData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            return !$char['isActive'] && getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
+                            return !$char['incapacitated'] &&
+                                !$char['isActive'] &&
+                                getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
                         },
                     ],
                 ],
@@ -292,7 +302,9 @@ class DLD_CharactersData
                             return $skill['characterId'] . $skill['id'];
                         },
                         'requires' => function (Game $game, $skill) {
-                            return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
+                            $char = $game->character->getCharacterData($skill['characterId']);
+                            return !$char['incapacitated'] &&
+                                getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
                                 $game->gameData->getResource('bone') > 0;
                         },
                         'onNightDrawCard' => function (Game $game, $skill, $data) {
@@ -785,13 +797,21 @@ class DLD_CharactersData
                     return $char['id'] . 'skillonEat';
                 },
                 'onEat' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && getUsePerDay($char['getPerDayKey']($game, $char), $game) < 1) {
+                    if (
+                        $data['characterId'] == $char['id'] &&
+                        str_contains($data['type'], 'berry') &&
+                        getUsePerDay($char['getPerDayKey']($game, $char), $game) < 1
+                    ) {
                         $data['stamina'] = 2;
                         usePerDay($char['getPerDayKey']($game, $char), $game);
                     }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && getUsePerDay($char['getPerDayKey']($game, $char), $game) < 1) {
+                    if (
+                        $data['characterId'] == $char['id'] &&
+                        str_contains($data['id'], 'berry') &&
+                        getUsePerDay($char['getPerDayKey']($game, $char), $game) < 1
+                    ) {
                         $data['stamina'] = 2;
                     }
                 },
@@ -824,10 +844,19 @@ class DLD_CharactersData
                             }
                         },
                         'onUse' => function (Game $game, $skill) {
+                            $characterIds = array_map(
+                                function ($d) {
+                                    return $d['id'];
+                                },
+                                array_filter($game->character->getAllCharacterData(), function ($character) {
+                                    return !$character['incapacitated'];
+                                })
+                            );
+
                             $game->selectionStates->initiateState(
                                 'characterSelection',
                                 [
-                                    'selectableCharacters' => $game->character->getAllCharacterIds(),
+                                    'selectableCharacters' => array_values($characterIds),
                                     'id' => $skill['id'],
                                 ],
                                 $skill['characterId'],
@@ -1254,12 +1283,12 @@ class DLD_CharactersData
                 'slots' => ['weapon', 'tool'],
                 // Double Health from meat
                 'onEat' => function (Game $game, $char, &$data) {
-                    if ($char['isActive']) {
+                    if ($data['characterId'] == $char['id']) {
                         $data['health'] *= 2;
                     }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    if ($char['isActive']) {
+                    if ($data['characterId'] == $char['id']) {
                         $data['health'] *= 2;
                     }
                 },
@@ -1365,13 +1394,13 @@ class DLD_CharactersData
                     return $char['id'];
                 },
                 'onEat' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && getUsePerDay($char['id'], $game) < 1) {
+                    if ($data['characterId'] == $char['id'] && getUsePerDay($char['id'], $game) < 1) {
                         usePerDay($char['id'], $game);
                         $data['health'] *= 2;
                     }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && getUsePerDay($char['id'], $game) < 1) {
+                    if ($data['characterId'] == $char['id'] && getUsePerDay($char['id'], $game) < 1) {
                         $data['health'] *= 2;
                     }
                 },
@@ -1640,6 +1669,7 @@ class DLD_CharactersData
                             $interruptState = $game->actInterrupt->getState('stResolveEncounter');
                             // $game->log('$interruptState', $interruptState);
                             if (
+                                !$char['incapacitated'] &&
                                 !$char['isActive'] &&
                                 $data['action'] == 'actUseSkill' &&
                                 $data['subAction'] == $skill['id'] &&
@@ -1660,7 +1690,7 @@ class DLD_CharactersData
                         'onEncounterPre' => function (Game $game, $skill, &$data) {
                             $damageTaken = $game->encounter->countDamageTaken($data);
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            if (!$char['isActive'] && $damageTaken > 0 && !$data['damageStamina']) {
+                            if (!$char['incapacitated'] && !$char['isActive'] && $damageTaken > 0 && !$data['damageStamina']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
@@ -1683,7 +1713,7 @@ class DLD_CharactersData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            return !$char['isActive'];
+                            return !$char['incapacitated'] && !$char['isActive'];
                         },
                     ],
                 ],
@@ -1997,7 +2027,7 @@ class DLD_CharactersData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            return !$char['isActive'];
+                            return !$char['incapacitated'] && !$char['isActive'];
                         },
                     ],
                 ],
@@ -2126,10 +2156,18 @@ class DLD_CharactersData
                 'onCraftPost' => function (Game $game, $char, &$data) {
                     // Choose tribe member to gain 1 hp or 1 stamina
                     // $data['interrupt'] = true;
+                    $characterIds = array_map(
+                        function ($d) {
+                            return $d['id'];
+                        },
+                        array_filter($game->character->getAllCharacterData(), function ($character) {
+                            return !$character['incapacitated'];
+                        })
+                    );
                     $game->selectionStates->initiateState(
                         'characterSelection',
                         [
-                            'selectableCharacters' => $game->character->getAllCharacterIds(),
+                            'selectableCharacters' => array_values($characterIds),
                             'id' => $char['id'] . 'craft',
                         ],
                         $char['id'],

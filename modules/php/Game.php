@@ -135,6 +135,13 @@ class Game extends \Table
         }
         $this->notify->all(...$arg);
     }
+    public function notify_player($playerId, ...$arg)
+    {
+        if ($this->getBgaEnvironment() == 'studio') {
+            $this->log('notify player', $playerId, ...$arg);
+        }
+        $this->notify->player($playerId, ...$arg);
+    }
     public function getCharacterHTML(?string $name = null)
     {
         if ($name) {
@@ -669,10 +676,13 @@ class Game extends \Table
         $this->setLastAction('actUseHerb');
         $this->completeAction();
     }
-    public function actEat(?string $resourceType = null): void
+    public function actEat(?string $resourceType = null, ?string $characterId = null): void
     {
         if (!$resourceType) {
             throw new BgaUserException(clienttranslate('Select a Resource'));
+        }
+        if ($characterId) {
+            $this->character->setSubmittingCharacterById($characterId);
         }
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
@@ -682,7 +692,12 @@ class Game extends \Table
                 $this->actions->validateCanRunAction('actEat', null, $resourceType);
 
                 $tokenData = $this->data->getTokens()[$resourceType];
-                $data = ['type' => $resourceType, ...$tokenData['actEat'], 'tokenName' => $tokenData['name']];
+                $data = [
+                    'type' => $resourceType,
+                    ...$tokenData['actEat'],
+                    'tokenName' => $tokenData['name'],
+                    'characterId' => $this->character->getSubmittingCharacterId(),
+                ];
                 return $data;
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
@@ -694,17 +709,15 @@ class Game extends \Table
                 }
                 $left = $this->adjustResource($data['type'], -$data['count'])['left'];
                 if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
-                    if ($left == 0) {
-                        $this->notify(
-                            'notify',
-                            !array_key_exists('stamina', $data)
-                                ? clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health')
-                                : clienttranslate(
-                                    '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
-                                ),
-                            [...$data, 'token_name' => $data['tokenName']]
-                        );
-                    }
+                    $this->notify(
+                        'notify',
+                        !array_key_exists('stamina', $data)
+                            ? clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health')
+                            : clienttranslate(
+                                '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
+                            ),
+                        [...$data, 'token_name' => $data['tokenName']]
+                    );
                 }
             }
         );
@@ -1000,6 +1013,7 @@ class Game extends \Table
             $saveState = false;
             $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'nightPhase');
         } elseif ($stateName == 'startHindrance') {
+            $this->markChanged('token');
             if (
                 sizeof(
                     array_filter($this->gameData->get('upgrades'), function ($v) {
@@ -1477,6 +1491,8 @@ class Game extends \Table
     public function argDinnerPhase($playerId)
     {
         $characters = $this->character->getAllCharacterDataForPlayer($playerId);
+        $action = $this->actions->getAction('actAddWood');
+        $hasWood = $action['requires']($this, $action);
         $actions = array_map(function ($char) {
             return [
                 'action' => 'actEat',
@@ -1485,7 +1501,7 @@ class Game extends \Table
             ];
         }, $characters);
         $result = [
-            'actions' => $actions,
+            'actions' => [...$actions, ...$hasWood ? [$action] : []],
             'dinnerEatableFoods' => [],
         ];
         $this->getItemData($result);
@@ -1493,8 +1509,8 @@ class Game extends \Table
         $this->getResources($result);
 
         foreach ($characters as $char) {
-            $result['dinnerEatableFoods'][$char['id']] = array_map(function ($eatable) {
-                $data = [...$eatable['actEat'], 'id' => $eatable['id']];
+            $result['dinnerEatableFoods'][$char['id']] = array_map(function ($eatable) use ($char) {
+                $data = [...$eatable['actEat'], 'id' => $eatable['id'], 'characterId' => $char['id']];
                 $this->hooks->onGetEatData($data);
                 return $data;
             }, $this->actions->getActionSelectable('actEat', null, $char['id']));
@@ -1657,8 +1673,8 @@ class Game extends \Table
                 $this->notify('morningPhase', clienttranslate('The fire pit used ${amount} wood'), [
                     'amount' => $woodNeeded,
                 ]);
-                $change = $this->adjustResource('fireWood', -$woodNeeded);
-                if ($change['left'] != 0) {
+                $this->adjustResource('fireWood', -$woodNeeded);
+                if ($this->gameData->getResource('fireWood') <= 0) {
                     $this->lose();
                 }
                 $this->notify('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
@@ -1783,7 +1799,7 @@ class Game extends \Table
         }, $this->gameData->get('campEquipment'));
 
         $result['eatableFoods'] = array_map(function ($eatable) {
-            $data = [...$eatable['actEat'], 'id' => $eatable['id']];
+            $data = [...$eatable['actEat'], 'id' => $eatable['id'], 'characterId' => $this->character->getTurnCharacterId()];
             $this->hooks->onGetEatData($data);
             return $data;
         }, $this->actions->getActionSelectable('actEat'));
@@ -1834,8 +1850,12 @@ class Game extends \Table
 
         $resourcesAvailable = [];
         $tokensData = $this->data->getTokens();
+        // var_dump(json_encode($tokensData));
+        $this->log($tokensData);
+        $this->log($tokensData);
         array_walk($tokensData, function ($v, $k) use (&$result, &$resourcesAvailable) {
             if ($v['type'] == 'resource' && isset($result['resources'][$k])) {
+                // var_dump(array_key_exists('expansion', $v) ? $v['expansion'] : null);
                 if (
                     (!array_key_exists('requires', $v) || $v['requires']($this, $v)) &&
                     (!array_key_exists('expansion', $v) || $this->isValidExpansion($v['expansion']))
@@ -1857,6 +1877,12 @@ class Game extends \Table
                 }
             }
         });
+        // array_walk($result['resources'], function ($v, $k) use (&$result, $tokensData) {
+        //     if (!isset($tokensData[$k])) {
+        //         unset($result['resources'][$k]);
+        //         unset($result['prevResources'][$k]);
+        //     }
+        // });
 
         $result['resourcesAvailable'] = $resourcesAvailable;
     }
@@ -2054,6 +2080,25 @@ class Game extends \Table
                 $result['canUndo'] = $this->undo->canUndo();
             }
             $this->notify('updateActionButtons', '', ['gameData' => $result]);
+        }
+        if (in_array($this->gamestate->state()['name'], ['dinnerPhasePrivate', 'dinnerPhase'])) {
+            foreach ($this->gamestate->getActivePlayerList() as $playerId) {
+                $characters = $this->character->getAllCharacterDataForPlayer($playerId);
+                $action = $this->actions->getAction('actAddWood');
+                $hasWood = $action['requires']($this, $action);
+                $actions = array_map(function ($char) {
+                    return [
+                        'action' => 'actEat',
+                        'character' => $char['character_name'],
+                        'type' => 'action',
+                    ];
+                }, $characters);
+                $result = [
+                    'actions' => [...$actions, ...$hasWood ? [$action] : []],
+                    'dinnerEatableFoods' => [],
+                ];
+                $this->notify_player((int) $playerId, 'updateActionButtons', '', ['gameData' => $result]);
+            }
         }
     }
 
@@ -2303,7 +2348,7 @@ class Game extends \Table
     public function giveResources()
     {
         $this->gameData->setResources([
-            'fireWood' => 2,
+            'fireWood' => 0,
             'wood' => 2,
             'bone' => 6,
             'meat' => 4,

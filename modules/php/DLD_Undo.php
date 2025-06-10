@@ -139,7 +139,7 @@ class DLD_Undo
             $this->initialState['stateName'] != 'playerTurn' &&
             $char == $this->game->character->getSubmittingCharacterId()
         ) {
-            if ($this->game->gamestate->state()['name'] != 'playerTurn') {
+            if ($this->game->gamestate->state()['name'] == 'playerTurn') {
                 $this->game::DbQuery('UPDATE `undoState` SET pending=false WHERE pending=true');
             }
         }

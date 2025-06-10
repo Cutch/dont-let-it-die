@@ -74,7 +74,7 @@ class DLD_Data
     }
     public function getTokens()
     {
-        return $this->get('tokens');
+        return $this->tokens;
     }
     public function getBoards()
     {

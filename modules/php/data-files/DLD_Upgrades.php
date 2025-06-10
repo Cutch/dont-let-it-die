@@ -379,7 +379,7 @@ class DLD_UpgradesData
                             $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
                                 $currentCharacter
                             ) {
-                                return $character != $currentCharacter;
+                                return !$character['incapacitated'] && $character != $currentCharacter;
                             });
                             $game->selectionStates->initiateState(
                                 'characterSelection',

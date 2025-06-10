@@ -928,10 +928,18 @@ class DLD_ItemsData
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive'] && in_array($skill['parentId'], $data['itemIdUsed'])) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
+                                $characterIds = array_map(
+                                    function ($d) {
+                                        return $d['id'];
+                                    },
+                                    array_filter($game->character->getAllCharacterData(), function ($character) {
+                                        return !$character['incapacitated'];
+                                    })
+                                );
                                 $game->selectionStates->initiateState(
                                     'characterSelection',
                                     [
-                                        'selectableCharacters' => $game->character->getAllCharacterIds(),
+                                        'selectableCharacters' => array_values($characterIds),
                                         'id' => $skill['id'],
                                         'cardId' => $data['cardId'],
                                     ],

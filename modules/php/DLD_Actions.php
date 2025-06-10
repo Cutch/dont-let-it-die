@@ -105,7 +105,7 @@ class DLD_Actions
                 },
             ],
             'actAddWood' => [
-                'state' => ['playerTurn'],
+                'state' => ['playerTurn', 'dinnerPhase'],
                 'stamina' => 0,
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {

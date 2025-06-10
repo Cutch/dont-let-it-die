@@ -104,6 +104,7 @@ class DLD_SelectionStates
                     ...$tokenData['actEat'],
                     'tokenName' => $tokenData['name'],
                     'selectionState' => $selectionState,
+                    'characterId' => $this->game->character->getSubmittingCharacterId(),
                 ];
                 return $data;
             },

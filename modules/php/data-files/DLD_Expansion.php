@@ -365,7 +365,7 @@ class DLD_ExpansionData
                             $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
                                 $currentCharacter
                             ) {
-                                return $character != $currentCharacter;
+                                return !$character['incapacitated'] && $character != $currentCharacter;
                             });
 
                             $data['interrupt'] = true;
@@ -402,7 +402,7 @@ class DLD_ExpansionData
                             $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
                                 $currentCharacter
                             ) {
-                                return $character != $currentCharacter;
+                                return !$character['incapacitated'] && $character != $currentCharacter;
                             });
                             $data['interrupt'] = true;
                             $game->selectionStates->initiateState(

@@ -1393,6 +1393,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                     if (!this.eatScreen.hasError()) {
                       this.bgaPerformAction('actEat', {
                         resourceType: this.eatScreen.getSelectedId(),
+                        characterId: action.character ?? null,
                       })
                         .then(() => {
                           this.eatScreen.hide();
@@ -1525,6 +1526,17 @@ declare('bgagame.dontletitdie', Gamegui, {
           break;
         case 'dinnerPhase':
         case 'dinnerPhasePrivate':
+          this.statusBar.addActionButton(
+            _('Done'),
+            () =>
+              (this.gamedatas.resources['fireWood'] ?? 0) <= (this.gamedatas['fireWoodCost'] ?? 0)
+                ? this.confirmationDialog(_('There is not enough wood for the morning phase. You will lose the game!'), () =>
+                    this.bgaPerformAction('actDone'),
+                  )
+                : this.bgaPerformAction('actDone'),
+            { color: 'secondary' },
+          );
+          break;
         case 'postEncounter':
           this.statusBar.addActionButton(_('Done'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
           break;

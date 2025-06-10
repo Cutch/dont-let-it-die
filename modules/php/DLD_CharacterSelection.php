@@ -170,7 +170,7 @@ class DLD_CharacterSelection
         $this->game->getAllPlayers($results);
         // $this->game->initCharacters($playerId);
         $this->game->notify('chooseCharacters', clienttranslate($message), array_merge(['gameData' => $results], $selectedCharactersArgs));
-
+        $this->game->markChanged('token');
         // Deactivate player, and move to next state if none are active
         $this->game->gamestate->setPlayerNonMultiactive(
             $playerId,
