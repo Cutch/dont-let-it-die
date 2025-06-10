@@ -1438,7 +1438,7 @@ class Game extends \Table
     {
         // Compute and return the game progression
         extract($this->gameData->getAll('day', 'turnNo'));
-        return (($day - 1) * 4 + ($turnNo ?? 0)) / (12 * 4);
+        return ((($day - 1) * 4 + ($turnNo ?? 0)) / (12 * 4)) * 100;
     }
     public function endTurn()
     {
