@@ -105,7 +105,7 @@ class DLD_GameData
         $this->game->globals->set($name, $value);
         $this->cachedGameData[$name] = $value;
     }
-    public function getItems(): array
+    public function getCreatedItems(): array
     {
         return $this->cachedGameItems;
     }

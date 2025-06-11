@@ -162,7 +162,7 @@ class DLD_Character
                 $characterData[$k] = $v;
             }
         });
-        $itemsLookup = $this->game->gameData->getItems();
+        $itemsLookup = $this->game->gameData->getCreatedItems();
         $characterData['dayEvent'] = array_map(function ($itemId) {
             return $this->game->data->getExpansion()[$itemId];
         }, array_filter(explode(',', $characterData['day_event'] ?? '')));
@@ -267,7 +267,7 @@ class DLD_Character
     }
     public function getItemValidations(int $itemId, array $character, ?int $removingItemId = null)
     {
-        $items = $this->game->gameData->getItems();
+        $items = $this->game->gameData->getCreatedItems();
         $item = $items[$itemId];
         $itemName = $this->game->data->getItems()[$item]['id'];
         $itemType = $this->game->data->getItems()[$item]['itemType'];
@@ -297,7 +297,7 @@ class DLD_Character
     public function equipAndValidateEquipment(string $characterId, int $itemId)
     {
         $character = $this->getCharacterData($characterId);
-        $itemsLookup = $this->game->gameData->getItems();
+        $itemsLookup = $this->game->gameData->getCreatedItems();
         $itemName = $itemsLookup[$itemId];
         $itemObj = $this->game->data->getItems()[$itemName];
         $itemType = $itemObj['itemType'];

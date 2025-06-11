@@ -136,7 +136,7 @@ class DLD_ItemTrade
             $this->game->gameData->set('campEquipment', $campEquipment);
 
             $results = [];
-            $items = $this->game->gameData->getItems();
+            $items = $this->game->gameData->getCreatedItems();
             $this->game->getAllPlayers($results);
             $this->game->getItemData($results);
             $this->game->notify('tradeItem', clienttranslate('${character_name_1} traded an item with the camp'), [
@@ -243,7 +243,7 @@ class DLD_ItemTrade
             $this->game->character->setCharacterEquipment($trade2['character']['id'], array_values($characterItems2));
 
             $results = [];
-            $items = $this->game->gameData->getItems();
+            $items = $this->game->gameData->getCreatedItems();
             $this->game->getAllPlayers($results);
             $this->game->getItemData($results);
             $this->game->notify('tradeItem', clienttranslate('${character_name_1} traded an item to ${character_name_2}'), [

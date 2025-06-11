@@ -1786,7 +1786,7 @@ class DLD_CharactersData
                                 $itemSelectionState = $game->selectionStates->getState('itemSelection');
                                 $characterId = $characterSelectionState['selectedCharacterId'];
                                 $itemId = $itemSelectionState['selectedItemId'];
-                                $itemsLookup = $game->gameData->getItems();
+                                $itemsLookup = $game->gameData->getCreatedItems();
                                 $itemName = $itemsLookup[$itemId];
                                 $game->character->unequipEquipment($skill['characterId'], [$itemId]);
                                 $itemObj = $game->data->getItems()[$itemName];

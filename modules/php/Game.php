@@ -574,7 +574,7 @@ class Game extends \Table
                 }
             }
         }
-        $items = $this->gameData->getItems();
+        $items = $this->gameData->getCreatedItems();
 
         $this->notify('notify', clienttranslate('{item_name} destroyed'), [
             'item_name' => notifyTextButton([
@@ -1742,7 +1742,7 @@ class Game extends \Table
     }
     public function getCraftedItems(): array
     {
-        $items = $this->gameData->getItems();
+        $items = $this->gameData->getCreatedItems();
         $campEquipment = array_count_values(
             array_map(function ($d) use ($items) {
                 return $items[$d];
@@ -1788,7 +1788,7 @@ class Game extends \Table
     {
         $result['builtEquipment'] = $this->getCraftedItems();
         $result['buildings'] = $this->gameData->get('buildings');
-        $items = $this->gameData->getItems();
+        $items = $this->gameData->getCreatedItems();
         $result['campEquipmentCounts'] = array_count_values(
             array_map(function ($d) use ($items) {
                 return $items[$d];

@@ -313,10 +313,9 @@ class DLD_ItemsData
                                 $char = $game->character->getCharacterData($skill['characterId']);
                                 usePerDay($char['id'] . $skill['id'], $game);
                                 $data['data']['willTakeDamage'] = 0;
-
                                 $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage'), [
                                     'item_name' => notifyTextButton([
-                                        'name' => $game->data->getItems()[$skill['itemId']]['name'],
+                                        'name' => $game->data->getItems()[$game->gameData->getCreatedItems()[$skill['itemId']]]['name'],
                                         'dataId' => $skill['itemId'],
                                         'dataType' => 'item',
                                     ]),
@@ -383,10 +382,9 @@ class DLD_ItemsData
                                 $char = $game->character->getCharacterData($skill['characterId']);
                                 usePerDay($char['id'] . $skill['id'], $game);
                                 $data['data']['willTakeDamage'] = 0;
-
                                 $game->eventLog(clienttranslate('${character_name} used ${item_name} to block the damage'), [
                                     'item_name' => notifyTextButton([
-                                        'name' => $game->data->getItems()[$skill['itemId']]['name'],
+                                        'name' => $game->data->getItems()[$game->gameData->getCreatedItems()[$skill['itemId']]]['name'],
                                         'dataId' => $skill['itemId'],
                                         'dataType' => 'item',
                                     ]),

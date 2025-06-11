@@ -79,7 +79,7 @@ class DLD_Encounter
             throw new BgaUserException(clienttranslate('That weapon choice is not available'));
         }
         $selectedWeapon = $selectedWeapon[0];
-        $items = $this->game->gameData->getItems();
+        $items = $this->game->gameData->getCreatedItems();
         if ($weaponId == 'none') {
             // pass
         } elseif ($weaponId == 'both') {
@@ -272,7 +272,7 @@ class DLD_Encounter
                 } elseif ($data['escape']) {
                     $_this->eventLog(clienttranslate('${character_name} escaped from a ${name}'), $data);
                 } else {
-                    $items = $this->game->gameData->getItems();
+                    $items = $this->game->gameData->getCreatedItems();
                     foreach ($data['itemIds'] as $k => $itemId) {
                         $itemObj = $this->game->data->getItems()[$items[$itemId]];
                         if (array_key_exists('onUse', $itemObj)) {

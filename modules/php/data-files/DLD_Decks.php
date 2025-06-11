@@ -861,7 +861,7 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     // Item selection, destroy 2 unequipped
 
-                    $items = $game->gameData->getItems();
+                    $items = $game->gameData->getCreatedItems();
                     $campEquipment = array_map(function ($d) use ($items, $game) {
                         return ['type' => $game->data->getItems()[$items[$d]]['itemType'], 'itemId' => $d];
                     }, $game->gameData->get('campEquipment'));

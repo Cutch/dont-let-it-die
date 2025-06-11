@@ -83,7 +83,7 @@ class DLD_Undo
     public function loadInitialState(): void
     {
         $moveId = $this->getLastMoveId();
-        $itemsData = json_encode($this->game->gameData->getItems());
+        $itemsData = json_encode($this->game->gameData->getCreatedItems());
         $globalsData = json_encode($this->game->gameData->getAll());
         $characterData = json_encode($this->game->character->getAllCharacterData());
         $extraTablesData = [];
