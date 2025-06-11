@@ -894,7 +894,7 @@ class DLD_CharactersData
                                 $game->character->adjustHealth($character['character_name'], 1);
                             }
                         }
-                        $game->eventLog(clienttranslate('${character_name} All tribe members gained 1 health after the rival tribe event'));
+                        $game->eventLog(clienttranslate('All tribe members gained 1 health after the rival tribe event'));
                     }
                 },
                 'onEncounterPost' => function (Game $game, $char, &$data) {
@@ -910,6 +910,7 @@ class DLD_CharactersData
                             $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                 'count' => $change,
                                 'character_resource' => clienttranslate('Health'),
+                                'character_name' => $game->getCharacterHTML($char['character_name']),
                             ]);
                         }
                     }

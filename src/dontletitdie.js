@@ -680,7 +680,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     });
   },
   setupBoard: function (gameData) {
-    this.firstPlayer = gameData.playerorder[0];
+    this.firstPlayer = Object.values(gameui.gamedatas.players).find((d) => d.player_no == 1).id;
     const decks = [
       { name: 'explore', expansion: 'hindrance' },
       { name: 'gather', expansion: 'base' },
@@ -747,6 +747,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         addClickListener(elem.querySelector(`.${characterName}`), characterName, () => {
           const saved = [...this.mySelectedCharacters];
           const i = this.mySelectedCharacters.indexOf(characterName);
+          console.log(this.mySelectedCharacters, i, characterName);
           if (i >= 0) {
             // Remove selection
             this.mySelectedCharacters.splice(i, 1);
@@ -757,6 +758,7 @@ declare('bgagame.dontletitdie', Gamegui, {
               this.mySelectedCharacters.push(characterName);
             }
           }
+          console.log(this.mySelectedCharacters);
           this.bgaPerformAction('actCharacterClicked', {
             character1: this.mySelectedCharacters?.[0],
             character2: this.mySelectedCharacters?.[1],
@@ -1551,6 +1553,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           } else if (playerCount === 4) {
             this.selectCharacterCount = 1;
           }
+          console.log(this.selectCharacterCount);
           this.statusBar.addActionButton(_('Confirm ${x} character(s)').replace('${x}', this.selectCharacterCount), () =>
             this.bgaPerformAction('actChooseCharacters'),
           );

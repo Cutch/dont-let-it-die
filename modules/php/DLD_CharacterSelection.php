@@ -106,7 +106,7 @@ class DLD_CharacterSelection
         $playerNo = ((int) $players[$playerId]['player_no']) - 1;
         $playerCount = sizeof($players);
         if ($playerCount == 3) {
-            for ($i = 0; $i < ($playerNo > 0 ? 2 : 1); $i++) {
+            for ($i = 0; $i < ($playerNo == 0 ? 2 : 1); $i++) {
                 $turnOrder[$playerNo + $i + ($playerNo > 0 ? 1 : 0)] = array_key_exists($i, $selectedCharacters)
                     ? $selectedCharacters[$i]
                     : null;
