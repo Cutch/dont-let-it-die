@@ -60,7 +60,7 @@ export class TradeScreen {
     this.game.selector.hide('trade');
   }
   getResourcesForDisplay(gameData) {
-    return this.game.getResourcesForDisplay(gameData).filter((d) => d !== 'trap' && d !== 'stew');
+    return this.game.getResourcesForDisplay(gameData).filter((d) => d !== 'trap' && d !== 'stew' && d !== 'fireWood');
   }
   show(gameData) {
     this.resourceRequested = null;

@@ -136,7 +136,7 @@ class DLD_CharactersData
                             }
                         },
                         'requires' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             return !$char['incapacitated'] && getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
                         },
                     ],
@@ -150,7 +150,7 @@ class DLD_CharactersData
                             return $skill['characterId'] . 'stamina';
                         },
                         'onGetActionCost' => function (Game $game, $skill, &$data) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             if (
                                 !$char['incapacitated'] &&
                                 !$char['isActive'] &&
@@ -174,7 +174,7 @@ class DLD_CharactersData
                             }
                         },
                         'requires' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             return !$char['incapacitated'] &&
                                 !$char['isActive'] &&
                                 getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
@@ -197,7 +197,7 @@ class DLD_CharactersData
                             }
                         },
                         'onGetActionCost' => function (Game $game, $skill, &$data) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             $interruptState = $game->actInterrupt->getState('actUseSkill');
                             if (
                                 !$char['incapacitated'] &&
@@ -227,7 +227,7 @@ class DLD_CharactersData
                             return ['notify' => false];
                         },
                         'requires' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             return !$char['incapacitated'] &&
                                 !$char['isActive'] &&
                                 getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
@@ -302,7 +302,7 @@ class DLD_CharactersData
                             return $skill['characterId'] . $skill['id'];
                         },
                         'requires' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             return !$char['incapacitated'] &&
                                 getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
                                 $game->gameData->getResource('bone') > 0;
@@ -1665,7 +1665,7 @@ class DLD_CharactersData
                         'interruptState' => ['resolveEncounter'],
                         'health' => 0,
                         'onGetActionCost' => function (Game $game, $skill, &$data) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             $interruptState = $game->actInterrupt->getState('stResolveEncounter');
                             // $game->log('$interruptState', $interruptState);
                             if (
@@ -1689,7 +1689,7 @@ class DLD_CharactersData
                         },
                         'onEncounterPre' => function (Game $game, $skill, &$data) {
                             $damageTaken = $game->encounter->countDamageTaken($data);
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             if (!$char['incapacitated'] && !$char['isActive'] && $damageTaken > 0 && !$data['damageStamina']) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
@@ -1712,7 +1712,7 @@ class DLD_CharactersData
                             return ['notify' => false];
                         },
                         'requires' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             return !$char['incapacitated'] && !$char['isActive'];
                         },
                     ],
@@ -2026,7 +2026,7 @@ class DLD_CharactersData
                             // return ['spendActionCost' => false];
                         },
                         'requires' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
                             return !$char['incapacitated'] && !$char['isActive'];
                         },
                     ],
