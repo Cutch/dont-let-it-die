@@ -1850,12 +1850,8 @@ class Game extends \Table
 
         $resourcesAvailable = [];
         $tokensData = $this->data->getTokens();
-        // var_dump(json_encode($tokensData));
-        $this->log($tokensData);
-        $this->log($tokensData);
         array_walk($tokensData, function ($v, $k) use (&$result, &$resourcesAvailable) {
             if ($v['type'] == 'resource' && isset($result['resources'][$k])) {
-                // var_dump(array_key_exists('expansion', $v) ? $v['expansion'] : null);
                 if (
                     (!array_key_exists('requires', $v) || $v['requires']($this, $v)) &&
                     (!array_key_exists('expansion', $v) || $this->isValidExpansion($v['expansion']))
@@ -1877,12 +1873,6 @@ class Game extends \Table
                 }
             }
         });
-        // array_walk($result['resources'], function ($v, $k) use (&$result, $tokensData) {
-        //     if (!isset($tokensData[$k])) {
-        //         unset($result['resources'][$k]);
-        //         unset($result['prevResources'][$k]);
-        //     }
-        // });
 
         $result['resourcesAvailable'] = $resourcesAvailable;
     }
