@@ -747,7 +747,6 @@ declare('bgagame.dontletitdie', Gamegui, {
         addClickListener(elem.querySelector(`.${characterName}`), characterName, () => {
           const saved = [...this.mySelectedCharacters];
           const i = this.mySelectedCharacters.indexOf(characterName);
-          console.log(this.mySelectedCharacters, i, characterName);
           if (i >= 0) {
             // Remove selection
             this.mySelectedCharacters.splice(i, 1);
@@ -758,7 +757,6 @@ declare('bgagame.dontletitdie', Gamegui, {
               this.mySelectedCharacters.push(characterName);
             }
           }
-          console.log(this.mySelectedCharacters);
           this.bgaPerformAction('actCharacterClicked', {
             character1: this.mySelectedCharacters?.[0],
             character2: this.mySelectedCharacters?.[1],
