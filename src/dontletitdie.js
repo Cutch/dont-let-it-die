@@ -35,7 +35,7 @@ import { TokenScreen } from './screens/token-screen';
 import { TooManyItemsScreen } from './screens/too-many-items-screen';
 import { UpgradeSelectionScreen } from './screens/upgrade-selection-screen';
 import { WeaponScreen } from './screens/weapon-screen';
-import { addClickListener, Deck, Dice, isStudio, renderImage, renderText, Selector, Tooltip, Tweening } from './utils/index';
+import { addClickListener, Deck, Dice, InfoOverlay, isStudio, renderImage, renderText, Selector, Tooltip, Tweening } from './utils/index';
 
 declare('bgagame.dontletitdie', Gamegui, {
   constructor: function () {
@@ -108,6 +108,8 @@ declare('bgagame.dontletitdie', Gamegui, {
       actConfirmTradeItem: _('Confirm Trade'),
       actSelectCharacter: _('Select Character'),
       actSelectCard: _('Select Card'),
+      actUndo: _('Undo'),
+      actEndTurn: _('End Turn'),
     };
   },
   getResourcesForDisplay: function (gameData) {
@@ -430,6 +432,8 @@ declare('bgagame.dontletitdie', Gamegui, {
         elem.style.order = 5;
       }
     });
+
+    this.infoOverlay.updateTurnOrder();
   },
   enableClick: function (elem) {
     if (elem.classList.contains('disabled')) {
@@ -928,6 +932,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.tweening = new Tweening(this, playArea);
     this.selector = new Selector(playArea);
     this.tooltip = new Tooltip($('game_play_area_wrap'));
+    this.infoOverlay = new InfoOverlay(this, $('game_play_area_wrap'));
     this.setupCharacterSelections(gameData);
     this.setupBoard(gameData);
     this.dice = new Dice(this, $('board-container'));
@@ -1649,6 +1654,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     dojo.subscribe('updateGameData', this, 'notif_updateGameData');
     dojo.subscribe('updateKnowledgeTree', this, 'notif_updateKnowledgeTree');
     dojo.subscribe('updateActionButtons', this, 'notif_updateActionButtons');
+    dojo.subscribe('notify', this, 'notif_actionNotification');
 
     // Example 1: standard notification handling
     // dojo.subscribe( 'tokenUsed', this, "notif_tokenUsed" );
@@ -1691,6 +1697,12 @@ declare('bgagame.dontletitdie', Gamegui, {
       this.updateGameDatas(notification.args.gameData);
     }
   },
+  notif_actionNotification: async function (notification) {
+    const usedActionId = notification.args.usedActionId;
+    if (usedActionId) {
+      this.infoOverlay.addMessage(notification.args);
+    }
+  },
   // notif_startSelection: async function (notification) {
   //   await this.notificationWrapper(notification);
   //   if (isStudio()) console.log('notif_startSelection', notification);
@@ -1698,6 +1710,7 @@ declare('bgagame.dontletitdie', Gamegui, {
   // },
   notif_resetNotifications: async function (notification) {
     await this.notificationWrapper(notification);
+    this.infoOverlay.addMessage({ ...notification.args, usedActionId: 'actUndo' });
     const lastMoveId = parseInt(notification.args.moveId, 10);
     for (const logId of Object.keys(gameui.log_to_move_id)) {
       const moveId = parseInt(gameui.log_to_move_id[logId], 10);

@@ -265,6 +265,8 @@ class DLD_CharactersData
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                 $game->eventLog(clienttranslate('${character_name} shuffled the ${deck} deck using their skill'), [
                                     'deck' => $game->decks->getDeckName($data['deck']),
+                                    'usedActionId' => 'actUseSkill',
+                                    'usedActionName' => $skill['name'],
                                 ]);
                             }
                         },
@@ -519,6 +521,8 @@ class DLD_CharactersData
                                     'character_resource_1' => clienttranslate('Health'),
                                     'count_2' => 2,
                                     'character_resource_2' => clienttranslate('Stamina'),
+                                    'usedActionId' => 'actUseSkill',
+                                    'usedActionName' => $skill['name'],
                                 ]
                             );
                             return ['notify' => false];
@@ -1040,6 +1044,8 @@ class DLD_CharactersData
                                     'buttons' => notifyButtons([
                                         ['name' => $game->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
                                     ]),
+                                    'usedActionId' => 'actUseSkill',
+                                    'usedActionName' => $skill['name'],
                                 ]);
                             }
                         },
@@ -1142,6 +1148,8 @@ class DLD_CharactersData
 
                                     $game->eventLog(clienttranslate('${character_name} placed a trap on ${deck}'), [
                                         'deck' => $game->decks->getDeckName($data['deck']),
+                                        'usedActionId' => 'actUseSkill',
+                                        'usedActionName' => $skill['name'],
                                     ]);
                                 }
                             }
@@ -1189,6 +1197,8 @@ class DLD_CharactersData
                                 $game->gameData->destroyResource('trap');
                                 $game->eventLog(clienttranslate('${character_name} removed a ${name} from the game'), [
                                     ...$data['data']['card'],
+                                    'usedActionId' => 'actUseSkill',
+                                    'usedActionName' => $skill['name'],
                                 ]);
                             }
                         },
@@ -1241,6 +1251,8 @@ class DLD_CharactersData
                                 $game->adjustResource($data['resourceType'], 1);
                                 $game->eventLog(clienttranslate('${character_name} copied 1 ${resource_type}'), [
                                     'resource_type' => $data['resourceType'],
+                                    'usedActionId' => 'actUseSkill',
+                                    'usedActionName' => $skill['name'],
                                 ]);
                             }
                         },
@@ -1475,7 +1487,10 @@ class DLD_CharactersData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->adjustResource($data['data']['card']['resourceType'], $data['data']['card']['count']);
-                                $game->eventLog(clienttranslate('${character_name} doubled the resources they found'));
+                                $game->eventLog(clienttranslate('${character_name} doubled the resources they found'), [
+                                    'usedActionId' => 'actUseSkill',
+                                    'usedActionName' => $skill['name'],
+                                ]);
                                 return ['notify' => false];
                             }
                         },
@@ -1705,6 +1720,8 @@ class DLD_CharactersData
                                     'count' => -$change,
                                     'character_resource' => clienttranslate('Health'),
                                     'character_name' => $game->getCharacterHTML($skill['characterId']),
+                                    'usedActionId' => 'actUseSkill',
+                                    'usedActionName' => $skill['name'],
                                 ]);
                                 // $data['data']['willTakeDamage'] = 0;
                             }
@@ -1792,19 +1809,17 @@ class DLD_CharactersData
                                 $game->character->unequipEquipment($skill['characterId'], [$itemId]);
                                 $itemObj = $game->data->getItems()[$itemName];
 
-                                $game->notify(
-                                    'activeCharacter',
-                                    clienttranslate('${character_name_1} gave ${item_name} to ${character_name_2}'),
-                                    [
-                                        'character_name_1' => $game->getCharacterHTML($skill['characterId']),
-                                        'character_name_2' => $game->getCharacterHTML($characterId),
-                                        'item_name' => notifyTextButton([
-                                            'name' => $itemObj['name'],
-                                            'dataId' => $itemObj['id'],
-                                            'dataType' => 'item',
-                                        ]),
-                                    ]
-                                );
+                                $game->eventLog(clienttranslate('${character_name_1} gave ${item_name} to ${character_name_2}'), [
+                                    'character_name_1' => $game->getCharacterHTML($skill['characterId']),
+                                    'character_name_2' => $game->getCharacterHTML($characterId),
+                                    'item_name' => notifyTextButton([
+                                        'name' => $itemObj['name'],
+                                        'dataId' => $itemObj['id'],
+                                        'dataType' => 'item',
+                                    ]),
+                                    'usedActionId' => 'actUseSkill',
+                                    'usedActionName' => $skill['name'],
+                                ]);
                                 $game->character->equipAndValidateEquipment($characterId, $itemId);
                             }
                         },

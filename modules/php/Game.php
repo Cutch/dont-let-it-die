@@ -107,6 +107,9 @@ class Game extends \Table
                     $args['player_name'] = $this->getPlayerNameById($playerId);
                 }
             }
+            if (!array_key_exists('character_name', $args) && $this->character->getTurnCharacterId()) {
+                $args['character_name'] = $this->getCharacterHTML();
+            }
             if (str_contains($message, '${resource_type}')) {
                 $args['resource_type'] = $this->data->getTokens()[$args['resource_type']]['name'];
             }
@@ -403,6 +406,7 @@ class Game extends \Table
         $this->notify('notify', clienttranslate('${character_name} cooked ${amount} ${type}'), [
             'amount' => 1,
             'type' => $resourceType,
+            'usedActionId' => 'actCook',
         ]);
         $this->hooks->onCookAfter($data);
         $this->setLastAction('actCook');
@@ -441,6 +445,7 @@ class Game extends \Table
         });
         $this->notify('notify', clienttranslate('${character_name} revived ${character_name_2} they should be recovered by the morning'), [
             'character_name_2' => $this->getCharacterHTML($character),
+            'usedActionId' => 'actRevive',
         ]);
         $this->setLastAction('actRevive');
         $this->completeAction();
@@ -479,6 +484,7 @@ class Game extends \Table
             'knowledgeId' => $knowledgeId,
             'knowledge_name' => $knowledgeObj['name'],
             'knowledge_name_suffix' => array_key_exists('name_suffix', $knowledgeObj) ? $knowledgeObj['name_suffix'] : '',
+            'usedActionId' => 'actSpendFKP',
         ]);
         $this->hooks->onUnlock($knowledgeObj);
         $this->setLastAction('actSpendFKP');
@@ -545,6 +551,7 @@ class Game extends \Table
                 $this->hooks->onCraftAfter($data);
                 $_this->eventLog(clienttranslate('${character_name} crafted a ${item_name}'), [
                     'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
+                    'usedActionId' => 'actCraft',
                 ]);
             }
         );
@@ -665,6 +672,7 @@ class Game extends \Table
         $this->notify('notify', clienttranslate('${character_name} traded ${offered} for ${requested}'), [
             'offered' => join(', ', $offeredStr),
             'requested' => join(', ', $requestedStr),
+            'usedActionId' => 'actTrade',
         ]);
         $this->setLastAction('actTrade');
         $this->completeAction();
@@ -678,7 +686,11 @@ class Game extends \Table
             function (Game $_this) {
                 return ['herb' => 1];
             },
-            function (Game $_this, bool $finalizeInterrupt, $data) {}
+            function (Game $_this, bool $finalizeInterrupt, $data) {
+                $this->notify('notify', '', [
+                    'usedActionId' => 'actUseHerb',
+                ]);
+            }
         );
 
         $this->setLastAction('actUseHerb');
@@ -731,7 +743,7 @@ class Game extends \Table
                             : clienttranslate(
                                 '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
                             ),
-                        [...$data, 'token_name' => $data['tokenName']]
+                        [...$data, 'token_name' => $data['tokenName'], 'usedActionId' => 'actEat']
                     );
                 }
             }
@@ -752,6 +764,7 @@ class Game extends \Table
         $this->notify('notify', clienttranslate('${character_name} added ${count} ${token_name} to the fire'), [
             'token_name' => 'wood',
             'count' => 1,
+            'usedActionId' => 'actAddWood',
         ]);
         $this->setLastAction('actAddWood');
         $this->completeAction();
@@ -791,6 +804,8 @@ class Game extends \Table
                 $skill['sendNotification'] = function () use (&$skill, $_this, &$notificationSent) {
                     $_this->notify('notify', clienttranslate('${character_name} used the skill ${skill_name}'), [
                         'skill_name' => $skill['name'],
+                        'usedActionId' => 'actUseSkill',
+                        'usedActionName' => $skill['name'],
                     ]);
                     $notificationSent = true;
                 };
@@ -800,7 +815,6 @@ class Game extends \Table
                     $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 }
                 if (!array_key_exists('interruptState', $skill) || (in_array('interrupt', $skill['state']) && $finalizeInterrupt)) {
-                    // var_dump(json_encode([array_key_exists('onUse', $skill)]));
                     $result = array_key_exists('onUse', $skill) ? $skill['onUse']($this, $skill, $character) : null;
                     if (!$result || !array_key_exists('spendActionCost', $result) || $result['spendActionCost'] != false) {
                         $_this->actions->spendActionCost('actUseSkill', $skillId);
@@ -856,6 +870,8 @@ class Game extends \Table
                 $skill['sendNotification'] = function () use (&$skill, $_this, &$notificationSent) {
                     $_this->notify('notify', clienttranslate('${character_name} used the item\'s skill ${skill_name}'), [
                         'skill_name' => $skill['name'],
+                        'usedActionId' => 'actUseSkill',
+                        'usedActionName' => $skill['name'],
                     ]);
                     $notificationSent = true;
                 };
@@ -952,6 +968,7 @@ class Game extends \Table
                     $card = $this->decks->pickCard($deck);
                     $this->eventLog(clienttranslate('${character_name} draws from the ${deck} deck'), [
                         'deck' => $this->decks->getDeckName($deck),
+                        'usedActionId' => 'actDraw' . ucfirst($deck),
                     ]);
                 }
 
@@ -995,6 +1012,7 @@ class Game extends \Table
                     $this->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                         'count' => $data['roll'],
                         'resource_type' => 'fkp',
+                        'usedActionId' => 'actInvestigateFire',
                     ]);
                 }
             }
@@ -1005,7 +1023,9 @@ class Game extends \Table
     public function actEndTurn(): void
     {
         // Notify all players about the choice to pass.
-        $this->eventLog(clienttranslate('${character_name} ends their turn'));
+        $this->eventLog(clienttranslate('${character_name} ends their turn'), [
+            'usedActionId' => 'actEndTurn',
+        ]);
 
         // at the end of the action, move to the next state
         $this->endTurn();

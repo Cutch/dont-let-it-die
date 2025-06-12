@@ -204,6 +204,7 @@
 }
 
 #token-container {
+  height: min-content;
   .resource-title {
     font-weight: 700;
     margin-bottom: 4px;
@@ -213,7 +214,7 @@
     display: flex;
     gap: 10px 16px;
     flex-flow: wrap;
-    padding: 10px 4px;
+    padding: 10px 16px 10px 4px;
     &.no-resource {
       padding: 2px 4px;
       font-size: 14px;

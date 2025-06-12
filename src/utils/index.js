@@ -2,6 +2,7 @@ export * from './clickable';
 export * from './deck';
 export * from './dice';
 export * from './images';
+export * from './info-overlay';
 export * from './selector';
 export * from './tooltip';
 export * from './tweening';
