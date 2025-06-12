@@ -2216,7 +2216,31 @@ class Game extends \Table
                     ];
                 });
                 $this->gameData->set('turnOrder', $turnOrder);
+                $this->gameData->set('turnOrderStart', $this->gameData->get('turnOrder'));
             }
+        }
+        if (!$this->gameData->get('turnOrderStart')) {
+            $players = $this->loadPlayersBasicInfos();
+
+            $characters = array_values(
+                $this->getCollectionFromDb('SELECT character_name, player_id FROM `character` order by character_name')
+            );
+            $players = array_orderby($players, 'player_no', SORT_ASC);
+            $turnOrder = [];
+            array_walk($players, function ($player) use (&$turnOrder, $characters) {
+                $turnOrder = [
+                    ...$turnOrder,
+                    ...array_map(
+                        function ($d) {
+                            return $d['character_name'];
+                        },
+                        array_filter($characters, function ($char) use ($player) {
+                            return $char['player_id'] == $player['player_id'];
+                        })
+                    ),
+                ];
+            });
+            $this->gameData->set('turnOrderStart', $turnOrder);
         }
 
         $result = [

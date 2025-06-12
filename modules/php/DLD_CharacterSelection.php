@@ -177,6 +177,7 @@ class DLD_CharacterSelection
             clienttranslate($message),
             array_merge(['gameData' => $results, 'playerId' => $playerId], $selectedCharactersArgs)
         );
+        $this->game->gameData->set('turnOrderStart', $this->game->gameData->get('turnOrder'));
         $this->game->markChanged('token');
         // Deactivate player, and move to next state if none are active
         $this->game->gamestate->setPlayerNonMultiactive(
