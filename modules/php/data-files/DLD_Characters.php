@@ -309,7 +309,18 @@ class DLD_CharactersData
                                 getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
                                 $game->gameData->getResource('bone') > 0;
                         },
-                        'onNightDrawCard' => function (Game $game, $skill, $data) {
+                        'onNightDrawCardPre' => function (Game $game, $skill, $data) {
+                            $card = $data['state']['card'];
+                            $game->log('$card[id] 1', $card['id']);
+                            $game->eventLog('${buttons}', [
+                                'buttons' => notifyButtons([
+                                    [
+                                        'name' => $game->decks->getDeckName($card['deck']),
+                                        'dataId' => $card['id'],
+                                        'dataType' => 'night-event',
+                                    ],
+                                ]),
+                            ]);
                             $game->actInterrupt->addSkillInterrupt($skill);
                         },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
@@ -317,10 +328,9 @@ class DLD_CharactersData
                                 usePerDay($skill['getPerDayKey']($game, $skill), $game);
                                 $game->adjustResource('bone', -1);
                                 $game->eventLog(clienttranslate('${character_name} re-draws the night event'));
-                                // TODO: Interrupt and Discard current night event
                                 $card = $game->decks->pickCard('night-event');
                                 $game->setActiveNightCard($card['id']);
-                                $data['state']['card'] = $card;
+                                $data['data']['state']['card'] = $card;
                                 $game->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
                                 $game->cardDrawEvent($card, 'night-event');
                             }
