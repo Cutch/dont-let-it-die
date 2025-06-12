@@ -23,14 +23,16 @@ class DLD_CharacterSelection
         $characters = [$character1, $character2, $character3, $character4];
         $this->validateCharacterCount(false, $characters);
         $playerId = $this->game->getCurrentPlayer();
-        $this->setTurnOrder($playerId, array_filter($characters));
+        $characters = array_filter($characters);
+        sort($characters);
+        $this->setTurnOrder($playerId, $characters);
         // Check if already selected
         $escapedCharacterList = join(
             ', ',
             array_map(function ($char) use ($playerId) {
                 $char = $this->game::escapeStringForDB($char);
                 return "'$char'";
-            }, array_filter($characters))
+            }, $characters)
         );
         if (
             $escapedCharacterList &&
@@ -54,7 +56,7 @@ class DLD_CharacterSelection
                     extract($this->game->data->getCharacters()[$char]);
                     $char = $this->game::escapeStringForDB($char);
                     return "('$char', $playerId, $stamina, $health)";
-                }, array_filter($characters))
+                }, $characters)
             );
             $this->game::DbQuery("INSERT INTO `character` (`character_name`, `player_id`, `stamina`, `health`) VALUES $values");
         }
@@ -132,6 +134,7 @@ class DLD_CharacterSelection
         $selectedCharacters = array_map(function ($char) {
             return $char['character_name'];
         }, array_values($this->game->getCollectionFromDb("SELECT character_name FROM `character` WHERE `player_id` = '$playerId'")));
+        $selectedCharacters = array_orderby($selectedCharacters, 'character_name', SORT_ASC);
 
         $this->validateCharacterCount(true, $selectedCharacters);
 
