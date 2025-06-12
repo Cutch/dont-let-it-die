@@ -1621,7 +1621,7 @@ class Game extends \Table
                 $this->gameData->set('day', $day);
                 $fireWood = $this->gameData->get('fireWood');
                 if (array_key_exists('allowFireWoodAddition', $this->gameData->get('morningState') ?? []) && $fireWood < $woodNeeded) {
-                    $missingWood = $woodNeeded - $fireWood;
+                    $missingWood = $woodNeeded + 1 - $fireWood;
                     $wood = $this->gameData->get('wood');
                     if ($wood >= $missingWood) {
                         $this->gameData->setResource('fireWood', min($fireWood + $missingWood, $this->gameData->getResourceMax('wood')));
