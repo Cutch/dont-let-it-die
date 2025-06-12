@@ -601,6 +601,19 @@ class DLD_Actions
             }
         }
     }
+    public function validateSelectable(
+        string $type,
+        callable $selector,
+        string $actionId,
+        ?string $subActionId = null,
+        ?string $characterId = null
+    ) {
+        $selections = $this->getActionSelectable($actionId, $subActionId, $characterId);
+        $selections = array_map($selector, $selections);
+        if (!in_array($type, $selections)) {
+            throw new BgaUserException(clienttranslate('The selection is invalid'));
+        }
+    }
     public function validateCanRunAction(string $action, ?string $subAction = null, ...$args)
     {
         $character = $this->game->character->getSubmittingCharacter();

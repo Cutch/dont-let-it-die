@@ -45,7 +45,7 @@ export class CookScreen {
       renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1.5, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), this.game.data[name].options.name, () => selectCallback(count));
     };
-    Object.keys(gameData.resources).forEach((name) => {
+    gameData.cookableFoods.forEach((name) => {
       if (name + '-cooked' in gameData.resources && gameData.resources[name])
         renderItem(
           name,

@@ -384,6 +384,14 @@ class Game extends \Table
     {
         // $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actCook', null, $resourceType);
+        $this->actions->validateSelectable(
+            $resourceType,
+            function ($d) {
+                return $d;
+            },
+            'actCook'
+        );
+
         $data = [
             'resourceType' => $resourceType,
         ];
@@ -690,6 +698,13 @@ class Game extends \Table
             [$this->hooks, 'onEat'],
             function (Game $_this) use ($resourceType) {
                 $this->actions->validateCanRunAction('actEat', null, $resourceType);
+                $this->actions->validateSelectable(
+                    $resourceType,
+                    function ($d) {
+                        return $d['id'];
+                    },
+                    'actEat'
+                );
 
                 $tokenData = $this->data->getTokens()[$resourceType];
                 $data = [
@@ -1798,11 +1813,14 @@ class Game extends \Table
             return ['name' => $items[$d], 'itemId' => $d];
         }, $this->gameData->get('campEquipment'));
 
+        $result['cookableFoods'] = $this->actions->getActionSelectable('actCook');
+
         $result['eatableFoods'] = array_map(function ($eatable) {
             $data = [...$eatable['actEat'], 'id' => $eatable['id'], 'characterId' => $this->character->getTurnCharacterId()];
             $this->hooks->onGetEatData($data);
             return $data;
         }, $this->actions->getActionSelectable('actEat'));
+
         $result['revivableFoods'] = array_map(function ($eatable) {
             $data = [...$eatable['actRevive'], 'id' => $eatable['id']];
             return $data;

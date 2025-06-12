@@ -97,6 +97,13 @@ class DLD_SelectionStates
             [$this->game->hooks, 'onEat'],
             function (Game $_this) use ($resourceType, $selectionState) {
                 $this->game->actions->validateCanRunAction('actEat', null, $resourceType);
+                $this->game->actions->validateSelectable(
+                    $resourceType,
+                    function ($d) {
+                        return $d['id'];
+                    },
+                    'actEat'
+                );
 
                 $tokenData = $this->game->data->getTokens()[$resourceType];
                 $data = [
