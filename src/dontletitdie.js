@@ -421,6 +421,15 @@ declare('bgagame.dontletitdie', Gamegui, {
         }
       }
     });
+
+    const selections = $('player_boards');
+    [...selections.children].forEach((elem) => {
+      if (elem.id?.includes('overall_player_board_')) {
+        elem.style.order = this.gamedatas.players[elem.id.replace('overall_player_board_', '')].player_no;
+      } else if (elem.id == 'token-container') {
+        elem.style.order = 5;
+      }
+    });
   },
   enableClick: function (elem) {
     if (elem.classList.contains('disabled')) {
