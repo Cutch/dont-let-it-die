@@ -309,9 +309,8 @@ class DLD_CharactersData
                                 getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
                                 $game->gameData->getResource('bone') > 0;
                         },
-                        'onNightDrawCardPre' => function (Game $game, $skill, $data) {
+                        'onNightDrawCardPre' => function (Game $game, $skill, &$data) {
                             $card = $data['state']['card'];
-                            $game->log('$card[id] 1', $card['id']);
                             $game->eventLog('${buttons}', [
                                 'buttons' => notifyButtons([
                                     [
@@ -322,6 +321,7 @@ class DLD_CharactersData
                                 ]),
                             ]);
                             $game->actInterrupt->addSkillInterrupt($skill);
+                            $data['notify'] = false;
                         },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
@@ -331,6 +331,7 @@ class DLD_CharactersData
                                 $card = $game->decks->pickCard('night-event');
                                 $game->setActiveNightCard($card['id']);
                                 $data['data']['state']['card'] = $card;
+                                $data['data']['notify'] = true;
                                 $game->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
                                 $game->cardDrawEvent($card, 'night-event');
                             }

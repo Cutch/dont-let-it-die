@@ -1364,11 +1364,13 @@ class Game extends \Table
                 if (!$data || !array_key_exists('onUse', $data) || $data['onUse'] != false) {
                     $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
                 }
-                $this->eventLog('${buttons}', [
-                    'buttons' => notifyButtons([
-                        ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'night-event'],
-                    ]),
-                ]);
+                if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
+                    $this->eventLog('${buttons}', [
+                        'buttons' => notifyButtons([
+                            ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'night-event'],
+                        ]),
+                    ]);
+                }
 
                 $this->nextState('morningPhase');
             }
