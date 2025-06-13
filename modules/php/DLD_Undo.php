@@ -85,7 +85,11 @@ class DLD_Undo
         $moveId = $this->getLastMoveId();
         $itemsData = json_encode($this->game->gameData->getCreatedItems());
         $globalsData = json_encode($this->game->gameData->getAll());
-        $characterData = json_encode($this->game->character->getAllCharacterData());
+        $characterData = [];
+        try {
+            $characterData = json_encode($this->game->character->getAllCharacterData());
+        } catch (Exception $e) {
+        }
         $extraTablesData = [];
         foreach ($this->extraTablesList as $table) {
             $extraTablesData[$table] = array_values($this->game->getCollectionFromDB("select * from $table"));

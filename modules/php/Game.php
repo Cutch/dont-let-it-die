@@ -888,15 +888,7 @@ class Game extends \Table
                     }
                     if (!$notificationSent && (!$result || !array_key_exists('notify', $result) || $result['notify'] != false)) {
                         $skill['sendNotification']();
-                    } else {
-                        // $_this->notify('updateGameData', '', [
-                        //     'gameData' => $_this->getAllDatas(),
-                        // ]);
                     }
-                } else {
-                    // $_this->notify('updateGameData', '', [
-                    //     'gameData' => $_this->getAllDatas(),
-                    // ]);
                 }
                 $_this->character->setSubmittingCharacter(null);
             }
@@ -2193,6 +2185,7 @@ class Game extends \Table
      */
     public function getAllDatas(): array
     {
+        $stateName = $this->gamestate->state()['name'];
         // TODO remove this check after initial games are no longer in progress
         $turnOrder = $this->gameData->get('turnOrder');
         if (sizeof(array_filter($turnOrder)) != 4) {
@@ -2218,10 +2211,15 @@ class Game extends \Table
                     ];
                 });
                 $this->gameData->set('turnOrder', $turnOrder);
-                $this->gameData->set('turnOrderStart', $this->gameData->get('turnOrder'));
+                if ($stateName !== 'characterSelect') {
+                    $this->gameData->set('turnOrderStart', $this->gameData->get('turnOrder'));
+                }
             }
         }
-        if (!$this->gameData->get('turnOrderStart') || sizeof($this->gameData->get('turnOrderStart')) < 4) {
+        if (
+            (!$this->gameData->get('turnOrderStart') || sizeof($this->gameData->get('turnOrderStart'))) < 4 &&
+            $stateName !== 'characterSelect'
+        ) {
             $players = $this->loadPlayersBasicInfos();
 
             $characters = array_values(
@@ -2243,6 +2241,9 @@ class Game extends \Table
                 ];
             });
             $this->gameData->set('turnOrderStart', $turnOrder);
+        }
+        if ($stateName == 'characterSelect' && $this->gameData->get('turnOrderStart')) {
+            $this->gameData->set('turnOrderStart', null);
         }
 
         $result = [

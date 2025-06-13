@@ -1097,11 +1097,11 @@ declare('bgagame.dontletitdie', Gamegui, {
         if (isActive) this.weaponScreen.show(args.args);
         break;
       case 'characterSelect':
-        this.selectedCharacters = args.args.characters;
+        this.selectedCharacters = args.args.characters ?? [];
         this.updateCharacterSelections(args.args);
         break;
       case 'playerTurn':
-        this.updatePlayers(args.args);
+        if (args.args.characters) this.updatePlayers(args.args);
         this.updateItems(args.args);
         this.updateKnowledgeTree(args.args);
         this.updateTrack(args.args);
@@ -1188,6 +1188,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         dojo.style('character-selector', 'display', 'none');
         dojo.style('game_play_area', 'display', '');
         this.refreshCharacters = true;
+        this.selectedCharacters = [];
         break;
       case 'confirmTradePhase':
       case 'waitTradePhase':
@@ -1570,6 +1571,29 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.statusBar.addActionButton(_('Confirm ${x} character(s)').replace('${x}', this.selectCharacterCount), () =>
             this.bgaPerformAction('actChooseCharacters'),
           );
+          this.statusBar.addActionButton(_('Randomize') + ` <i class="fa6 fa6-solid fa6-dice-d6 dlid__dice"></i>`, () => {
+            const saved = [...this.mySelectedCharacters];
+            const otherCharacters = this.selectedCharacters.filter((d) => d.playerId != gameui.player_id).map((d) => d.name);
+            const validCharacters = Object.keys(this.data).filter(
+              (d) => this.data[d].options.type === 'character' && !otherCharacters.includes(d),
+            );
+            this.mySelectedCharacters = [];
+            for (let i = 0; i < this.selectCharacterCount; i++) {
+              let choice = validCharacters[Math.floor(Math.random() * validCharacters.length)];
+              while (!choice || this.mySelectedCharacters.includes(choice)) {
+                choice = validCharacters[Math.floor(Math.random() * validCharacters.length)];
+              }
+              this.mySelectedCharacters.push(choice);
+            }
+            this.bgaPerformAction('actCharacterClicked', {
+              character1: this.mySelectedCharacters?.[0],
+              character2: this.mySelectedCharacters?.[1],
+              character3: this.mySelectedCharacters?.[2],
+              character4: this.mySelectedCharacters?.[3],
+            }).catch(() => {
+              this.mySelectedCharacters = saved;
+            });
+          });
           break;
         case 'playerTurn':
           if (isActive) {
@@ -1651,7 +1675,6 @@ declare('bgagame.dontletitdie', Gamegui, {
     // dojo.subscribe('startSelection', this, 'notif_startSelection');
     dojo.subscribe('characterClicked', this, 'notif_characterClicked');
     dojo.subscribe('updateCharacterData', this, 'notif_updateCharacterData');
-    dojo.subscribe('updateGameData', this, 'notif_updateGameData');
     dojo.subscribe('updateKnowledgeTree', this, 'notif_updateKnowledgeTree');
     dojo.subscribe('updateActionButtons', this, 'notif_updateActionButtons');
     dojo.subscribe('notify', this, 'notif_actionNotification');
@@ -1676,7 +1699,6 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.notifqueue.setSynchronous('rollFireDie', 3250);
     this.notifqueue.setSynchronous('shuffle', 1500);
     this.notifqueue.setSynchronous('tokenUsed', 300);
-    this.notifqueue.setSynchronous('updateGameData', 300);
   },
   notificationWrapper: async function (notification) {
     notification.args = notification.args ?? {};
@@ -1742,17 +1764,6 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
     return this.decks[notification.args.deck].shuffle(notification.args);
   },
-  notif_updateGameData: async function (notification) {
-    await this.notificationWrapper(notification);
-    if (isStudio()) console.log('notif_updateGameData', notification);
-    this.updatePlayers(notification.args.gameData);
-    this.updateItems(notification.args.gameData);
-    this.updateKnowledgeTree(notification.args.gameData);
-    // if (notification.args?.gamestate?.name)
-    //   await this.onUpdateActionButtons(notification.args.gamestate.name, notification.args.gameData);
-    // if (notification.args?.gamestate?.name == 'tradePhase') this.itemTradeScreen.update(notification.args);
-    if (notification.args?.gamestate?.name == 'startHindrance') this.upgradeSelectionScreen.update(notification.args.gameData);
-  },
   notif_zombieChange: async function (notification) {
     await this.notificationWrapper(notification);
     if (isStudio()) console.log('notif_zombieChange', notification);
@@ -1787,7 +1798,7 @@ declare('bgagame.dontletitdie', Gamegui, {
   notif_characterClicked: async function (notification) {
     await this.notificationWrapper(notification);
     if (isStudio()) console.log('notif_characterClicked', notification);
-    this.selectedCharacters = notification.args.gameData.characters;
+    this.selectedCharacters = notification.args.gameData.characters ?? [];
     this.updateCharacterSelections(notification.args);
   },
   notif_tradeItem: async function (notification) {
