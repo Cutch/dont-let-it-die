@@ -121,7 +121,7 @@ class DLD_Character
     {
         $turnOrderStart = $this->game->gameData->get('turnOrderStart');
         $turnOrder =
-            sizeof($turnOrderStart) == 4 && $this->game->gamestate->state()['name'] != 'characterSelect'
+            sizeof($turnOrderStart ?? []) == 4 && $this->game->gamestate->state()['name'] != 'characterSelect'
                 ? $turnOrderStart
                 : $this->game->gameData->get('turnOrder');
         return array_values(array_filter($turnOrder));

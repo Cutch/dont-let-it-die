@@ -54,7 +54,7 @@ class DLD_GameData
         'partials' => [],
         'tokens' => [],
         'resources' => [
-            'fireWood' => 0,
+            'fireWood' => 3,
             'wood' => 0,
             'bone' => 0,
             'meat' => 0,
