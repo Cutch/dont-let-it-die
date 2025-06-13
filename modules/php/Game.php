@@ -2219,7 +2219,7 @@ class Game extends \Table
                 $this->gameData->set('turnOrderStart', $this->gameData->get('turnOrder'));
             }
         }
-        if (!$this->gameData->get('turnOrderStart')) {
+        if (!$this->gameData->get('turnOrderStart') || sizeof($this->gameData->get('turnOrderStart')) < 4) {
             $players = $this->loadPlayersBasicInfos();
 
             $characters = array_values(

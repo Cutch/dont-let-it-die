@@ -119,7 +119,11 @@ class DLD_Character
     }
     public function getAllCharacterIds(): array
     {
-        $turnOrder = $this->game->gameData->get('turnOrderStart') ?? $this->game->gameData->get('turnOrder');
+        $turnOrderStart = $this->game->gameData->get('turnOrderStart');
+        $turnOrder =
+            sizeof($turnOrderStart) == 4 && $this->game->gamestate->state()['name'] != 'characterSelect'
+                ? $turnOrderStart
+                : $this->game->gameData->get('turnOrder');
         return array_values(array_filter($turnOrder));
     }
     public function getAllCharacterData(bool $_skipHooks = false): array
