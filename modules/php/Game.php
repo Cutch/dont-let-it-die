@@ -2117,7 +2117,6 @@ class Game extends \Table
                 }, $characters);
                 $result = [
                     'actions' => [...$actions, ...$hasWood ? [$action] : []],
-                    'dinnerEatableFoods' => [],
                 ];
                 $this->notify_player((int) $playerId, 'updateActionButtons', '', ['gameData' => $result]);
             }

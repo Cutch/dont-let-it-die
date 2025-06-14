@@ -66,6 +66,7 @@ export class EatScreen {
         selectCallback(),
       );
     };
+    let found = false;
     eatableFoods.forEach((food, i) => {
       const available = this.game.gamedatas.resources[food['id']];
       const requires = food['count'];
@@ -79,8 +80,10 @@ export class EatScreen {
             document.querySelector(`#eat-screen .token-block.${food['id']}`).style['outline'] = `5px solid #fff`;
           }
         });
+        found = true;
       }
     });
+    if (!found) eatElem.innerHTML = `<div class="dlid__container"><h3>${_('None')}</h3></div>`;
     this.scroll();
   }
 }

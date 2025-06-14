@@ -1405,7 +1405,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                   );
                 } else if (actionId === 'actEat') {
                   this.clearActionButtons();
-                  this.eatScreen.show(this.gamedatas, action.character && this.gamedatas.dinnerEatableFoods[action.character]);
+                  this.eatScreen.show(this.gamedatas, action.character && this.gamedatas.dinnerEatableFoods?.[action.character]);
                   this.statusBar.addActionButton(_('Eat') + `${suffix}`, () => {
                     if (!this.eatScreen.hasError()) {
                       this.bgaPerformAction('actEat', {

@@ -80,7 +80,7 @@ class DLD_Actions
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {
                     $variables = $game->gameData->getResources();
-                    $array = $this->getActionSelectable($action['id']);
+                    $array = $this->getActionSelectable($action['id'], null, $game->character->getSubmittingCharacterId());
                     $array = array_filter(
                         $array,
                         function ($v) use ($variables) {
@@ -491,7 +491,7 @@ class DLD_Actions
         $data = [
             'action' => $actionId,
             'selectable' => $this->getAction($actionId, $subActionId)['selectable']($this->game),
-            'characterId' => $characterId ?? $this->game->character->getTurnCharacterId(),
+            'characterId' => $characterId ?? $this->game->character->getSubmittingCharacterId(),
         ];
         return $this->game->hooks->onGetActionSelectable($data)['selectable'];
     }
