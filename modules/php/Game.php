@@ -810,8 +810,10 @@ class Game extends \Table
                     $notificationSent = true;
                 };
                 if ($_this->gamestate->state()['name'] == 'interrupt') {
+                    // Only applies to skills from an interrupt state
                     $skill['sendNotification']();
                     $_this->actInterrupt->actInterrupt($skillId);
+                    $_this->actions->spendActionCost('actUseSkill', $skillId);
                     $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 }
                 if (!array_key_exists('interruptState', $skill) || (in_array('interrupt', $skill['state']) && $finalizeInterrupt)) {

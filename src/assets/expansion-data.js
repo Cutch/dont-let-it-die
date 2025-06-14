@@ -60,7 +60,7 @@ export default {
               title: _('Make a snappy comeback'),
             },
             _(
-              'Take 1 Damage. You manage to shake it loose! It looks pretty angry though... Fight the Snapping Turtle in normal combat. S: +1 = 1 Damage | 1 Life If you win, take this card and flip it upside down.',
+              'Take 1 Damage. You manage to shake it loose! It looks pretty angry though... Fight the Snapping Turtle in normal combat. 1 Damage | 1 Life. If you win, take this card and flip it upside down.',
             ),
           ],
         },

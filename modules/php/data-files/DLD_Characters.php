@@ -222,6 +222,7 @@ class DLD_CharactersData
                             $game->character->adjustStamina($turn_char['character_name'], 2);
                             // $game->adjustResource($data['data']['card']['resourceType'], $data['data']['card']['count']);
                             $game->eventLog(clienttranslate('${character_name} gave ${turn_character_name} 2 stamina'), [
+                                'character_name' => $game->getCharacterHTML($skill['characterId']),
                                 'turn_character_name' => $turn_char['character_name'],
                             ]);
                             return ['notify' => false];
@@ -2137,7 +2138,7 @@ class DLD_CharactersData
                         'name' => '+1 ' . clientTranslate('Roll'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
-                        'damage' => 1,
+                        'health' => 1,
                         'random' => true,
                         'onInvestigateFire' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
@@ -2183,7 +2184,6 @@ class DLD_CharactersData
                 'slots' => ['weapon', 'tool'],
                 'onCraftPost' => function (Game $game, $char, &$data) {
                     // Choose tribe member to gain 1 hp or 1 stamina
-                    // $data['interrupt'] = true;
                     $characterIds = array_map(
                         function ($d) {
                             return $d['id'];
@@ -2203,9 +2203,6 @@ class DLD_CharactersData
                         'playerTurn',
                         clienttranslate('Give Character 1 Health or Stamina')
                     );
-                    // $game->actInterrupt->addSkillInterrupt($skill);
-                    // $char = $game->character->getCharacterData($skill['characterId']);
-                    // $game->actInterrupt->addSkillInterrupt($char['skills']['Yurtskill2']);
                 },
                 'skills' => [
                     'skill1' => [
