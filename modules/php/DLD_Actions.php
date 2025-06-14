@@ -202,11 +202,13 @@ class DLD_Actions
                 'state' => ['playerTurn'],
                 'stamina' => 2,
                 'random' => true,
+                'type' => 'action',
             ],
             'actDrawForage' => [
                 'state' => ['playerTurn'],
                 'stamina' => 2,
                 'random' => true,
+                'type' => 'action',
             ],
             'actDrawHarvest' => [
                 'state' => ['playerTurn'],

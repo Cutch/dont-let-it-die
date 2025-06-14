@@ -243,7 +243,6 @@ class DLD_ActInterrupt
         if (!$state) {
             return;
         }
-        $this->game->log('completeInterrupt', ['action' => 'completeInterrupt', 'state' => $state]);
         $data = $state['data'];
         // Check that the state change has not already handled the function call
         if ($data && array_key_exists('functionName', $data) && $this->getState($data['functionName'])) {
@@ -252,10 +251,9 @@ class DLD_ActInterrupt
             $this->game->log('actInterrupt changeState ', $data['functionName']);
         }
     }
-    public function onInterruptCancel()
+    public function onInterruptCancel($cancelAll = false)
     {
         $state = $this->getLatestInterruptState();
-        $this->game->log('onInterruptCancel', ['action' => 'onInterruptCancel', 'state' => $state]);
         if (!$state) {
             return false;
         }
@@ -263,9 +261,11 @@ class DLD_ActInterrupt
 
         $playerId = $this->game->getCurrentPlayer();
 
-        $characterIds = array_map(function ($char) {
-            return $char['id'];
-        }, $this->game->character->getAllCharacterDataForPlayer($playerId));
+        $characterIds = $cancelAll
+            ? $this->game->character->getAllCharacterIds()
+            : array_map(function ($char) {
+                return $char['id'];
+            }, $this->game->character->getAllCharacterDataForPlayer($playerId));
         // Remove skills so that we know there's nothing left to do
         // $skills = $data['skills'];
         // array_walk($skills, function (&$v, $k) use ($characterIds) {
@@ -289,16 +289,9 @@ class DLD_ActInterrupt
         if ($changeState) {
             if ($data && array_key_exists('functionName', $data) && $this->getState($state['functionName'])) {
                 $this->setState($state['functionName'], [...$this->getState($state['functionName']), 'cancelled' => true]);
-                $this->game->log('actInterruptCancel ' . $state['functionName'], $data['args']);
                 call_user_func([$this->game, $data['functionName']], ...$data['args']);
-                $this->game->log('onInterruptCancel 3 call ', $data['functionName']);
             }
         }
-        $this->game->log('onInterruptCancel 2', [
-            'action' => 'onInterruptCancel',
-            'characterIds' => $characterIds,
-            'changeState' => $changeState,
-        ]);
 
         return true;
     }

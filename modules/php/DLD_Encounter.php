@@ -257,6 +257,7 @@ class DLD_Encounter
                     'damagedCharacter' => $this->game->character->getSubmittingCharacterId(),
                     'originalDamagedCharacter' => $this->game->character->getSubmittingCharacterId(),
                     'stamina' => 0,
+                    'damageTaken' => 0,
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {

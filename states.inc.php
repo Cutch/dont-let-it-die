@@ -112,7 +112,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('Select a Character'),
         'type' => 'multipleactiveplayer',
         'args' => 'argSelectionCount',
-        'possibleactions' => ['actChooseCharacters', 'actCharacterClicked'],
+        'possibleactions' => ['actChooseCharacters', 'actCharacterClicked', 'actUnPass'],
         'transitions' => ['playerTurn' => $playerTurn, 'startHindrance' => $startHindrance],
         'action' => 'stSelectCharacter',
     ],
@@ -315,7 +315,7 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'action' => 'stInterrupt',
         'args' => 'argInterrupt',
-        'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone'],
+        'possibleactions' => ['actUseSkill', 'actUseItem', 'actDone', 'actUnPass'],
         'transitions' => [
             'endGame' => $gameEnd,
             'eatSelection' => $eatSelection,

@@ -187,6 +187,15 @@ class DLD_CharacterSelection
             $this->game->isValidExpansion('hindrance') ? 'startHindrance' : 'playerTurn'
         );
     }
+    public function actUnPass(): void
+    {
+        $playerId = $this->game->getCurrentPlayer();
+        // Deactivate player, and move to next state if none are active
+        $this->game->gamestate->setPlayersMultiactive(
+            [$playerId],
+            $this->game->isValidExpansion('hindrance') ? 'startHindrance' : 'playerTurn'
+        );
+    }
     public function test_swapCharacter($character)
     {
         $oldChar = $this->game->character->getTurnCharacterId();

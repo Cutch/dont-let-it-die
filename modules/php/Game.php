@@ -17,6 +17,8 @@
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
+
+use Bga\GameFramework\Actions\CheckAction;
 use Bga\GameFramework\Actions\Types\JsonParam;
 
 use BgaUserException;
@@ -1025,6 +1027,19 @@ class Game extends \Table
         // at the end of the action, move to the next state
         $this->endTurn();
         $this->completeAction(false);
+    }
+    #[CheckAction(false)]
+    public function actUnPass(): void
+    {
+        $this->gamestate->checkPossibleAction('actUnPass');
+        $stateName = $this->gamestate->state()['name'];
+        if ($stateName == 'characterSelect') {
+            $this->characterSelection->actUnPass();
+        } elseif ($stateName == 'interrupt') {
+            if (!$this->actInterrupt->onInterruptCancel(true)) {
+                $this->nextState('playerTurn');
+            }
+        }
     }
     public function actDone(): void
     {
@@ -2169,6 +2184,7 @@ class Game extends \Table
             $result['actions'] = array_values($this->actions->getValidActions());
             $result['availableSkills'] = $this->actions->getAvailableSkills();
             $result['availableItemSkills'] = $this->actions->getAvailableItemSkills();
+            $result['activeTurnPlayerId'] = $this->character->getTurnCharacter(true)['player_id'];
         }
         if ($this->gamestate->state()['name'] == 'playerTurn') {
             $result['canUndo'] = $this->undo->canUndo();

@@ -1623,6 +1623,40 @@ declare('bgagame.dontletitdie', Gamegui, {
       //     },
       //     { color: 'secondary' },
       //   );
+    } else if (!this.isSpectator && stateName && actions != null) {
+      switch (stateName) {
+        case 'characterSelect':
+          this.statusBar.addActionButton(
+            _('Back'),
+            () => {
+              this.bgaPerformAction('actUnPass', null, { checkAction: false });
+            },
+            { color: 'secondary' },
+          );
+        case 'interrupt':
+          if (this.gamedatas.currentState === 'playerTurn' && this.gamedatas.activeTurnPlayerId == gameui.player_id) {
+            actions
+              .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
+              .forEach((action) => {
+                const actionId = action.action;
+                if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
+                  return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
+                    (skill) => {
+                      const suffix = this.getActionSuffixHTML(skill);
+                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {}, { classes: 'bgabutton_gray', disabled: true });
+                    },
+                  );
+                }
+              });
+            this.statusBar.addActionButton(
+              _('Skip Other\s Selection'),
+              () => {
+                this.bgaPerformAction('actUnPass', null, { checkAction: false });
+              },
+              { color: 'red' },
+            );
+          }
+      }
     }
   },
 
