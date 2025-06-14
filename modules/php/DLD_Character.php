@@ -474,7 +474,7 @@ class DLD_Character
     //     }
     //     return null;
     // }
-    public function getSubmittingCharacterId(): string
+    public function getSubmittingCharacterId(): ?string
     {
         return $this->submittingCharacter ? $this->submittingCharacter : $this->getTurnCharacterId();
     }
