@@ -122,6 +122,7 @@ class DLD_SelectionStates
                 if (array_key_exists('stamina', $data)) {
                     $data['stamina'] = $this->game->character->adjustActiveStamina($data['stamina']);
                 }
+                $_this->actions->spendActionCost('actEat');
                 $left = $this->game->adjustResource($data['type'], -$data['count'])['left'];
                 if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
                     if ($left == 0) {

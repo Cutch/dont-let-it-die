@@ -593,8 +593,8 @@ class DLD_DecksData
                     }
                 },
                 'onAdjustStamina' => function (Game $game, $nightCard, &$data) {
-                    if ($data > 0) {
-                        $data = 0;
+                    if ($data['change'] > 0) {
+                        $data['change'] = 0;
                     }
                     return $data;
                 },

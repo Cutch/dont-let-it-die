@@ -500,13 +500,13 @@ class DLD_Actions
      * @return array
      * @see ./states.inc.php
      */
-    public function getActionCost(string $action, ?string $subAction = null): array
+    public function getActionCost(string $action, ?string $subAction = null, ?string $characterId = null): array
     {
         $actionObj = $this->getAction($action, $subAction);
-        $this->skillActionCost($action, $subAction, $actionObj);
+        $this->skillActionCost($action, $subAction, $actionObj, $characterId);
         return $actionObj;
     }
-    private function skillActionCost(string $action, ?string $subAction = null, array &$skill)
+    private function skillActionCost(string $action, ?string $subAction = null, array &$skill, ?string $characterId = null)
     {
         $actionCost = [
             'action' => $action,
@@ -517,6 +517,7 @@ class DLD_Actions
             'perForever' => array_key_exists('perForever', $skill) ? $skill['perForever'] : null,
             'name' => array_key_exists('name', $skill) ? $skill['name'] : null,
             'random' => array_key_exists('random', $skill) ? $skill['random'] : null,
+            'characterId' => $characterId ?? $this->game->character->getSubmittingCharacterId(),
         ];
         $this->game->hooks->onGetActionCost($actionCost);
 
@@ -581,10 +582,9 @@ class DLD_Actions
                     ))) &&
             (!array_key_exists('requires', $actionObj) || $actionObj['requires']($this->game, $actionObj, ...$args));
     }
-    public function spendActionCost(string $action, ?string $subAction = null)
+    public function spendActionCost(string $action, ?string $subAction = null, ?string $characterId = null)
     {
-        $cost = $this->getActionCost($action, $subAction);
-        $this->game->log('$cost', $cost);
+        $cost = $this->getActionCost($action, $subAction, $characterId);
         $this->spendCost($cost);
     }
     public function spendCost(array $cost)

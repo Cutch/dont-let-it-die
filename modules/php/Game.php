@@ -734,6 +734,7 @@ class Game extends \Table
                 if (array_key_exists('stamina', $data)) {
                     $data['stamina'] = $this->character->adjustActiveStamina($data['stamina']);
                 }
+                $_this->actions->spendActionCost('actEat');
                 $left = $this->adjustResource($data['type'], -$data['count'])['left'];
                 if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
                     $this->notify(
@@ -1526,6 +1527,7 @@ class Game extends \Table
         $hasWood = $action['requires']($this, $action);
         $actions = array_map(function ($char) {
             return [
+                ...$this->actions->getActionCost('actEat', null, $char['character_name']),
                 'action' => 'actEat',
                 'character' => $char['character_name'],
                 'type' => 'action',
@@ -2112,6 +2114,7 @@ class Game extends \Table
                 $hasWood = $action['requires']($this, $action);
                 $actions = array_map(function ($char) {
                     return [
+                        ...$this->actions->getActionCost('actEat', null, $char['character_name']),
                         'action' => 'actEat',
                         'character' => $char['character_name'],
                         'type' => 'action',
@@ -2530,6 +2533,13 @@ class Game extends \Table
     {
         $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
             $data['stamina'] = $data['maxStamina'];
+        });
+        $this->completeAction();
+    }
+    public function noStamina()
+    {
+        $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
+            $data['stamina'] = 0;
         });
         $this->completeAction();
     }

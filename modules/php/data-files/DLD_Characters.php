@@ -738,12 +738,14 @@ class DLD_CharactersData
                 },
                 'onGetActionSelectable' => function (Game $game, $char, &$data) {
                     if ($data['characterId'] == $char['id'] && $data['action'] == 'actEat') {
-                        $data['selectable'] = array_filter(
-                            $data['selectable'],
-                            function ($v, $k) {
-                                return in_array($v['id'], ['berry', 'berry-cooked']);
-                            },
-                            ARRAY_FILTER_USE_BOTH
+                        $data['selectable'] = array_values(
+                            array_filter(
+                                $data['selectable'],
+                                function ($v, $k) {
+                                    return in_array($v['id'], ['berry', 'berry-cooked']);
+                                },
+                                ARRAY_FILTER_USE_BOTH
+                            )
                         );
                     }
                 },
@@ -1320,12 +1322,14 @@ class DLD_CharactersData
                 },
                 'onGetActionSelectable' => function (Game $game, $char, &$data) {
                     if ($data['characterId'] == $char['id'] && $data['action'] == 'actEat') {
-                        $data['selectable'] = array_filter(
-                            $data['selectable'],
-                            function ($v, $k) {
-                                return in_array($v['id'], ['meat', 'meat-cooked', 'fish', 'fish-cooked']);
-                            },
-                            ARRAY_FILTER_USE_BOTH
+                        $data['selectable'] = array_values(
+                            array_filter(
+                                $data['selectable'],
+                                function ($v, $k) {
+                                    return in_array($v['id'], ['meat', 'meat-cooked', 'fish', 'fish-cooked']);
+                                },
+                                ARRAY_FILTER_USE_BOTH
+                            )
                         );
                     }
                 },
@@ -1470,8 +1474,7 @@ class DLD_CharactersData
                 'slots' => ['weapon'],
                 'onDraw' => function (Game $game, $char, &$data) {
                     $card = $data['card'];
-                    $game->log('onDraw check', $char['isActive'], $card);
-                    if ($char['isActive'] && $card['type'] == 'berry') {
+                    if ($char['isActive'] && array_key_exists('resourceType', $card) && $card['resourceType'] == 'berry') {
                         if ($game->character->adjustActiveHealth(1) == 1) {
                             $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                 'count' => 1,
@@ -1676,10 +1679,22 @@ class DLD_CharactersData
                 'name' => 'Vog',
                 'slots' => ['weapon', 'tool'],
                 'onGetActionCost' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && $data['action'] == 'actEat') {
+                    if ($char['id'] == $data['characterId'] && $data['action'] == 'actEat') {
                         $data['stamina'] += 1;
                     }
                 },
+                // 'onSpendActionCost' => function (Game $game, $char, &$data) {
+                //     if ($char['id'] == $game->character->getSubmittingCharacterId()) {
+                //         if (array_key_exists('stamina', $data) && $data['stamina'] > 0) {
+                //             $diff = $game->character->getActiveStamina() - $data['stamina'];
+                //             if ($diff < 0) {
+                //                 $data['stamina'] += $diff;
+                //                 $data['health'] = (array_key_exists('health', $data) ? $data['health'] : 0) - $diff;
+                //                 $data['healthAsStamina'] = true;
+                //             }
+                //         }
+                //     }
+                // },
                 'onMorning' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         array_push($data['skipMorningDamage'], 'Vog');
