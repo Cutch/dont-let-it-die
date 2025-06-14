@@ -276,12 +276,13 @@ class DLD_CharactersData
                         },
                     ],
                 ],
-                'onEncounterPost' => function (Game $game, $char, $data) {
+                'onEncounterPost' => function (Game $game, $char, &$data) {
                     if ($game->encounter->killCheck($data)) {
                         $data['stamina'] += 1;
 
                         $game->eventLog(clienttranslate('${character_name} gave 1 stamina to ${active_character_name}'), [
-                            'active_character_name' => $game->getCharacterHTML($char['character_name']),
+                            'active_character_name' => $game->getCharacterHTML($game->character->getSubmittingCharacterId()),
+                            'character_name' => $game->getCharacterHTML($char['character_name']),
                         ]);
                     }
                 },
