@@ -17,7 +17,6 @@ class DLD_Hooks
     {
         $unlocks = $this->game->getUnlockedKnowledge();
         $activeNightCards = $this->game->getActiveNightCards();
-        // var_dump(json_encode($activeNightCards));
         $buildings = $this->game->getBuildings();
         $actions = $this->game->actions->getActions();
         $characters = $this->game->character->getAllCharacterData(true);

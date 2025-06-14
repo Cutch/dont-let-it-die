@@ -277,7 +277,6 @@ class DLD_ActInterrupt
         // $this->setState($state['functionName'], null); // TODO: for items this doesnt work, but does work for player turn?
 
         // $this->game->log($this->game->gamestate->state()['name'], $state);
-        // var_dump($this->game->gamestate->getActivePlayerList(), $this->game->gamestate->state()['name']);
         $changeState = false;
         foreach ($characterIds as $k => $v) {
             $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);

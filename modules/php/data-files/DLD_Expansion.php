@@ -1069,9 +1069,9 @@ class DLD_ExpansionData
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Exhausted'),
                 'onMorningAfter' => function (Game $game, $card, &$data) {
-                    $game->character->adjustStamina($game->character->getTurnCharacterId(), -2);
+                    $game->character->adjustStamina($card['characterId'], -2);
                     $game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
-                        'character_name' => $game->getCharacterHTML($data['characterId']),
+                        'character_name' => $game->getCharacterHTML($card['characterId']),
                         'acquireOrDropSentence' => $card['acquireSentence'],
                         'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
                     ]);

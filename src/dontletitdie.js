@@ -1634,7 +1634,7 @@ declare('bgagame.dontletitdie', Gamegui, {
             { color: 'secondary' },
           );
         case 'interrupt':
-          if (this.gamedatas.currentState === 'playerTurn' && this.gamedatas.activeTurnPlayerId == gameui.player_id) {
+          if (gameui.gamedatas.activeTurnPlayerId == gameui.player_id) {
             actions
               .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
               .forEach((action) => {

@@ -645,7 +645,6 @@ class DLD_Actions
     {
         // Get some values from the current game situation from the database.
         $validActionsFiltered = array_filter($this->getActions(), function ($v) {
-            // var_dump(json_encode($v));
             $actionCost = $this->getActionCost($v['id']);
             $stamina = $this->game->character->getActiveStamina();
             $health = $this->game->character->getActiveHealth();

@@ -322,6 +322,7 @@ class DLD_SelectionStates
             'actions' => [],
             'selectionState' => $this->game->gameData->get($stateName),
             'character_name' => $this->game->getCharacterHTML($state['characterId']),
+            'activeTurnPlayerId' => 0,
         ];
         $this->game->getGameData($result);
         $this->game->getResources($result);

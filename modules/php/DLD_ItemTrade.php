@@ -268,6 +268,7 @@ class DLD_ItemTrade
                     'type' => 'action',
                 ],
             ],
+            'activeTurnPlayerId' => 0,
         ];
         // $result['character_name'] = $this->game->getCharacterHTML();
         // $this->game->getAllPlayers($result);
@@ -290,6 +291,7 @@ class DLD_ItemTrade
                     'type' => 'action',
                 ],
             ],
+            'activeTurnPlayerId' => 0,
         ];
         return $result;
     }
@@ -308,6 +310,7 @@ class DLD_ItemTrade
     {
         $result = [
             'actions' => [],
+            'activeTurnPlayerId' => 0,
         ];
         $result['character_name'] = $this->game->getCharacterHTML();
         $this->game->getAllPlayers($result);

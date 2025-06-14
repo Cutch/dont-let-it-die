@@ -886,7 +886,6 @@ class Game extends \Table
                     $skill['sendNotification']();
                 }
                 if (!array_key_exists('interruptState', $skill) || (in_array('interrupt', $skill['state']) && $finalizeInterrupt)) {
-                    // var_dump(json_encode([array_key_exists('onUse', $skill)]));
                     $result = array_key_exists('onUse', $skill) ? $skill['onUse']($this, $skill, $character) : null;
                     if (!$result || !array_key_exists('spendActionCost', $result) || $result['spendActionCost'] != false) {
                         $_this->actions->spendActionCost('actUseItem', $skillId);
@@ -1111,6 +1110,7 @@ class Game extends \Table
             ...$this->gameData->get('state'),
             'resolving' => $this->actInterrupt->isStateResolving(),
             'character_name' => $this->getCharacterHTML(),
+            'activeTurnPlayerId' => 0,
         ];
         $this->getDecks($result);
         return $result;
@@ -1454,6 +1454,7 @@ class Game extends \Table
                     'action' => 'actUseItem',
                     'type' => 'action',
                 ],
+                'activeTurnPlayerId' => 0,
             ],
             // 'availableSkills' => array_values(
             //     $this->actions->wrapSkills(
@@ -1546,6 +1547,7 @@ class Game extends \Table
                 'action' => 'actEat',
                 'character' => $char['character_name'],
                 'type' => 'action',
+                'activeTurnPlayerId' => 0,
             ];
         }, $characters);
         $result = [
