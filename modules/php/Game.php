@@ -1466,8 +1466,8 @@ class Game extends \Table
                     'action' => 'actUseItem',
                     'type' => 'action',
                 ],
-                'activeTurnPlayerId' => 0,
             ],
+            'activeTurnPlayerId' => 0,
             // 'availableSkills' => array_values(
             //     $this->actions->wrapSkills(
             //         array_filter($this->data->getExpansion()[$card['id']]['skills'], function ($skill) {
@@ -1563,7 +1563,6 @@ class Game extends \Table
                         'action' => 'actEat',
                         'character' => $char['character_name'],
                         'type' => 'action',
-                        'activeTurnPlayerId' => 0,
                     ];
                 },
                 array_filter($characters, function ($char) {
@@ -1579,6 +1578,7 @@ class Game extends \Table
         $result = [
             'actions' => $this->getDinnerPhaseActions($playerId),
             'dinnerEatableFoods' => [],
+            'activeTurnPlayerId' => 0,
         ];
         $this->getItemData($result);
         $this->getGameData($result);
@@ -2163,6 +2163,7 @@ class Game extends \Table
             foreach ($this->gamestate->getActivePlayerList() as $playerId) {
                 $result = [
                     'actions' => $this->getDinnerPhaseActions($playerId),
+                    'activeTurnPlayerId' => 0,
                 ];
                 $this->notify_player((int) $playerId, 'updateActionButtons', '', ['gameData' => $result]);
             }
