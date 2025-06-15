@@ -177,15 +177,13 @@ class DLD_CharacterSelection
             clienttranslate($message),
             array_merge(['gameData' => $results, 'playerId' => $playerId], $selectedCharactersArgs)
         );
-        if (sizeof(array_filter($this->game->gameData->get('turnOrder'))) > 4) {
+        $this->game->markChanged('token');
+        $targetState = $this->game->isValidExpansion('hindrance') ? 'startHindrance' : 'playerTurn';
+        // Deactivate player, and move to next state if none are active
+        $this->game->gamestate->setPlayerNonMultiactive($playerId, $targetState);
+        if ($this->game->gamestate->state(true, false, true)['name'] == $targetState) {
             $this->game->gameData->set('turnOrderStart', $this->game->gameData->get('turnOrder'));
         }
-        $this->game->markChanged('token');
-        // Deactivate player, and move to next state if none are active
-        $this->game->gamestate->setPlayerNonMultiactive(
-            $playerId,
-            $this->game->isValidExpansion('hindrance') ? 'startHindrance' : 'playerTurn'
-        );
     }
     public function actUnPass(): void
     {

@@ -776,7 +776,7 @@ class DLD_ExpansionData
                                 ['id' => $card['characterId']],
                                 $card['characterId'],
                                 false,
-                                $game->gamestate->state()['name'],
+                                $game->gamestate->state(true, false, true)['name'],
                                 null,
                                 false // No interrupt as eat is cancelled
                             );

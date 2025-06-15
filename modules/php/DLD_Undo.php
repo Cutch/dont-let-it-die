@@ -21,7 +21,7 @@ class DLD_Undo
 
     public function actUndo(): void
     {
-        if ($this->game->gamestate->state()['name'] != 'playerTurn') {
+        if ($this->game->gamestate->state(true, false, true)['name'] != 'playerTurn') {
             throw new BgaUserException(clienttranslate('Only player actions can be undone'));
         }
         if (!$this->canUndo()) {
@@ -63,7 +63,7 @@ class DLD_Undo
         $this->game->markChanged('knowledge');
         $this->game->markChanged('actions');
         $this->game::DbQuery("DELETE FROM `undoState` where pending OR undo_id = $undoId");
-        $currentState = $this->game->gamestate->state()['name'];
+        $currentState = $this->game->gamestate->state(true, false, true)['name'];
         $this->game->nextState('undo');
         $this->game->nextState($currentState);
         $this->game->completeAction(false);
@@ -97,7 +97,7 @@ class DLD_Undo
         $extraTables = json_encode($extraTablesData);
         $stateName = '';
         try {
-            $stateName = $this->game->gamestate->state()['name'];
+            $stateName = $this->game->gamestate->state(true, false, true)['name'];
         } catch (Exception $e) {
         }
         $this->initialState = [
@@ -129,7 +129,7 @@ class DLD_Undo
             $this->savedMoveId = $moveId;
 
             $pending = 'false';
-            if ($this->game->gamestate->state()['name'] != 'playerTurn') {
+            if ($this->game->gamestate->state(true, false, true)['name'] != 'playerTurn') {
                 $pending = 'true';
             }
             $this->game::DbQuery(
@@ -143,7 +143,7 @@ class DLD_Undo
             $this->initialState['stateName'] != 'playerTurn' &&
             $char == $this->game->character->getSubmittingCharacterId()
         ) {
-            if ($this->game->gamestate->state()['name'] == 'playerTurn') {
+            if ($this->game->gamestate->state(true, false, true)['name'] == 'playerTurn') {
                 $this->game::DbQuery('UPDATE `undoState` SET pending=false WHERE pending=true');
             }
         }

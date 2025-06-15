@@ -94,7 +94,7 @@ class Game extends \Table
         $this->undo = new DLD_Undo($this);
         // automatically complete notification args when needed
         $this->notify->addDecorator(function (string $message, array $args) {
-            $args['gamestate'] = ['name' => $this->gamestate->state()['name']];
+            $args['gamestate'] = ['name' => $this->gamestate->state(true, false, true)['name']];
             if (!array_key_exists('character_name', $args) && str_contains($message, '${character_name}')) {
                 $args['character_name'] = $this->getCharacterHTML();
             }
@@ -774,7 +774,7 @@ class Game extends \Table
     }
     public function actUseSkill(string $skillId): void
     {
-        if ($this->gamestate->state()['name'] == 'playerTurn') {
+        if ($this->gamestate->state(true, false, true)['name'] == 'playerTurn') {
             $this->setLastAction('actUseSkill');
         }
         $this->actInterrupt->interruptableFunction(
@@ -794,7 +794,7 @@ class Game extends \Table
                     'skill' => $skill,
                     'character' => $character,
                     'turnCharacter' => $this->character->getTurnCharacter(),
-                    'nextState' => $this->gamestate->state()['name'] == 'dayEvent' ? 'playerTurn' : false,
+                    'nextState' => $this->gamestate->state(true, false, true)['name'] == 'dayEvent' ? 'playerTurn' : false,
                 ];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
@@ -812,7 +812,7 @@ class Game extends \Table
                     ]);
                     $notificationSent = true;
                 };
-                if ($_this->gamestate->state()['name'] == 'interrupt') {
+                if ($_this->gamestate->state(true, false, true)['name'] == 'interrupt') {
                     // Only applies to skills from an interrupt state
                     $skill['sendNotification']();
                     $_this->actInterrupt->actInterrupt($skillId);
@@ -841,7 +841,7 @@ class Game extends \Table
     }
     public function actUseItem(string $skillId): void
     {
-        if ($this->gamestate->state()['name'] == 'playerTurn') {
+        if ($this->gamestate->state(true, false, true)['name'] == 'playerTurn') {
             $this->setLastAction('actUseItem');
         }
         $this->actInterrupt->interruptableFunction(
@@ -880,7 +880,7 @@ class Game extends \Table
                     ]);
                     $notificationSent = true;
                 };
-                if ($_this->gamestate->state()['name'] == 'interrupt') {
+                if ($_this->gamestate->state(true, false, true)['name'] == 'interrupt') {
                     $_this->actInterrupt->actInterrupt($skillId);
                     $_this->character->setSubmittingCharacter('actUseItem', $skillId);
                     $skill['sendNotification']();
@@ -1031,7 +1031,7 @@ class Game extends \Table
     public function actUnPass(): void
     {
         $this->gamestate->checkPossibleAction('actUnPass');
-        $stateName = $this->gamestate->state()['name'];
+        $stateName = $this->gamestate->state(true, false, true)['name'];
         if ($stateName == 'characterSelect') {
             $this->characterSelection->actUnPass();
         } elseif ($stateName == 'interrupt') {
@@ -1054,7 +1054,7 @@ class Game extends \Table
     {
         // $this->character->addExtraTime();
         $saveState = true;
-        $stateName = $this->gamestate->state()['name'];
+        $stateName = $this->gamestate->state(true, false, true)['name'];
         if ($stateName == 'postEncounter') {
             $this->nextState('playerTurn');
         } elseif ($stateName == 'tradePhase') {
@@ -1433,7 +1433,9 @@ class Game extends \Table
         if ($this->gamestate == null) {
             $this->trace('TRACE [__init] ' . json_encode($args) . PHP_EOL . $stackString);
         } else {
-            $this->trace('TRACE [' . $this->gamestate->state()['name'] . '] ' . json_encode($args) . PHP_EOL . $stackString);
+            $this->trace(
+                'TRACE [' . $this->gamestate->state(true, false, true)['name'] . '] ' . json_encode($args) . PHP_EOL . $stackString
+            );
         }
     }
     public function argPlayerState(): array
@@ -2137,7 +2139,14 @@ class Game extends \Table
 
             $this->notify('updateKnowledgeTree', '', ['gameData' => $result]);
         }
-        if (!in_array($this->gamestate->state()['name'], ['characterSelect', 'interrupt', 'dinnerPhasePrivate', 'dinnerPhase'])) {
+        if (
+            !in_array($this->gamestate->state(true, false, true)['name'], [
+                'characterSelect',
+                'interrupt',
+                'dinnerPhasePrivate',
+                'dinnerPhase',
+            ])
+        ) {
             $availableUnlocks = $this->data->getValidKnowledgeTree();
             $result = [
                 'tradeRatio' => $this->getTradeRatio(),
@@ -2145,12 +2154,12 @@ class Game extends \Table
                 'availableSkills' => $this->actions->getAvailableSkills(),
                 'availableItemSkills' => $this->actions->getAvailableItemSkills(),
             ];
-            if ($this->gamestate->state()['name'] == 'playerTurn') {
+            if ($this->gamestate->state(true, false, true)['name'] == 'playerTurn') {
                 $result['canUndo'] = $this->undo->canUndo();
             }
             $this->notify('updateActionButtons', '', ['gameData' => $result]);
         }
-        if (in_array($this->gamestate->state()['name'], ['dinnerPhasePrivate', 'dinnerPhase'])) {
+        if (in_array($this->gamestate->state(true, false, true)['name'], ['dinnerPhasePrivate', 'dinnerPhase'])) {
             foreach ($this->gamestate->getActivePlayerList() as $playerId) {
                 $result = [
                     'actions' => $this->getDinnerPhaseActions($playerId),
@@ -2196,14 +2205,14 @@ class Game extends \Table
             }, array_keys($availableUnlocks)),
             'resolving' => $this->actInterrupt->isStateResolving(),
         ];
-        if ($this->gamestate->state()['name'] != 'characterSelect') {
+        if ($this->gamestate->state(true, false, true)['name'] != 'characterSelect') {
             $result['character_name'] = $this->getCharacterHTML();
             $result['actions'] = array_values($this->actions->getValidActions());
             $result['availableSkills'] = $this->actions->getAvailableSkills();
             $result['availableItemSkills'] = $this->actions->getAvailableItemSkills();
             $result['activeTurnPlayerId'] = $this->character->getTurnCharacter(true)['player_id'];
         }
-        if ($this->gamestate->state()['name'] == 'playerTurn') {
+        if ($this->gamestate->state(true, false, true)['name'] == 'playerTurn') {
             $result['canUndo'] = $this->undo->canUndo();
         }
         $this->getDecks($result);
@@ -2222,7 +2231,7 @@ class Game extends \Table
      */
     public function getAllDatas(): array
     {
-        $stateName = $this->gamestate->state()['name'];
+        $stateName = $this->gamestate->state(true, false, true)['name'];
         // TODO remove this check after initial games are no longer in progress
         $turnOrder = $this->gameData->get('turnOrder');
         if (sizeof(array_filter($turnOrder)) != 4) {
@@ -2254,7 +2263,7 @@ class Game extends \Table
             }
         }
         if (
-            (!$this->gameData->get('turnOrderStart') || sizeof($this->gameData->get('turnOrderStart'))) < 4 &&
+            (!$this->gameData->get('turnOrderStart') || sizeof($this->gameData->get('turnOrderStart')) < 4) &&
             $stateName !== 'characterSelect'
         ) {
             $players = $this->loadPlayersBasicInfos();
@@ -2379,7 +2388,7 @@ class Game extends \Table
         $this->reloadPlayersBasicInfos();
         $this->character->clearCache();
 
-        $stateName = $this->gamestate->state()['name'];
+        $stateName = $this->gamestate->state(true, false, true)['name'];
         $stateType = $this->gamestate->state()['type'];
         $this->log($stateName, $stateType, $returningPlayerId, $this->character->getTurnCharacter()['playerId']);
         if ($stateType === 'activeplayer') {

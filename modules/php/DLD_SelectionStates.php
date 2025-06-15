@@ -236,7 +236,7 @@ class DLD_SelectionStates
         if (!$sendToCampId) {
             throw new BgaUserException(clienttranslate('Select an item'));
         }
-        $state = $this->getState($this->game->gamestate->state()['name']);
+        $state = $this->getState($this->game->gamestate->state(true, false, true)['name']);
         $items = $state['items'];
         if (
             !in_array(
@@ -292,7 +292,7 @@ class DLD_SelectionStates
     }
     public function stateToStateNameMapping(?string $stateName = null): ?string
     {
-        $stateName = $stateName ?? $this->game->gamestate->state()['name'];
+        $stateName = $stateName ?? $this->game->gamestate->state(true, false, true)['name'];
         if ($stateName == 'characterSelection') {
             return 'characterSelectionState';
         } elseif ($stateName == 'hindranceSelection') {

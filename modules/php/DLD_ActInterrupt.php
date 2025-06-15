@@ -29,7 +29,7 @@ class DLD_ActInterrupt
         if (!$existingData) {
             // First time calling
             $data = $startCallback($this->game, ...$args);
-            $currentState = $this->game->gamestate->state()['name'];
+            $currentState = $this->game->gamestate->state(true, false, true)['name'];
             if ($data === null) {
                 return;
             }
@@ -50,7 +50,7 @@ class DLD_ActInterrupt
             if ($cancel) {
                 return;
             }
-            // if($this->game->gamestate->state()['name'] != $currentState){
+            // if($this->game->gamestate->state(true,true,true)['name'] != $currentState){
             //     // If we moved to a selection screen, we will need to call the hook again after, and finalize the function
 
             //     $this->setState($functionName, $interruptData);
@@ -64,7 +64,7 @@ class DLD_ActInterrupt
             } else {
                 $this->setState($functionName, $interruptData);
                 // Goto the skill screen
-                if ($this->game->gamestate->state()['name'] === $currentState) {
+                if ($this->game->gamestate->state(true, false, true)['name'] === $currentState) {
                     $this->game->nextState('interrupt');
                     $this->game->completeAction(false);
                 }
@@ -81,7 +81,7 @@ class DLD_ActInterrupt
             $this->setState($functionName, null);
         } elseif (!array_key_exists('activated', $existingData)) {
             $this->setState($functionName, ['activated' => true, ...$existingData]);
-            $this->game->log('exitHook finalize', $functionName, $this->game->gamestate->state()['name'], $existingData);
+            $this->game->log('exitHook finalize', $functionName, $this->game->gamestate->state(true, false, true)['name'], $existingData);
             // Don't need to re-check for interrupts
             $hook($existingData['data'], ['suffix' => 'Post']);
             // Calling after skill screen
@@ -99,7 +99,9 @@ class DLD_ActInterrupt
         }
         $data = $state['data'];
 
-        return $data && array_key_exists('currentState', $data) && $data['currentState'] == $this->game->gamestate->state()['name'];
+        return $data &&
+            array_key_exists('currentState', $data) &&
+            $data['currentState'] == $this->game->gamestate->state(true, false, true)['name'];
     }
     public function checkForInterrupt(): bool
     {
@@ -183,7 +185,7 @@ class DLD_ActInterrupt
     private function getDataForState(): ?array
     {
         $state = $this->getEntireState();
-        $stateName = $this->game->gamestate->state()['name'];
+        $stateName = $this->game->gamestate->state(true, false, true)['name'];
         $data = array_keys(
             array_filter($state, function ($v) use ($stateName) {
                 return $v['currentState'] == $stateName;
@@ -276,7 +278,7 @@ class DLD_ActInterrupt
         // $this->setState($state['functionName'], [...$data, 'skills' => $skills, 'activated' => true]);
         // $this->setState($state['functionName'], null); // TODO: for items this doesnt work, but does work for player turn?
 
-        // $this->game->log($this->game->gamestate->state()['name'], $state);
+        // $this->game->log($this->game->gamestate->state(true,true,true)['name'], $state);
         $changeState = false;
         foreach ($characterIds as $k => $v) {
             $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);

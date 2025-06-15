@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS `character` (
     `character_name` varchar(10) NOT NULL,
     `player_id` int(10) unsigned NOT NULL,
     `necromancer_player_id` int(10) unsigned NULL,
+    `order` int(10) UNSIGNED DEFAULT 0,
     `item_1` int(10) unsigned NULL,
     `item_2` int(10) unsigned NULL,
     `item_3` int(10) unsigned NULL,

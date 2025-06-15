@@ -629,7 +629,7 @@ class DLD_Character
             ]);
             $data['incapacitated'] = true;
             $data['stamina'] = 0;
-            if ($data['isActive'] && $this->game->gamestate->state()['name'] == 'playerTurn') {
+            if ($data['isActive'] && $this->game->gamestate->state(true, false, true)['name'] == 'playerTurn') {
                 $this->game->endTurn();
             }
             $hookData = [

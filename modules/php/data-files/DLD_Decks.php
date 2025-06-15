@@ -508,7 +508,7 @@ class DLD_DecksData
                         ],
                         $currentCharacter['id'],
                         true,
-                        $game->gamestate->state()['name']
+                        $game->gamestate->state(true, false, true)['name']
                     );
 
                     return ['notify' => false, 'nextState' => false];
