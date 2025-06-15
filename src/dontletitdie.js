@@ -198,7 +198,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       playerSideContainer.querySelector(`.stamina .value`).innerHTML = `${character.stamina ?? 0}/${character.maxStamina ?? 0}`;
       const healthLine = playerSideContainer.querySelector(`.status`);
       if (character.incapacitated) {
-        if ((character.health ?? 0) > 0) {
+        if (character.recovering) {
           healthLine.innerHTML = _('Recovering');
           if (!healthLine.classList.contains('healing')) healthLine.classList.add('healing');
         } else if (!healthLine.classList.contains('incapacitated')) {
@@ -206,7 +206,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           healthLine.classList.add('incapacitated');
         }
       } else {
-        if ((character.health ?? 0) > 0) {
+        if (character.recovering) {
           if (healthLine.classList.contains('healing')) {
             healthLine.innerHTML = '';
             healthLine.classList.remove('healing');
@@ -313,7 +313,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         // const coverElem = characterElem.querySelector(`.cover`);
         coverElem.classList.add('cover');
         if (character.incapacitated) {
-          if ((character.health ?? 0) > 0) {
+          if (character.recovering) {
             coverElem.innerHTML = _('Recovering');
             if (!coverElem.classList.contains('healing')) coverElem.classList.add('healing');
           } else if (!coverElem.classList.contains('incapacitated')) {
@@ -321,7 +321,7 @@ declare('bgagame.dontletitdie', Gamegui, {
             coverElem.classList.add('incapacitated');
           }
         } else {
-          if ((character.health ?? 0) > 0) {
+          if (character.recovering) {
             if (coverElem.classList.contains('healing')) coverElem.classList.remove('healing');
           } else if (coverElem.classList.contains('incapacitated')) {
             coverElem.classList.remove('incapacitated');

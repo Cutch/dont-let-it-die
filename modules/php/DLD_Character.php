@@ -245,6 +245,9 @@ class DLD_Character
         $characterData['health'] = clamp($characterData['health'], 0, $characterData['maxHealth']);
         $characterData['stamina'] = clamp($characterData['stamina'], 0, $characterData['maxStamina']);
         $characterData['playerId'] = $characterData['player_id'];
+        $characterData['incapacitated'] = !!$characterData['incapacitated'];
+        $characterData['recovering'] = $characterData['health'] > 0 && $characterData['incapacitated'];
+
         if (
             $characterData['player_zombie'] &&
             array_key_exists('necromancer_player_id', $characterData) &&
@@ -599,7 +602,7 @@ class DLD_Character
 
     public function _adjustHealth(array &$data, $healthChange, &$prev, $characterName): bool
     {
-        if ($data['incapacitated'] && $healthChange > 0) {
+        if ($data['incapacitated'] && !$data['recovering'] && $healthChange > 0) {
             return true;
         }
         $prev = $data['health'];
@@ -682,7 +685,8 @@ class DLD_Character
                 'physicalHindrance' => $char['physicalHindrance'],
                 'necklaces' => $char['necklaces'],
                 'health' => $char['health'],
-                'incapacitated' => !!$char['incapacitated'],
+                'incapacitated' => $char['incapacitated'],
+                'recovering' => $char['recovering'],
                 'slotsUsed' => $slotsUsed,
                 'slotsAllowed' => $slotsAllowed,
             ];

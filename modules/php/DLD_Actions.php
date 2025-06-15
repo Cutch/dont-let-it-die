@@ -52,7 +52,7 @@ class DLD_Actions
                 },
             ],
             'actSpendFKP' => [
-                'state' => ['playerTurn'],
+                'state' => ['playerTurn', 'dinnerPhase'],
                 'stamina' => 0,
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {
@@ -80,7 +80,8 @@ class DLD_Actions
                 'type' => 'action',
                 'requires' => function (Game $game, $action) {
                     $variables = $game->gameData->getResources();
-                    $array = $this->getActionSelectable($action['id'], null, $game->character->getSubmittingCharacterId());
+                    $char = $game->character->getSubmittingCharacter(true);
+                    $array = $this->getActionSelectable($action['id'], null, $char['id']);
                     $array = array_filter(
                         $array,
                         function ($v) use ($variables) {
@@ -90,7 +91,7 @@ class DLD_Actions
                         },
                         ARRAY_FILTER_USE_BOTH
                     );
-                    return sizeof($array) > 0;
+                    return sizeof($array) > 0 && (!$char['incapacitated'] || $char['recovering']);
                 },
                 'selectable' => function (Game $game) {
                     return array_values(

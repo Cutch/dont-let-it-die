@@ -375,7 +375,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('It\'s dinner time'),
         'type' => 'private',
         'args' => 'argDinnerPhase',
-        'possibleactions' => ['actEat', 'actAddWood', 'actDone'],
+        'possibleactions' => ['actEat', 'actSpendFKP', 'actAddWood', 'actDone'],
     ],
     $nightPhase => [
         'name' => 'nightPhase',
