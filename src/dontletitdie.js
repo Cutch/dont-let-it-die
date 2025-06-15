@@ -1230,7 +1230,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.updateGameDatas(args);
     const actions = args?.actions;
     const isActive = this.isActive();
-    if (isStudio()) console.log('onUpdateActionButtons', isActive, args);
+    if (isStudio()) console.log('onUpdateActionButtons', isActive, stateName, actions);
     if (isActive && stateName && actions != null) {
       this.clearActionButtons();
 
@@ -1623,8 +1623,34 @@ declare('bgagame.dontletitdie', Gamegui, {
       //     },
       //     { color: 'secondary' },
       //   );
-    } else if (!this.isSpectator && stateName && actions != null) {
+    } else if (!this.isSpectator && stateName) {
+      const skipOthersActions = () => {
+        if (!this.gamedatas.isRealTime)
+          this.statusBar.addActionButton(
+            _("Skip Other's Selection"),
+            () => {
+              this.bgaPerformAction('actUnPass', null, { checkAction: false });
+            },
+            { color: 'red' },
+          );
+      };
       switch (stateName) {
+        case 'dinnerPhase':
+        case 'dinnerPhasePrivate':
+          skipOthersActions();
+          break;
+        case 'tradePhase':
+          skipOthersActions();
+          break;
+        case 'waitTradePhase':
+          this.statusBar.addActionButton(
+            _('Cancel'),
+            () => {
+              this.bgaPerformAction('actUnPass', null, { checkAction: false });
+            },
+            { color: 'secondary' },
+          );
+          break;
         case 'characterSelect':
           this.statusBar.addActionButton(
             _('Back'),
@@ -1633,8 +1659,9 @@ declare('bgagame.dontletitdie', Gamegui, {
             },
             { color: 'secondary' },
           );
+          break;
         case 'interrupt':
-          if (gameui.gamedatas.activeTurnPlayerId == gameui.player_id) {
+          if (gameui.gamedatas.activeTurnPlayerId == gameui.player_id && !this.gamedatas.isRealTime) {
             actions
               .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
               .forEach((action) => {
@@ -1643,19 +1670,14 @@ declare('bgagame.dontletitdie', Gamegui, {
                   return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
                     (skill) => {
                       const suffix = this.getActionSuffixHTML(skill);
-                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {}, { classes: 'bgabutton_gray', disabled: true });
+                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {}, { disabled: true });
                     },
                   );
                 }
               });
-            this.statusBar.addActionButton(
-              _('Skip Other\s Selection'),
-              () => {
-                this.bgaPerformAction('actUnPass', null, { checkAction: false });
-              },
-              { color: 'red' },
-            );
+            skipOthersActions();
           }
+          break;
       }
     }
   },

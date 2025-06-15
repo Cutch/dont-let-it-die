@@ -365,7 +365,7 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'action' => 'stDinnerPhase',
         // 'args' => 'argDinnerPhase',
-        'possibleactions' => [],
+        'possibleactions' => ['actUnPass'],
         'transitions' => ['nightPhase' => $nightPhase, 'changeZombiePlayer' => $changeZombiePlayer],
         'initialprivate' => $dinnerPhasePrivate,
     ],
@@ -375,7 +375,7 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('It\'s dinner time'),
         'type' => 'private',
         'args' => 'argDinnerPhase',
-        'possibleactions' => ['actEat', 'actSpendFKP', 'actAddWood', 'actDone'],
+        'possibleactions' => ['actEat', 'actSpendFKP', 'actAddWood', 'actUnPass', 'actDone'],
     ],
     $nightPhase => [
         'name' => 'nightPhase',
@@ -426,7 +426,7 @@ $machinestates = [
         'action' => 'stTradePhase',
         'args' => 'argTradePhase',
         'initialprivate' => $tradePhaseActions,
-        'possibleactions' => [],
+        'possibleactions' => ['actUnPass'],
         'transitions' => ['nextCharacter' => $nextCharacter],
     ],
     $tradePhaseActions => [
@@ -435,7 +435,7 @@ $machinestates = [
         'type' => 'private',
         'action' => 'stTradePhaseWait',
         'args' => 'argTradePhaseActions',
-        'possibleactions' => ['actTradeItem', 'actTradeDone'],
+        'possibleactions' => ['actTradeItem', 'actTradeDone', 'actUnPass'],
         'transitions' => ['confirmTradePhase' => $confirmTradePhase, 'waitTradePhase' => $waitTradePhase],
     ],
     $confirmTradePhase => [
@@ -453,7 +453,7 @@ $machinestates = [
         'type' => 'private',
         // 'action' => 'stTradePhaseWait',
         'args' => 'argWaitTradePhase',
-        'possibleactions' => [],
+        'possibleactions' => ['actUnPass'],
         'transitions' => ['tradePhaseActions' => $tradePhaseActions],
     ],
     $changeZombiePlayer => [

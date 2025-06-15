@@ -1038,6 +1038,16 @@ class Game extends \Table
             if (!$this->actInterrupt->onInterruptCancel(true)) {
                 $this->nextState('playerTurn');
             }
+        } elseif ($stateName == 'dinnerPhase') {
+            $this->gamestate->unsetPrivateStateForAllPlayers();
+            $this->nextState('nightPhase');
+        } elseif ($stateName == 'tradePhase') {
+            $privateState = $this->gamestate->getPrivateState($this->getCurrentPlayer());
+            if ($privateState && $privateState['name'] == 'waitTradePhase') {
+                $this->itemTrade->actCancelTrade();
+            } else {
+                $this->itemTrade->actUnPass();
+            }
         }
     }
     public function actDone(): void
@@ -2278,6 +2288,7 @@ class Game extends \Table
             'expansion' => $this->getExpansion(),
             'difficulty' => $this->getDifficulty(),
             'trackDifficulty' => $this->getTrackDifficulty(),
+            'isRealTime' => $this->isRealTime(),
             'allItems' => array_values(
                 array_map(
                     function ($d) {

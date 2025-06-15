@@ -47,6 +47,11 @@ class DLD_ItemTrade
         $this->game->gamestate->setPlayerNonMultiactive($selfId, 'nextCharacter');
         // $this->game->gamestate->unsetPrivateState($selfId);
     }
+    public function actUnPass(): void
+    {
+        $this->game->gamestate->unsetPrivateStateForAllPlayers();
+        $this->game->nextState('nextCharacter');
+    }
     public function actTradeItem(#[JsonParam] array $data): void
     {
         if (sizeof($data['selection']) != 2) {
