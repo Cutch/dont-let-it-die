@@ -5,7 +5,7 @@
       "module": "amd",
       "lib": ["dom", "esnext"],  
       "esModuleInterop": true,
-      "sourceMap": false,
+      "sourceMap": true,
       "allowJs": true,
       "typeRoots": ["src/types", "./types", "./node_modules/@types"],
       "outFile": "dontletitdie.js",

@@ -51,7 +51,7 @@ class DLD_CharactersData
                     ],
                 ],
                 'onEncounterPost' => function (Game $game, $char, &$data) {
-                    if ($char['isActive'] && $game->encounter->$game->encounter->killCheck($data)) {
+                    if ($char['isActive'] && $game->encounter->killCheck($data)) {
                         $data['stamina'] += 2;
                         $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                             'count' => 2,

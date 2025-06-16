@@ -115,7 +115,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     };
   },
   getResourcesForDisplay: function (gameData) {
-    return this.resourcesForDisplay.filter((d) => d in gameData.resources && d !== 'fireWood');
+    return this.resourcesForDisplay.filter((d) => d in (gameData?.resources ?? this.gamedata.resources) && d !== 'fireWood');
   },
 
   /*

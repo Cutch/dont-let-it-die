@@ -119,6 +119,7 @@ class DLD_Encounter
             'chooseWeapons' => $chooseWeapons,
             ...$this->game->getArgsData(),
         ];
+        $this->game->getResources($result);
         return $result;
     }
     public function stResolveEncounter()

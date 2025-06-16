@@ -23,5 +23,6 @@ node_modules
 !.vscode/extensions.json
 
 /dontletitdie.js
+/dontletitdie.js.map
 /dontletitdie.css
 /dontletitdie.css.map
