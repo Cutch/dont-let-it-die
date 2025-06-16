@@ -129,7 +129,7 @@ export class Deck {
           const cardInnerTooltip = new Tooltip(this.game.tooltip.renderByElement());
           const renderItem = (name, elem) => {
             elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"></div>`);
-            renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1.5, pos: 'replace' });
+            renderImage(name, elem.querySelector(`.token.${name}`), { scale: this.scale / 2, pos: 'replace' });
             this.game.addHelpTooltip({
               node: elem.querySelector(`.token.${name}`),
               tooltipText: name,

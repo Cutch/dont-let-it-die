@@ -55,7 +55,7 @@ class DLD_ItemTrade
     public function actTradeItem(#[JsonParam] array $data): void
     {
         if (sizeof($data['selection']) != 2) {
-            throw new BgaUserException(clienttranslate('You must select 2 items to trade'));
+            throw new BgaUserException(clienttranslate('You must make 2 selections'));
         }
         $selfId = $this->game->getCurrentPlayer();
         $hasSelf = false;
