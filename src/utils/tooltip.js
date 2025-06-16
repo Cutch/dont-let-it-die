@@ -47,6 +47,7 @@ export class Tooltip {
       document.addEventListener('keydown', this.handleEscapeKey);
       this.tooltipElem.addEventListener('scroll', this.scroll);
     }, 0);
+    this.tooltipElem.focus();
   }
   hide() {
     if (!this.tooltipBody.querySelector('.tooltip-overlay:not([style*="display: none"])')) {

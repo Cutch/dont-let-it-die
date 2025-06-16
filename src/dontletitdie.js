@@ -654,7 +654,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (!availableElem) {
       $('game_play_area').insertAdjacentHTML(
         'beforeend',
-        `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div><div id="items-see-all" class="see-all">${_('See all Craftable Items')}</div></div>`,
+        `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div><div id="items-see-all" class="see-all see-all-button">${_('See all Craftable Items')}</div></div>`,
       );
       availableElem = document.querySelector(`#items-container .items`);
       addClickListener($('items-see-all'), 'See All', () => {

@@ -123,7 +123,7 @@ export class Deck {
       if (!isPartial) {
         this.game.tooltip
           .renderByElement()
-          .insertAdjacentHTML('beforeend', `<div id="see-all" class="see-all deck-see-all-button">${_('See All')}</div>`);
+          .insertAdjacentHTML('beforeend', `<div id="see-all" class="see-all see-all-button">${_('See All')}</div>`);
         addClickListener($('see-all'), _('See All'), () => {
           this.game.tooltip.renderByElement().innerHTML = '';
           const cardInnerTooltip = new Tooltip(this.game.tooltip.renderByElement());
