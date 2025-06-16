@@ -909,8 +909,8 @@ class DLD_DecksData
                 'onRollDie' => function (Game $game, $nightCard, &$data) {
                     if ($data['value'] > 1) {
                         $game->eventLog(clienttranslate('Roll reduced by 1'));
+                        $data['value'] = $data['value'] - 1;
                     }
-                    $data['value'] = max($data['value'], $data['value'] - 1);
                 },
             ],
             'night-event-9_10' => [
