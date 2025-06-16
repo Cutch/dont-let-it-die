@@ -1040,6 +1040,7 @@ class Game extends \Table
             if (!$this->actInterrupt->onInterruptCancel(true)) {
                 $this->nextState('playerTurn');
             }
+            $this->completeAction();
         } elseif ($stateName == 'dinnerPhase') {
             $this->gamestate->unsetPrivateStateForAllPlayers();
             $this->nextState('nightPhase');

@@ -302,7 +302,7 @@ class DLD_Encounter
                         if ($_this->character->getActiveHealth() != 0) {
                             $_this->adjustResource('meat', $data['willReceiveMeat']);
 
-                            if ($change > 0 && $data['damagedCharacter'] == $data['originalDamagedCharacter']) {
+                            if ($change != 0 && $data['damagedCharacter'] == $data['originalDamagedCharacter']) {
                                 $_this->eventLog(
                                     '${character_name} defeated a ${name}, gained ${willReceiveMeat} meat and lost ${damageTaken} ${resource}',
                                     [
