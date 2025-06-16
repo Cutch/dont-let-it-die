@@ -195,6 +195,26 @@ class DLD_SelectionStates
         $this->game->hooks->onCardSelection($data);
         $this->completeSelectionState($data);
     }
+    public function actTokenReduceSelection(#[JsonParam] array $costData): void
+    {
+        $stateData = $this->getState(null);
+        $newTotalCost = array_sum($costData);
+        $oldTotalCost = array_sum($stateData['item']['cost']);
+        if ($newTotalCost != $oldTotalCost) {
+            if ($oldTotalCost - $newTotalCost > $stateData['reduceBy'] || $newTotalCost < $stateData['totalCost']) {
+                throw new BgaUserException(clienttranslate('Invalid Selection'));
+            }
+        }
+
+        $this->setState(null, $stateData);
+        $data = [
+            'cost' => $costData,
+            'nextState' => $stateData['nextState'],
+            'isInterrupt' => $stateData['isInterrupt'],
+        ];
+        $this->game->hooks->onTokenReduceSelection($data);
+        $this->completeSelectionState($data);
+    }
     public function actSelectItem(?string $itemId = null, ?string $characterId = null): void
     {
         if (!$itemId) {
@@ -311,6 +331,8 @@ class DLD_SelectionStates
             return 'eatSelectionState';
         } elseif ($stateName == 'buttonSelection') {
             return 'buttonSelectionState';
+        } elseif ($stateName == 'tokenReduceSelection') {
+            return 'tokenReduceSelectionState';
         }
         return null;
     }

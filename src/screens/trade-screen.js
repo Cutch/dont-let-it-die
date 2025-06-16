@@ -63,7 +63,7 @@ export class TradeScreen {
     return this.game.getResourcesForDisplay(gameData).filter((d) => d !== 'trap' && d !== 'stew' && d !== 'fireWood');
   }
   show(gameData) {
-    this.resourceRequested = null;
+    this.resourceSelected = null;
     this.resourceRequested = null;
     this.updateFunctions = [];
     this.tradeRatio = gameData.tradeRatio;

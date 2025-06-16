@@ -597,8 +597,14 @@ class DLD_CharactersData
                             $existingData = $game->actInterrupt->getState('actCraft');
                             if ($char['isActive'] && !$existingData) {
                                 $game->selectionStates->initiateState(
-                                    'resourceSelection',
-                                    ['id' => $skill['id'], ...$data, 'title' => clienttranslate('Item Costs')],
+                                    'tokenReduceSelection',
+                                    [
+                                        'id' => $skill['id'],
+                                        ...$data,
+                                        'reduceBy' => 2,
+                                        'totalCost' => 2,
+                                        'title' => clienttranslate('Item Costs'),
+                                    ],
                                     $char['id'],
                                     true,
                                     'playerTurn',
@@ -613,26 +619,14 @@ class DLD_CharactersData
                             $char = $game->character->getCharacterData($skill['characterId']);
                             return $char['isActive'] && sizeof(array_filter($game->gameData->getResources())) > 0;
                         },
-                        'onResourceSelection' => function (Game $game, $skill, &$data) {
-                            $selectionState = $game->selectionStates->getState('resourceSelection');
+                        'onTokenReduceSelection' => function (Game $game, $skill, &$data) {
+                            $selectionState = $game->selectionStates->getState('tokenReduceSelection');
                             if ($selectionState['id'] == $skill['id']) {
                                 $state = $game->actInterrupt->getState('actCraft');
                                 if ($state) {
-                                    $maxChange = clamp(array_sum($state['data']['item']['cost']) - 2, 0, 2);
-                                    if (array_key_exists($data['resourceType'], $state['data']['item']['cost'])) {
-                                        $state['data']['item']['cost'][$data['resourceType']] = max(
-                                            $state['data']['item']['cost'][$data['resourceType']] - $maxChange,
-                                            0
-                                        );
-                                    }
+                                    $state['data']['item']['cost'] = $data['cost'];
                                     $game->actInterrupt->setState('actCraft', $state);
                                 }
-                            }
-                        },
-                        'onResourceSelectionOptions' => function (Game $game, $skill, &$resources) {
-                            $state = $game->selectionStates->getState('resourceSelection');
-                            if ($state['id'] == $skill['id']) {
-                                $resources = $state['item']['cost'];
                             }
                         },
                     ],
@@ -641,6 +635,25 @@ class DLD_CharactersData
                     if ($char['isActive']) {
                         unset($data['actDrawHunt']);
                         unset($data['actDrawForage']);
+                    }
+                },
+                'onHasResourceCost' => function (Game $game, $char, &$data) {
+                    if ($char['isActive']) {
+                        $cost = $data['cost'];
+                        $resources = $data['resources'];
+                        $total = 0;
+                        $offBy = 0;
+                        $hasTotal = 0;
+                        foreach ($cost as $key => $value) {
+                            $total += $value;
+                            if ($resources[$key] < $value) {
+                                $offBy = $value - $resources[$key];
+                            }
+                            if ($resources[$key]) {
+                                $hasTotal += min($resources[$key], $value);
+                            }
+                        }
+                        $data['hasResources'] = $data['hasResources'] || ($offBy <= 2 && $hasTotal >= 2 && $total - $hasTotal <= 2);
                     }
                 },
             ],

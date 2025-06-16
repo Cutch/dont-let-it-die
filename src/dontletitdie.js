@@ -31,6 +31,7 @@ import { CookScreen } from './screens/cook-screen';
 import { EatScreen } from './screens/eat-screen';
 import { ItemsScreen } from './screens/items-screen';
 import { ReviveScreen } from './screens/revive-screen';
+import { TokenReduceScreen } from './screens/token-reduce-screen';
 import { TokenScreen } from './screens/token-screen';
 import { TooManyItemsScreen } from './screens/too-many-items-screen';
 import { UpgradeSelectionScreen } from './screens/upgrade-selection-screen';
@@ -58,6 +59,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.eatScreen = new EatScreen(this);
     this.itemsScreen = new ItemsScreen(this);
     this.reviveScreen = new ReviveScreen(this);
+    this.tokenReduceScreen = new TokenReduceScreen(this);
     this.tokenScreen = new TokenScreen(this);
     this.tooManyItemsScreen = new TooManyItemsScreen(this);
     this.upgradeSelectionScreen = new UpgradeSelectionScreen(this);
@@ -1084,6 +1086,9 @@ declare('bgagame.dontletitdie', Gamegui, {
       case 'resourceSelection':
         if (isActive) this.tokenScreen.show(args.args);
         break;
+      case 'tokenReduceSelection':
+        if (isActive) this.tokenReduceScreen.show(args.args);
+        break;
       case 'characterSelection':
         if (isActive) this.characterSelectionScreen.show(args.args);
         break;
@@ -1166,6 +1171,9 @@ declare('bgagame.dontletitdie', Gamegui, {
         break;
       case 'characterSelection':
         this.characterSelectionScreen.hide();
+        break;
+      case 'tokenReduceSelection':
+        this.tokenReduceScreen.hide();
         break;
       case 'hindranceSelection':
         this.hindranceSelectionScreen.hide();
@@ -1501,6 +1509,12 @@ declare('bgagame.dontletitdie', Gamegui, {
         case 'resourceSelection':
           this.statusBar.addActionButton(_('Select Resource'), () => {
             this.bgaPerformAction('actSelectResource', { resourceType: this.tokenScreen.getSelectedId() });
+          });
+          addSelectionCancelButton();
+          break;
+        case 'tokenReduceSelection':
+          this.statusBar.addActionButton(args.selectionState?.button ? _(args.selectionState.button) : _('Select'), () => {
+            this.bgaPerformAction('actTokenReduceSelection', { data: JSON.stringify(this.tokenReduceScreen.getSelection()) });
           });
           addSelectionCancelButton();
           break;

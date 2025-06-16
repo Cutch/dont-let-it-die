@@ -23,7 +23,7 @@ export class TokenScreen {
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="token-screen" class="dlid__container">
-            <div id="resource" class="dlid__container"><h3>${_(gameData?.title ?? 'Your Resources')}</h3><div class="tokens"></div></div>
+            <div id="resource" class="dlid__container"><h3>${_(gameData.selectionState?.title ?? 'Your Resources')}</h3><div class="tokens"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
       );

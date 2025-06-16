@@ -241,6 +241,11 @@ class DLD_Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
+    function onHasResourceCost(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
     function onRollDie(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
@@ -282,6 +287,11 @@ class DLD_Hooks
         return $data;
     }
     function onCardSelection(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onTokenReduceSelection(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;

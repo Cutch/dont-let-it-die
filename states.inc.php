@@ -77,6 +77,7 @@ $tradePhase = 60;
 $tradePhaseActions = 61;
 $confirmTradePhase = 62;
 $waitTradePhase = 63;
+$tokenReduceSelection = 70;
 $undo = 96;
 $changeZombiePlayer = 97;
 $gameEnd = 99;
@@ -93,6 +94,7 @@ $interruptScreens = [
     'itemSelection' => $itemSelection,
     'interrupt' => $interrupt,
     'cardSelection' => $cardSelection,
+    'tokenReduceSelection' => $tokenReduceSelection,
     'undo' => $undo,
 ];
 
@@ -225,6 +227,15 @@ $machinestates = [
         'type' => 'multipleactiveplayer',
         'args' => 'argResourceSelection',
         'possibleactions' => ['actSelectResource', 'actCancel'],
+        'transitions' => ['playerTurn' => $playerTurn],
+    ],
+    $tokenReduceSelection => [
+        'name' => 'tokenReduceSelection',
+        'description' => clienttranslate('${character_name} is selecting resources'),
+        'descriptionmyturn' => clienttranslate('${character_name} Reduce resources'),
+        'type' => 'multipleactiveplayer',
+        'args' => 'argSelectionState',
+        'possibleactions' => ['actTokenReduceSelection', 'actCancel'],
         'transitions' => ['playerTurn' => $playerTurn],
     ],
     $nextCharacter => [

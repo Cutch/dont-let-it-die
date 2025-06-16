@@ -528,7 +528,7 @@ class Game extends \Table
                 $item = $data['item'];
                 $itemType = $data['itemType'];
                 foreach ($item['cost'] as $key => $value) {
-                    if ($_this->adjustResource($key, -$value)['left'] > 0) {
+                    if ($_this->adjustResource($key, -$value)['left'] != 0) {
                         throw new BgaUserException(clienttranslate('Missing resources'));
                     }
                 }
@@ -1196,6 +1196,10 @@ class Game extends \Table
     {
         $this->selectionStates->actSelectResource($resourceType);
     }
+    public function actTokenReduceSelection(#[JsonParam] array $data): void
+    {
+        $this->selectionStates->actTokenReduceSelection($data);
+    }
     public function actSelectHindrance(#[JsonParam] array $data): void
     {
         $this->selectionStates->actSelectHindrance($data);
@@ -1849,17 +1853,24 @@ class Game extends \Table
         }
         return $sums;
     }
-    public function hasResourceCost($cost)
+    public function hasResourceCost(array $item)
     {
         $resources = $this->gameData->getResources();
 
         $hasResources = true;
-        foreach ($cost as $key => $value) {
+        foreach ($item['cost'] as $key => $value) {
             if ($resources[$key] < $value) {
                 $hasResources = false;
             }
         }
-        return $hasResources;
+        $results = [
+            'itemId' => $item['id'],
+            'cost' => $item['cost'],
+            'resources' => $resources,
+            'hasResources' => $hasResources,
+        ];
+        $this->hooks->onHasResourceCost($results);
+        return $results['hasResources'];
     }
     public function getItemData(&$result): void
     {
@@ -1902,7 +1913,7 @@ class Game extends \Table
         $result['availableEquipmentWithCost'] = array_values(
             array_filter($availableEquipment, function ($itemName) {
                 $item = $this->data->getItems()[$itemName];
-                return $this->hasResourceCost($item['cost']);
+                return $this->hasResourceCost($item);
             })
         );
         $result['foreverUseItems'] = getUsePerForeverItems($this);
@@ -2502,6 +2513,34 @@ class Game extends \Table
         ]);
         $this->completeAction();
     }
+    // TEST FUNCTIONS START HERE
+    public function noResources()
+    {
+        $this->gameData->setResources([
+            'fireWood' => 0,
+            'wood' => 0,
+            'bone' => 0,
+            'meat' => 0,
+            'meat-cooked' => 0,
+            'fish' => 0,
+            'fish-cooked' => 0,
+            'herb' => 0,
+            'dino-egg' => 0,
+            'dino-egg-cooked' => 0,
+            'berry' => 0,
+            'berry-cooked' => 0,
+            'rock' => 0,
+            'stew' => 0,
+            'fiber' => 0,
+            'hide' => 0,
+            'trap' => 0,
+            'fkp' => 20,
+            'gem-y' => 0,
+            'gem-b' => 0,
+            'gem-p' => 0,
+        ]);
+        $this->completeAction();
+    }
     public function giveClub()
     {
         $itemId = $this->gameData->createItem('club');
@@ -2668,7 +2707,7 @@ class Game extends \Table
         $notUnlocked = array_filter(
             $data,
             function ($v, $k) use ($unlocks) {
-                return !in_array($k, $unlocks);
+                return !in_array($k, $unlocks) && $k != 'fire-starter';
             },
             ARRAY_FILTER_USE_BOTH
         );
@@ -2681,6 +2720,8 @@ class Game extends \Table
 
         foreach (array_keys($notUnlocked) as $knowledgeId) {
             $this->unlockKnowledge($knowledgeId);
+            $knowledgeObj = $this->data->getKnowledgeTree()[$knowledgeId];
+            array_key_exists('onUse', $knowledgeObj) ? $knowledgeObj['onUse']($this, $knowledgeObj) : null;
         }
         $this->completeAction();
     }
