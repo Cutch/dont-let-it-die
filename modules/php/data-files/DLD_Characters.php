@@ -1437,13 +1437,13 @@ class DLD_CharactersData
                     return $char['id'];
                 },
                 'onEat' => function (Game $game, $char, &$data) {
-                    if ($data['characterId'] == $char['id'] && getUsePerDay($char['id'], $game) < 1) {
+                    if ($data['characterId'] == $char['id'] && $char['health'] == 1 && getUsePerDay($char['id'], $game) < 1) {
                         usePerDay($char['id'], $game);
                         $data['health'] *= 2;
                     }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    if ($data['characterId'] == $char['id'] && getUsePerDay($char['id'], $game) < 1) {
+                    if ($data['characterId'] == $char['id'] && $char['health'] == 1 && getUsePerDay($char['id'], $game) < 1) {
                         $data['health'] *= 2;
                     }
                 },
