@@ -1310,9 +1310,7 @@ class Game extends \Table
                     $card['deck'] != $card['deckType'] &&
                     ($card['deckType'] == 'physical-hindrance' || $card['deckType'] == 'mental-hindrance')
                 ) {
-                    $card = $this->decks->pickCard($card['deckType']);
                     $this->checkHindrance(true, $this->character->getSubmittingCharacterId());
-                    // $this->character->addHindrance($this->character->getSubmittingCharacterId(), $card);
                     $this->nextState('playerTurn');
                 } elseif ($card['deckType'] == 'day-event') {
                     $this->nextState('dayEvent');
