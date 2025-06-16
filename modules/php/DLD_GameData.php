@@ -47,7 +47,6 @@ class DLD_GameData
         'craftingLevel' => 0,
         'turnOrder' => [],
         'turnNo' => 0,
-        'turnActions' => [],
         'interruptState' => [],
         'activateCharacters' => [],
         'actInterruptState' => [],

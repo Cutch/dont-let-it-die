@@ -545,7 +545,7 @@ class DLD_DecksData
                 'type' => 'deck',
                 'onMorning' => function (Game $game, $nightCard, &$data) {
                     $data['health'] = min($data['health'] - 1, 0);
-                    $game->eventLog(clienttranslate('A volcano causes an additional health damage'));
+                    $game->eventLog(clienttranslate('Everyone takes an additional 1 damage from the morning phase'));
                 },
             ],
             'night-event-7_15' => [
@@ -644,7 +644,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('Everyone heals 1 extra hp when eating tomorrow'));
+                    $game->eventLog(clienttranslate('Eating during the day phase tomorrow heals for 1 extra'));
                 },
                 'onEat' => function (Game $game, $nightCard, &$data) {
                     $data['health'] += 1;
@@ -706,22 +706,24 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('Only 2 investigate fire action can be taken tomorrow'));
+                    $game->eventLog(
+                        clienttranslate('Each character can only perform 1 Investigate Fire action tomorrow, due to the increased heat')
+                    );
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
-                    if (
-                        array_key_exists('actInvestigateFire', $game->actions->getTurnActions()) &&
-                        $game->actions->getTurnActions()['actInvestigateFire'] > 0
-                    ) {
+                    if (getUsePerDay($nightCard['id'] . $game->character->getTurnCharacterId(), $game) >= 1) {
                         unset($data['actInvestigateFire']);
                     }
+                },
+                'onInvestigateFirePost' => function (Game $game, $nightCard, &$data) {
+                    usePerDay($nightCard['id'] . $game->character->getTurnCharacterId(), $game);
                 },
             ],
             'night-event-8_11' => [
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('Bad mushrooms make some skills not work tomorrow'));
+                    $game->eventLog(clienttranslate('Skills that require stamina to activate cannot be used tomorrow'));
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     // Stamina skills can't be used
@@ -733,14 +735,14 @@ class DLD_DecksData
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
                     $game->adjustResource('meat', 2);
-                    $game->eventLog(clienttranslate('The tribe receives 2 meat'));
+                    $game->eventLog(clienttranslate('Group receives 2 meat'));
                 },
             ],
             'night-event-8_13' => [
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('Freezing winds deal 1 damage and lessens everyone\'s stamina'));
+                    $game->eventLog(clienttranslate('Everyone takes 1 damage and starts the morning with -2 stamina'));
                     $game->character->adjustAllHealth(-1);
                 },
                 'onMorning' => function (Game $game, $nightCard, &$data) {
@@ -781,7 +783,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('The night was peaceful'));
+                    $game->eventLog(clienttranslate('It was a calm night'));
                 },
             ],
             'night-event-8_2' => [
@@ -835,7 +837,9 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('Can\'t investigate the fire tomorrow, it\'s too hot'));
+                    $game->eventLog(clienttranslate('You may not perform the ${action} action today'), [
+                        'action' => clienttranslate('Investigate Fire'),
+                    ]);
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     unset($data['actInvestigateFire']);
@@ -892,7 +896,7 @@ class DLD_DecksData
                 'deck' => 'night-event',
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('Sharing knowledge increases fire knowledge by 4'));
+                    $game->eventLog(clienttranslate('Each character gets 1 FKP token'));
                     $game->adjustResource('fkp', 4);
                 },
             ],
@@ -970,7 +974,9 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('No exploring tomorrow'));
+                    $game->eventLog(clienttranslate('You may not perform the ${action} action today'), [
+                        'action' => clienttranslate('Explore'),
+                    ]);
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     unset($data['actDrawExplore']);
@@ -993,7 +999,11 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('Actions outside of camp are harder tomorrow'));
+                    $game->eventLog(
+                        clienttranslate(
+                            'Foraging, Gathering, Harvesting, Hunting, and Exploring cost +1 Stamina to perform during the Day Phase tomorrow'
+                        )
+                    );
                 },
                 'onGetActionCost' => function (Game $game, $char, &$data) {
                     if (in_array($data['action'], ['actDrawForage', 'actDrawExplore', 'actDrawHunt', 'actDrawGather', 'actDrawHarvest'])) {
@@ -1006,7 +1016,9 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('Unable to craft tomorrow'));
+                    $game->eventLog(clienttranslate('You may not perform the ${action} action today'), [
+                        'action' => clienttranslate('Craft'),
+                    ]);
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     unset($data['actCraft']);
@@ -1065,7 +1077,9 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $game->eventLog(clienttranslate('Unable to trade with tribes tomorrow'));
+                    $game->eventLog(clienttranslate('You may not perform the ${action} action today'), [
+                        'action' => clienttranslate('Trade'),
+                    ]);
                 },
                 'onGetValidActions' => function (Game $game, $nightCard, &$data) {
                     unset($data['actTrade']);

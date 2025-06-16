@@ -556,14 +556,6 @@ class DLD_Actions
             }, $skills)
         );
     }
-    public function resetTurnActions()
-    {
-        $this->game->gameData->set('turnActions', []);
-    }
-    public function getTurnActions()
-    {
-        return $this->game->gameData->get('turnActions');
-    }
     public function checkRequirements(array $actionObj, ...$args): bool
     {
         return (!array_key_exists('getState', $actionObj) ||
@@ -640,9 +632,6 @@ class DLD_Actions
         if (!array_key_exists($action, $validActions)) {
             throw new BgaUserException(clienttranslate('This action can not be used this turn'));
         }
-        $turnActions = $this->game->gameData->get('turnActions');
-        $turnActions[$action] = ($turnActions[$action] ?? 0) + 1;
-        $this->game->gameData->set('turnActions', $turnActions);
     }
     public function getValidActions()
     {

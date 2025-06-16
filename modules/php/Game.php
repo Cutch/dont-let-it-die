@@ -1759,7 +1759,6 @@ class Game extends \Table
                     'day' => $data['day'],
                 ]);
                 $this->hooks->onMorningAfter($data);
-                $this->actions->resetTurnActions();
                 if ($data['changeOrder']) {
                     $this->character->rotateTurnOrder();
                 }
