@@ -180,7 +180,7 @@ class DLD_BoardsData
                         },
                     ],
                     'resource-1' => [
-                        'unlockCost' => 5,
+                        'unlockCost' => 4,
                         'type' => 'unlock',
                         'requires' => function (Game $game, $obj) {
                             $unlocks = $game->getUnlockedKnowledgeIds(false);
