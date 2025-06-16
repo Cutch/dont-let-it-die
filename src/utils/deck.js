@@ -1,6 +1,7 @@
 import { getAllData } from '../assets';
 import { addClickListener } from './clickable';
 import { getSpriteSize, renderImage } from './images';
+import { Tooltip } from './tooltip';
 export class Deck {
   constructor(game, deck, countData, div, scale = 4, style = 'vertical') {
     this.game = game;
@@ -29,10 +30,10 @@ export class Deck {
     this.topDiscard = null;
     this.setDiscard(this.topDiscard);
   }
-  async shuffle(gameData) {
+  async shuffle(args) {
     return new Promise((resolve) => {
       this.topDiscard = null;
-      this.setDiscard(gameData.decksDiscards?.[gameData.deck]?.name);
+      this.setDiscard(this.game.gamedatas.decksDiscards?.[args.deck]?.name ?? this.game.gamedatas.decksDiscards[args.deck]?.[0]);
       this.div.querySelector(`.shuffle-1`).classList.add('enable');
       this.div.querySelector(`.shuffle-2`).classList.add('enable');
       if (this.partialCleanup) {
@@ -64,19 +65,7 @@ export class Deck {
       )}</div>`;
     } else {
       renderImage(cardId, this.div.querySelector(`.flipped-card`), { scale: this.scale, pos: 'replace' });
-      this.cleanup = addClickListener(this.div.querySelector(`.flipped-card`), cardId, () => {
-        this.game.tooltip.show();
-        const {
-          frame: { w, h },
-          rotate,
-        } = getAllData()[cardId];
-
-        renderImage(cardId, this.game.tooltip.renderByElement(), {
-          withText: true,
-          scale: (rotate ? h : w) < 300 ? 1 : 2,
-          pos: 'replace',
-        });
-      });
+      this.cleanup = addClickListener(this.div.querySelector(`.flipped-card`), cardId, this.discardTooltip(cardId));
     }
     this.div
       .querySelector(`.flipped-card`)
@@ -118,6 +107,42 @@ export class Deck {
       }
     }
   }
+  discardTooltip(cardId, isPartial = false) {
+    return () => {
+      this.game.tooltip.show();
+      const {
+        frame: { w, h },
+        rotate,
+      } = getAllData()[cardId];
+
+      renderImage(cardId, this.game.tooltip.renderByElement(), {
+        withText: true,
+        scale: (rotate ? h : w) < 300 ? 1 : 2,
+        pos: 'replace',
+      });
+      if (!isPartial) {
+        this.game.tooltip
+          .renderByElement()
+          .insertAdjacentHTML('beforeend', `<div id="see-all" class="see-all deck-see-all-button">${_('See All')}</div>`);
+        addClickListener($('see-all'), _('See All'), () => {
+          this.game.tooltip.renderByElement().innerHTML = '';
+          const cardInnerTooltip = new Tooltip(this.game.tooltip.renderByElement());
+          const renderItem = (name, elem) => {
+            elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"></div>`);
+            renderImage(name, elem.querySelector(`.token.${name}`), { scale: 1.5, pos: 'replace' });
+            this.game.addHelpTooltip({
+              node: elem.querySelector(`.token.${name}`),
+              tooltipText: name,
+              tooltipElem: cardInnerTooltip,
+            });
+          };
+          this.game.gamedatas.decksDiscards[this.deck].forEach((name) => {
+            renderItem(name, this.game.tooltip.renderByElement());
+          });
+        });
+      }
+    };
+  }
   async partialDraw(cardId) {
     this.div.insertAdjacentHTML(
       'beforeend',
@@ -135,19 +160,7 @@ export class Deck {
     this.div.querySelector(`.flip-card`).classList.add('partial');
     await this.game.wait(1000);
     this.partialDrawCard = cardId;
-    this.partialCleanup = addClickListener(this.div.querySelector(`.flip-card`), cardId, () => {
-      this.game.tooltip.show();
-      const {
-        frame: { w, h },
-        rotate,
-      } = getAllData()[cardId];
-
-      renderImage(cardId, this.game.tooltip.renderByElement(), {
-        withText: true,
-        scale: (rotate ? h : w) < 300 ? 1 : 2,
-        pos: 'replace',
-      });
-    });
+    this.partialCleanup = addClickListener(this.div.querySelector(`.flip-card`), cardId, this.discardTooltip(cardId, true));
   }
   isAnimating() {
     return this.isDrawing;

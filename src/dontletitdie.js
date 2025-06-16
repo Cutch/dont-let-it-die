@@ -654,7 +654,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (!availableElem) {
       $('game_play_area').insertAdjacentHTML(
         'beforeend',
-        `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div><div id="items-see-all">${_('See all Craftable Items')}</div></div>`,
+        `<div id="items-container" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div><div id="items-see-all" class="see-all">${_('See all Craftable Items')}</div></div>`,
       );
       availableElem = document.querySelector(`#items-container .items`);
       addClickListener($('items-see-all'), 'See All', () => {
@@ -719,7 +719,8 @@ declare('bgagame.dontletitdie', Gamegui, {
     decks.forEach(({ name: deck }) => {
       if (!this.decks[deck] && gameData.decks[deck]) {
         this.decks[deck] = new Deck(this, deck, gameData.decks[deck], document.querySelector(`.board > .${deck}`), 2);
-        if (!this.decks[deck].isAnimating()) this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name);
+        if (!this.decks[deck].isAnimating() && gameData.decksDiscards)
+          this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name ?? gameData.decksDiscards[deck]?.[0]);
         if (gameData.game.partials && gameData.game.partials[deck]) {
           this.decks[deck].drawCard(gameData.game.partials[deck].id, true);
         }
@@ -861,8 +862,9 @@ declare('bgagame.dontletitdie', Gamegui, {
       if (gameData.decks[deck]) {
         if (!this.decks[deck]) {
           this.decks[deck] = new Deck(this, deck, gameData.decks[deck], eventDeckContainer.querySelector(`.${deck}`), scale, 'horizontal');
-          if (gameData.decksDiscards[deck]?.name) {
-            if (!this.decks[deck].isAnimating()) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+          if (gameData.decksDiscards && (gameData.decksDiscards[deck]?.name || gameData.decksDiscards[deck]?.[0])) {
+            if (!this.decks[deck].isAnimating())
+              this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name ?? gameData.decksDiscards[deck]?.[0]);
           }
         } else {
           this.decks[deck].updateDeckCounts(gameData.decks[deck]);
@@ -881,8 +883,9 @@ declare('bgagame.dontletitdie', Gamegui, {
 
     drawDecks.forEach(({ name: deck }) => {
       if (this.decks[deck] && gameData.decks[deck]) {
-        if (gameData.decksDiscards[deck]?.name) {
-          if (!this.decks[deck].isAnimating()) this.decks[deck].setDiscard(gameData.decksDiscards[deck].name);
+        if (gameData.decksDiscards && (gameData.decksDiscards[deck]?.name || gameData.decksDiscards[deck]?.[0])) {
+          if (!this.decks[deck].isAnimating())
+            this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name ?? gameData.decksDiscards[deck]?.[0]);
         }
         this.decks[deck].updateMarker(gameData.decks[deck]);
       }
@@ -1824,14 +1827,16 @@ declare('bgagame.dontletitdie', Gamegui, {
   notif_cardDrawn: async function (notification) {
     await this.notificationWrapper(notification);
     if (isStudio()) console.log('notif_cardDrawn', notification);
-    this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
+    const gameData = notification.args.gameData;
+    this.decks[notification.args.deck].updateDeckCounts(gameData.decks[notification.args.deck]);
     await this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
-    this.decks[notification.args.deck].updateMarker(notification.args.decks[notification.args.deck]);
+    this.decks[notification.args.deck].updateMarker(gameData.decks[notification.args.deck]);
   },
   notif_shuffle: async function (notification) {
     await this.notificationWrapper(notification);
     if (isStudio()) console.log('notif_shuffle', notification);
-    this.decks[notification.args.deck].updateDeckCounts(notification.args.decks[notification.args.deck]);
+    const gameData = notification.args.gameData;
+    this.decks[notification.args.deck].updateDeckCounts(gameData.decks[notification.args.deck]);
     return this.decks[notification.args.deck].shuffle(notification.args);
   },
   notif_zombieChange: async function (notification) {

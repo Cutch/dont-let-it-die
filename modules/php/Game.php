@@ -230,14 +230,16 @@ class Game extends \Table
     }
     public function cardDrawEvent($card, $deck, $arg = [])
     {
+        $gameData = [];
+        $this->getDecks($gameData);
         $result = [
             'card' => $card,
             'deck' => $deck,
             'resolving' => $this->actInterrupt->isStateResolving(),
             'character_name' => $this->getCharacterHTML(),
+            'gameData' => $gameData,
             ...$arg,
         ];
-        $this->getDecks($result);
         $this->notify('cardDrawn', '', $result);
         $partials = $this->gameData->get('partials');
         if (array_key_exists('partial', $arg) && $arg['partial']) {
@@ -1448,7 +1450,7 @@ class Game extends \Table
 
         $decksDiscards = $this->gameData->get('tempDeckDiscard');
         if ($decksDiscards) {
-            $result['decksDiscards'] = $decksDiscards;
+            unset($result['decksDiscards']);
             $this->gameData->set('tempDeckDiscard', null);
         }
         return $result;

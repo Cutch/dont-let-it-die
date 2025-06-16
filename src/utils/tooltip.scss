@@ -12,7 +12,7 @@
   align-items: center;
   .scroll-overlay {
     overflow: auto;
-    height: 100vh;
+    height: calc(100vh / var(--bga-game-zoom, 1));
   }
   .inner {
     position: relative;

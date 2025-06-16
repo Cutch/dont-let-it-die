@@ -29,26 +29,6 @@ class DLD_Decks
         foreach ($this->getAllDeckNames() as $deck) {
             $this->decks[$deck] = $this->game->initDeck(str_replace('-', '', $deck));
         }
-        $type = 'explore';
-        $filtered_cards = array_filter(
-            $this->game->data->getDecks(),
-            function ($v, $k) use ($type) {
-                return $v['type'] == 'deck' && $v['deck'] == $type;
-            },
-            ARRAY_FILTER_USE_BOTH
-        );
-        $cards = array_map(
-            function ($k, $v) {
-                return [
-                    'type' => $v['deck'],
-                    'card_location' => 'deck',
-                    'type_arg' => $k,
-                    'nbr' => 1,
-                ];
-            },
-            array_keys($filtered_cards),
-            $filtered_cards
-        );
     }
     public function getDeck(string $name): Deck
     {
@@ -147,10 +127,16 @@ class DLD_Decks
                         '`'
                 );
                 $discardData = $this->game->getCollectionFromDb(
-                    "SELECT `card_type` `type`, `card_type_arg` `name`
+                    "SELECT `card_type_arg` `name`, `card_type` `type`
                 FROM `$sqlName` a
-                WHERE `card_location` = 'discard' AND `card_location_arg` = (SELECT MAX(`card_location_arg`) FROM `$sqlName` b WHERE `card_location` = 'discard')"
+                WHERE `card_location` = 'discard'
+                ORDER BY card_location_arg DESC"
                 );
+                $map = [];
+                foreach ($discardData as $element) {
+                    $map[$element['type']][] = $element['name'];
+                }
+                $discardData = $map;
                 $this->cachedData[$deck] = ['decks' => $deckData, 'decksDiscards' => $discardData];
             }
             $result['decks'] = array_merge($result['decks'], $deckData);
@@ -201,11 +187,13 @@ class DLD_Decks
         );
         if (sizeof($cards) > 0) {
             $this->getDeck($deck)->moveCard($cards[0]['id'], 'deck');
+            $gameData = [];
+            $this->game->getDecks($gameData);
             $results = [
                 'deck' => $deck,
                 'deckName' => $this->getDeckName($deck),
+                'gameData' => $gameData,
             ];
-            $this->game->getDecks($results);
             $this->game->notify('shuffle', '', $results);
         } else {
             throw new Exception('Missing card id');
@@ -217,11 +205,13 @@ class DLD_Decks
             $this->getDeck($deck)->moveAllCardsInLocation('discard', 'deck');
             $this->getDeck($deck)->shuffle('deck');
             unset($this->cachedData[$deck]);
+            $gameData = [];
+            $this->game->getDecks($gameData);
             $results = [
                 'deck' => $deck,
                 'deckName' => $this->getDeckName($deck),
+                'gameData' => $gameData,
             ];
-            $this->game->getDecks($results);
             if ($notify) {
                 $this->game->notify('shuffle', clienttranslate('The ${deckName} deck is out of cards, shuffling'), $results);
             } else {
@@ -231,7 +221,12 @@ class DLD_Decks
     }
     public function pickCard(string $deck): array
     {
+        // $partials = $this->game->gameData->get('partials');
+        // if (!array_key_exists($deck, $partials)) {
+        // Would need to store all the decks in the undo data
         $this->game->markRandomness();
+        // }
+
         $topCard = $this->getDeck($deck)->getCardOnTop('deck');
         if (!$topCard) {
             $this->shuffleInDiscard($deck);
