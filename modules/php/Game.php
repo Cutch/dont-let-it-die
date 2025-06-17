@@ -1687,21 +1687,27 @@ class Game extends \Table
                 $day = $this->gameData->get('day');
                 $day += 1;
                 $this->gameData->set('day', $day);
-                $fireWood = $this->gameData->get('fireWood');
-                if (array_key_exists('allowFireWoodAddition', $this->gameData->get('morningState') ?? []) && $fireWood < $woodNeeded) {
-                    $missingWood = $woodNeeded + 1 - $fireWood;
-                    $wood = $this->gameData->get('wood');
-                    if ($wood >= $missingWood) {
-                        $this->gameData->setResource('fireWood', min($fireWood + $missingWood, $this->gameData->getResourceMax('wood')));
-                        $this->gameData->setResource('wood', max($wood - $missingWood, 0));
-                        $this->notify(
-                            'notify',
-                            clienttranslate('During the night the tribe quickly added ${woodNeeded} ${token_name} to the fire'),
-                            [
-                                'woodNeeded' => $woodNeeded,
-                                'token_name' => 'wood',
-                            ]
-                        );
+                $fireWood = $this->gameData->getResource('fireWood');
+                if (array_key_exists('allowFireWoodAddition', $this->gameData->get('morningState') ?? [])) {
+                    $this->gameData->set('morningState', [...$this->gameData->get('morningState') ?? [], 'allowFireWoodAddition' => false]);
+                    if ($fireWood < $woodNeeded + 1) {
+                        $missingWood = $woodNeeded + 1 - $fireWood;
+                        $wood = $this->gameData->getResource('wood');
+                        if ($wood >= $missingWood) {
+                            $this->gameData->setResource(
+                                'fireWood',
+                                min($fireWood + $missingWood, $this->gameData->getResourceMax('wood'))
+                            );
+                            $this->gameData->setResource('wood', max($wood - $missingWood, 0));
+                            $this->notify(
+                                'notify',
+                                clienttranslate('During the night the tribe quickly added ${woodNeeded} ${token_name} to the fire'),
+                                [
+                                    'woodNeeded' => $woodNeeded,
+                                    'token_name' => 'wood',
+                                ]
+                            );
+                        }
                     }
                 }
 
@@ -2223,6 +2229,7 @@ class Game extends \Table
             $result['availableSkills'] = $this->actions->getAvailableSkills();
             $result['availableItemSkills'] = $this->actions->getAvailableItemSkills();
             $result['activeTurnPlayerId'] = $this->character->getTurnCharacter(true)['player_id'];
+            $this->getAllPlayers($result);
         }
         if ($this->gamestate->state(true, false, true)['name'] == 'playerTurn') {
             $result['canUndo'] = $this->undo->canUndo();
