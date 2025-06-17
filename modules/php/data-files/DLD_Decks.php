@@ -725,9 +725,11 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     $game->eventLog(clienttranslate('Skills that require stamina to activate cannot be used tomorrow'));
                 },
-                'onGetValidActions' => function (Game $game, $nightCard, &$data) {
+                'onGetCharacterSkills' => function (Game $game, $nightCard, &$data) {
                     // Stamina skills can't be used
-                    return !array_key_exists('stamina', $data);
+                    $data = array_filter($data, function ($d) {
+                        return !array_key_exists('stamina', $d) || $d['stamina'] == 0;
+                    });
                 },
             ],
             'night-event-8_12' => [

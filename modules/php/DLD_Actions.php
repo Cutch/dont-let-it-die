@@ -340,45 +340,50 @@ class DLD_Actions
     {
         $characters = $this->game->character->getAllCharacterData();
         $unlocks = $this->game->getUnlockedKnowledge();
-        // $character = $this->game->character->getSubmittingCharacter();
-        return array_merge(
+        $characterSkills = array_merge(
             ...array_map(function ($c) {
                 if (array_key_exists('skills', $c)) {
                     return $c['skills'];
                 }
                 return [];
-            }, $characters),
-            ...array_map(function ($c) {
-                if (array_key_exists('skills', $c)) {
-                    return array_filter($c['skills'], function ($item) {
-                        return $item['type'] == 'skill';
-                    });
-                }
-                return [];
-            }, $this->getActiveDayEvents()),
-            ...array_map(function ($c) {
-                if (array_key_exists('skills', $c)) {
-                    return $c['skills'];
-                }
-                return [];
-            }, $unlocks),
-            ...array_map(function ($c) {
-                if (array_key_exists('skills', $c)) {
-                    return array_filter($c['skills'], function ($item) {
-                        return $item['type'] == 'skill';
-                    });
-                }
-                return [];
-            }, $this->getActiveDayEvents())
-            // ...array_map(function ($item) {
-            //     if (!array_key_exists('skills', $item)) {
-            //         return [];
-            //     }
-            //     return array_filter($item['skills'], function ($item) {
-            //         return $item['type'] == 'skill';
-            //     });
-            // }, $character['dayEvent'])
+            }, $characters)
         );
+        $this->game->hooks->onGetCharacterSkills($characterSkills);
+        return [
+            ...$characterSkills,
+            ...array_merge(
+                ...array_map(function ($c) {
+                    if (array_key_exists('skills', $c)) {
+                        return array_filter($c['skills'], function ($item) {
+                            return $item['type'] == 'skill';
+                        });
+                    }
+                    return [];
+                }, $this->getActiveDayEvents()),
+                ...array_map(function ($c) {
+                    if (array_key_exists('skills', $c)) {
+                        return $c['skills'];
+                    }
+                    return [];
+                }, $unlocks),
+                ...array_map(function ($c) {
+                    if (array_key_exists('skills', $c)) {
+                        return array_filter($c['skills'], function ($item) {
+                            return $item['type'] == 'skill';
+                        });
+                    }
+                    return [];
+                }, $this->getActiveDayEvents())
+                // ...array_map(function ($item) {
+                //     if (!array_key_exists('skills', $item)) {
+                //         return [];
+                //     }
+                //     return array_filter($item['skills'], function ($item) {
+                //         return $item['type'] == 'skill';
+                //     });
+                // }, $character['dayEvent'])
+            ),
+        ];
     }
     public function getActiveEquipmentSkills()
     {

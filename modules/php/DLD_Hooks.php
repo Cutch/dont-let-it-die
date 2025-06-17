@@ -160,6 +160,11 @@ class DLD_Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
+    function onGetCharacterSkills(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
     function onGetValidActions(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);
