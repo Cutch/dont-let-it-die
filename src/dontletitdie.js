@@ -198,23 +198,26 @@ declare('bgagame.dontletitdie', Gamegui, {
       }
       playerSideContainer.querySelector(`.health .value`).innerHTML = `${character.health ?? 0}/${character.maxHealth ?? 0}`;
       playerSideContainer.querySelector(`.stamina .value`).innerHTML = `${character.stamina ?? 0}/${character.maxStamina ?? 0}`;
-      const healthLine = playerSideContainer.querySelector(`.status`);
+      const statusLine = playerSideContainer.querySelector(`.status`);
       if (character.incapacitated) {
         if (character.recovering) {
-          healthLine.innerHTML = _('Recovering');
-          if (!healthLine.classList.contains('healing')) healthLine.classList.add('healing');
-        } else if (!healthLine.classList.contains('incapacitated')) {
-          healthLine.innerHTML = _('Incapacitated');
-          healthLine.classList.add('incapacitated');
+          statusLine.innerHTML = _('Recovering');
+          if (!statusLine.classList.contains('healing')) statusLine.classList.add('healing');
+        } else if (!statusLine.classList.contains('incapacitated')) {
+          statusLine.innerHTML = _('Incapacitated');
+          statusLine.classList.add('incapacitated');
         }
       } else {
         if (character.recovering) {
-          if (healthLine.classList.contains('healing')) {
-            healthLine.innerHTML = '';
-            healthLine.classList.remove('healing');
+          if (statusLine.classList.contains('healing')) {
+            statusLine.innerHTML = '';
+            statusLine.classList.remove('healing');
           }
-        } else if (healthLine.classList.contains('incapacitated')) {
-          healthLine.classList.remove('incapacitated');
+        } else if (statusLine.classList.contains('incapacitated')) {
+          statusLine.classList.remove('incapacitated');
+        } else if (statusLine.classList.contains('healing')) {
+          statusLine.innerHTML = '';
+          statusLine.classList.remove('healing');
         }
       }
 
@@ -855,7 +858,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     // });
 
     const marker = $('track-marker');
-    marker.style.top = `${(gameData.game.day - 1) * 35 + 236}px`;
+    marker.style.top = `${(gameData.game.day - 1) * 33.3 + 236}px`;
 
     const eventDeckContainer = $('event-deck-container');
     decks.forEach(({ name: deck, scale }) => {
