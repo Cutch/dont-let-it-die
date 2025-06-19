@@ -922,7 +922,7 @@ declare('bgagame.dontletitdie', Gamegui, {
 
     $('game_play_area_wrap').classList.add('dlid');
     $('right-side').classList.add('dlid');
-
+    this.replayFrom = new URLSearchParams(window.location.search).get('replayFrom');
     this.expansionList = gameData.expansionList;
     this.expansion = gameData.expansion;
     const expansionI = this.expansionList.indexOf(this.expansion);
@@ -1794,6 +1794,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (notification.args.gameData) {
       this.updateGameDatas(notification.args.gameData);
     }
+    return this.replayFrom >= notification.move_id;
   },
   notif_actionNotification: async function (notification) {
     const usedActionId = notification.args.usedActionId;
@@ -1823,12 +1824,13 @@ declare('bgagame.dontletitdie', Gamegui, {
     }
   },
   notif_rollFireDie: async function (notification) {
+    if (await this.notificationWrapper(notification)) return;
     await this.notificationWrapper(notification);
     if (isStudio()) console.log('notif_rollFireDie', notification);
     return this.dice.roll(notification.args);
   },
   notif_cardDrawn: async function (notification) {
-    await this.notificationWrapper(notification);
+    if (await this.notificationWrapper(notification)) return;
     if (isStudio()) console.log('notif_cardDrawn', notification);
     const gameData = notification.args.gameData;
     this.decks[notification.args.deck].updateDeckCounts(gameData.decks[notification.args.deck]);
@@ -1836,7 +1838,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.decks[notification.args.deck].updateMarker(gameData.decks[notification.args.deck]);
   },
   notif_shuffle: async function (notification) {
-    await this.notificationWrapper(notification);
+    if (await this.notificationWrapper(notification)) return;
     if (isStudio()) console.log('notif_shuffle', notification);
     const gameData = notification.args.gameData;
     this.decks[notification.args.deck].updateDeckCounts(gameData.decks[notification.args.deck]);
