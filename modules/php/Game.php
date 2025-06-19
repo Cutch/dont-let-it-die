@@ -300,11 +300,11 @@ class Game extends \Table
         $data = [
             'value' => $value,
         ];
-        $data['sendNotification'] = function () use ($data, $characterName, &$notificationSent, $actionName) {
-            $sideNum = $data['value'] == 0 ? 1 : ($data['value'] == 3 ? 6 : ($data['value'] == 2 ? 5 : 2));
+        $data['sendNotification'] = function () use ($value, $characterName, &$notificationSent, $actionName) {
+            $sideNum = $value == 0 ? 1 : ($value == 3 ? 6 : ($value == 2 ? 5 : 2));
             if ($characterName) {
                 $this->notify('rollFireDie', clienttranslate('${character_name} rolled a ${value} ${action_name}'), [
-                    'value' => $data['value'] == 0 ? clienttranslate('blank') : $data['value'],
+                    'value' => $value == 0 ? clienttranslate('blank') : $value,
                     'character_name' => $this->getCharacterHTML($characterName),
                     'characterId' => $characterName,
                     'roll' => $sideNum,
@@ -312,7 +312,7 @@ class Game extends \Table
                 ]);
             } else {
                 $this->notify('rollFireDie', clienttranslate('The fire die rolled a ${value} ${action_name}'), [
-                    'value' => $data['value'] == 0 ? clienttranslate('blank') : $data['value'],
+                    'value' => $value == 0 ? clienttranslate('blank') : $value,
                     'roll' => $sideNum,
                     'action_name' => '(' . $actionName . ')',
                 ]);
@@ -324,7 +324,7 @@ class Game extends \Table
         if (!$notificationSent) {
             $data['sendNotification']();
         }
-        return $value;
+        return $data['value'];
     }
     public function addExtraTime(?int $extraTime = null)
     {
