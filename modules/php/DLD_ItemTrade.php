@@ -55,10 +55,25 @@ class DLD_ItemTrade
         $this->game->gameData->set('tradeYield', [(int) $selfId, ...$this->game->gameData->get('tradeYield') ?? []]);
         // $this->game->gamestate->unsetPrivateState($selfId);
     }
-    public function actUnPass(): void
+    public function actForceSkip(): void
     {
         $this->game->gamestate->unsetPrivateStateForAllPlayers();
         $this->game->nextState('nextCharacter');
+    }
+    public function actUnBack(): void
+    {
+        $selfId = $this->game->getCurrentPlayer();
+        if (!$this->game->gamestate->isPlayerActive($selfId)) {
+            $this->game->gameData->set(
+                'tradeYield',
+                array_values(
+                    array_filter($this->game->gameData->get('tradeYield') ?? [], function ($d) use ($selfId) {
+                        return $d != $selfId;
+                    })
+                )
+            );
+            $this->game->gamestate->setPlayersMultiactive([$selfId], 'playerTurn', false);
+        }
     }
     public function actTradeItem(#[JsonParam] array $data): void
     {

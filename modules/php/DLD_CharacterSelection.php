@@ -186,7 +186,7 @@ class DLD_CharacterSelection
             $this->game->gameData->set('turnOrderStart', $this->game->gameData->get('turnOrder'));
         }
     }
-    public function actUnPass(): void
+    public function actUnBack(): void
     {
         $playerId = $this->game->getCurrentPlayer();
         // Deactivate player, and move to next state if none are active

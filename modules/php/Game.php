@@ -1043,13 +1043,11 @@ class Game extends \Table
         $this->completeAction(false);
     }
     #[CheckAction(false)]
-    public function actUnPass(): void
+    public function actForceSkip(): void
     {
-        $this->gamestate->checkPossibleAction('actUnPass');
+        $this->gamestate->checkPossibleAction('actForceSkip');
         $stateName = $this->gamestate->state(true, false, true)['name'];
-        if ($stateName == 'characterSelect') {
-            $this->characterSelection->actUnPass();
-        } elseif ($stateName == 'interrupt') {
+        if ($stateName == 'interrupt') {
             if (!$this->actInterrupt->onInterruptCancel(true)) {
                 $this->nextState('playerTurn');
             }
@@ -1062,8 +1060,23 @@ class Game extends \Table
             if ($privateState && $privateState['name'] == 'waitTradePhase') {
                 $this->itemTrade->actCancelTrade();
             } else {
-                $this->itemTrade->actUnPass();
+                $this->itemTrade->actForceSkip();
             }
+        }
+    }
+    #[CheckAction(false)]
+    public function actUnBack(): void
+    {
+        $this->gamestate->checkPossibleAction('actUnBack');
+        $stateName = $this->gamestate->state(true, false, true)['name'];
+        if ($stateName == 'characterSelect') {
+            $this->characterSelection->actUnBack();
+        } elseif ($stateName == 'dinnerPhase') {
+            $playerId = $this->getCurrentPlayer();
+            $this->gamestate->setPlayersMultiactive([$playerId], '');
+            $this->gamestate->initializePrivateState($playerId);
+        } elseif ($stateName == 'tradePhase') {
+            $this->itemTrade->actUnBack();
         }
     }
     public function actDone(): void

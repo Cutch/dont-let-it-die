@@ -1661,36 +1661,41 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.statusBar.addActionButton(
             _("Skip Other's Selection"),
             () => {
-              this.bgaPerformAction('actUnPass', null, { checkAction: false });
+              this.bgaPerformAction('actForceSkip', null, { checkAction: false });
             },
             { color: 'red' },
           );
       };
+      const backAction = () => {
+        this.statusBar.addActionButton(
+          _('Back'),
+          () => {
+            this.bgaPerformAction('actUnBack', null, { checkAction: false });
+          },
+          { color: 'secondary' },
+        );
+      };
       switch (stateName) {
         case 'dinnerPhase':
         case 'dinnerPhasePrivate':
+          backAction();
           skipOthersActions();
           break;
         case 'tradePhase':
+          backAction();
           skipOthersActions();
           break;
         case 'waitTradePhase':
           this.statusBar.addActionButton(
             _('Cancel'),
             () => {
-              this.bgaPerformAction('actUnPass', null, { checkAction: false });
+              this.bgaPerformAction('actForceSkip', null, { checkAction: false });
             },
             { color: 'secondary' },
           );
           break;
         case 'characterSelect':
-          this.statusBar.addActionButton(
-            _('Back'),
-            () => {
-              this.bgaPerformAction('actUnPass', null, { checkAction: false });
-            },
-            { color: 'secondary' },
-          );
+          backAction();
           break;
         case 'interrupt':
           if (gameui.gamedatas.activeTurnPlayerId == gameui.player_id && !this.gamedatas.isRealTime) {
