@@ -3,15 +3,16 @@
         "name": "Expansion",
         "values": {
             "0": {
-                "name": "Base"
+                "name": "Base",
+                "description": "Base game"
             },
             "1": {
                 "name": "Mini Expansion",
-                "description": "1 new character<br/>Day Events"
+                "description": "1 new character <br/> Day events"
             },
             "2": {
                 "name": "Hindrance Expansion",
-                "description": "4 new characters<br/>New explore action<br/>Upgrade Substitutions<br/>Physical and Mental Hindrances"
+                "description": "4 new characters <br/> New actions <br/> Tech tree substitutions <br/> Physical and mental hindrances"
             },
             "3": {
                 "name": "Death Valley Expansion",
@@ -20,21 +21,49 @@
         },
         "default": 0
     },
+    "104": {
+        "name": "Upgrades Selection",
+        "values": {
+            "0": {
+                "name": "Random",
+                "description": "Randomly choose upgrades placed by the leader"
+            },
+            "1": {
+                "name": "Player's Choice",
+                "description": "Choose from all of the upgrades available"
+            }
+        },
+        "displaycondition": [
+            {
+                "type": "otheroption",
+                "id": 100,
+                "value": [
+                    2,
+                    3
+                ]
+            }
+        ],
+        "default": 0
+    },
     "101": {
         "name": "Difficulty",
         "values": {
             "0": {
                 "name": "Easy",
-                "firstgameonly": true
+                "firstgameonly": true,
+                "description": "Change the tech tree difficulty"
             },
             "1": {
-                "name": "Normal"
+                "name": "Normal",
+                "description": "Change the tech tree difficulty"
             },
             "2": {
-                "name": "Normal+"
+                "name": "Normal+",
+                "description": "Change the tech tree difficulty"
             },
             "3": {
-                "name": "Hard"
+                "name": "Hard",
+                "description": "Change the tech tree difficulty"
             }
         },
         "default": 1
@@ -48,7 +77,7 @@
             },
             "1": {
                 "name": "Hard",
-                "description": "Remove 2 health each morning"
+                "description": "Remove 2 health each morning, more firewood"
             }
         },
         "default": 0

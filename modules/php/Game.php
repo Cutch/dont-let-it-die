@@ -80,6 +80,7 @@ class Game extends \Table
             'difficulty' => 101,
             'trackDifficulty' => 102,
             'trusting' => 103,
+            'randomUpgrades' => 104,
         ]);
         $this->gameData = new DLD_GameData($this);
         $this->actions = new DLD_Actions($this);
@@ -1079,15 +1080,39 @@ class Game extends \Table
             $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'nightPhase');
         } elseif ($stateName == 'startHindrance') {
             $this->markChanged('token');
-            if (
-                sizeof(
+            // TODO Depreciated Can be removed
+            if (!$this->gameData->get('upgradesCount')) {
+                if (
+                    sizeof(
+                        array_filter($this->gameData->get('upgrades'), function ($v) {
+                            return $v['replace'] == null;
+                        })
+                    ) > 0
+                ) {
+                    throw new BgaUserException(
+                        sprintf(self::_('%d discoveries must replace existing track discoveries'), sizeof($this->gameData->get('upgrades')))
+                    );
+                }
+            } else {
+                if (
+                    sizeof(
+                        array_filter($this->gameData->get('upgrades'), function ($v) {
+                            return $v['replace'] != null;
+                        })
+                    ) != $this->gameData->get('upgradesCount')
+                ) {
+                    throw new BgaUserException(
+                        sprintf(self::_('%d discoveries must replace existing track discoveries'), $this->gameData->get('upgradesCount'))
+                    );
+                }
+                $this->gameData->set(
+                    'upgrades',
                     array_filter($this->gameData->get('upgrades'), function ($v) {
                         return $v['replace'] == null;
                     })
-                ) > 0
-            ) {
-                throw new BgaUserException(clienttranslate('All discoveries must replace an existing track discovery'));
+                );
             }
+
             $saveState = false;
             $this->character->addExtraTime();
             $this->gamestate->setPlayerNonMultiactive($this->getCurrentPlayer(), 'playerTurn');
@@ -1637,23 +1662,36 @@ class Game extends \Table
             $this->giveExtraTime((int) $playerId);
         }
         if ($this->isValidExpansion('hindrance')) {
-            $upgrades = array_keys($this->data->getUpgrades());
-            shuffle($upgrades);
+            $randomUpgrades = $this->useRandomUpgrades();
+            $upgrades = $this->data->getUpgrades();
             $count = 5;
             if ($this->getDifficulty() == 'easy') {
                 $count = 4;
             } elseif ($this->getDifficulty() == 'hard') {
                 $count = 6;
             }
-            $upgrades = array_slice($upgrades, 0, $count);
-            $upgrades = array_column(
-                array_map(function ($k) {
-                    return [$k, ['replace' => null]];
-                }, $upgrades),
-                1,
-                0
-            );
+            if ($randomUpgrades) {
+                shuffle($upgrades);
+                $upgrades = array_slice($upgrades, 0, $count);
+                $upgrades = array_column(
+                    array_map(function ($k) {
+                        return [$k['id'], ['replace' => null]];
+                    }, $upgrades),
+                    1,
+                    0
+                );
+            } else {
+                array_orderby($upgrades, 'name', SORT_ASC);
+                $upgrades = array_column(
+                    array_map(function ($k) {
+                        return [$k['id'], ['replace' => null]];
+                    }, $upgrades),
+                    1,
+                    0
+                );
+            }
             $this->gameData->set('upgrades', $upgrades);
+            $this->gameData->set('upgradesCount', $count);
         }
     }
     public function stStartHindrance()
@@ -2102,6 +2140,10 @@ class Game extends \Table
         $difficultyMapping = ['normal', 'hard'];
         return $difficultyMapping[$this->gameData->get('trackDifficulty')];
     }
+    public function useRandomUpgrades()
+    {
+        return $this->gameData->get('randomUpgrades') == '0';
+    }
     public function getIsTrusting()
     {
         return $this->gameData->get('trusting') == '1';
@@ -2413,6 +2455,7 @@ class Game extends \Table
         $this->gameData->set('difficulty', $this->getGameStateValue('difficulty'));
         $this->gameData->set('trackDifficulty', $this->getGameStateValue('trackDifficulty'));
         $this->gameData->set('trusting', $this->getGameStateValue('trusting'));
+        $this->gameData->set('randomUpgrades', $this->getGameStateValue('randomUpgrades'));
 
         $this->decks = new DLD_Decks($this);
         $this->decks->setup();

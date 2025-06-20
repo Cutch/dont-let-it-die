@@ -178,6 +178,7 @@ class DLD_CharacterSelection
             array_merge(['gameData' => $results, 'playerId' => $playerId], $selectedCharactersArgs)
         );
         $this->game->markChanged('token');
+
         $targetState = $this->game->isValidExpansion('hindrance') ? 'startHindrance' : 'playerTurn';
         // Deactivate player, and move to next state if none are active
         $this->game->gamestate->setPlayerNonMultiactive($playerId, $targetState);
