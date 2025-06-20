@@ -65,7 +65,11 @@ class DLD_ExpansionData
                                 ]);
                                 $game->adjustResource('rock', 1);
                             }
+                            usePerDay($skill['parentId'], $game);
                             return ['notify' => false];
+                        },
+                        'requires' => function (Game $game, $skill) {
+                            return getUsePerDay($skill['parentId'], $game) == 0;
                         },
                     ],
                 ],

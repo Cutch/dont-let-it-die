@@ -752,11 +752,13 @@ class Game extends \Table
                 if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
                     $this->notify(
                         'notify',
-                        (!array_key_exists('stamina', $data)
-                                ? clienttranslate('${character_name} ate ${token_name} and gained ${health} health')
-                                : array_key_exists('health', $data))
-                            ? clienttranslate('${character_name} ate ${token_name} and gained ${health} health and ${stamina} stamina')
-                            : clienttranslate('${character_name} ate ${token_name} and gained ${stamina} stamina'),
+                        !array_key_exists('stamina', $data)
+                            ? clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health')
+                            : (array_key_exists('health', $data)
+                                ? clienttranslate(
+                                    '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
+                                )
+                                : clienttranslate('${character_name} ate ${count} ${token_name} and gained ${stamina} stamina')),
                         [...$data, 'token_name' => $data['tokenName'], 'usedActionId' => 'actEat']
                     );
                 }
