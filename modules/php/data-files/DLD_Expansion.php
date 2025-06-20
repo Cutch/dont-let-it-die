@@ -366,7 +366,7 @@ class DLD_ExpansionData
                         'state' => ['dayEvent'],
                         'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
-                            $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
+                            $characters = array_filter($game->character->getAllCharacterData(false), function ($character) use (
                                 $currentCharacter
                             ) {
                                 return !$character['incapacitated'] && $character != $currentCharacter;
@@ -403,7 +403,7 @@ class DLD_ExpansionData
                         'stamina' => 2,
                         'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
-                            $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
+                            $characters = array_filter($game->character->getAllCharacterData(false), function ($character) use (
                                 $currentCharacter
                             ) {
                                 return !$character['incapacitated'] && $character != $currentCharacter;

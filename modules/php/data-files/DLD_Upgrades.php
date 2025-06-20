@@ -376,7 +376,7 @@ class DLD_UpgradesData
                         $aboveMax = $data['currentHealth'] + $data['change'] - $data['maxHealth'];
                         if ($aboveMax > 0) {
                             $currentCharacter = $game->character->getTurnCharacterId();
-                            $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
+                            $characters = array_filter($game->character->getAllCharacterData(false), function ($character) use (
                                 $currentCharacter
                             ) {
                                 return !$character['incapacitated'] && $character != $currentCharacter;

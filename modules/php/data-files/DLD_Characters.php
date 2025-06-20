@@ -1873,7 +1873,7 @@ class DLD_CharactersData
                         'stamina' => 1,
                         'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacter();
-                            $characters = array_filter($game->character->getAllCharacterIds(), function ($character) use (
+                            $characters = array_filter($game->character->getAllCharacterData(false), function ($character) use (
                                 $currentCharacter
                             ) {
                                 return $character != $currentCharacter['id'];
