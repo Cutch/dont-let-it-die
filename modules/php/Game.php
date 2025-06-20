@@ -1389,15 +1389,22 @@ class Game extends \Table
                 if (!$data || !array_key_exists('onUse', $data) || $data['onUse'] != false) {
                     $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
                 }
-                if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
+                if (
+                    (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) &&
+                    (!$result || !array_key_exists('notify', $result) || $result['notify'] != false)
+                ) {
                     $this->eventLog('${buttons}', [
                         'buttons' => notifyButtons([
                             ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'night-event'],
                         ]),
                     ]);
                 }
-
-                $this->nextState('morningPhase');
+                if (
+                    (!$data || !array_key_exists('nextState', $data) || $data['nextState'] != false) &&
+                    (!$result || !array_key_exists('nextState', $result) || $result['nextState'] != false)
+                ) {
+                    $this->nextState('morningPhase');
+                }
             }
         );
     }

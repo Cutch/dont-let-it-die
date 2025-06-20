@@ -499,19 +499,20 @@ class DLD_DecksData
                             }, $character['equipment']);
                         }, $game->character->getAllCharacterData())
                     );
+                    if (sizeof($items) > 0) {
+                        $game->selectionStates->initiateState(
+                            'itemSelection',
+                            [
+                                'items' => $items,
+                                'id' => $nightCard['id'],
+                            ],
+                            $currentCharacter['id'],
+                            false,
+                            'morningPhase'
+                        );
 
-                    $game->selectionStates->initiateState(
-                        'itemSelection',
-                        [
-                            'items' => $items,
-                            'id' => $nightCard['id'],
-                        ],
-                        $currentCharacter['id'],
-                        true,
-                        $game->gamestate->state(true, false, true)['name']
-                    );
-
-                    return ['notify' => false, 'nextState' => false];
+                        return ['nextState' => false];
+                    }
                 },
                 'onItemSelection' => function (Game $game, $skill, &$data) {
                     $itemSelectionState = $game->selectionStates->getState('itemSelection');
@@ -923,9 +924,22 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     // Remove physical hindrance from each character
                     // Skip morning phase damage
-                    $game->selectionStates->initiateHindranceSelection($nightCard['id']);
-                    // $data['interrupt'] = true;
-                    return ['notify' => false, 'nextState' => false, 'interrupt' => true];
+
+                    if (
+                        sizeof(
+                            array_filter($game->character->getAllCharacterData(false), function ($d) {
+                                return sizeof($d['physicalHindrance']) > 0;
+                            })
+                        ) > 0
+                    ) {
+                        $game->selectionStates->initiateHindranceSelection(
+                            $nightCard['id'],
+                            $game->character->getAllCharacterIds(false),
+                            null,
+                            false
+                        );
+                        return ['nextState' => false];
+                    }
                 },
                 'onMorning' => function (Game $game, $nightCard, &$data) {
                     $turnOrder = $game->gameData->get('turnOrder');
@@ -965,7 +979,7 @@ class DLD_DecksData
                                 }
                             }
                         }
-                        if ($characterTotal == $characterCount && $characterTotal == $count) {
+                        if ($characterTotal != $characterCount || $characterTotal != $count) {
                             throw new BgaUserException(clienttranslate('Remove 1 hindrance from each character'));
                         }
                         $data['nextState'] = 'playerTurn';

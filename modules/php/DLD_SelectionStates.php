@@ -454,7 +454,7 @@ class DLD_SelectionStates
                     return ['physicalHindrance' => $d['physicalHindrance'], 'characterId' => $d['character_name']];
                 },
                 array_filter($this->game->character->getAllCharacterData(), function ($d) use ($characters) {
-                    return in_array($d['id'], $characters);
+                    return in_array($d['id'], $characters) && sizeof($d['physicalHindrance']) > 0;
                 })
             )
         );

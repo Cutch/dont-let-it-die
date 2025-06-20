@@ -46,7 +46,7 @@ export class HindranceSelectionScreen {
           'afterbegin',
           `<div id="hindrance-items-${d.characterId}" class="dlid__container"><h3>${d.characterId}</h3><div class="items"></div></div>`,
         );
-      const div = document.querySelector(`#hindrance-items-${d.characterId}`);
+      const div = document.querySelector(`#hindrance-items-${d.characterId} .items`);
       d.physicalHindrance.forEach(({ id }) => {
         renderItem(id, div, () => {
           const i = this.cardSelections.findIndex((d) => d.cardId === id);

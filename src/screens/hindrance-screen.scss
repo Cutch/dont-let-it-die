@@ -2,4 +2,14 @@
   margin-top: 1rem;
   overflow: hidden;
   padding: 1rem;
+  .selections {
+    display: flex;
+    gap: 3rem;
+    flex-flow: wrap;
+  }
+  .items {
+    display: flex;
+    gap: 1rem;
+    flex-flow: wrap;
+  }
 }
