@@ -198,7 +198,7 @@ class DLD_ActInterrupt
         $data = $state[$functionName];
         return ['functionName' => $functionName, 'data' => $data];
     }
-    public function actInterrupt(string $skillId): void
+    public function actInterrupt(string $skillId, ?string $skillSecondaryId = null): void
     {
         $state = $this->getLatestInterruptState();
         $this->game->character->addExtraTime();

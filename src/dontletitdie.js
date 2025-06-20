@@ -1317,7 +1317,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                     (skill) => {
                       const suffix = this.getActionSuffixHTML(skill);
                       this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
-                        return this.bgaPerformAction(actionId, { skillId: skill.id });
+                        return this.bgaPerformAction(actionId, { skillId: skill.id, skillSecondaryId: skill.secondaryId });
                       });
                     },
                   );

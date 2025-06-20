@@ -117,13 +117,47 @@ class DLD_CharactersData
                             return $skill['characterId'] . $skill['id'];
                         },
                         'onInvestigateFire' => function (Game $game, $skill, &$data) {
-                            if ($data['originalRoll'] < 3 && getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1) {
-                                // If kara is not the character, and the roll is not the max
-                                $game->actInterrupt->addSkillInterrupt($skill);
+                            if (getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1) {
+                                $rolling2 = array_key_exists('originalRoll2', $data);
+
+                                if ($data['originalRoll'] < 3) {
+                                    // If the roll is not the max
+                                    $game->actInterrupt->addSkillInterrupt([
+                                        ...$skill,
+                                        'id' => $skill['id'],
+                                        'secondaryId' => 'roll1',
+                                        ...$rolling2
+                                            ? [
+                                                'skillOption' => [
+                                                    'name' => $data['originalRoll'] == 0 ? clienttranslate('blank') : $data['originalRoll'],
+                                                ],
+                                            ]
+                                            : [],
+                                    ]);
+                                }
+                                if ($rolling2 && $data['originalRoll2'] < 3) {
+                                    // If the roll is not the max
+                                    $game->actInterrupt->addSkillInterrupt([
+                                        ...$skill,
+                                        'id' => $skill['id'],
+                                        'secondaryId' => 'roll2',
+                                        ...$rolling2
+                                            ? [
+                                                'skillOption' => [
+                                                    'name' =>
+                                                        $data['originalRoll2'] == 0 ? clienttranslate('blank') : $data['originalRoll2'],
+                                                ],
+                                            ]
+                                            : [],
+                                    ]);
+                                }
                             }
                         },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
-                            if ($skill['id'] == $activatedSkill['id']) {
+                            if (
+                                $skill['id'] == $activatedSkill['id'] &&
+                                (!array_key_exists('secondaryId', $activatedSkill) || $activatedSkill['secondaryId'] == 'roll1')
+                            ) {
                                 $char = $game->character->getCharacterData($skill['characterId']);
                                 $game->eventLog(clienttranslate('${character_name} is re-rolling ${active_character_name}\'s fire die'), [
                                     'character_name' => $game->getCharacterHTML($char['character_name']),
@@ -131,7 +165,24 @@ class DLD_CharactersData
                                         $game->character->getTurnCharacter()['character_name']
                                     ),
                                 ]);
-                                $data['data']['roll'] = $game->rollFireDie($skill['name'], $char['character_name']);
+                                $data['data']['roll'] =
+                                    $game->rollFireDie($skill['name'], $char['character_name']) +
+                                    (array_key_exists('originalRoll2', $data['data']) ? $data['data']['originalRoll2'] : 0);
+                                usePerDay($skill['getPerDayKey']($game, $skill), $game);
+                            }
+                            if (
+                                $skill['id'] == $activatedSkill['id'] &&
+                                (!array_key_exists('secondaryId', $activatedSkill) || $activatedSkill['secondaryId'] == 'roll2')
+                            ) {
+                                $char = $game->character->getCharacterData($skill['characterId']);
+                                $game->eventLog(clienttranslate('${character_name} is re-rolling ${active_character_name}\'s fire die'), [
+                                    'character_name' => $game->getCharacterHTML($char['character_name']),
+                                    'active_character_name' => $game->getCharacterHTML(
+                                        $game->character->getTurnCharacter()['character_name']
+                                    ),
+                                ]);
+                                $data['data']['roll'] =
+                                    $game->rollFireDie($skill['name'], $char['character_name']) + $data['data']['originalRoll'];
                                 usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             }
                         },
@@ -776,11 +827,12 @@ class DLD_CharactersData
                         $data['stamina'] = 5;
                     }
                 },
-                'onInvestigateFire' => function (Game $game, $char, &$data) {
+                'onInvestigateFirePre' => function (Game $game, $char, &$data) {
                     $char = $game->character->getCharacterData($char['id']);
                     if ($char['isActive']) {
                         $roll2 = $game->rollFireDie(clienttranslate('Investigate Fire'), $char['character_name']);
                         $data['roll'] += $roll2;
+                        $data['originalRoll2'] = $roll2;
                     }
                 },
                 'skills' => [

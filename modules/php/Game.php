@@ -783,7 +783,7 @@ class Game extends \Table
         $this->setLastAction('actAddWood');
         $this->completeAction();
     }
-    public function actUseSkill(string $skillId): void
+    public function actUseSkill(string $skillId, ?string $skillSecondaryId = null): void
     {
         if ($this->gamestate->state(true, false, true)['name'] == 'playerTurn') {
             $this->setLastAction('actUseSkill');
@@ -792,7 +792,7 @@ class Game extends \Table
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onUseSkill'],
-            function (Game $_this) use ($skillId) {
+            function (Game $_this) use ($skillId, $skillSecondaryId) {
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 // $this->character->addExtraTime();
                 $_this->actions->validateCanRunAction('actUseSkill', $skillId);
@@ -802,6 +802,7 @@ class Game extends \Table
                 $_this->character->setSubmittingCharacter(null);
                 return [
                     'skillId' => $skillId,
+                    'skillSecondaryId' => $skillSecondaryId,
                     'skill' => $skill,
                     'character' => $character,
                     'turnCharacter' => $this->character->getTurnCharacter(),
@@ -812,6 +813,7 @@ class Game extends \Table
                 $skill = $data['skill'];
                 $character = $data['character'];
                 $skillId = $data['skillId'];
+                $skillSecondaryId = $data['skillSecondaryId'];
                 $_this->hooks->reconnectHooks($skill, $_this->character->getSkill($skillId)['skill']);
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 $notificationSent = false;
@@ -826,7 +828,7 @@ class Game extends \Table
                 if ($_this->gamestate->state(true, false, true)['name'] == 'interrupt') {
                     // Only applies to skills from an interrupt state
                     $skill['sendNotification']();
-                    $_this->actInterrupt->actInterrupt($skillId);
+                    $_this->actInterrupt->actInterrupt($skillId, $skillSecondaryId);
                     $_this->actions->spendActionCost('actUseSkill', $skillId);
                     $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 }
