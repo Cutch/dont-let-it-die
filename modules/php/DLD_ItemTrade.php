@@ -47,6 +47,14 @@ class DLD_ItemTrade
         $this->game->gamestate->setPlayerNonMultiactive($selfId, 'nextCharacter');
         // $this->game->gamestate->unsetPrivateState($selfId);
     }
+    public function actTradeYield(): void
+    {
+        $selfId = $this->game->getCurrentPlayer();
+
+        $this->game->gamestate->setPlayerNonMultiactive($selfId, 'nextCharacter');
+        $this->game->gameData->set('tradeYield', [(int) $selfId, ...$this->game->gameData->get('tradeYield') ?? []]);
+        // $this->game->gamestate->unsetPrivateState($selfId);
+    }
     public function actUnPass(): void
     {
         $this->game->gamestate->unsetPrivateStateForAllPlayers();
@@ -68,16 +76,19 @@ class DLD_ItemTrade
             if (array_key_exists('character', $trade)) {
                 $trade['character'] = $this->game->character->getCharacterData($trade['character']);
                 $hasSelf = $hasSelf || $selfId == $trade['character']['playerId'];
-                if ($selfId == $trade['character']['playerId']) {
+                if ($sendToCamp) {
+                    $trade1 = $trade;
+                } else {
                     if (!$trade1) {
                         $trade1 = $trade;
                     } else {
                         $trade2 = $trade;
                     }
-                } else {
-                    $trade2 = $trade;
                 }
             } else {
+                if ($trade2) {
+                    $trade1 = $trade2;
+                }
                 $trade2 = $trade;
                 $sendToCamp = true;
             }
@@ -85,9 +96,9 @@ class DLD_ItemTrade
                 $hasItem = $hasItem || true;
             }
         });
-        if (!$hasSelf) {
-            throw new BgaUserException(clienttranslate('Select one of your character\'s items to trade'));
-        }
+        // if (!$hasSelf) {
+        //     throw new BgaUserException(clienttranslate('Select one of your character\'s items to trade'));
+        // }
         if (!$hasItem) {
             throw new BgaUserException(clienttranslate('Select one item to trade'));
         }
@@ -97,6 +108,13 @@ class DLD_ItemTrade
             'trade2' => $trade2,
         ];
         $this->game->hooks->onItemTrade($hookData);
+        $activatePlayer = function ($toPlayerId) {
+            if (!in_array((int) $toPlayerId, $this->game->gameData->get('tradeYield') ?? [])) {
+                if (!$this->game->gamestate->isPlayerActive($toPlayerId)) {
+                    $this->game->gamestate->setPlayersMultiactive([$toPlayerId], 'playerTurn', false);
+                }
+            }
+        };
         if ($sendToCamp) {
             $itemId1 = array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null;
             $itemId2 = array_key_exists('itemId', $trade2) ? $trade2['itemId'] : null;
@@ -126,18 +144,18 @@ class DLD_ItemTrade
                 }
                 array_push($characterItems, $itemId2);
             }
-            $campEquipment = array_filter($this->game->gameData->get('campEquipment'), function ($d) use ($itemId2) {
-                return $d != $itemId2;
-            });
+            $campEquipment = array_values(
+                array_filter($this->game->gameData->get('campEquipment'), function ($d) use ($itemId2) {
+                    return $d != $itemId2;
+                })
+            );
 
             if ($itemId1) {
                 array_push($campEquipment, $itemId1);
             }
 
-            $this->game->log('setCharacterEquipment', $characterItems);
             $this->game->character->setCharacterEquipment($character['id'], $characterItems);
 
-            $this->game->log('campEquipment', $campEquipment);
             $this->game->gameData->set('campEquipment', $campEquipment);
 
             $results = [];
@@ -154,30 +172,34 @@ class DLD_ItemTrade
                 'character2' => null,
                 'gameData' => $results,
             ]);
+            $activatePlayer($trade1['character']['playerId']);
         } else {
-            if ($trade1['character']['playerId'] != $trade2['character']['playerId']) {
-                $this->game->gameData->set('tradeState', [
-                    'trade1' => $trade1,
-                    'trade2' => $trade2,
-                ]);
-                $toPlayerId = $trade2['character']['playerId'];
-                if (!$this->game->gamestate->isPlayerActive($toPlayerId)) {
-                    $this->game->gamestate->setPlayersMultiactive([$toPlayerId], 'playerTurn', false);
-                    $this->game->gamestate->initializePrivateState($toPlayerId);
-                    $this->game->gamestate->nextPrivateState($toPlayerId, 'confirmTradePhase');
-                } else {
-                    $this->game->gamestate->nextPrivateState($toPlayerId, 'confirmTradePhase');
-                }
-                foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
-                    // $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
-                    if ($toPlayerId != $playerId) {
-                        $this->game->gamestate->nextPrivateState($playerId, 'waitTradePhase');
-                    }
-                }
-            } else {
-                $responseData = [...$this->tradeProcess($trade1, $trade2), 'trade1' => $trade1, 'trade2' => $trade2];
-                $this->completeTrade($responseData);
-            }
+            // var_dump($this->game->gamestate->getActivePlayerList(), $this->game->gamestate->isPlayerActive(2411502));
+            $activatePlayer($trade1['character']['playerId']);
+            $activatePlayer($trade2['character']['playerId']);
+            // if ($trade1['character']['playerId'] != $trade2['character']['playerId']) {
+            //     $this->game->gameData->set('tradeState', [
+            //         'trade1' => $trade1,
+            //         'trade2' => $trade2,
+            //     ]);
+            //     $toPlayerId = $trade2['character']['playerId'];
+            //     if (!$this->game->gamestate->isPlayerActive($toPlayerId)) {
+            //         $this->game->gamestate->setPlayersMultiactive([$toPlayerId], 'playerTurn', false);
+            //         $this->game->gamestate->initializePrivateState($toPlayerId);
+            //         $this->game->gamestate->nextPrivateState($toPlayerId, 'confirmTradePhase');
+            //     } else {
+            //         $this->game->gamestate->nextPrivateState($toPlayerId, 'confirmTradePhase');
+            //     }
+            //     foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
+            //         // $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
+            //         if ($toPlayerId != $playerId) {
+            //             $this->game->gamestate->nextPrivateState($playerId, 'waitTradePhase');
+            //         }
+            //     }
+            // } else {
+            $responseData = [...$this->tradeProcess($trade1, $trade2), 'trade1' => $trade1, 'trade2' => $trade2];
+            $this->completeTrade($responseData);
+            // }
         }
     }
     private function tradeProcess($trade1, $trade2)
@@ -327,6 +349,7 @@ class DLD_ItemTrade
     }
     public function stTradePhase()
     {
+        $this->game->gameData->set('tradeYield', []);
         if (sizeof($this->game->getCraftedItems()) == 0) {
             $this->game->nextState('nextCharacter');
         } else {

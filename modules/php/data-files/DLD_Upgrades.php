@@ -258,7 +258,7 @@ class DLD_UpgradesData
                 'skills' => [
                     'skill1' => [
                         'type' => 'skill',
-                        'name' => clienttranslate('Fire Watch'),
+                        'name' => clienttranslate('Tinder'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'global' => true,

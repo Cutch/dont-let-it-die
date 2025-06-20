@@ -284,11 +284,9 @@ class DLD_SelectionStates
             return $d != $sendToCampId;
         });
 
-        $this->game->log('setCharacterEquipment', [...$characterItems, ...$items]);
         $this->game->character->setCharacterEquipment($character['id'], [...$characterItems, ...$items]);
 
         $campEquipment = $this->game->gameData->get('campEquipment');
-        $this->game->log('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->game->gameData->set('campEquipment', [...$campEquipment, $sendToCampId]);
         $this->game->markChanged('player');
         $this->completeSelectionState([

@@ -1551,6 +1551,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         case 'tradePhase':
         case 'tradePhaseActions':
           this.statusBar.addActionButton(_('Pass'), () => this.bgaPerformAction('actTradeDone'), { color: 'secondary' });
+          this.statusBar.addActionButton(_('Yield to All Changes'), () => this.bgaPerformAction('actTradeYield'), { color: 'secondary' });
           break;
         case 'confirmTradePhase':
           this.statusBar.addActionButton(_('Cancel'), () => this.bgaPerformAction('actCancelTrade'), { color: 'secondary' });

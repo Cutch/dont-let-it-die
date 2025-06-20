@@ -6,13 +6,16 @@
                 "name": "Base"
             },
             "1": {
-                "name": "Mini Expansion"
+                "name": "Mini Expansion",
+                "description": "1 new character<br/>Day Events"
             },
             "2": {
-                "name": "Hindrance Expansion"
+                "name": "Hindrance Expansion",
+                "description": "4 new characters<br/>New explore action<br/>Upgrade Substitutions<br/>Physical and Mental Hindrances"
             },
             "3": {
-                "name": "Death Valley Expansion"
+                "name": "Death Valley Expansion",
+                "description": "7 new characters"
             }
         },
         "default": 0
@@ -21,7 +24,8 @@
         "name": "Difficulty",
         "values": {
             "0": {
-                "name": "Easy"
+                "name": "Easy",
+                "firstgameonly": true
             },
             "1": {
                 "name": "Normal"
@@ -39,12 +43,55 @@
         "name": "Track Difficulty",
         "values": {
             "0": {
-                "name": "Normal"
+                "name": "Normal",
+                "description": "Remove 1 health each morning"
             },
             "1": {
-                "name": "Hard"
+                "name": "Hard",
+                "description": "Remove 2 health each morning"
             }
         },
         "default": 0
+    },
+    "103": {
+        "name": "Trusting",
+        "values": {
+            "0": {
+                "description": "Allows players to skip certain phases or actions on behalf of other players",
+                "name": "No"
+            },
+            "1": {
+                "description": "Allows players to skip certain phases or actions on behalf of other players",
+                "name": "Yes"
+            }
+        },
+        "displaycondition": [
+            {
+                "type": "minplayers",
+                "value": [
+                    2,
+                    3,
+                    4
+                ]
+            },
+            {
+                "type": "otheroption",
+                "id": 200,
+                "value": [
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20
+                ]
+            }
+        ],
+        "default": 1
     }
 }

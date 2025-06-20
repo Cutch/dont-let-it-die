@@ -4,7 +4,7 @@ export class ItemTradeScreen {
   constructor(game) {
     this.game = game;
     this.selection = [];
-    this.scale = 2;
+    this.scale = 3;
   }
   getTrade() {
     return { selection: this.selection.map(({ character, equipment }) => ({ character: character?.name, itemId: equipment?.itemId })) };
@@ -109,7 +109,6 @@ export class ItemTradeScreen {
         'beforeend',
         `<div id="item-trade-screen" class="dlid__container" style="--player-color:#${'000'}">
             <div id="item-trade-screen-content">
-              <div id="item-trade-screen__${gameui.player_id}" class="player-item-container"></div>
               <div id="item-trade-screen__camp"><div id="item-trade-screen__camp" class="dlid__container"><h3>${_(
                 'Camp Items',
               )}</h3><div class="items"></div></div></div>
@@ -117,6 +116,7 @@ export class ItemTradeScreen {
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
       );
+      // <div id="item-trade-screen__${gameui.player_id}" class="player-item-container"></div>
       this.itemTradeContent = document.querySelector(`#item-trade-screen-content`);
 
       itemTradeElem = document.querySelector(`#item-trade-screen`);
@@ -127,17 +127,17 @@ export class ItemTradeScreen {
 
       const playerIds = Array.from(new Set(gameData.characters.map((d) => d.playerId)));
       // Add the other player containers
-      playerIds
-        .filter((playerId) => playerId != gameui.player_id)
-        .forEach((playerId) => {
-          this.itemTradeContent.insertAdjacentHTML(
-            'beforeend',
-            `<div id="item-trade-screen__${playerId}" class="player-item-container"></div>`,
-          );
-        });
+      // playerIds
+      //   .filter((playerId) => playerId != gameui.player_id)
+      //   .forEach((playerId) => {
+      //     this.itemTradeContent.insertAdjacentHTML(
+      //       'beforeend',
+      //       `<div id="item-trade-screen__${playerId}" class="player-item-container"></div>`,
+      //     );
+      //   });
       // Add header and character image
       gameData.characters.forEach((character) => {
-        const container = document.querySelector(`#item-trade-screen__${character.playerId}`);
+        const container = document.querySelector(`#item-trade-screen-content`);
         container.insertAdjacentHTML(
           'beforeend',
           `<div id="item-trade-screen__${character.name}" class="dlid__container"><div class="character-image"></div><h3>${character.name}</h3><div class="items"></div></div>`,
@@ -168,6 +168,10 @@ export class ItemTradeScreen {
             pos: 'insert',
             css: `character-${character.name} item-${equipment.itemId}`,
           });
+          this.game.addHelpTooltip({
+            node: itemsElem.querySelector(`.item-${equipment.itemId}`),
+            tooltipText: equipment.id,
+          });
           addClickListener(itemsElem.querySelector(`.item-${equipment.itemId}`), equipment.name, () => {
             this.updateSelection(character, equipment);
           });
@@ -197,6 +201,10 @@ export class ItemTradeScreen {
       gameData.campEquipment.forEach((equipment) => {
         if (!itemsElem.querySelector(`.item-${equipment.itemId}`)) {
           renderImage(equipment.name, itemsElem, { scale: this.scale, pos: 'insert', css: `character-null item-${equipment.itemId}` });
+          this.game.addHelpTooltip({
+            node: itemsElem.querySelector(`.item-${equipment.itemId}`),
+            tooltipText: equipment.name,
+          });
           addClickListener(itemsElem.querySelector(`.item-${equipment.itemId}`), equipment.name, () => {
             this.updateSelection(null, equipment);
           });

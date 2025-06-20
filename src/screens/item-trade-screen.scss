@@ -6,8 +6,9 @@
 #item-trade-screen-content {
   display: flex;
   gap: 2rem;
-  flex-flow: column;
+  flex-flow: row wrap;
   align-items: center;
+  justify-content: center;
   .dlid__container {
     background-color: #ffffff90;
     padding: 1rem 2rem;

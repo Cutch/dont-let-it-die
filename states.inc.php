@@ -446,7 +446,7 @@ $machinestates = [
         'type' => 'private',
         'action' => 'stTradePhaseWait',
         'args' => 'argTradePhaseActions',
-        'possibleactions' => ['actTradeItem', 'actTradeDone', 'actUnPass'],
+        'possibleactions' => ['actTradeItem', 'actTradeDone', 'actTradeYield', 'actUnPass'],
         'transitions' => ['confirmTradePhase' => $confirmTradePhase, 'waitTradePhase' => $waitTradePhase],
     ],
     $confirmTradePhase => [

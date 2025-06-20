@@ -79,6 +79,7 @@ class Game extends \Table
             'expansion' => 100,
             'difficulty' => 101,
             'trackDifficulty' => 102,
+            'trusting' => 103,
         ]);
         $this->gameData = new DLD_GameData($this);
         $this->actions = new DLD_Actions($this);
@@ -577,9 +578,11 @@ class Game extends \Table
         if (in_array($itemId, $campEquipment)) {
             $this->gameData->set(
                 'campEquipment',
-                array_filter($campEquipment, function ($id) use ($itemId) {
-                    return $id != $itemId;
-                })
+                array_values(
+                    array_filter($campEquipment, function ($id) use ($itemId) {
+                        return $id != $itemId;
+                    })
+                )
             );
             $this->markChanged('player');
         } else {
@@ -621,6 +624,11 @@ class Game extends \Table
     public function actTradeDone(): void
     {
         $this->itemTrade->actTradeDone();
+        // $this->completeAction();
+    }
+    public function actTradeYield(): void
+    {
+        $this->itemTrade->actTradeYield();
         // $this->completeAction();
     }
     public function actTradeItem(#[JsonParam] array $data): void
@@ -1896,9 +1904,11 @@ class Game extends \Table
                 return $items[$d];
             }, $this->gameData->get('campEquipment'))
         );
-        $result['campEquipment'] = array_map(function ($d) use ($items) {
-            return ['name' => $items[$d], 'itemId' => $d];
-        }, $this->gameData->get('campEquipment'));
+        $result['campEquipment'] = array_values(
+            array_map(function ($d) use ($items) {
+                return ['name' => $items[$d], 'itemId' => $d];
+            }, $this->gameData->get('campEquipment'))
+        );
 
         $result['cookableFoods'] = $this->actions->getActionSelectable('actCook');
 
@@ -2091,6 +2101,10 @@ class Game extends \Table
     {
         $difficultyMapping = ['normal', 'hard'];
         return $difficultyMapping[$this->gameData->get('trackDifficulty')];
+    }
+    public function getIsTrusting()
+    {
+        return $this->gameData->get('trusting') == '1';
     }
     private array $changed = ['token' => false, 'player' => false, 'knowledge' => false, 'actions' => false];
     public function markChanged(string $type)
@@ -2323,7 +2337,7 @@ class Game extends \Table
             'expansion' => $this->getExpansion(),
             'difficulty' => $this->getDifficulty(),
             'trackDifficulty' => $this->getTrackDifficulty(),
-            'isRealTime' => $this->isRealTime(),
+            'isRealTime' => $this->isRealTime() || !$this->getIsTrusting(),
             'allItems' => array_values(
                 array_map(
                     function ($d) {
@@ -2398,6 +2412,7 @@ class Game extends \Table
         $this->gameData->set('expansion', $this->getGameStateValue('expansion'));
         $this->gameData->set('difficulty', $this->getGameStateValue('difficulty'));
         $this->gameData->set('trackDifficulty', $this->getGameStateValue('trackDifficulty'));
+        $this->gameData->set('trusting', $this->getGameStateValue('trusting'));
 
         $this->decks = new DLD_Decks($this);
         $this->decks->setup();
