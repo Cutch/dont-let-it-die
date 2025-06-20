@@ -376,21 +376,26 @@ class DLD_UpgradesData
                         $aboveMax = $data['currentHealth'] + $data['change'] - $data['maxHealth'];
                         if ($aboveMax > 0) {
                             $currentCharacter = $game->character->getTurnCharacterId();
-                            $characters = array_filter($game->character->getAllCharacterData(false), function ($character) use (
-                                $currentCharacter
-                            ) {
-                                return !$character['incapacitated'] && $character != $currentCharacter;
-                            });
-                            $game->selectionStates->initiateState(
-                                'characterSelection',
-                                [
-                                    'selectableCharacters' => array_values($characters),
-                                    'id' => $unlock['id'],
-                                    'aboveMax' => $aboveMax,
-                                ],
-                                $currentCharacter,
-                                false
+                            $characterIds = array_map(
+                                function ($d) {
+                                    return $d['id'];
+                                },
+                                array_filter($game->character->getAllCharacterData(), function ($character) use ($currentCharacter) {
+                                    return !$character['incapacitated'] && $character != $currentCharacter;
+                                })
                             );
+                            if (sizeof($characterIds) > 0) {
+                                $game->selectionStates->initiateState(
+                                    'characterSelection',
+                                    [
+                                        'selectableCharacters' => array_values($characterIds),
+                                        'id' => $unlock['id'],
+                                        'aboveMax' => $aboveMax,
+                                    ],
+                                    $currentCharacter,
+                                    false
+                                );
+                            }
                             // TODO: we dont know what this will interrupt
                             // ideally we should track the next state and then redirect back there after selection
                         }

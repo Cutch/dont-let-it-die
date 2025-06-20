@@ -366,24 +366,29 @@ class DLD_ExpansionData
                         'state' => ['dayEvent'],
                         'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
-                            $characters = array_filter($game->character->getAllCharacterData(false), function ($character) use (
-                                $currentCharacter
-                            ) {
-                                return !$character['incapacitated'] && $character != $currentCharacter;
-                            });
-
-                            $data['interrupt'] = true;
-                            $game->selectionStates->initiateState(
-                                'characterSelection',
-                                [
-                                    'selectableCharacters' => array_values($characters),
-                                    'title' => 'Punch a Character',
-                                    'id' => $skill['id'],
-                                ],
-                                $currentCharacter,
-                                false
+                            $characterIds = array_map(
+                                function ($d) {
+                                    return $d['id'];
+                                },
+                                array_filter($game->character->getAllCharacterData(false), function ($character) use ($currentCharacter) {
+                                    return !$character['incapacitated'] && $character != $currentCharacter;
+                                })
                             );
-                            return ['notify' => false, 'nextState' => false];
+
+                            if (sizeof($characterIds) > 0) {
+                                $data['interrupt'] = true;
+                                $game->selectionStates->initiateState(
+                                    'characterSelection',
+                                    [
+                                        'selectableCharacters' => array_values($characterIds),
+                                        'title' => 'Punch a Character',
+                                        'id' => $skill['id'],
+                                    ],
+                                    $currentCharacter,
+                                    false
+                                );
+                                return ['notify' => false, 'nextState' => false];
+                            }
                         },
                         'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
@@ -403,22 +408,27 @@ class DLD_ExpansionData
                         'stamina' => 2,
                         'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
-                            $characters = array_filter($game->character->getAllCharacterData(false), function ($character) use (
-                                $currentCharacter
-                            ) {
-                                return !$character['incapacitated'] && $character != $currentCharacter;
-                            });
-                            $data['interrupt'] = true;
-                            $game->selectionStates->initiateState(
-                                'characterSelection',
-                                [
-                                    'selectableCharacters' => array_values($characters),
-                                    'id' => $skill['id'],
-                                ],
-                                $currentCharacter,
-                                false
+                            $characterIds = array_map(
+                                function ($d) {
+                                    return $d['id'];
+                                },
+                                array_filter($game->character->getAllCharacterData(false), function ($character) use ($currentCharacter) {
+                                    return !$character['incapacitated'] && $character != $currentCharacter;
+                                })
                             );
-                            return ['notify' => false, 'nextState' => false];
+                            if (sizeof($characterIds) > 0) {
+                                $data['interrupt'] = true;
+                                $game->selectionStates->initiateState(
+                                    'characterSelection',
+                                    [
+                                        'selectableCharacters' => array_values($characterIds),
+                                        'id' => $skill['id'],
+                                    ],
+                                    $currentCharacter,
+                                    false
+                                );
+                                return ['notify' => false, 'nextState' => false];
+                            }
                         },
                         'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');

@@ -1873,11 +1873,14 @@ class DLD_CharactersData
                         'stamina' => 1,
                         'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacter();
-                            $characters = array_filter($game->character->getAllCharacterData(false), function ($character) use (
-                                $currentCharacter
-                            ) {
-                                return $character != $currentCharacter['id'];
-                            });
+                            $characterIds = array_map(
+                                function ($d) {
+                                    return $d['id'];
+                                },
+                                array_filter($game->character->getAllCharacterData(false), function ($character) use ($currentCharacter) {
+                                    return !$character['incapacitated'] && $character != $currentCharacter;
+                                })
+                            );
 
                             $items = array_map(function ($d) {
                                 return ['name' => $d['id'], 'itemId' => $d['itemId']];
@@ -1895,7 +1898,7 @@ class DLD_CharactersData
                             $game->selectionStates->initiateState(
                                 'characterSelection',
                                 [
-                                    'selectableCharacters' => array_values($characters),
+                                    'selectableCharacters' => array_values($characterIds),
                                     'id' => $skill['id'],
                                 ],
                                 $currentCharacter['id'],
@@ -1930,7 +1933,15 @@ class DLD_CharactersData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            return $char['isActive'] && sizeof($char['equipment']) > 0;
+                            $characterIds = array_map(
+                                function ($d) {
+                                    return $d['id'];
+                                },
+                                array_filter($game->character->getAllCharacterData(false), function ($character) use ($skill) {
+                                    return !$character['incapacitated'] && $character != $skill['characterId'];
+                                })
+                            );
+                            return $char['isActive'] && sizeof($char['equipment']) > 0 && sizeof($characterIds) > 0;
                         },
                     ],
                 ],
@@ -2284,17 +2295,19 @@ class DLD_CharactersData
                             return !$character['incapacitated'];
                         })
                     );
-                    $game->selectionStates->initiateState(
-                        'characterSelection',
-                        [
-                            'selectableCharacters' => array_values($characterIds),
-                            'id' => $char['id'] . 'craft',
-                        ],
-                        $char['id'],
-                        false,
-                        'playerTurn',
-                        clienttranslate('Give Character 1 Health or Stamina')
-                    );
+                    if (sizeof($characterIds) > 0) {
+                        $game->selectionStates->initiateState(
+                            'characterSelection',
+                            [
+                                'selectableCharacters' => array_values($characterIds),
+                                'id' => $char['id'] . 'craft',
+                            ],
+                            $char['id'],
+                            false,
+                            'playerTurn',
+                            clienttranslate('Give Character 1 Health or Stamina')
+                        );
+                    }
                 },
                 'skills' => [
                     'skill1' => [

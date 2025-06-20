@@ -346,6 +346,20 @@ class DLD_SelectionStates
             'character_name' => $this->game->getCharacterHTML($state['characterId']),
             'activeTurnPlayerId' => 0,
         ];
+        // TODO this fixes the bug with day event selections, can be removed later
+        if (
+            array_key_exists('selectableCharacters', $result['selectionState']) &&
+            sizeof($result['selectionState']['selectableCharacters']) > 0 &&
+            gettype($result['selectionState']['selectableCharacters'][0]) == 'array'
+        ) {
+            $temp = $this->game->gameData->get($stateName);
+            $temp['selectableCharacters'] = array_map(function ($d) {
+                return $d['id'];
+            }, $temp['selectableCharacters']);
+            $this->game->gameData->set($stateName, $temp);
+            $result['selectionState'] = $temp;
+        }
+
         $this->game->getGameData($result);
         $this->game->getResources($result);
         if ($stateName === 'deckSelectionState') {
