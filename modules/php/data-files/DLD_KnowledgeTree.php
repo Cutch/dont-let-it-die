@@ -31,10 +31,14 @@ class DLD_KnowledgeTreeData
             'spices' => [
                 'name' => clienttranslate('Spices'),
                 'onEat' => function (Game $game, $char, &$data) {
-                    $data['health'] += 1;
+                    if (array_key_exists('health', $data)) {
+                        $data['health'] += 1;
+                    }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    $data['health'] += 1;
+                    if (array_key_exists('health', $data)) {
+                        $data['health'] += 1;
+                    }
                 },
             ],
             'cooking-1' => [

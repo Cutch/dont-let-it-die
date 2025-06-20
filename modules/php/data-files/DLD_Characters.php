@@ -96,13 +96,17 @@ class DLD_CharactersData
                 'name' => 'Kara',
                 'slots' => ['weapon', 'tool'],
                 'onEat' => function (Game $game, $char, &$data) {
-                    if ($data['characterId'] == $char['id']) {
-                        $data['health'] *= 2;
+                    if (array_key_exists('health', $data)) {
+                        if ($data['characterId'] == $char['id']) {
+                            $data['health'] *= 2;
+                        }
                     }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    if ($data['characterId'] == $char['id']) {
-                        $data['health'] *= 2;
+                    if (array_key_exists('health', $data)) {
+                        if ($data['characterId'] == $char['id']) {
+                            $data['health'] *= 2;
+                        }
                     }
                 },
                 'skills' => [
@@ -1376,13 +1380,17 @@ class DLD_CharactersData
                 'slots' => ['weapon', 'tool'],
                 // Double Health from meat
                 'onEat' => function (Game $game, $char, &$data) {
-                    if ($data['characterId'] == $char['id']) {
-                        $data['health'] *= 2;
+                    if (array_key_exists('health', $data)) {
+                        if ($data['characterId'] == $char['id']) {
+                            $data['health'] *= 2;
+                        }
                     }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    if ($data['characterId'] == $char['id']) {
-                        $data['health'] *= 2;
+                    if (array_key_exists('health', $data)) {
+                        if ($data['characterId'] == $char['id']) {
+                            $data['health'] *= 2;
+                        }
                     }
                 },
                 'onGetActionSelectable' => function (Game $game, $char, &$data) {
@@ -1489,14 +1497,18 @@ class DLD_CharactersData
                     return $char['id'];
                 },
                 'onEat' => function (Game $game, $char, &$data) {
-                    if ($data['characterId'] == $char['id'] && $char['health'] == 1 && getUsePerDay($char['id'], $game) < 1) {
-                        usePerDay($char['id'], $game);
-                        $data['health'] *= 2;
+                    if (array_key_exists('health', $data)) {
+                        if ($data['characterId'] == $char['id'] && $char['health'] == 1 && getUsePerDay($char['id'], $game) < 1) {
+                            usePerDay($char['id'], $game);
+                            $data['health'] *= 2;
+                        }
                     }
                 },
                 'onGetEatData' => function (Game $game, $char, &$data) {
-                    if ($data['characterId'] == $char['id'] && $char['health'] == 1 && getUsePerDay($char['id'], $game) < 1) {
-                        $data['health'] *= 2;
+                    if (array_key_exists('health', $data)) {
+                        if ($data['characterId'] == $char['id'] && $char['health'] == 1 && getUsePerDay($char['id'], $game) < 1) {
+                            $data['health'] *= 2;
+                        }
                     }
                 },
                 'skills' => [

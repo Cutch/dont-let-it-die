@@ -648,10 +648,14 @@ class DLD_DecksData
                     $game->eventLog(clienttranslate('Eating during the day phase tomorrow heals for 1 extra'));
                 },
                 'onEat' => function (Game $game, $nightCard, &$data) {
-                    $data['health'] += 1;
+                    if (array_key_exists('health', $data)) {
+                        $data['health'] += 1;
+                    }
                 },
                 'onGetEatData' => function (Game $game, $nightCard, &$data) {
-                    $data['health'] += 1;
+                    if (array_key_exists('health', $data)) {
+                        $data['health'] += 1;
+                    }
                 },
             ],
             'night-event-7_9' => [

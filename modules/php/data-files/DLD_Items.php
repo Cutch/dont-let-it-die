@@ -493,10 +493,14 @@ class DLD_ItemsData
                     'bone' => 2,
                 ],
                 'onEat' => function (Game $game, $item, &$data) {
-                    $data['health'] += 2;
+                    if (array_key_exists('health', $data)) {
+                        $data['health'] += 2;
+                    }
                 },
                 'onGetEatData' => function (Game $game, $item, &$data) {
-                    $data['health'] += 2;
+                    if (array_key_exists('health', $data)) {
+                        $data['health'] += 2;
+                    }
                 },
             ],
             'carving-knife' => [
