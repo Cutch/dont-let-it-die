@@ -1806,7 +1806,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (notification.args.gameData) {
       this.updateGameDatas(notification.args.gameData);
     }
-    return this.replayFrom >= notification.move_id;
+    return this.replayFrom > notification.move_id;
   },
   notif_actionNotification: async function (notification) {
     const usedActionId = notification.args.usedActionId;
@@ -1842,11 +1842,14 @@ declare('bgagame.dontletitdie', Gamegui, {
     return this.dice.roll(notification.args);
   },
   notif_cardDrawn: async function (notification) {
-    if (await this.notificationWrapper(notification)) return;
     if (isStudio()) console.log('notif_cardDrawn', notification);
     const gameData = notification.args.gameData;
+    if (await this.notificationWrapper(notification)) {
+      if (!notification.args.partial) this.decks[notification.args.deck].setDiscard(notification.args.card.id);
+    } else {
+      await this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
+    }
     this.decks[notification.args.deck].updateDeckCounts(gameData.decks[notification.args.deck]);
-    await this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
     this.decks[notification.args.deck].updateMarker(gameData.decks[notification.args.deck]);
   },
   notif_shuffle: async function (notification) {

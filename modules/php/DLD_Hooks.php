@@ -15,6 +15,7 @@ class DLD_Hooks
     }
     private function getHook(): array
     {
+        $tokens = $this->game->getValidTokens();
         $unlocks = $this->game->getUnlockedKnowledge();
         $activeNightCards = $this->game->getActiveNightCards();
         $buildings = $this->game->getBuildings();
@@ -90,7 +91,7 @@ class DLD_Hooks
                 return [];
             }, $this->game->actions->getActiveDayEvents())
         );
-        return [...$actions, ...$unlocks, ...$buildings, ...$characters, ...$skills, ...$equipment, ...$activeNightCards];
+        return [...$actions, ...$tokens, ...$unlocks, ...$buildings, ...$characters, ...$skills, ...$equipment, ...$activeNightCards];
     }
     private function callHooks($functionName, $args, &$data1, &$data2 = null, &$data3 = null, &$data4 = null)
     {

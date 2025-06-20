@@ -65,10 +65,28 @@ class DLD_TokensData
                 'expansion' => 'mini-expansion',
                 'actEat' => [
                     'count' => 2,
-                    'health' => 1,
+                    'stamina' => 1,
                 ],
                 'requires' => function (Game $game) {
                     return in_array('Sig', $game->character->getAllCharacterIds());
+                },
+                'onGetActionSelectable' => function (Game $game, $token, &$data) {
+                    if ($data['action'] == 'actEat' && getUsePerDay($data['characterId'] . 'fish', $game) >= 1) {
+                        $data['selectable'] = array_values(
+                            array_filter(
+                                $data['selectable'],
+                                function ($v, $k) {
+                                    return $v['id'] != 'fish';
+                                },
+                                ARRAY_FILTER_USE_BOTH
+                            )
+                        );
+                    }
+                },
+                'onEat' => function (Game $game, $token, &$data) {
+                    if ($data['type'] == $token['id']) {
+                        usePerDay($data['characterId'] . 'fish', $game);
+                    }
                 },
             ],
             'fish-cooked' => [
@@ -78,10 +96,28 @@ class DLD_TokensData
                 'expansion' => 'mini-expansion',
                 'actEat' => [
                     'count' => 1,
-                    'health' => 2,
+                    'stamina' => 2,
                 ],
                 'requires' => function (Game $game) {
                     return in_array('Sig', $game->character->getAllCharacterIds());
+                },
+                'onGetActionSelectable' => function (Game $game, $token, &$data) {
+                    if ($data['action'] == 'actEat' && getUsePerDay($data['characterId'] . 'fish', $game) >= 1) {
+                        $data['selectable'] = array_values(
+                            array_filter(
+                                $data['selectable'],
+                                function ($v, $k) {
+                                    return $v['id'] != 'fish-cooked';
+                                },
+                                ARRAY_FILTER_USE_BOTH
+                            )
+                        );
+                    }
+                },
+                'onEat' => function (Game $game, $token, &$data) {
+                    if ($data['type'] == $token['id']) {
+                        usePerDay($data['characterId'] . 'fish', $game);
+                    }
                 },
             ],
             'meat' => [

@@ -752,11 +752,11 @@ class Game extends \Table
                 if (!$data || !array_key_exists('notify', $data) || $data['notify'] != false) {
                     $this->notify(
                         'notify',
-                        !array_key_exists('stamina', $data)
-                            ? clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health')
-                            : clienttranslate(
-                                '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
-                            ),
+                        (!array_key_exists('stamina', $data)
+                                ? clienttranslate('${character_name} ate ${token_name} and gained ${health} health')
+                                : array_key_exists('health', $data))
+                            ? clienttranslate('${character_name} ate ${token_name} and gained ${health} health and ${stamina} stamina')
+                            : clienttranslate('${character_name} ate ${token_name} and gained ${stamina} stamina'),
                         [...$data, 'token_name' => $data['tokenName'], 'usedActionId' => 'actEat']
                     );
                 }
@@ -813,7 +813,7 @@ class Game extends \Table
                 $skill = $data['skill'];
                 $character = $data['character'];
                 $skillId = $data['skillId'];
-                $skillSecondaryId = $data['skillSecondaryId'];
+                $skillSecondaryId = array_key_exists('skillSecondaryId', $data) ? $data['skillSecondaryId'] : null;
                 $_this->hooks->reconnectHooks($skill, $_this->character->getSkill($skillId)['skill']);
                 $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
                 $notificationSent = false;

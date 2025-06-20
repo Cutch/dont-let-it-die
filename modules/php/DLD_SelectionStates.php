@@ -128,11 +128,11 @@ class DLD_SelectionStates
                     if ($left == 0) {
                         $this->game->notify(
                             'notify',
-                            !array_key_exists('stamina', $data)
-                                ? clienttranslate('${character_name} ate ${count} ${token_name} and gained ${health} health')
-                                : clienttranslate(
-                                    '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
-                                ),
+                            (!array_key_exists('stamina', $data)
+                                    ? clienttranslate('${character_name} ate ${token_name} and gained ${health} health')
+                                    : array_key_exists('health', $data))
+                                ? clienttranslate('${character_name} ate ${token_name} and gained ${health} health and ${stamina} stamina')
+                                : clienttranslate('${character_name} ate ${token_name} and gained ${stamina} stamina'),
                             [...$data, 'token_name' => $data['tokenName']]
                         );
                     }
