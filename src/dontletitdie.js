@@ -1352,15 +1352,26 @@ declare('bgagame.dontletitdie', Gamegui, {
                 } else if (actionId === 'actCraft') {
                   this.clearActionButtons();
                   this.craftScreen.show(this.gamedatas);
+
                   this.statusBar.addActionButton(this.getActionMappings().actCraft + `${suffix}`, () => {
                     if (!this.craftScreen.hasError()) {
-                      this.bgaPerformAction('actCraft', {
-                        itemName: this.craftScreen.getSelectedId(),
-                      })
-                        .then(() => {
-                          this.craftScreen.hide();
+                      const makeCall = () =>
+                        this.bgaPerformAction('actCraft', {
+                          itemName: this.craftScreen.getSelectedId(),
                         })
-                        .catch(console.error);
+                          .then(() => {
+                            this.craftScreen.hide();
+                          })
+                          .catch(console.error);
+
+                      if (this.gamedatas.allBuildings.includes(this.craftScreen.getSelectedId()))
+                        this.confirmationDialog(
+                          dojo.string.substitute(_('Only ${count} building(s) can be created this game') + '.', {
+                            count: this.gamedatas.maxBuildingCount,
+                          }),
+                          makeCall,
+                        );
+                      else makeCall();
                     }
                   });
                   this.statusBar.addActionButton(

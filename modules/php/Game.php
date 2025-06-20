@@ -2285,6 +2285,12 @@ class Game extends \Table
                 ];
             }, array_keys($availableUnlocks)),
             'resolving' => $this->actInterrupt->isStateResolving(),
+            'allBuildings' => array_keys(
+                array_filter($this->data->getItems(), function ($d) {
+                    return $d['type'] == 'item' && $d['itemType'] == 'building';
+                })
+            ),
+            'maxBuildingCount' => $this->getMaxBuildingCount(),
         ];
         if ($this->gamestate->state(true, false, true)['name'] != 'characterSelect') {
             $result['character_name'] = $this->getCharacterHTML();
