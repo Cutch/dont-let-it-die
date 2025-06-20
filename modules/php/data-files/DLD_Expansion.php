@@ -371,7 +371,7 @@ class DLD_ExpansionData
                                     return $d['id'];
                                 },
                                 array_filter($game->character->getAllCharacterData(false), function ($character) use ($currentCharacter) {
-                                    return !$character['incapacitated'] && $character != $currentCharacter;
+                                    return !$character['incapacitated'] && $character['id'] != $currentCharacter;
                                 })
                             );
 
@@ -413,7 +413,7 @@ class DLD_ExpansionData
                                     return $d['id'];
                                 },
                                 array_filter($game->character->getAllCharacterData(false), function ($character) use ($currentCharacter) {
-                                    return !$character['incapacitated'] && $character != $currentCharacter;
+                                    return !$character['incapacitated'] && $character['id'] != $currentCharacter;
                                 })
                             );
                             if (sizeof($characterIds) > 0) {

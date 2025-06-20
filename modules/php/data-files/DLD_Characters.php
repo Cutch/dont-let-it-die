@@ -1878,7 +1878,7 @@ class DLD_CharactersData
                                     return $d['id'];
                                 },
                                 array_filter($game->character->getAllCharacterData(false), function ($character) use ($currentCharacter) {
-                                    return !$character['incapacitated'] && $character != $currentCharacter;
+                                    return !$character['incapacitated'] && $character['id'] != $currentCharacter['id'];
                                 })
                             );
 

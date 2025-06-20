@@ -381,7 +381,7 @@ class DLD_UpgradesData
                                     return $d['id'];
                                 },
                                 array_filter($game->character->getAllCharacterData(), function ($character) use ($currentCharacter) {
-                                    return !$character['incapacitated'] && $character != $currentCharacter;
+                                    return !$character['incapacitated'] && $character['id'] != $currentCharacter;
                                 })
                             );
                             if (sizeof($characterIds) > 0) {
