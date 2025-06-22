@@ -65,6 +65,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.upgradeSelectionScreen = new UpgradeSelectionScreen(this);
     this.weaponScreen = new WeaponScreen(this);
     this.currentResources = { prevResources: {}, resources: {} };
+    this.animations = [];
     this.resourcesForDisplay = [
       'wood',
       'rock',
@@ -740,8 +741,18 @@ declare('bgagame.dontletitdie', Gamegui, {
         <i class="fa fa-cloud day-background-cloud" aria-hidden="true"></i>
         <span></span></div></div>`,
     );
+    document.getElementById('game_play_area').insertAdjacentHTML(
+      'beforeend',
+      `<div id="night-popup" class="night-popup"><div id="night-text">
+        <i class="fa6 fa6-solid fa6-moon night-background" aria-hidden="true"></i>
+        <i class="fa fa-cloud night-background-cloud" aria-hidden="true"></i>
+        <span>${_('Night Phase')}</span><div class="night-card"></div></div></div>`,
+    );
   },
+
   showDayTracker: async function () {
+    await Promise.all(this.animations);
+    this.animations = [];
     const elem = $('day-text');
     elem.querySelector('span').innerText = _('Day') + ' ' + this.gamedatas.game.day;
     const anim = dojo.fx.chain([
@@ -752,7 +763,22 @@ declare('bgagame.dontletitdie', Gamegui, {
       }),
       dojo.fadeOut({ node: elem, duration: 500 }),
     ]);
-    await this.bgaPlayDojoAnimation(anim);
+    this.animations.push(this.bgaPlayDojoAnimation(anim));
+  },
+  showNightTracker: async function (cardId) {
+    await Promise.all(this.animations);
+    this.animations = [];
+    const elem = $('night-text');
+    renderImage(cardId, elem.querySelector('.night-card'), { scale: 1, pos: 'replace' });
+    const anim = dojo.fx.chain([
+      dojo.fadeIn({ node: elem, duration: 500 }),
+      dojo.animateProperty({
+        node: elem,
+        duration: 4000,
+      }),
+      dojo.fadeOut({ node: elem, duration: 500 }),
+    ]);
+    this.animations.push(this.bgaPlayDojoAnimation(anim));
   },
   setupCharacterSelections: function (gameData) {
     const playArea = $('game_play_area');
@@ -958,6 +984,7 @@ declare('bgagame.dontletitdie', Gamegui, {
 
     // Setup game notifications to handle (see "setupNotifications" method below)
     this.setupNotifications();
+    this.firstRender = true;
   },
   updateKnowledgeTree(gameData) {
     let knowledgeContainer = document.querySelector('#knowledge-container .unlocked-tokens');
@@ -1063,7 +1090,7 @@ declare('bgagame.dontletitdie', Gamegui, {
   // onEnteringState: this method is called each time we are entering into a new game state.
   //                  You can use this method to perform some user interface changes at this moment.
   //
-  onEnteringState: function (stateName, args = {}) {
+  onEnteringState: async function (stateName, args = {}) {
     args.args = args.args ?? {};
     args.args['gamestate'] = { name: stateName };
     if (args.args) {
@@ -1124,14 +1151,15 @@ declare('bgagame.dontletitdie', Gamegui, {
         break;
       case 'tradeSelect':
       case 'tradePhase':
+        if (this.firstRender && args.args.drawNightCard) await this.showNightTracker(args.args.drawNightCard.card.id);
+
         this.leftTradePhase = false;
+        await Promise.all(this.animations);
         if (this.leftMorningPhase == 'morning') {
-          setTimeout(() => {
-            if (this.leftMorningPhase != 'skip') {
-              this.itemTradeScreen.show(args.args);
-            }
-            this.leftMorningPhase = null;
-          }, 500);
+          if (this.leftMorningPhase != 'skip') {
+            this.itemTradeScreen.show(args.args);
+          }
+          this.leftMorningPhase = null;
         } else if (!this.leftMorningPhase) {
           this.itemTradeScreen.show(args.args);
         }
@@ -1140,7 +1168,9 @@ declare('bgagame.dontletitdie', Gamegui, {
       case 'waitTradePhase':
         this.itemTradeScreen.showConfirm(args.args);
         break;
-      // case 'nightDrawCard':
+      case 'nightDrawCard':
+        this.showNightTracker(args.args.card.id);
+        break;
       // case 'drawCard':
       //   if (!args.args.resolving) {
       //     this.decks[args.args.deck].drawCard(args.args.card.id);
@@ -1148,6 +1178,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       //   }
       //   break;
     }
+    this.firstRender = false;
   },
 
   // onLeavingState: this method is called each time we are leaving a game state.

@@ -360,7 +360,11 @@ class DLD_ItemTrade
         $result = [
             'actions' => [],
             'activeTurnPlayerId' => 0,
-            'lastItemOwners' => $this->game->gameData->get('tempLastItemOwners'),
+            'drawNightCard' => $this->game->gameData->get('drawNightState') ?? $this->game->gameData->get('state'),
+            'lastItemOwners' =>
+                sizeof($this->game->gameData->get('tempLastItemOwners')) > 0
+                    ? $this->game->gameData->get('tempLastItemOwners')
+                    : $this->game->gameData->get('lastItemOwners'),
         ];
         $result['character_name'] = $this->game->getCharacterHTML();
         $this->game->getAllPlayers($result);

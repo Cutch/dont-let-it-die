@@ -1171,7 +1171,7 @@ class Game extends \Table
     public function argNightDrawCard()
     {
         $result = [
-            ...$this->gameData->get('state'),
+            ...$this->gameData->get('drawNightState') ?? $this->gameData->get('state'),
             'resolving' => $this->actInterrupt->isStateResolving(),
             'character_name' => $this->getCharacterHTML(),
             'activeTurnPlayerId' => 0,
@@ -1272,6 +1272,7 @@ class Game extends \Table
     }
     public function stPlayerTurn()
     {
+        $this->gameData->set('tempLastItemOwners', []);
         $this->actions->clearDayEvent();
         // if (!$this->actInterrupt->checkForInterrupt()) {
         $char = $this->character->getTurnCharacter();
@@ -1407,7 +1408,7 @@ class Game extends \Table
             [$this->hooks, 'onNight'],
             function (Game $_this) {
                 $card = $this->decks->pickCard('night-event');
-                $this->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
+                $this->gameData->set('drawNightState', ['card' => $card, 'deck' => 'night-event']);
                 return ['card' => $card, 'deck' => 'night-event'];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
@@ -1425,7 +1426,7 @@ class Game extends \Table
             [$this->hooks, 'onNightDrawCard'],
             function (Game $_this) {
                 // deck,card
-                $state = $this->gameData->get('state');
+                $state = $this->gameData->get('drawNightState') ?? $this->gameData->get('state');
                 $deck = $state['deck'];
                 $card = $state['card'];
                 $this->cardDrawEvent($card, $deck);

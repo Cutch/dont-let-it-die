@@ -257,6 +257,7 @@
     border-radius: 2rem;
     user-select: none;
     overflow: hidden;
+    text-align: center;
     .day-background {
       color: yellow;
       position: absolute;
@@ -270,6 +271,53 @@
       position: absolute;
       font-size: 15rem;
       bottom: -2rem;
+      right: 1rem;
+      z-index: -1;
+    }
+  }
+}
+
+.night-popup {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  #night-text {
+    position: relative;
+    opacity: 0;
+    box-shadow: 0 0 5px black;
+    font-size: 8rem;
+    font-weight: 900;
+    z-index: 10;
+    background: #496668;
+    padding: 2rem 6rem;
+    border-radius: 2rem;
+    user-select: none;
+    overflow: hidden;
+    margin: 2rem;
+    text-align: center;
+    span{
+      color: #fff;
+    }
+    .night-background {
+      color: #abab3e;
+      position: absolute;
+      font-size: 15rem;
+      top: 0;
+      left: 1rem;
+      z-index: -1;
+    }
+    .night-background-cloud {
+      color: #2f2f2f;
+      position: absolute;
+      font-size: 15rem;
+      bottom: -1rem;
       right: 1rem;
       z-index: -1;
     }

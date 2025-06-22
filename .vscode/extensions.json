@@ -1,5 +1,3 @@
 {
-  "recommendations": [
-    "Natizyskunk.sftp"
-  ]
+  "recommendations": ["Natizyskunk.sftp", "bmewburn.vscode-intelephense-client"]
 }
