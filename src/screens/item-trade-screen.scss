@@ -67,4 +67,17 @@
     position: absolute;
     background-color: #fff;
   }
+  .last-item-owner {
+    border-radius: 50%;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    transform: translate(25%, 25%);
+  }
+  .items {
+    position: relative;
+  }
+  .base-image {
+    position: relative;
+  }
 }

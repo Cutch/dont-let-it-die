@@ -59,16 +59,20 @@ export class ItemTradeScreen {
     this.clearSelection();
     const tween = new Tweening(this.game, document.querySelector(`#item-trade-screen`));
     this.show(gameData);
+    const findParentImageContainer = (elem) => {
+      if (elem.parentNode.classList.contains('tooltip-image-and-text')) return elem.parentNode;
+      return elem;
+    };
     setTimeout(() => {
       if (itemName1)
         tween.addDestroyTween(
-          document.querySelector(`.character-${character1 ?? null}.item-${itemId1 ?? null}`),
-          document.querySelector(`.character-${character2 ?? null}.item-${itemId1 ?? null}`),
+          findParentImageContainer(document.querySelector(`.character-${character1 ?? null}.item-${itemId1 ?? null}`)),
+          findParentImageContainer(document.querySelector(`.character-${character2 ?? null}.item-${itemId1 ?? null}`)),
         );
       if (itemName2)
         tween.addDestroyTween(
-          document.querySelector(`.character-${character2 ?? null}.item-${itemId2 ?? null}`),
-          document.querySelector(`.character-${character1 ?? null}.item-${itemId2 ?? null}`),
+          findParentImageContainer(document.querySelector(`.character-${character2 ?? null}.item-${itemId2 ?? null}`)),
+          findParentImageContainer(document.querySelector(`.character-${character1 ?? null}.item-${itemId2 ?? null}`)),
         );
     }, 0);
   }
@@ -125,7 +129,7 @@ export class ItemTradeScreen {
       this.arrowElem.style['display'] = 'none';
       this.cleanup = addPassiveListener('scroll', () => this.scroll());
 
-      const playerIds = Array.from(new Set(gameData.characters.map((d) => d.playerId)));
+      // const playerIds = Array.from(new Set(gameData.characters.map((d) => d.playerId)));
       // Add the other player containers
       // playerIds
       //   .filter((playerId) => playerId != gameui.player_id)
@@ -144,6 +148,7 @@ export class ItemTradeScreen {
         );
         renderImage(character.name, document.querySelector(`#item-trade-screen__${character.name} .character-image`), {
           scale: 3,
+          baseCss: 'base-image',
           overridePos: {
             x: 0.2,
             y: 0.16,
@@ -167,6 +172,7 @@ export class ItemTradeScreen {
             scale: this.scale,
             pos: 'insert',
             css: `character-${character.name} item-${equipment.itemId}`,
+            baseCss: 'base-image',
           });
           this.game.addHelpTooltip({
             node: itemsElem.querySelector(`.item-${equipment.itemId}`),
@@ -175,6 +181,22 @@ export class ItemTradeScreen {
           addClickListener(itemsElem.querySelector(`.item-${equipment.itemId}`), equipment.name, () => {
             this.updateSelection(character, equipment);
           });
+        }
+        if (!itemsElem.querySelector(`.item-${equipment.itemId} .last-item-owner`)) {
+          const characterName = this.game.gamedatas.lastItemOwners?.[equipment.itemId];
+
+          if (characterName) {
+            renderImage(characterName, itemsElem.querySelector(`.item-${equipment.itemId}`), {
+              scale: 4,
+              css: 'last-item-owner',
+              overridePos: {
+                x: 0.3,
+                y: 0.16,
+                w: 0.7,
+                h: 0.4,
+              },
+            });
+          }
         }
       });
       // });
@@ -200,7 +222,12 @@ export class ItemTradeScreen {
       // itemsElem.innerHTML = '';
       gameData.campEquipment.forEach((equipment) => {
         if (!itemsElem.querySelector(`.item-${equipment.itemId}`)) {
-          renderImage(equipment.name, itemsElem, { scale: this.scale, pos: 'insert', css: `character-null item-${equipment.itemId}` });
+          renderImage(equipment.name, itemsElem, {
+            scale: this.scale,
+            pos: 'insert',
+            css: `character-null item-${equipment.itemId}`,
+            baseCss: 'base-image',
+          });
           this.game.addHelpTooltip({
             node: itemsElem.querySelector(`.item-${equipment.itemId}`),
             tooltipText: equipment.name,
@@ -208,6 +235,23 @@ export class ItemTradeScreen {
           addClickListener(itemsElem.querySelector(`.item-${equipment.itemId}`), equipment.name, () => {
             this.updateSelection(null, equipment);
           });
+        }
+
+        if (!itemsElem.querySelector(`.item-${equipment.itemId} .last-item-owner`)) {
+          const characterName = this.game.gamedatas.lastItemOwners?.[equipment.itemId];
+
+          if (characterName) {
+            renderImage(characterName, itemsElem.querySelector(`.item-${equipment.itemId}`), {
+              scale: 4,
+              css: 'last-item-owner',
+              overridePos: {
+                x: 0.3,
+                y: 0.16,
+                w: 0.7,
+                h: 0.4,
+              },
+            });
+          }
         }
       });
       if (!document.querySelector(`#item-trade-screen__camp .items .empty`)) {
