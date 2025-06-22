@@ -544,6 +544,7 @@ class Game extends \Table
                     $_this->character->updateCharacterData($_this->character->getSubmittingCharacterId(), function (&$data) use ($itemId) {
                         array_push($data['necklaces'], ['itemId' => $itemId]);
                     });
+                    usePerDay($_this->character->getSubmittingCharacterId() . 'craftjewlery', $this);
                 } elseif ($itemType == 'building') {
                     $currentBuildings = $_this->gameData->get('buildings');
                     $itemId = $_this->gameData->createItem($itemName);

@@ -233,12 +233,14 @@ class DLD_UpgradesData
                 'unlockCost' => 5,
                 'onGetActionSelectable' => function (Game $game, $skill, &$data) {
                     if ($data['action'] == 'actCraft') {
-                        array_push(
-                            $data['selectable'],
-                            $game->data->getItems()['gem-y-necklace'],
-                            $game->data->getItems()['gem-b-necklace'],
-                            $game->data->getItems()['gem-p-necklace']
-                        );
+                        if (getUsePerDay($game->character->getSubmittingCharacterId() . 'craftjewlery', $game) == 0) {
+                            array_push(
+                                $data['selectable'],
+                                $game->data->getItems()['gem-y-necklace'],
+                                $game->data->getItems()['gem-b-necklace'],
+                                $game->data->getItems()['gem-p-necklace']
+                            );
+                        }
                     }
                 },
             ],
