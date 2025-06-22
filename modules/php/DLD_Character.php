@@ -345,6 +345,7 @@ class DLD_Character
             $equipment = [...$equippedIds, ...$items];
             $data['equipment'] = $equipment;
         });
+        $this->updateItemLastOwner($characterName, $items);
     }
     public function unequipEquipment(string $characterName, array $items): void
     {
@@ -361,6 +362,15 @@ class DLD_Character
         $this->updateCharacterData($characterName, function (&$data) use ($equipment) {
             $data['equipment'] = $equipment;
         });
+        $this->updateItemLastOwner($characterName, $equipment);
+    }
+    public function updateItemLastOwner(string $characterName, array $equipment): void
+    {
+        $lastItemOwners = $this->game->gameData->get('lastItemOwners');
+        foreach ($equipment as $id) {
+            $lastItemOwners[$id] = $characterName;
+        }
+        $this->game->gameData->set('lastItemOwners', $lastItemOwners);
     }
     public function addHindrance(string $characterName, array $card): void
     {

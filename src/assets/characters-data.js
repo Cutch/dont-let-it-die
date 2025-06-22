@@ -61,8 +61,8 @@ export default {
           type: 'character',
           text: [
             { title: 'Cron' },
-            _('When a tribe member dies, they gain 1 Stamina'),
-            _('Spend 1 Stamina to shuffle a discard pile back into its deck'),
+            _('When a tribe member kills a Danger! card, they gain 1 Stamina'),
+            _('Spend 2 Stamina to shuffle a discard pile back into its deck'),
             _('Starts with Hide Armor'),
           ],
         },

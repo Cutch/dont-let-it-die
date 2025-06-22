@@ -95,4 +95,12 @@ if (!function_exists('addId')) {
         $values = implode(',', $values);
         return "INSERT INTO `$table` ($keys) VALUES $values";
     }
+    function flatten(array $array)
+    {
+        $return = [];
+        array_walk_recursive($array, function ($a) use (&$return) {
+            $return[] = $a;
+        });
+        return $return;
+    }
 }

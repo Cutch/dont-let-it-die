@@ -41,6 +41,8 @@ class DLD_GameData
         'upgrades' => [],
         'campEquipment' => [],
         'destroyedEquipment' => [],
+        'lastItemOwners' => [],
+        'tempLastItemOwners' => [],
         'activeNightCards' => [],
         'activeDayCards' => [],
         'day' => 1,

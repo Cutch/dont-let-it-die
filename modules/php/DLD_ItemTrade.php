@@ -148,7 +148,7 @@ class DLD_ItemTrade
                 $hasOpenSlots = $result['hasOpenSlots'];
                 $hasDuplicateTool = $result['hasDuplicateTool'];
 
-                if (in_array($trade1['character']['id'], ['Sig', 'Tooth'])) {
+                if ($this->checkForTradableCharacters($trade1['character']['id'], $itemId2)) {
                     throw new BgaUserException(clienttranslate('Tribe member cannot obtain items from trade'));
                 }
                 if (!$hasOpenSlots) {
@@ -217,6 +217,13 @@ class DLD_ItemTrade
             // }
         }
     }
+    private function checkForTradableCharacters(string $characterName, string|int $itemId)
+    {
+        $tempLastItemOwners = $this->game->gameData->get('tempLastItemOwners');
+        return in_array($characterName, ['Sig', 'Tooth']) &&
+            (!array_key_exists($itemId, $tempLastItemOwners) || $tempLastItemOwners[$itemId] != $characterName);
+    }
+
     private function tradeProcess($trade1, $trade2)
     {
         $itemId1 = array_key_exists('itemId', $trade1) ? $trade1['itemId'] : null;
@@ -241,7 +248,7 @@ class DLD_ItemTrade
             $result = $this->game->character->getItemValidations((int) $itemId1, $trade2['character'], (int) $itemId2);
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
-            if (in_array($trade2['character']['id'], ['Sig', 'Tooth'])) {
+            if ($this->checkForTradableCharacters($trade2['character']['id'], $itemId1)) {
                 throw new BgaUserException(clienttranslate('Tribe member cannot obtain items from trade'));
             }
             if (!$hasOpenSlots) {
@@ -257,7 +264,7 @@ class DLD_ItemTrade
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
 
-            if (in_array($trade1['character']['id'], ['Sig', 'Tooth'])) {
+            if ($this->checkForTradableCharacters($trade1['character']['id'], $itemId2)) {
                 throw new BgaUserException(clienttranslate('Tribe member cannot obtain items from trade'));
             }
             if (!$hasOpenSlots) {
@@ -365,6 +372,7 @@ class DLD_ItemTrade
     public function stTradePhase()
     {
         $this->game->gameData->set('tradeYield', []);
+        $this->game->gameData->set('tempLastItemOwners', $this->game->gameData->get('lastItemOwners'));
         if (sizeof($this->game->getCraftedItems()) == 0) {
             $this->game->nextState('nextCharacter');
         } else {

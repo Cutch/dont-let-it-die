@@ -1871,13 +1871,14 @@ class Game extends \Table
      */
     public function upgradeTableDb($from_version)
     {
-        //       if ($from_version <= 1404301345)
-        //       {
-        //            // ! important ! Use DBPREFIX_<table_name> for all tables
-        //
-        //            $sql = "ALTER TABLE DBPREFIX_xxxxxxx ....";
-        //            $this->applyDbUpgradeToAllDB( $sql );
-        //       }
+        // if ($from_version <= 2506201717) {
+        //     // ! important ! Use DBPREFIX_<table_name> for all tables
+        //     try {
+        //         $sql = 'ALTER TABLE DBPREFIX_item ADD  `last_owner` varchar(10)';
+        //         $this->applyDbUpgradeToAllDB($sql);
+        //     } catch (Exception $e) {
+        //     }
+        // }
         //
         //       if ($from_version <= 1405061421)
         //       {
@@ -2395,6 +2396,22 @@ class Game extends \Table
         }
         if ($stateName == 'characterSelect' && $this->gameData->get('turnOrderStart')) {
             $this->gameData->set('turnOrderStart', null);
+        }
+        $equippedEquipment = array_merge(
+            [],
+            ...array_map(function ($data) {
+                return array_map(function ($d) {
+                    return $d['id'];
+                }, $data['equipment']);
+            }, $this->character->getAllCharacterData(false))
+        );
+        if (sizeof($this->gameData->get('lastItemOwners')) == 0 && sizeof($equippedEquipment) > 0) {
+            foreach ($this->character->getAllCharacterData(false) as $char) {
+                $ids = array_map(function ($d) {
+                    return $d['itemId'];
+                }, $char['equipment']);
+                $this->character->updateItemLastOwner($char['id'], $ids);
+            }
         }
 
         $result = [

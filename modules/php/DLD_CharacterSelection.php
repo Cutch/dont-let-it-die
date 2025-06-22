@@ -216,6 +216,12 @@ class DLD_CharacterSelection
                 return $charId == $oldChar ? $character : $charId;
             }, $turnOrder)
         );
+        $this->game->gameData->set(
+            'turnOrderStart',
+            array_map(function ($charId) use ($oldChar, $character) {
+                return $charId == $oldChar ? $character : $charId;
+            }, $this->game->gameData->get('turnOrderStart'))
+        );
         if (array_key_exists('startsWith', $data)) {
             $itemId = $this->game->gameData->createItem($data['startsWith']);
             $this->game->character->equipEquipment($character, [$itemId]);
