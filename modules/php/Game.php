@@ -124,6 +124,10 @@ class Game extends \Table
     {
         $this->undo->actUndo();
     }
+    public function getVersion(): int
+    {
+        return intval($this->gamestate->table_globals[300]);
+    }
     protected function initTable(): void
     {
         $this->undo->loadInitialState();
@@ -1640,6 +1644,7 @@ class Game extends \Table
     {
         $characters = $this->character->getAllCharacterDataForPlayer($playerId);
         $result = [
+            'version' => $this->getVersion(),
             'actions' => $this->getDinnerPhaseActions($playerId),
             'dinnerEatableFoods' => [],
             'activeTurnPlayerId' => 0,
@@ -2288,6 +2293,7 @@ class Game extends \Table
         });
 
         $result = [
+            'version' => $this->getVersion(),
             'activeCharacter' => $this->character->getTurnCharacterId(),
             'activeCharacters' => $this->gameData->getAllMultiActiveCharacterIds(),
             'fireWoodCost' => $this->getFirewoodCost(),
@@ -2417,6 +2423,7 @@ class Game extends \Table
         }
 
         $result = [
+            'version' => $this->getVersion(),
             'expansionList' => self::$expansionList,
             'expansion' => $this->getExpansion(),
             'difficulty' => $this->getDifficulty(),

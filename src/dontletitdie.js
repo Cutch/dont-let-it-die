@@ -41,6 +41,7 @@ import { addClickListener, Deck, Dice, InfoOverlay, isStudio, renderImage, rende
 declare('bgagame.dontletitdie', Gamegui, {
   constructor: function () {
     // Used For character selection
+    this.reloadShown = false;
     this.selectedCharacters = [];
     this.mySelectedCharacters = [];
     this.data = [];
@@ -1099,6 +1100,10 @@ declare('bgagame.dontletitdie', Gamegui, {
     }
   },
   updateGameDatas: function (gameData = {}) {
+    if (this.gamedatas.version < gameData.version && !this.reloadShown) {
+      this.infoDialog(_('There is a new version available.'), _('Reload'), () => window.location.reload());
+      this.reloadShown = true;
+    }
     const clone = { ...gameData };
     delete clone.gamestate;
     Object.assign(this.gamedatas, clone);
@@ -1903,7 +1908,6 @@ declare('bgagame.dontletitdie', Gamegui, {
   },
   notif_rollFireDie: async function (notification) {
     if (await this.notificationWrapper(notification)) return;
-    await this.notificationWrapper(notification);
     if (isStudio()) console.log('notif_rollFireDie', notification);
     return this.dice.roll(notification.args);
   },

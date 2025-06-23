@@ -358,6 +358,7 @@ class DLD_ItemTrade
     public function argTradePhase()
     {
         $result = [
+            'version' => $this->game->getVersion(),
             'actions' => [],
             'activeTurnPlayerId' => 0,
             'drawNightCard' => $this->game->gameData->get('drawNightState') ?? $this->game->gameData->get('state'),

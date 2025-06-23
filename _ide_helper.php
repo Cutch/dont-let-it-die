@@ -332,6 +332,7 @@ namespace {
 
     abstract class GameState extends APP_Object
     {
+        public array $table_globals;
         /**
          * You can call this method to make any player active.
          *
