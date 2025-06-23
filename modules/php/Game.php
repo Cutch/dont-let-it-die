@@ -1919,6 +1919,11 @@ class Game extends \Table
                 return $items[$d];
             }, $this->gameData->get('destroyedEquipment'))
         );
+        $buildings = array_count_values(
+            array_map(function ($d) use ($items) {
+                return $d['name'];
+            }, $this->gameData->get('buildings'))
+        );
 
         $equippedEquipment = array_merge(
             [],
@@ -1930,10 +1935,11 @@ class Game extends \Table
         );
         $equippedCounts = array_count_values(array_values($equippedEquipment));
         $sums = [];
-        foreach (array_keys($campEquipment + $destroyedEquipment + $equippedCounts) as $key) {
+        foreach (array_keys($campEquipment + $destroyedEquipment + $equippedCounts + $buildings) as $key) {
             $sums[$key] =
                 (array_key_exists($key, $campEquipment) ? $campEquipment[$key] : 0) +
                 (array_key_exists($key, $destroyedEquipment) ? $destroyedEquipment[$key] : 0) +
+                (array_key_exists($key, $buildings) ? $buildings[$key] : 0) +
                 (array_key_exists($key, $equippedCounts) ? $equippedCounts[$key] : 0);
         }
         return $sums;
@@ -2003,6 +2009,30 @@ class Game extends \Table
                 return $this->hasResourceCost($item);
             })
         );
+
+        $craftingLevel = $this->gameData->get('craftingLevel');
+        $buildings = $this->gameData->get('buildings');
+        $allBuildableEquipment = array_values(
+            array_filter(
+                $this->data->getItems(),
+                function ($v, $k) use ($craftingLevel) {
+                    return $v['type'] == 'item' && $v['craftingLevel'] <= $craftingLevel;
+                },
+                ARRAY_FILTER_USE_BOTH
+            )
+        );
+        $result['availableEquipmentCount'] = array_combine(
+            array_map(function ($d) {
+                return $d['id'];
+            }, $allBuildableEquipment),
+            array_map(function ($d) use ($result, $buildings) {
+                if ($d['itemType'] == 'building' && sizeof($buildings) >= $this->getMaxBuildingCount()) {
+                    return 0;
+                }
+                return $d['count'] - (array_key_exists($d['id'], $result['builtEquipment']) ? $result['builtEquipment'][$d['id']] : 0);
+            }, $allBuildableEquipment)
+        );
+
         $result['foreverUseItems'] = getUsePerForeverItems($this);
     }
     public function getValidTokens(): array

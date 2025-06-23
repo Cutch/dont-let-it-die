@@ -195,7 +195,15 @@
   justify-content: center;
   gap: 1em;
 }
-
+.cannot-build::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #0000006b;
+}
 #knowledge-container {
   position: relative;
   .fkp {

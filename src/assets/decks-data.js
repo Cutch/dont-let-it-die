@@ -1622,7 +1622,7 @@ export default {
           deck: 'night-event',
           text: [
             _('A group of sabertooths are drawn to the smell of your camp') + '.',
-            _('If you have any raw meat, throw it out to draw them away. Otherwise, everyone takes 1 damage') + '.',
+            _('If you have any raw meat, throw it out to draw them away. Otherwise, everyone takes 2 damage') + '.',
           ],
         },
         frame: {

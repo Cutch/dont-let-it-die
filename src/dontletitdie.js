@@ -680,15 +680,15 @@ declare('bgagame.dontletitdie', Gamegui, {
       });
     }
     availableElem.innerHTML = '';
-    const keys = Object.keys(gameData.availableEquipment);
-    keys.forEach((name) => this.updateItem(name, availableElem, gameData.availableEquipment?.[name] ?? 0));
+    const keys = Object.keys(gameData.availableEquipmentCount);
+    keys.forEach((name) => this.updateItem(name, availableElem, gameData.availableEquipmentCount?.[name] ?? 0));
     if (keys.length === 0) {
       availableElem.innerHTML = `<b>${_('None')}</b>`;
     }
   },
   updateItem: function (name, elem, count) {
     elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"></div>`);
-    renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert' });
+    renderImage(name, elem.querySelector(`.token.${name}`), { scale: 2, pos: 'insert', css: count === 0 ? 'cannot-build' : '' });
     if (count != null)
       elem.querySelector(`.token.${name} .image`).insertAdjacentHTML('beforeend', `<div class="counter dot dot--number">${count}</div>`);
     addClickListener(elem.querySelector(`.token.${name}`), name, () => {
