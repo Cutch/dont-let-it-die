@@ -736,14 +736,14 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.updateResources(gameData);
     document.getElementById('game_play_area').insertAdjacentHTML(
       'beforeend',
-      `<div id="day-popup" class="day-popup"><div id="day-text">
+      `<div id="day-popup" class="day-popup"><div id="day-text" style="display: none">
         <i class="fa fa-sun-o day-background" aria-hidden="true"></i>
         <i class="fa fa-cloud day-background-cloud" aria-hidden="true"></i>
         <span></span></div></div>`,
     );
     document.getElementById('game_play_area').insertAdjacentHTML(
       'beforeend',
-      `<div id="night-popup" class="night-popup"><div id="night-text">
+      `<div id="night-popup" class="night-popup"><div id="night-text" style="display: none">
         <i class="fa6 fa6-solid fa6-moon night-background" aria-hidden="true"></i>
         <i class="fa fa-cloud night-background-cloud" aria-hidden="true"></i>
         <span>${_('Night Phase')}</span><div class="night-card"></div></div></div>`,
@@ -763,13 +763,36 @@ declare('bgagame.dontletitdie', Gamegui, {
       }),
       dojo.fadeOut({ node: elem, duration: 500 }),
     ]);
-    this.animations.push(this.bgaPlayDojoAnimation(anim));
+    elem.style.display = '';
+    const promise = this.bgaPlayDojoAnimation(anim);
+    this.animations.push(promise);
+    await promise;
+    elem.style.display = 'none';
   },
   showNightTracker: async function (cardId) {
     await Promise.all(this.animations);
     this.animations = [];
     const elem = $('night-text');
     renderImage(cardId, elem.querySelector('.night-card'), { scale: 1, pos: 'replace' });
+    this.addHelpTooltip({
+      node: elem.querySelector('.night-card .card'),
+      tooltipText: cardId,
+    });
+    addClickListener(
+      elem.querySelector('.night-card .card'),
+      'Tooltip',
+      () => {
+        this.tooltip.show();
+        this.tooltip
+          .renderByElement()
+          .insertAdjacentHTML(
+            'beforeend',
+            `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${renderText({ name: cardId })}</span></div>`,
+          );
+      },
+      true,
+    );
+    elem.style.display = '';
     const anim = dojo.fx.chain([
       dojo.fadeIn({ node: elem, duration: 500 }),
       dojo.animateProperty({
@@ -778,7 +801,10 @@ declare('bgagame.dontletitdie', Gamegui, {
       }),
       dojo.fadeOut({ node: elem, duration: 500 }),
     ]);
-    this.animations.push(this.bgaPlayDojoAnimation(anim));
+    const promise = this.bgaPlayDojoAnimation(anim);
+    this.animations.push(promise);
+    await promise;
+    elem.style.display = 'none';
   },
   setupCharacterSelections: function (gameData) {
     const playArea = $('game_play_area');
@@ -1337,9 +1363,13 @@ declare('bgagame.dontletitdie', Gamegui, {
                   this.clearActionButtons();
                   Object.values(this.gamedatas.availableUnlocks).forEach((unlock) => {
                     const suffix = this.getActionSuffixHTML(unlock);
-                    this.statusBar.addActionButton(`${_(unlock.name)}${suffix}`, () => {
-                      return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
-                    });
+                    this.statusBar.addActionButton(
+                      `${_(unlock.name)}${suffix}`,
+                      () => {
+                        return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
+                      },
+                      { disabled: unlock.unlockCost > this.gamedatas.resources.fkp },
+                    );
                   });
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
                 } else if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
