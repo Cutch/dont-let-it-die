@@ -780,7 +780,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       tooltipText: cardId,
     });
     addClickListener(
-      elem.querySelector('.night-card .card'),
+      elem.querySelector('.night-card .tooltip-image-and-text'),
       'Tooltip',
       () => {
         this.tooltip.show();
@@ -1099,8 +1099,8 @@ declare('bgagame.dontletitdie', Gamegui, {
       selections.appendChild(itemsArr[i]);
     }
   },
-  updateGameDatas: function (gameData = {}) {
-    if (this.gamedatas.version < gameData.version && !this.reloadShown) {
+  updateGameDatas: function (gameData) {
+    if (gameData?.version && this.gamedatas.version < gameData?.version && !this.reloadShown) {
       this.infoDialog(_('There is a new version available.'), _('Reload'), () => window.location.reload());
       this.reloadShown = true;
     }

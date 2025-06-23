@@ -604,7 +604,7 @@ class Game extends \Table
         }
         $items = $this->gameData->getCreatedItems();
 
-        $this->notify('notify', clienttranslate('{item_name} destroyed'), [
+        $this->notify('notify', clienttranslate('${item_name} destroyed'), [
             'item_name' => notifyTextButton([
                 'name' => $this->data->getItems()[$items[$itemId]]['name'],
                 'dataId' => $itemId,
