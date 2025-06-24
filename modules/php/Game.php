@@ -1130,7 +1130,7 @@ class Game extends \Table
                 $this->gameData->set(
                     'upgrades',
                     array_filter($this->gameData->get('upgrades'), function ($v) {
-                        return $v['replace'] == null;
+                        return $v['replace'] != null;
                     })
                 );
             }
