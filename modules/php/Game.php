@@ -1668,14 +1668,18 @@ class Game extends \Table
     {
         $action = $this->actions->getAction('actEat');
         $hasFood = $action['requires']($this, $action);
-        if ($hasFood) {
+        $actAddWood = $this->actions->getAction('actAddWood');
+        $hasWood = $actAddWood['requires']($this, $actAddWood);
+        $actSpendFKP = $this->actions->getAction('actSpendFKP');
+        $hasFKP = $actSpendFKP['requires']($this, $actSpendFKP);
+        if ($hasFood || $hasWood || $hasFKP) {
             $this->gamestate->setAllPlayersMultiactive();
             foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
                 $this->giveExtraTime((int) $playerId);
             }
             $this->gamestate->initializePrivateStateForAllActivePlayers();
         } else {
-            $this->notify('playerTurn', clienttranslate('The tribe skipped dinner as there is nothing to eat'));
+            $this->notify('playerTurn', clienttranslate('The tribe skipped dinner as there is nothing to do'));
             $this->nextState('nightPhase');
         }
     }
@@ -2296,10 +2300,7 @@ class Game extends \Table
         }
         if (in_array($this->gamestate->state(true, false, true)['name'], ['dinnerPhasePrivate', 'dinnerPhase'])) {
             foreach ($this->gamestate->getActivePlayerList() as $playerId) {
-                $result = [
-                    'actions' => $this->getDinnerPhaseActions($playerId),
-                    'activeTurnPlayerId' => 0,
-                ];
+                $result = $this->argDinnerPhase($playerId);
                 $this->notify_player((int) $playerId, 'updateActionButtons', '', ['gameData' => $result]);
             }
         }
