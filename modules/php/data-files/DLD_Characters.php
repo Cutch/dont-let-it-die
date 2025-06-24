@@ -1196,7 +1196,6 @@ class DLD_CharactersData
                             if ($state['id'] == $skill['id']) {
                                 $tokens = $game->gameData->get('tokens') ?? [];
                                 if ($state['type'] == 'move') {
-                                    $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                     $tokens[$data['deck']] = array_values(
                                         array_filter($tokens[$data['deck']], function ($token) {
                                             return $token != 'trap';
@@ -1224,6 +1223,7 @@ class DLD_CharactersData
                                     );
                                     // $data['nextState'] = false;
                                 } else {
+                                    $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                     if (!array_key_exists($data['deck'], $tokens)) {
                                         $tokens[$data['deck']] = [];
                                     }

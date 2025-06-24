@@ -954,8 +954,8 @@ class DLD_ExpansionData
                 'dropSentence' => clienttranslate('no longer has'),
                 'name' => clienttranslate('Swollen Eyes'),
                 'onDraw' => function (Game $game, $card, &$data) {
-                    if ($card['characterId'] == $game->character->getTurnCharacterId() && $card['deckType'] == 'resource') {
-                        $card['count'] -= 1;
+                    if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['card']['deckType'] == 'resource') {
+                        $data['card']['count'] -= 1;
                     }
                 },
             ],

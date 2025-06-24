@@ -407,7 +407,7 @@ export default {
             _('Damage:') + ' X',
             _('Range') + ': ' + 1,
             _("Roll the Fire Die before fighting a Danger! card, this roll value is the Fire Stick's damage"),
-            _('You may spend up to 3 FKP tokens to increase X by 1 per FXP for 1 combat'),
+            _('You may spend up to 3 FKP tokens to increase X by 1 per FKP for 1 combat'),
           ],
         },
         frame: { x: 876, y: 2200, w: 438, h: 438 },
