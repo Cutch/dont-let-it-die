@@ -1279,22 +1279,28 @@ class DLD_CharactersData
                                 );
                                 $game->gameData->set('tokens', $tokens);
                                 $game->gameData->destroyResource('trap');
-                                $game->eventLog(clienttranslate('${character_name} removed a ${name} from the game'), [
+                                $game->eventLog(clienttranslate('${character_name} removed a ${name} from the ${deck_name} deck'), [
                                     ...$data['data']['card'],
                                     'usedActionId' => 'actUseSkill',
                                     'usedActionName' => $skill['name'],
+                                    'deck_name' => notifyButtons([
+                                        [
+                                            'name' => $game->decks->getDeckName($data['data']['card']['deck']),
+                                            'dataId' => $data['data']['card']['id'],
+                                            'dataType' => 'card',
+                                        ],
+                                    ]),
                                 ]);
                             }
                         },
                         'requires' => function (Game $game, $skill) {
-                            $char = $game->character->getCharacterData($skill['characterId']);
                             $tokens = $game->gameData->get('tokens') ?? [];
                             $count = sizeof(
                                 array_filter(array_keys($tokens ?? []), function ($deck) use ($tokens) {
                                     return in_array('trap', $tokens[$deck]);
                                 })
                             );
-                            return $char['isActive'] && $count > 0;
+                            return $count > 0;
                         },
                     ],
                 ],
