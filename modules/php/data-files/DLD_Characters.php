@@ -1153,7 +1153,8 @@ class DLD_CharactersData
                                         return in_array('trap', $tokens[$deckName]);
                                     })
                                 );
-                                if ($count >= 2) {
+
+                                if ($count >= $game->gameData->getResourceMax('trap')) {
                                     $decks = array_filter(
                                         array_intersect(
                                             ['explore', 'gather', 'forage', 'harvest', 'hunt'],
