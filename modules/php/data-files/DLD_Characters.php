@@ -1359,7 +1359,7 @@ class DLD_CharactersData
                             $value = $game->rollFireDie($skill['name'], $skill['characterId']);
                             usePerDay($skill['id'], $game);
                             if ($value == 0) {
-                                $change = $game->character->getActiveStamina(2);
+                                $change = $game->character->adjustActiveStamina(2);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
                                     'count' => $change,
                                     'character_resource' => clienttranslate('Stamina'),

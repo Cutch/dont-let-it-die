@@ -278,7 +278,7 @@ class DLD_Encounter
                         $itemObj = $this->game->data->getItems()[$items[$itemId]];
                         if (array_key_exists('onUse', $itemObj)) {
                             $itemObj['characterId'] = $this->game->character->getSubmittingCharacterId();
-                            $itemObj['onUse']($this->game, $itemObj);
+                            $itemObj['onUse']($this->game, $itemObj, $itemId);
                         }
                     }
                     $damageTaken = $this->countDamageTaken($data);

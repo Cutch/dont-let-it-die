@@ -500,6 +500,7 @@ class DLD_ExpansionData
                                     'resource_type' => 'bone',
                                 ]);
                             } else {
+                                $game->character->adjustHealth($currentCharacter, -2);
                                 $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 2,
                                     'character_resource' => clienttranslate('Health'),

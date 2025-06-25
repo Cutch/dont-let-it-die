@@ -411,7 +411,7 @@ class DLD_ItemsData
                     'hide' => 2,
                     'bone' => 2,
                 ],
-                'onUse' => function (Game $game, $item) {
+                'onUse' => function (Game $game, $item, $itemId) {
                     usePerDay($item, $game);
                 },
                 'requires' => function (Game $game, $item) {
@@ -1067,8 +1067,8 @@ class DLD_ItemsData
                 'cost' => [
                     'rock' => 1,
                 ],
-                'onUse' => function (Game $game, $item) {
-                    $game->character->unequipEquipment($item['characterId'], [$item['id']]);
+                'onUse' => function (Game $game, $item, $itemId) {
+                    $game->character->unequipEquipment($item['characterId'], [$itemId]);
                     $game->notify('usedItem', clienttranslate('${character_name} used ${item_name} and lost their ${item_name}'), [
                         'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                     ]);
