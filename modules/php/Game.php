@@ -442,6 +442,8 @@ class Game extends \Table
         if ($food == 'meat-cooked') {
             $left = $this->adjustResource('fish-cooked', -$requireCount)['left'];
             $left = $this->adjustResource('meat-cooked', $left)['left'];
+        } elseif ($food == 'berry-cooked') {
+            $left = $this->adjustResource('berry-cooked', -$requireCount)['left'];
         } else {
             $left = $this->adjustResource('fish-cooked', -$requireCount);
         }
