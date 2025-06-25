@@ -833,11 +833,13 @@ class DLD_DecksData
                             $game->character->unequipEquipment(
                                 $char['character_name'],
                                 array_map(function ($item) {
-                                    return $item['id'];
-                                }, $char['equipment'])
+                                    return $item['itemId'];
+                                }, $char['equipment']),
+                                true
                             );
                         }
                     }
+                    $game->skip('tradePhase');
                 },
             ],
             'night-event-8_4' => [

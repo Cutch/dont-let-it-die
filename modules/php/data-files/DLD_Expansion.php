@@ -599,8 +599,9 @@ class DLD_ExpansionData
                             $game->character->unequipEquipment(
                                 $game->character->getTurnCharacterId(),
                                 array_map(function ($item) {
-                                    return $item['id'];
-                                }, $weapons)
+                                    return $item['itemId'];
+                                }, $weapons),
+                                true
                             );
                             $game->eventLog(clienttranslate('${character_name} sent their weapon to camp'));
                         }
@@ -620,14 +621,14 @@ class DLD_ExpansionData
                         $character = $game->character->getTurnCharacter();
                         $weaponIds = array_map(
                             function ($item) {
-                                return $item['id'];
+                                return $item['itemId'];
                             },
                             array_filter($character['equipment'], function ($item) {
                                 return $item['itemType'] == 'weapon';
                             })
                         );
                         if (sizeof($weaponIds) > 0) {
-                            $game->character->unequipEquipment($game->character->getTurnCharacterId(), $weaponIds);
+                            $game->character->unequipEquipment($game->character->getTurnCharacterId(), $weaponIds, true);
                             $game->eventLog(clienttranslate('${character_name} sent their weapon to camp'));
                         }
                     }
@@ -830,14 +831,14 @@ class DLD_ExpansionData
                         $character = $game->character->getTurnCharacter();
                         $toolIds = array_map(
                             function ($item) {
-                                return $item['id'];
+                                return $item['itemId'];
                             },
                             array_filter($character['equipment'], function ($item) {
                                 return $item['itemType'] == 'tool';
                             })
                         );
                         if (sizeof($toolIds) > 0) {
-                            $game->character->unequipEquipment($game->character->getTurnCharacterId(), $toolIds);
+                            $game->character->unequipEquipment($game->character->getTurnCharacterId(), $toolIds, true);
                             $game->eventLog(clienttranslate('${character_name} sent their tool to camp'));
                         }
                     }

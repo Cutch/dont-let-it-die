@@ -377,6 +377,10 @@ class DLD_ItemTrade
     }
     public function stTradePhase()
     {
+        if ($this->game->checkSkip('tradePhase')) {
+            $this->game->nextState('nextCharacter');
+            return;
+        }
         $this->game->gameData->set('tradeYield', []);
         $this->game->gameData->set('tempLastItemOwners', $this->game->gameData->get('lastItemOwners'));
         if (sizeof($this->game->getCraftedItems()) == 0) {

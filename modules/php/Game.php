@@ -199,6 +199,25 @@ class Game extends \Table
     {
         $this->notify('notify', $message, $arg);
     }
+    public function skip(string $name): void
+    {
+        if (!in_array($name, $this->gameData->get('skip'))) {
+            $this->gameData->set('skip', [...$this->gameData->get('skip'), $name]);
+        }
+    }
+    public function checkSkip(string $name): bool
+    {
+        $check = in_array($name, $this->gameData->get('skip'));
+        if ($check) {
+            $this->gameData->set(
+                'skip',
+                array_filter($this->gameData->get('skip'), function ($d) use ($name) {
+                    return $d != $name;
+                })
+            );
+        }
+        return $check;
+    }
     public function checkHindrance($drawPhysical = true, ?string $char = null): bool
     {
         $data = ['maxPhysicalHindrance' => 3, 'maxMentalHindrance' => 1, 'canDrawMentalHindrance' => true];

@@ -54,6 +54,7 @@ class DLD_GameData
         'actInterruptState' => [],
         'partials' => [],
         'tokens' => [],
+        'skip' => [],
         'resources' => [
             'fireWood' => 3,
             'wood' => 0,

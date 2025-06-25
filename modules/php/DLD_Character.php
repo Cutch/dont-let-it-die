@@ -347,14 +347,17 @@ class DLD_Character
         });
         $this->updateItemLastOwner($characterName, $items);
     }
-    public function unequipEquipment(string $characterName, array $items): void
+    public function unequipEquipment(string $characterName, array $items, bool $sendToCamp = false): void
     {
-        $this->updateCharacterData($characterName, function (&$data) use ($items) {
+        $this->updateCharacterData($characterName, function (&$data) use ($items, $sendToCamp) {
             $equippedIds = array_map(function ($d) {
                 return $d['itemId'];
             }, $data['equipment']);
             $equipment = array_diff($equippedIds, array_intersect($equippedIds, $items));
             $data['equipment'] = $equipment;
+            if ($sendToCamp) {
+                $this->game->gameData->set('campEquipment', [...$this->game->gameData->get('campEquipment'), ...$items]);
+            }
         });
     }
     public function setCharacterEquipment(string $characterName, array $equipment): void
