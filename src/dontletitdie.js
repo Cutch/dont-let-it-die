@@ -1309,6 +1309,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (isStudio()) console.log('onUpdateActionButtons', isActive, stateName, actions);
     if (isActive && stateName && actions != null) {
       this.clearActionButtons();
+      const skipButtons = ['actDrawGather', 'actDrawForage', 'actDrawHarvest', 'actDrawHunt', 'actDrawExplore'];
 
       // Add test action buttons in the action status bar, simulating a card click:
       if (actions) {
@@ -1361,6 +1362,7 @@ declare('bgagame.dontletitdie', Gamegui, {
               );
             }
             const suffix = this.getActionSuffixHTML(action);
+            if (skipButtons.includes(actionId)) return;
             return this.statusBar.addActionButton(
               `${this.getActionMappings()[actionId]}${suffix}`,
               () => {
