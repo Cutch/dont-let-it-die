@@ -670,7 +670,6 @@ class DLD_UpgradesData
                         $game->character->setFirstTurnOrder($state['selectedCharacterId']);
                     }
                 },
-                // TODO: On morning select the next character to go first, needs testing
             ],
             '8-B' => [
                 'deck' => 'upgrade',

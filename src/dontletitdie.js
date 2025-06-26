@@ -959,17 +959,17 @@ declare('bgagame.dontletitdie', Gamegui, {
           });
         });
       };
-      const node1 = document.querySelector(`#log_${logId} .dlid__log-button`);
-      if (node1) {
-        node1.innerHTML = _(node1.innerHTML);
-        addButtonListener(node1);
-      }
+      const nodes1 = document.querySelectorAll(`#log_${logId} .dlid__log-button`);
+      nodes1.forEach((node) => {
+        node.innerHTML = _(node.innerHTML);
+        addButtonListener(node);
+      });
       setTimeout(() => {
-        const node2 = document.querySelector(`#dockedlog_${logId} .dlid__log-button`);
-        if (node2) {
-          node2.innerHTML = _(node2.innerHTML);
-          addButtonListener(node2);
-        }
+        const nodes2 = document.querySelectorAll(`#dockedlog_${logId} .dlid__log-button`);
+        nodes2.forEach((node) => {
+          node.innerHTML = _(node.innerHTML);
+          addButtonListener(node);
+        });
       }, 0);
     });
 
