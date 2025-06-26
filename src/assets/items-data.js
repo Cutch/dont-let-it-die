@@ -318,7 +318,8 @@ export default {
             dojo.string.substitute(_('${number} Max Health'), {
               number: '+1',
             }),
-            _('Ignore all damage from a Danger! Card, twice per day'),
+            _('When you take damage from a Danger! card, roll the fire die'),
+            _('If you roll a 1, remove 1 from the incoming damage'),
           ],
         },
         frame: { x: 876, y: 1760, w: 438, h: 438 },
