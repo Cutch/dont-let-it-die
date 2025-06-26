@@ -21,6 +21,8 @@ namespace Bga\Games\DontLetItDie;
 use BgaUserException;
 use Exception;
 
+use function PHPSTORM_META\type;
+
 class DLD_GameData
 {
     private Game $game;
@@ -46,7 +48,7 @@ class DLD_GameData
         'activeNightCards' => [],
         'activeDayCards' => [],
         'day' => 1,
-        'craftingLevel' => 0,
+        'craftingLevel' => [],
         'turnOrder' => [],
         'turnNo' => 0,
         'interruptState' => [],
@@ -129,7 +131,12 @@ class DLD_GameData
     }
     public function get(string $name): mixed
     {
-        return array_key_exists($name, $this->cachedGameData) ? $this->cachedGameData[$name] : null;
+        $value = array_key_exists($name, $this->cachedGameData) ? $this->cachedGameData[$name] : null;
+        if ($name == 'craftingLevel' && is_numeric($value)) {
+            $value = $value == 0 ? [] : range(1, $value);
+            $this->set($name, $value);
+        }
+        return $value;
     }
     public function getAll(...$names): array
     {

@@ -64,7 +64,7 @@ class DLD_KnowledgeTreeData
                 'name_suffix' => ' 1',
                 'onUse' => function (Game $game, $obj) {
                     $craftingLevel = $game->gameData->get('craftingLevel');
-                    $game->gameData->set('craftingLevel', max($craftingLevel, 1));
+                    $game->gameData->set('craftingLevel', [...$craftingLevel, 1]);
                 },
             ],
             'crafting-2' => [
@@ -72,7 +72,7 @@ class DLD_KnowledgeTreeData
                 'name_suffix' => ' 2',
                 'onUse' => function (Game $game, $obj) {
                     $craftingLevel = $game->gameData->get('craftingLevel');
-                    $game->gameData->set('craftingLevel', max($craftingLevel, 2));
+                    $game->gameData->set('craftingLevel', [...$craftingLevel, 2]);
                 },
             ],
             'crafting-3' => [
@@ -80,7 +80,7 @@ class DLD_KnowledgeTreeData
                 'name_suffix' => ' 3',
                 'onUse' => function (Game $game, $obj) {
                     $craftingLevel = $game->gameData->get('craftingLevel');
-                    $game->gameData->set('craftingLevel', max($craftingLevel, 3));
+                    $game->gameData->set('craftingLevel', [...$craftingLevel, 3]);
                 },
             ],
             'fire-starter' => [

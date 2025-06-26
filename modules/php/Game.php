@@ -2041,7 +2041,7 @@ class Game extends \Table
             array_filter(
                 $this->data->getItems(),
                 function ($v, $k) use ($craftingLevel) {
-                    return $v['type'] == 'item' && $v['craftingLevel'] <= $craftingLevel;
+                    return $v['type'] == 'item' && in_array($v['craftingLevel'], $craftingLevel);
                 },
                 ARRAY_FILTER_USE_BOTH
             )
@@ -2741,8 +2741,7 @@ class Game extends \Table
     }
     public function giveItems()
     {
-        $craftingLevel = $this->gameData->get('craftingLevel');
-        $this->gameData->set('craftingLevel', max($craftingLevel, 3));
+        $this->gameData->set('craftingLevel', [1, 2, 3]);
 
         extract($this->gameData->getAll('turnNo', 'turnOrder'));
 
@@ -2818,8 +2817,7 @@ class Game extends \Table
     }
     public function maxCraftLevel()
     {
-        $craftingLevel = $this->gameData->get('craftingLevel');
-        $this->gameData->set('craftingLevel', max($craftingLevel, 3));
+        $this->gameData->set('craftingLevel', [1, 2, 3]);
     }
     public function kill()
     {

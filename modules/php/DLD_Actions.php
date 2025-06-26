@@ -280,7 +280,7 @@ class DLD_Actions
                             $game->data->getItems(),
                             function ($v, $k) use ($craftingLevel, $craftedItems, $buildings, $game) {
                                 return $v['type'] == 'item' &&
-                                    $v['craftingLevel'] <= $craftingLevel &&
+                                    in_array($v['craftingLevel'], $craftingLevel) &&
                                     ($v['itemType'] != 'building' || sizeof($buildings) < $game->getMaxBuildingCount()) &&
                                     (!array_key_exists($k, $craftedItems) || $craftedItems[$k] < $v['count']);
                             },
