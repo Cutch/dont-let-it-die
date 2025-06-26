@@ -23,7 +23,7 @@ export class Deck {
       .querySelector(`.${this.deck}-back`)
       .insertAdjacentHTML(
         'beforeend',
-        `<div class="deck-counter dot dot--number counter">${this.countData.count}</div><div class="action-cost"></div>`,
+        `<div class="deck-counter dot dot--number counter">${this.countData.count}</div><div class="action-cost cost-with-text card-cost"></div>`,
       );
     this.drawing = [];
     this.partialDrawCard = null;

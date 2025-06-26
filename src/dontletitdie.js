@@ -1353,7 +1353,7 @@ declare('bgagame.dontletitdie', Gamegui, {
 
               const elemCost = document.querySelector(`.board .${uppercaseDeck.toLowerCase()}-back .action-cost`);
               const suffix = this.getActionSuffixHTML(action);
-              elemCost.innerHTML = suffix;
+              elemCost.innerHTML = `${this.getActionMappings()[actionId]}${suffix}`;
               elemCost.style.display = '';
               this.clickListeners.push(
                 addClickListener(document.querySelector(`.board .${uppercaseDeck.toLowerCase()}-back`), `${uppercaseDeck} Deck`, () => {
