@@ -288,7 +288,7 @@ class DLD_Actions
                         )
                     );
                 },
-                'onGetActionCost' => function (Game $game, $action, &$data) {
+                'onGetActionCostPost' => function (Game $game, $action, &$data) {
                     if ($data['action'] == 'actCraft' && $data['subAction'] == 'rock-weapon') {
                         $data['stamina'] = min($data['stamina'], 1);
                     }
