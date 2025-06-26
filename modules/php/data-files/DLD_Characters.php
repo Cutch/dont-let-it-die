@@ -1884,8 +1884,13 @@ class DLD_CharactersData
                                 function ($d) {
                                     return $d['id'];
                                 },
-                                array_filter($game->character->getAllCharacterData(false), function ($character) use ($currentCharacter) {
-                                    return !$character['incapacitated'] && $character['id'] != $currentCharacter['id'];
+                                array_filter($game->character->getAllCharacterData(false), function ($character) use (
+                                    $currentCharacter,
+                                    $game
+                                ) {
+                                    return !$character['incapacitated'] &&
+                                        $character['id'] != $currentCharacter['id'] &&
+                                        !$game->itemTrade->checkForTradableCharacters($character['id'], null);
                                 })
                             );
 
@@ -1911,11 +1916,12 @@ class DLD_CharactersData
                                 $currentCharacter['id'],
                                 true
                             );
-                            return ['notify' => false, 'nextState' => false];
+                            return ['notify' => false, 'spendActionCost' => false, 'nextState' => false];
                         },
                         'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $characterSelectionState = $game->selectionStates->getState('characterSelection');
                             if ($characterSelectionState && $characterSelectionState['id'] == $skill['id']) {
+                                $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                 $itemSelectionState = $game->selectionStates->getState('itemSelection');
                                 $characterId = $characterSelectionState['selectedCharacterId'];
                                 $itemId = $itemSelectionState['selectedItemId'];
@@ -1944,8 +1950,10 @@ class DLD_CharactersData
                                 function ($d) {
                                     return $d['id'];
                                 },
-                                array_filter($game->character->getAllCharacterData(false), function ($character) use ($skill) {
-                                    return !$character['incapacitated'] && $character != $skill['characterId'];
+                                array_filter($game->character->getAllCharacterData(false), function ($character) use ($skill, $game) {
+                                    return !$character['incapacitated'] &&
+                                        $character != $skill['characterId'] &&
+                                        !$game->itemTrade->checkForTradableCharacters($character['id'], null);
                                 })
                             );
                             return $char['isActive'] && sizeof($char['equipment']) > 0 && sizeof($characterIds) > 0;

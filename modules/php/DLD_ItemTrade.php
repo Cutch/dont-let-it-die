@@ -217,7 +217,7 @@ class DLD_ItemTrade
             // }
         }
     }
-    private function checkForTradableCharacters(string $characterName, string|int $itemId)
+    public function checkForTradableCharacters(string $characterName, string|int|null $itemId)
     {
         $tempLastItemOwners = $this->game->gameData->get('tempLastItemOwners');
         return in_array($characterName, ['Sig', 'Tooth']) &&
