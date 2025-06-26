@@ -306,7 +306,7 @@ class DLD_UpgradesData
                 'name' => clienttranslate('Smoke Cover'),
                 'unlockCost' => 4,
                 'onNightDrawCard' => function (Game $game, $unlock, &$data) {
-                    if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
+                    if (array_key_exists('eventType', $data['state']['card']) && $data['state']['card']['eventType'] == 'rival-tribe') {
                         $roll = min($game->rollFireDie($unlock['name']), $game->rollFireDie($unlock['name']));
                         rivalTribe($game, $data, $roll);
 
@@ -320,8 +320,8 @@ class DLD_UpgradesData
                 'name' => clienttranslate('Revenge'),
                 'unlockCost' => 8,
                 'onNightDrawCard' => function (Game $game, $unlock, &$data) {
-                    if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
-                        $resourceType = $data['card']['resourceType'];
+                    if (array_key_exists('eventType', $data['state']['card']) && $data['state']['card']['eventType'] == 'rival-tribe') {
+                        $resourceType = $data['state']['card']['resourceType'];
                         $roll = $game->rollFireDie($unlock['name']);
                         if ($resourceType == 'gem') {
                             $left = $game->adjustResource('gem-y', $roll)['left'];

@@ -1075,7 +1075,9 @@ class DLD_DecksData
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
                     $card1 = $game->decks->pickCard('hunt');
+                    $game->cardDrawEvent($card1, 'hunt');
                     $card2 = $game->decks->pickCard('hunt');
+                    $game->cardDrawEvent($card2, 'hunt');
                     $game->eventLog(clienttranslate('Draws 2 from the ${deck} deck ${buttons}'), [
                         'deck' => 'hunt',
                         'buttons' => notifyButtons([
@@ -1088,10 +1090,33 @@ class DLD_DecksData
                         array_key_exists('damage', $card2) ? $card2['damage'] : 0
                     );
                     if ($maxDamage > 0) {
-                        $game->eventLog(clienttranslate('Received ${damage}'), ['damage' => $maxDamage]);
-                        // Choose tribe member to receive damage
+                        $game->selectionStates->initiateState(
+                            'characterSelection',
+                            [
+                                'id' => $nightCard['id'],
+                                'maxDamage' => $maxDamage,
+                                'selectableCharacters' => $game->character->getAllCharacterIds(),
+                            ],
+                            $game->character->getTurnCharacterId(),
+                            false,
+                            'morningPhase',
+                            clienttranslate('Who is attacked')
+                        );
+                        return ['nextState' => false];
                     } else {
                         $game->eventLog(clienttranslate('No predator\'s visited the camp'));
+                    }
+                },
+                'onCharacterSelection' => function (Game $game, $nightCard, &$data) {
+                    $characterSelectionState = $game->selectionStates->getState('characterSelection');
+                    if ($characterSelectionState && $characterSelectionState['id'] == $nightCard['id']) {
+                        $characterId = $characterSelectionState['selectedCharacterId'];
+                        $game->character->adjustHealth($characterId, -$characterSelectionState['maxDamage']);
+                        $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
+                            'count' => $characterSelectionState['maxDamage'],
+                            'character_resource' => clienttranslate('Health'),
+                            'character_name' => $game->getCharacterHTML($characterId),
+                        ]);
                     }
                 },
             ],
