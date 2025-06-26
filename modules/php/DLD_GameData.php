@@ -48,7 +48,7 @@ class DLD_GameData
         'activeNightCards' => [],
         'activeDayCards' => [],
         'day' => 1,
-        'craftingLevel' => [],
+        'craftingLevel' => [0],
         'turnOrder' => [],
         'turnNo' => 0,
         'interruptState' => [],
@@ -132,9 +132,13 @@ class DLD_GameData
     public function get(string $name): mixed
     {
         $value = array_key_exists($name, $this->cachedGameData) ? $this->cachedGameData[$name] : null;
-        if ($name == 'craftingLevel' && is_numeric($value)) {
-            $value = $value == 0 ? [] : range(1, $value);
-            $this->set($name, $value);
+        if ($name == 'craftingLevel') {
+            if (is_numeric($value)) {
+                $value = $value == 0 ? [] : range(1, $value);
+                $this->set($name, $value);
+            } elseif (!in_array(0, $value)) {
+                $this->set($name, [0, ...$value]);
+            }
         }
         return $value;
     }

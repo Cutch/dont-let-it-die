@@ -2741,7 +2741,7 @@ class Game extends \Table
     }
     public function giveItems()
     {
-        $this->gameData->set('craftingLevel', [1, 2, 3]);
+        $this->gameData->set('craftingLevel', [0, 1, 2, 3]);
 
         extract($this->gameData->getAll('turnNo', 'turnOrder'));
 
@@ -2817,7 +2817,7 @@ class Game extends \Table
     }
     public function maxCraftLevel()
     {
-        $this->gameData->set('craftingLevel', [1, 2, 3]);
+        $this->gameData->set('craftingLevel', [0, 1, 2, 3]);
     }
     public function kill()
     {
