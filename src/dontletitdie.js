@@ -948,7 +948,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     });
   },
   setup: function (gameData) {
-    dojo.subscribe('addMoveToLog', gameui, (logId, moveId) => {
+    dojo.subscribe('addMoveToLog', gameui, () => {
       const addButtonListener = (node) => {
         addClickListener(node, 'Card', () => {
           this.tooltip.show();
@@ -959,14 +959,9 @@ declare('bgagame.dontletitdie', Gamegui, {
           });
         });
       };
-      const nodes1 = document.querySelectorAll(`#log_${logId} .dlid__log-button`);
-      nodes1.forEach((node) => {
-        node.innerHTML = _(node.innerHTML);
-        addButtonListener(node);
-      });
+      const nodes = document.querySelectorAll(`.dlid__log-button:not(.dlid__clickable)`);
       setTimeout(() => {
-        const nodes2 = document.querySelectorAll(`#dockedlog_${logId} .dlid__log-button`);
-        nodes2.forEach((node) => {
+        nodes.forEach((node) => {
           node.innerHTML = _(node.innerHTML);
           addButtonListener(node);
         });

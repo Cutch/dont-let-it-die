@@ -15,15 +15,15 @@ export const addClickListener = function (elem, name, callback, addPadding = fal
     }
   };
   elem.addEventListener('keydown', keydown);
-  elem.classList.add('clickable');
+  elem.classList.add('dlid__clickable');
   if (addPadding) {
-    elem.classList.add('clickable-padding');
+    elem.classList.add('dlid__clickable-padding');
   }
   elem.role = 'button';
   elem['aria-label'] = name;
   return () => {
-    elem.classList.remove('clickable');
-    elem.classList.remove('clickable-padding');
+    elem.classList.remove('dlid__clickable');
+    elem.classList.remove('dlid__clickable-padding');
     elem.tabIndex = '';
     elem.removeEventListener('click', click);
     elem.removeEventListener('keydown', keydown);
