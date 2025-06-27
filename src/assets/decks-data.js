@@ -1641,7 +1641,7 @@ export default {
             _(
               'The ground beneath everyone begins to tremble. Before anyone can even react, the ground opens up and swallows un-equipped items!',
             ),
-            _('Remove 1 weapon and 1 tool that are currently equipped from play') + '.',
+            _('Remove 1 weapon and 1 tool, that are not currently equipped, from play') + '.',
           ],
         },
         frame: {

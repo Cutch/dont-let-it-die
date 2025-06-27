@@ -628,7 +628,7 @@ class Game extends \Table
         $this->notify('notify', clienttranslate('${item_name} destroyed'), [
             'item_name' => notifyTextButton([
                 'name' => $this->data->getItems()[$items[$itemId]]['name'],
-                'dataId' => $itemId,
+                'dataId' => $items[$itemId],
                 'dataType' => 'item',
             ]),
         ]);

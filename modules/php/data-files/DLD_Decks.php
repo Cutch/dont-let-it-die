@@ -878,17 +878,21 @@ class DLD_DecksData
                     $campEquipment = array_map(function ($d) use ($items, $game) {
                         return ['type' => $game->data->getItems()[$items[$d]]['itemType'], 'itemId' => $d];
                     }, $game->gameData->get('campEquipment'));
-                    $tools = array_filter($campEquipment, function ($d) {
-                        $d['type'] == 'tool';
-                    });
+                    $tools = array_values(
+                        array_filter($campEquipment, function ($d) {
+                            return $d['type'] == 'tool';
+                        })
+                    );
                     if (sizeof($tools)) {
                         $game->destroyItem($tools[random_int(0, sizeof($tools) - 1)]['itemId']);
                     }
-                    $weapons = array_filter($campEquipment, function ($d) {
-                        $d['type'] == 'weapon';
-                    });
+                    $weapons = array_values(
+                        array_filter($campEquipment, function ($d) {
+                            return $d['type'] == 'weapon';
+                        })
+                    );
                     if (sizeof($weapons)) {
-                        $game->destroyItem($weapons[random_int(0, sizeof($tools) - 1)]['itemId']);
+                        $game->destroyItem($weapons[random_int(0, sizeof($weapons) - 1)]['itemId']);
                     }
                 },
             ],
