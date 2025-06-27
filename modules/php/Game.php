@@ -1619,20 +1619,30 @@ class Game extends \Table
     public function stNextCharacter(): void
     {
         // Retrieve the active player ID.
-        while (true) {
-            if ($this->character->isLastCharacter()) {
-                $this->nextState('dinnerPhase');
-                $this->actions->clearDayEvent();
-                break;
-            } else {
-                $this->character->activateNextCharacter();
-                $this->actions->clearDayEvent();
-                if ($this->character->getActiveHealth() == 0) {
-                    $this->notify('playerTurn', clienttranslate('${character_name} is incapacitated'), []);
-                } else {
-                    $this->nextState('playerTurn');
-                    $this->notify('playerTurn', clienttranslate('${character_name} begins their turn'), []);
+        if (
+            sizeof(
+                array_filter($this->character->getAllCharacterData(true), function ($d) {
+                    return $d['incapacitated'] && !$d['recovering'];
+                })
+            ) == 4
+        ) {
+            $this->lose();
+        } else {
+            while (true) {
+                if ($this->character->isLastCharacter()) {
+                    $this->nextState('dinnerPhase');
+                    $this->actions->clearDayEvent();
                     break;
+                } else {
+                    $this->character->activateNextCharacter();
+                    $this->actions->clearDayEvent();
+                    if ($this->character->getActiveHealth() == 0) {
+                        $this->notify('playerTurn', clienttranslate('${character_name} is incapacitated'), []);
+                    } else {
+                        $this->nextState('playerTurn');
+                        $this->notify('playerTurn', clienttranslate('${character_name} begins their turn'), []);
+                        break;
+                    }
                 }
             }
         }

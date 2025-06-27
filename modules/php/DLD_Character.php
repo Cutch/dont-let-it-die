@@ -92,6 +92,15 @@ class DLD_Character
         $values = implode(',', $values);
         $this->game::DbQuery("UPDATE `character` SET {$values} WHERE character_name = '$name'");
         $this->game->markChanged('player');
+
+        if (
+            array_key_exists('becameIncapacitated', $data) &&
+            $data['becameIncapacitated'] &&
+            $data['isActive'] &&
+            $this->game->gamestate->state(true, false, true)['name'] == 'playerTurn'
+        ) {
+            $this->game->endTurn();
+        }
     }
     public function updateCharacterData(string $name, $callback)
     {
@@ -641,10 +650,8 @@ class DLD_Character
                 'character_name' => $this->game->getCharacterHTML($characterName),
             ]);
             $data['incapacitated'] = true;
+            $data['becameIncapacitated'] = true;
             $data['stamina'] = 0;
-            if ($data['isActive'] && $this->game->gamestate->state(true, false, true)['name'] == 'playerTurn') {
-                $this->game->endTurn();
-            }
             $hookData = [
                 'characterId' => $characterName,
             ];
