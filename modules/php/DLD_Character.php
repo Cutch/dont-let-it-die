@@ -172,6 +172,8 @@ class DLD_Character
                 $characterData[$k] = $v;
             }
         });
+        $characterData['slots'] = array_count_values($characterData['slots']);
+
         $itemsLookup = $this->game->gameData->getCreatedItems();
         $characterData['dayEvent'] = array_map(function ($itemId) {
             return $this->game->data->getExpansion()[$itemId];
@@ -284,7 +286,14 @@ class DLD_Character
         $item = $items[$itemId];
         $itemName = $this->game->data->getItems()[$item]['id'];
         $itemType = $this->game->data->getItems()[$item]['itemType'];
-        $slotsAllowed = array_count_values($character['slots']);
+        $this->game->hooks->onGetSlots($character);
+        $result = [
+            'character' => $character,
+            'item' => $this->game->data->getItems()[$item],
+            'canEquip' => true,
+        ];
+        $this->game->hooks->onGetItemValidation($result);
+        $slotsAllowed = $character['slots'];
         $equipment = array_values(
             array_filter($character['equipment'], function ($d) use ($removingItemId) {
                 return $d['itemId'] != $removingItemId;
@@ -305,7 +314,7 @@ class DLD_Character
                     return $d['id'] == $itemName;
                 })
             ) > 0;
-        return ['hasOpenSlots' => $hasOpenSlots, 'hasDuplicateTool' => $hasDuplicateTool];
+        return ['hasOpenSlots' => $hasOpenSlots, 'hasDuplicateTool' => $hasDuplicateTool, 'canEquip' => $result['canEquip']];
     }
     public function equipAndValidateEquipment(string $characterId, int $itemId)
     {
@@ -316,9 +325,10 @@ class DLD_Character
         $itemType = $itemObj['itemType'];
 
         $result = $this->getItemValidations((int) $itemId, $character);
+        $canEquip = $result['canEquip'];
         $hasOpenSlots = $result['hasOpenSlots'];
         $hasDuplicateTool = $result['hasDuplicateTool'];
-        if ($hasOpenSlots && !$hasDuplicateTool) {
+        if ($hasOpenSlots && !$hasDuplicateTool && $canEquip) {
             $this->equipEquipment($character['id'], [$itemId]);
         } else {
             $existingItems = array_map(
@@ -691,7 +701,8 @@ class DLD_Character
     public function getMarshallCharacters()
     {
         return array_map(function ($char) {
-            $slotsAllowed = array_count_values($char['slots']);
+            $this->game->hooks->onGetSlots($char);
+            $slotsAllowed = $char['slots'];
             $slotsUsed = array_count_values(
                 array_map(function ($d) {
                     return $d['itemType'];

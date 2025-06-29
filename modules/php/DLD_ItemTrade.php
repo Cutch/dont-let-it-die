@@ -145,6 +145,7 @@ class DLD_ItemTrade
             );
             if ($itemId2) {
                 $result = $this->game->character->getItemValidations((int) $itemId2, $trade1['character'], (int) $itemId1);
+                $canEquip = $result['canEquip'];
                 $hasOpenSlots = $result['hasOpenSlots'];
                 $hasDuplicateTool = $result['hasDuplicateTool'];
 
@@ -153,6 +154,9 @@ class DLD_ItemTrade
                 }
                 if (!$hasOpenSlots) {
                     throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
+                }
+                if (!$canEquip) {
+                    throw new BgaUserException(clienttranslate('Can\'t equip that item'));
                 }
                 if ($hasDuplicateTool) {
                     throw new BgaUserException(clienttranslate('Cannot have a duplicate tool'));
@@ -246,6 +250,7 @@ class DLD_ItemTrade
         );
         if ($itemId1) {
             $result = $this->game->character->getItemValidations((int) $itemId1, $trade2['character'], (int) $itemId2);
+            $canEquip = $result['canEquip'];
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
             if ($this->checkForTradableCharacters($trade2['character']['id'], $itemId1)) {
@@ -254,6 +259,9 @@ class DLD_ItemTrade
             if (!$hasOpenSlots) {
                 throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
             }
+            if (!$canEquip) {
+                throw new BgaUserException(clienttranslate('Can\'t equip that item'));
+            }
             if ($hasDuplicateTool) {
                 throw new BgaUserException(clienttranslate('Cannot of a duplicate tool'));
             }
@@ -261,6 +269,7 @@ class DLD_ItemTrade
         }
         if ($itemId2) {
             $result = $this->game->character->getItemValidations((int) $itemId2, $trade1['character'], (int) $itemId1);
+            $canEquip = $result['canEquip'];
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
 
@@ -269,6 +278,9 @@ class DLD_ItemTrade
             }
             if (!$hasOpenSlots) {
                 throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
+            }
+            if (!$canEquip) {
+                throw new BgaUserException(clienttranslate('Can\'t equip that item'));
             }
             if ($hasDuplicateTool) {
                 throw new BgaUserException(clienttranslate('Cannot of a duplicate tool'));

@@ -607,6 +607,11 @@ class DLD_ExpansionData
                         }
                     }
                 },
+                'onGetItemValidation' => function (Game $game, $card, &$data) {
+                    if ($data['character']['id'] == $card['characterId'] && array_key_exists('range', $data['item'])) {
+                        $data['canEquip'] = $data['item']['range'] < 2;
+                    }
+                },
             ],
             'hindrance_1_1' => [
                 'deck' => 'physical-hindrance',
@@ -631,6 +636,11 @@ class DLD_ExpansionData
                             $game->character->unequipEquipment($game->character->getTurnCharacterId(), $weaponIds, true);
                             $game->eventLog(clienttranslate('${character_name} sent their weapon to camp'));
                         }
+                    }
+                },
+                'onGetSlots' => function (Game $game, $card, &$data) {
+                    if (array_key_exists('weapon', $data['slots']) && $data['id'] == $card['characterId']) {
+                        unset($data['slots']['weapon']);
                     }
                 },
             ],
@@ -841,6 +851,11 @@ class DLD_ExpansionData
                             $game->character->unequipEquipment($game->character->getTurnCharacterId(), $toolIds, true);
                             $game->eventLog(clienttranslate('${character_name} sent their tool to camp'));
                         }
+                    }
+                },
+                'onGetSlots' => function (Game $game, $card, &$data) {
+                    if (array_key_exists('tool', $data['slots']) && $data['id'] == $card['characterId']) {
+                        unset($data['slots']['tool']);
                     }
                 },
             ],

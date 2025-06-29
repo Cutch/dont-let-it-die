@@ -1067,6 +1067,7 @@ class DLD_ItemsData
                 'cost' => [
                     'rock' => 1,
                 ],
+                'useCost' => [], //Makes this optional
                 'onUse' => function (Game $game, $item, $itemId) {
                     $game->character->unequipEquipment($item['characterId'], [$itemId]);
                     $game->notify('usedItem', clienttranslate('${character_name} used ${item_name} and lost their ${item_name}'), [
