@@ -1433,7 +1433,7 @@ class DLD_CharactersData
                         'interruptState' => ['resolveEncounter'],
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
-                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                                $game->character->clearCharacterSkills($data['skills'], $skill['characterId']);
                             }
                         },
                         'onEncounter' => function (Game $game, $skill, &$data) {
@@ -1455,7 +1455,7 @@ class DLD_CharactersData
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $data['data']['loot']['hide'] = $data['data']['willReceiveMeat'];
                                 $data['data']['willReceiveMeat'] = 0;
-                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                                $game->character->clearCharacterSkills($data['skills'], $skill['characterId']);
                             }
                         },
                         'onEncounter' => function (Game $game, $skill, &$data) {
@@ -1477,7 +1477,7 @@ class DLD_CharactersData
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $data['data']['loot']['bone'] = $data['data']['willReceiveMeat'];
                                 $data['data']['willReceiveMeat'] = 0;
-                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                                $game->character->clearCharacterSkills($data['skills'], $skill['characterId']);
                             }
                         },
                         'onEncounter' => function (Game $game, $skill, &$data) {
@@ -1995,10 +1995,11 @@ class DLD_CharactersData
                         'type' => 'skill',
                         'name' => clienttranslate('Double Healing'), // If Cooked
                         'state' => ['interrupt'],
-                        'interruptState' => ['playerTurn', 'eatSelection'],
+                        'interruptState' => ['playerTurn', 'eatSelection', 'dinnerPhase'],
+                        'cancellable' => false,
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
-                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                                $game->character->clearCharacterSkills($data['skills'], $skill['characterId']);
                                 $data['data']['health'] *= 2;
                             }
                         },
@@ -2006,7 +2007,7 @@ class DLD_CharactersData
                             $skill['sendNotification']();
                         },
                         'onEat' => function (Game $game, $skill, &$data) {
-                            if ($game->character->getSubmittingCharacterId() == $skill['characterId']) {
+                            if ($data['characterId'] == $skill['characterId']) {
                                 if (str_contains($data['type'], '-cooked')) {
                                     $game->actInterrupt->addSkillInterrupt($skill);
                                 }
@@ -2020,10 +2021,11 @@ class DLD_CharactersData
                         'type' => 'skill',
                         'name' => clienttranslate('+1 Max Health'), // If Cooked
                         'state' => ['interrupt'],
-                        'interruptState' => ['playerTurn', 'eatSelection'],
+                        'interruptState' => ['playerTurn', 'eatSelection', 'dinnerPhase'],
+                        'cancellable' => false,
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
-                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                                $game->character->clearCharacterSkills($data['skills'], $skill['characterId']);
                                 $game->character->updateCharacterData($skill['characterId'], function (&$data) {
                                     $data['modifiedMaxHealth'] += 1;
                                 });
@@ -2033,7 +2035,7 @@ class DLD_CharactersData
                             $skill['sendNotification']();
                         },
                         'onEat' => function (Game $game, $skill, &$data) {
-                            if ($game->character->getSubmittingCharacterId() == $skill['characterId']) {
+                            if ($data['characterId'] == $skill['characterId']) {
                                 if (str_contains($data['type'], '-cooked')) {
                                     $game->actInterrupt->addSkillInterrupt($skill);
                                 }
@@ -2333,7 +2335,7 @@ class DLD_CharactersData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->character->setSubmittingCharacter('actUseSkill', $activatedSkill['id']);
-                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                                $game->character->clearCharacterSkills($data['skills'], $skill['characterId']);
                                 $state = $game->selectionStates->getState('characterSelection');
                                 $change = $game->character->adjustHealth($state['selectedCharacterId'], 1);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
@@ -2362,7 +2364,7 @@ class DLD_CharactersData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $game->character->setSubmittingCharacter('actUseSkill', $activatedSkill['id']);
-                                $this->clearCharacterSkills($data['skills'], $skill['characterId']);
+                                $game->character->clearCharacterSkills($data['skills'], $skill['characterId']);
                                 $state = $game->selectionStates->getState('characterSelection');
                                 $change = $game->character->adjustStamina($state['selectedCharacterId'], 1);
                                 $game->eventLog(clienttranslate('${character_name} gained ${count} ${character_resource}'), [
@@ -2392,13 +2394,5 @@ class DLD_CharactersData
                 // Cannot be used with Atouk, handled in choose
             ],
         ];
-    }
-    private function clearCharacterSkills(&$skills, $itemId)
-    {
-        array_walk($skills, function ($v, $k) use (&$skills, $itemId) {
-            if ($v['characterId'] == $itemId) {
-                unset($skills[$k]);
-            }
-        });
     }
 }

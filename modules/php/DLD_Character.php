@@ -482,6 +482,13 @@ class DLD_Character
                 }
             }
         }
+        foreach ($this->game->actions->getActions() as $k => $action) {
+            if (array_key_exists('skills', $action)) {
+                if (array_key_exists($skillId, $action['skills'])) {
+                    return ['character' => $currentCharacter, 'skill' => $action['skills'][$skillId]];
+                }
+            }
+        }
         return null;
     }
     // public function getItem($itemId): ?array
@@ -711,5 +718,13 @@ class DLD_Character
                 'slotsAllowed' => $slotsAllowed,
             ];
         }, $this->getAllCharacterData());
+    }
+    public function clearCharacterSkills(&$skills, ?string $characterId = null)
+    {
+        array_walk($skills, function ($v, $k) use (&$skills, $characterId) {
+            if ($characterId == null || $v['characterId'] == $characterId) {
+                unset($skills[$k]);
+            }
+        });
     }
 }

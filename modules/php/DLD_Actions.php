@@ -122,6 +122,88 @@ class DLD_Actions
                         usePerDay($data['characterId'] . 'fish', $game);
                     }
                 },
+                'skills' => [
+                    'skill1' => [
+                        'type' => 'skill',
+                        'name' => clienttranslate('Eat'),
+                        'state' => ['interrupt'],
+                        'interruptState' => ['playerTurn', 'eatSelection', 'dinnerPhase'],
+                        'cancellable' => false,
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                            if ($skill['id'] == $activatedSkill['id']) {
+                                $game->character->clearCharacterSkills($data['skills']);
+                            }
+                        },
+                        'onUse' => function (Game $game, $skill) {
+                            $skill['sendNotification']();
+                        },
+                        'onEat' => function (Game $game, $skill, &$data) {
+                            if (
+                                ($data['characterId'] !== 'Cali' || !str_contains($data['type'], '-cooked')) &&
+                                sizeof($this->game->character->getCharacterData($data['characterId'], true)['physicalHindrance']) > 0
+                            ) {
+                                $skill['characterId'] = $data['characterId'];
+                                $game->actInterrupt->addSkillInterrupt($skill);
+                            }
+                        },
+                    ],
+                    'skill2' => [
+                        'type' => 'skill',
+                        'name' => clienttranslate('Clear Hindrance'),
+                        'state' => ['interrupt'],
+                        'interruptState' => ['playerTurn', 'eatSelection', 'dinnerPhase'],
+                        'cancellable' => false,
+                        'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
+                            if ($skill['id'] == $activatedSkill['id']) {
+                                $data['skipAndDontComplete'] = true;
+                                // var_dump(json_encode($data));
+                                $game->selectionStates->initiateHindranceSelection(
+                                    $skill['id'],
+                                    [$data['data']['characterId']],
+                                    null,
+                                    false,
+                                    $data['currentState'],
+                                    true
+                                );
+                            }
+                        },
+                        'onUse' => function (Game $game, $skill) {
+                            return ['notify' => false];
+                        },
+                        'onEat' => function (Game $game, $skill, &$data) {
+                            if (sizeof($this->game->character->getCharacterData($data['characterId'], true)['physicalHindrance']) > 0) {
+                                $skill['characterId'] = $data['characterId'];
+                                $game->actInterrupt->addSkillInterrupt($skill);
+                            }
+                        },
+                        'onHindranceSelection' => function (Game $game, $action, &$data) {
+                            $state = $game->selectionStates->getState('hindranceSelection');
+                            if ($state && $state['id'] == $action['id']) {
+                                $count = 0;
+                                foreach ($state['characters'] as $char) {
+                                    $cardIds = array_map(
+                                        function ($d) {
+                                            return $d['cardId'];
+                                        },
+                                        array_filter($data['selections'], function ($d) use ($char) {
+                                            return $d['characterId'] == $char['characterId'];
+                                        })
+                                    );
+                                    foreach ($char['physicalHindrance'] as $card) {
+                                        if (in_array($card['id'], $cardIds)) {
+                                            $count++;
+                                            $this->game->character->removeHindrance($char['characterId'], $card);
+                                        }
+                                    }
+                                }
+                                if ($count > 1) {
+                                    throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
+                                }
+                                $game->notify('notify', clienttranslate('${character_name} ate and removed a hindrance'));
+                            }
+                        },
+                    ],
+                ],
             ],
             'actAddWood' => [
                 'state' => ['playerTurn', 'dinnerPhase'],
@@ -378,6 +460,14 @@ class DLD_Actions
                     }
                     return [];
                 }, $this->getActiveDayEvents()),
+                ...array_values(
+                    array_map(function ($c) {
+                        if (array_key_exists('skills', $c)) {
+                            return $c['skills'];
+                        }
+                        return [];
+                    }, $this->actions)
+                ),
                 ...array_map(function ($c) {
                     if (array_key_exists('skills', $c)) {
                         return $c['skills'];

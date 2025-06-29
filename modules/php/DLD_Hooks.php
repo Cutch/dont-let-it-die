@@ -51,6 +51,20 @@ class DLD_Hooks
                 }
                 return [];
             }, $buildings),
+            ...array_values(
+                array_map(function ($c) {
+                    if (array_key_exists('skills', $c)) {
+                        return $c['skills'];
+                    }
+                    return [];
+                }, $actions)
+            ),
+            // ...array_map(function ($c) {
+            //     if (array_key_exists('skills', $c)) {
+            //         return $c['skills'];
+            //     }
+            //     return [];
+            // }, $actions),
             ...array_map(function ($c) {
                 if (array_key_exists('skills', $c)) {
                     return $c['skills'];

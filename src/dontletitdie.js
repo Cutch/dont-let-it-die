@@ -1531,8 +1531,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                         characterId: action.character ?? null,
                       })
                         .then(() => {
-                          this.eatScreen.hide();
-                          this.onUpdateActionButtons(stateName, args);
+                          if (this.gamedatas.gamestate.name !== 'eatSelection') this.eatScreen.hide();
                         })
                         .catch(console.error);
                     }
@@ -1661,7 +1660,8 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.statusBar.addActionButton(_('Cancel'), () => this.bgaPerformAction('actCancelTrade'), { color: 'secondary' });
           break;
         case 'interrupt':
-          this.statusBar.addActionButton(_('Skip'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
+          if (!this.gamedatas.availableSkills.some((d) => d.cancellable === false))
+            this.statusBar.addActionButton(_('Skip'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
           break;
         case 'dayEvent':
           // No Cancel Button
@@ -1772,7 +1772,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         case 'dinnerPhase':
         case 'dinnerPhasePrivate':
           backAction();
-          skipOthersActions();
+          if (!this.gamedatas.availableSkills.some((d) => d.cancellable === false)) skipOthersActions();
           break;
         case 'tradePhase':
           backAction();
@@ -1791,22 +1791,23 @@ declare('bgagame.dontletitdie', Gamegui, {
           backAction();
           break;
         case 'interrupt':
-          if (gameui.gamedatas.activeTurnPlayerId == gameui.player_id && !this.gamedatas.isRealTime) {
-            actions
-              .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
-              .forEach((action) => {
-                const actionId = action.action;
-                if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
-                  return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
-                    (skill) => {
-                      const suffix = this.getActionSuffixHTML(skill);
-                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {}, { disabled: true });
-                    },
-                  );
-                }
-              });
-            skipOthersActions();
-          }
+          if (!this.gamedatas.availableSkills.some((d) => d.cancellable === false))
+            if (gameui.gamedatas.activeTurnPlayerId == gameui.player_id && !this.gamedatas.isRealTime) {
+              actions
+                .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
+                .forEach((action) => {
+                  const actionId = action.action;
+                  if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
+                    return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
+                      (skill) => {
+                        const suffix = this.getActionSuffixHTML(skill);
+                        this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {}, { disabled: true });
+                      },
+                    );
+                  }
+                });
+              skipOthersActions();
+            }
           break;
       }
     }

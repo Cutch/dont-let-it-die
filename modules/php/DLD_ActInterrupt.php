@@ -222,21 +222,24 @@ class DLD_ActInterrupt
                 $skills = array_values($skills);
             }
         });
-        $this->setState($functionName, [...$data, 'skills' => $skills]);
-        $newCharacterIds = $this->getSkillsCharacterIds($skills);
+        if (array_key_exists('skipAndDontComplete', $data)) {
+        } else {
+            $this->setState($functionName, [...$data, 'skills' => $skills]);
+            $newCharacterIds = $this->getSkillsCharacterIds($skills);
 
-        $array = array_unique(array_diff($characterIds, $newCharacterIds));
-        // if (sizeof($array) > 0) {
-        //     $this->game->gamestate->setPlayerNonMultiactive($array[0], $data['currentState']);
-        // }
-        $changeState = !$this->game->gamestate->isMutiactiveState();
-        if (!$changeState) {
-            foreach ($array as $k => $v) {
-                $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
+            $array = array_unique(array_diff($characterIds, $newCharacterIds));
+            // if (sizeof($array) > 0) {
+            //     $this->game->gamestate->setPlayerNonMultiactive($array[0], $data['currentState']);
+            // }
+            $changeState = !$this->game->gamestate->isMutiactiveState();
+            if (!$changeState) {
+                foreach ($array as $k => $v) {
+                    $changeState |= $this->game->gameData->removeMultiActiveCharacter($v, $data['currentState']);
+                }
             }
-        }
-        if ($changeState) {
-            $this->completeInterrupt();
+            if ($changeState) {
+                $this->completeInterrupt();
+            }
         }
     }
     public function completeInterrupt()

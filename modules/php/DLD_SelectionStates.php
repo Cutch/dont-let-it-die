@@ -457,7 +457,8 @@ class DLD_SelectionStates
         ?array $characters = null,
         ?string $button = null,
         ?bool $cancellable = true,
-        ?string $nextState = 'playerTurn'
+        ?string $nextState = 'playerTurn',
+        bool $isInterrupt = false
     ) {
         if ($characters == null) {
             $characters = [$this->game->character->getTurnCharacterId()];
@@ -467,7 +468,7 @@ class DLD_SelectionStates
                 function ($d) {
                     return ['physicalHindrance' => $d['physicalHindrance'], 'characterId' => $d['character_name']];
                 },
-                array_filter($this->game->character->getAllCharacterData(), function ($d) use ($characters) {
+                array_filter($this->game->character->getAllCharacterData(true), function ($d) use ($characters) {
                     return in_array($d['id'], $characters) && sizeof($d['physicalHindrance']) > 0;
                 })
             )
@@ -477,7 +478,9 @@ class DLD_SelectionStates
             ['id' => $id, 'characters' => $characters, 'button' => $button],
             $this->game->character->getTurnCharacterId(),
             $cancellable,
-            $nextState
+            $nextState,
+            null,
+            $isInterrupt
         );
     }
 }

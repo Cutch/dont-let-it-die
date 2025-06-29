@@ -96,6 +96,7 @@ $interruptScreens = [
     'cardSelection' => $cardSelection,
     'tokenReduceSelection' => $tokenReduceSelection,
     'undo' => $undo,
+    'dinnerPhase' => $dinnerPhase,
 ];
 
 $machinestates = [

@@ -855,7 +855,9 @@ class Game extends \Table
                 };
                 if ($_this->gamestate->state(true, false, true)['name'] == 'interrupt') {
                     // Only applies to skills from an interrupt state
-                    $skill['sendNotification']();
+                    if (!$notificationSent && (!$data || !array_key_exists('notify', $data) || $data['notify'] != false)) {
+                        $skill['sendNotification']();
+                    }
                     $_this->actInterrupt->actInterrupt($skillId, $skillSecondaryId);
                     $_this->actions->spendActionCost('actUseSkill', $skillId);
                     $_this->character->setSubmittingCharacter('actUseSkill', $skillId);
