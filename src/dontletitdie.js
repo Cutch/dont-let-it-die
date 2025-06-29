@@ -94,6 +94,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     return {
       actInvestigateFire: _('Investigate Fire'),
       actCraft: _('Craft'),
+      actDraw: _('Draw'),
       actDrawGather: _('Gather'),
       actDrawForage: _('Forage'),
       actDrawHarvest: _('Harvest'),
@@ -1304,7 +1305,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (isStudio()) console.log('onUpdateActionButtons', isActive, stateName, actions);
     if (isActive && stateName && actions != null) {
       this.clearActionButtons();
-      const skipButtons = ['actDrawGather', 'actDrawForage', 'actDrawHarvest', 'actDrawHunt', 'actDrawExplore'];
+      let renderedDrawMenu = false;
 
       // Add test action buttons in the action status bar, simulating a card click:
       if (actions) {
@@ -1313,11 +1314,16 @@ declare('bgagame.dontletitdie', Gamegui, {
           // actAddWood: 'darkgray',
           // actRevive: 'darkgray',
           // actEat: 'darkgray',
+          actDraw: 'green',
           actUseSkill: 'green',
           actUseItem: 'green',
         };
         actions
-          .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
+          .sort((a, b) => {
+            const d1 = a.action.includes('actDraw') ? 8 : null;
+            const d2 = b.action.includes('actDraw') ? 8 : null;
+            return (d1 ?? a?.stamina ?? 9) - (d2 ?? b?.stamina ?? 9);
+          })
           .forEach((action) => {
             const actionId = action.action;
             if (stateName == 'eatSelection') return;
@@ -1356,8 +1362,32 @@ declare('bgagame.dontletitdie', Gamegui, {
                 }),
               );
             }
+            if (actionId.includes('actDraw')) {
+              if (!renderedDrawMenu) {
+                const suffix = this.getActionSuffixHTML({ random: true });
+                this.statusBar.addActionButton(
+                  `${this.getActionMappings()['actDraw']}${suffix}`,
+                  () => {
+                    this.clearActionButtons();
+
+                    actions
+                      .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
+                      .filter((d) => d.action.includes('actDraw'))
+                      .forEach((action) => {
+                        const suffix = this.getActionSuffixHTML(action);
+                        this.statusBar.addActionButton(`${this.getActionMappings()[action.action]}${suffix}`, () => {
+                          return this.bgaPerformAction(action.action);
+                        });
+                      });
+                    this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
+                  },
+                  stateName === 'playerTurn' ? { classes: 'bgabutton_' + (colorLookup['actDraw'] ?? 'blue') } : null,
+                );
+              }
+              renderedDrawMenu = true;
+              return;
+            }
             const suffix = this.getActionSuffixHTML(action);
-            if (skipButtons.includes(actionId)) return;
             return this.statusBar.addActionButton(
               `${this.getActionMappings()[actionId]}${suffix}`,
               () => {
