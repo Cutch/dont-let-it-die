@@ -777,7 +777,7 @@ class DLD_DecksData
                                     array_filter($character['equipment'], function ($equipment) {
                                         return $equipment['itemType'] == 'weapon';
                                     })
-                                )
+                                ) == 0
                             ) {
                                 $game->character->adjustHealth($character['character_name'], -2);
                             }
