@@ -103,4 +103,10 @@ if (!function_exists('addId')) {
         });
         return $return;
     }
+    function toId(array $array)
+    {
+        return array_map(function ($d) {
+            return $d['id'];
+        }, $array);
+    }
 }

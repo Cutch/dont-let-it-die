@@ -37,6 +37,7 @@
 .dice-base {
   transform: translate(-50%, -50%);
   box-shadow: 0 0 30px 16px black;
+  background-color: #000000bf;
   border-radius: 50%;
   border-radius: 50%;
   width: 10em;
@@ -49,32 +50,32 @@
   width: 10em;
   height: 10em;
   transform-style: preserve-3d;
-  transform: translate(-50%, -50%) rotateX(0) rotateZ(0);
-  transition: transform 1s;
+  transform: translate3d(-50%, -50%, 2rem) rotateX(0) rotateZ(0);
+  // transition: transform 1s;
   position: relative;
 
   &.show-1 {
-    transform: translate(-50%, -50%) rotateX(720deg) rotateZ(-720deg);
+    transform: translate3d(-50%, -50%, 2rem) rotateX(720deg) rotateZ(-720deg);
   }
 
   &.show-6 {
-    transform: translate(-50%, -50%) rotateX(-990deg) rotateZ(810deg);
+    transform: translate3d(-50%, -50%, 2rem) rotateX(-990deg) rotateZ(810deg);
   }
 
   &.show-3 {
-    transform: translate(-50%, -50%) rotateY(-900deg) rotateZ(-1440deg);
+    transform: translate3d(-50%, -50%, 2rem) rotateY(-900deg) rotateZ(-1440deg);
   }
 
   &.show-4 {
-    transform: translate(-50%, -50%) rotateX(-810deg) rotateZ(-1080deg);
+    transform: translate3d(-50%, -50%, 2rem) rotateX(-810deg) rotateZ(-1080deg);
   }
 
   &.show-5 {
-    transform: translate(-50%, -50%) rotateY(810deg) rotateZ(810deg);
+    transform: translate3d(-50%, -50%, 2rem) rotateY(810deg) rotateZ(810deg);
   }
 
   &.show-2 {
-    transform: translate(-50%, -50%) rotateX(900deg) rotateZ(-900deg);
+    transform: translate3d(-50%, -50%, 2rem) rotateX(900deg) rotateZ(-900deg);
   }
 
   .side-wrapper {

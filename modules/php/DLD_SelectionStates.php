@@ -353,9 +353,7 @@ class DLD_SelectionStates
             gettype($result['selectionState']['selectableCharacters'][0]) == 'array'
         ) {
             $temp = $this->game->gameData->get($stateName);
-            $temp['selectableCharacters'] = array_map(function ($d) {
-                return $d['id'];
-            }, $temp['selectableCharacters']);
+            $temp['selectableCharacters'] = toId($temp['selectableCharacters']);
             $this->game->gameData->set($stateName, $temp);
             $result['selectionState'] = $temp;
         }

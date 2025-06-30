@@ -938,7 +938,7 @@ class DLD_DecksData
                     if (
                         sizeof(
                             array_filter($game->character->getAllCharacterData(false), function ($d) {
-                                return sizeof($d['physicalHindrance']) > 0;
+                                return sizeof($d['physicalHindrance']) > 0 && !in_array('hindrance_2_5', toId($d['physicalHindrance']));
                             })
                         ) > 0
                     ) {
@@ -962,7 +962,7 @@ class DLD_DecksData
                     if ($state && $state['id'] == $nightCard['id']) {
                         $characterTotal = sizeof(
                             array_filter($game->character->getAllCharacterData(false), function ($d) {
-                                return sizeof($d['physicalHindrance']) > 0;
+                                return sizeof($d['physicalHindrance']) > 0 && !in_array('hindrance_2_5', toId($d['physicalHindrance']));
                             })
                         );
                         $characterCount = sizeof(

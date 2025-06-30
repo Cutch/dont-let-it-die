@@ -138,7 +138,8 @@ class DLD_ItemsData
                                         return ['physicalHindrance' => $d['physicalHindrance'], 'characterId' => $d['id']];
                                     },
                                     array_filter($game->character->getAllCharacterData(false), function ($d) {
-                                        return sizeof($d['physicalHindrance']) > 0;
+                                        return sizeof($d['physicalHindrance']) > 0 &&
+                                            !in_array('hindrance_2_5', toId($d['physicalHindrance']));
                                     })
                                 )
                             );
@@ -193,7 +194,8 @@ class DLD_ItemsData
                             return $char['isActive'] &&
                                 sizeof(
                                     array_filter($game->character->getAllCharacterData(false), function ($d) {
-                                        return sizeof($d['physicalHindrance']) > 0;
+                                        return sizeof($d['physicalHindrance']) > 0 &&
+                                            !in_array('hindrance_2_5', toId($d['physicalHindrance']));
                                     })
                                 ) > 0;
                         },
@@ -930,10 +932,7 @@ class DLD_ItemsData
                             $char = $game->character->getCharacterData($skill['characterId']);
                             if ($char['isActive'] && in_array($skill['parentId'], $data['itemIdUsed'])) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
-                                $characterIds = array_map(
-                                    function ($d) {
-                                        return $d['id'];
-                                    },
+                                $characterIds = toId(
                                     array_filter($game->character->getAllCharacterData(), function ($character) {
                                         return !$character['incapacitated'];
                                     })

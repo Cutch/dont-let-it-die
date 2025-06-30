@@ -1965,9 +1965,7 @@ class Game extends \Table
         $equippedEquipment = array_merge(
             [],
             ...array_map(function ($data) {
-                return array_map(function ($d) {
-                    return $d['id'];
-                }, $data['equipment']);
+                return toId($data['equipment']);
             }, $this->character->getAllCharacterData())
         );
         $equippedCounts = array_count_values(array_values($equippedEquipment));
@@ -2031,9 +2029,7 @@ class Game extends \Table
         $selectable = $this->actions->getActionSelectable('actCraft');
 
         $result['availableEquipment'] = array_combine(
-            array_map(function ($d) {
-                return $d['id'];
-            }, $selectable),
+            toId($selectable),
             array_map(function ($d) use ($result) {
                 return $d['count'] - (array_key_exists($d['id'], $result['builtEquipment']) ? $result['builtEquipment'][$d['id']] : 0);
             }, $selectable)
@@ -2059,9 +2055,7 @@ class Game extends \Table
             )
         );
         $result['availableEquipmentCount'] = array_combine(
-            array_map(function ($d) {
-                return $d['id'];
-            }, $allBuildableEquipment),
+            toId($allBuildableEquipment),
             array_map(function ($d) use ($result, $buildings) {
                 if ($d['itemType'] == 'building' && sizeof($buildings) >= $this->getMaxBuildingCount()) {
                     return 0;
@@ -2472,9 +2466,7 @@ class Game extends \Table
         $equippedEquipment = array_merge(
             [],
             ...array_map(function ($data) {
-                return array_map(function ($d) {
-                    return $d['id'];
-                }, $data['equipment']);
+                return toId($data['equipment']);
             }, $this->character->getAllCharacterData(false))
         );
         if (sizeof($this->gameData->get('lastItemOwners')) == 0 && sizeof($equippedEquipment) > 0) {
@@ -2494,10 +2486,7 @@ class Game extends \Table
             'trackDifficulty' => $this->getTrackDifficulty(),
             'isRealTime' => $this->isRealTime() || !$this->getIsTrusting(),
             'allItems' => array_values(
-                array_map(
-                    function ($d) {
-                        return $d['id'];
-                    },
+                toId(
                     array_filter($this->data->getItems(), function ($d) {
                         return $d['type'] == 'item';
                     })
@@ -2877,6 +2866,11 @@ class Game extends \Table
     public function shuffle()
     {
         $this->decks->shuffleInDiscard('gather', true);
+        $this->completeAction();
+    }
+    public function destroy(string $resourceType = 'fiber')
+    {
+        $this->gameData->destroyResource($resourceType);
         $this->completeAction();
     }
     public function unlockAll()

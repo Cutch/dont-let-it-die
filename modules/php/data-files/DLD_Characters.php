@@ -121,7 +121,10 @@ class DLD_CharactersData
                             return $skill['characterId'] . $skill['id'];
                         },
                         'onInvestigateFire' => function (Game $game, $skill, &$data) {
-                            if (getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1) {
+                            if (
+                                getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1 &&
+                                !$game->character->getCharacterData($skill['characterId'], true)['incapacitated']
+                            ) {
                                 $rolling2 = array_key_exists('originalRoll2', $data);
 
                                 if ($data['originalRoll'] < 3) {
@@ -333,7 +336,7 @@ class DLD_CharactersData
                     ],
                 ],
                 'onEncounterPost' => function (Game $game, $char, &$data) {
-                    if ($game->encounter->killCheck($data)) {
+                    if ($game->encounter->killCheck($data) && !$char['incapacitated']) {
                         $data['stamina'] += 1;
 
                         $game->eventLog(clienttranslate('${character_name} gave 1 stamina to ${active_character_name}'), [
@@ -439,10 +442,7 @@ class DLD_CharactersData
                         'onUse' => function (Game $game, $skill, &$data) {
                             $myCharId = $skill['characterId'];
                             $characters = array_values(
-                                array_map(
-                                    function ($d) {
-                                        return $d['id'];
-                                    },
+                                toId(
                                     array_filter($game->character->getAllCharacterData(false), function ($d) {
                                         return sizeof($d['physicalHindrance']) > 0;
                                     })
@@ -932,10 +932,7 @@ class DLD_CharactersData
                             }
                         },
                         'onUse' => function (Game $game, $skill) {
-                            $characterIds = array_map(
-                                function ($d) {
-                                    return $d['id'];
-                                },
+                            $characterIds = toId(
                                 array_filter($game->character->getAllCharacterData(), function ($character) {
                                     return !$character['incapacitated'];
                                 })
@@ -970,7 +967,11 @@ class DLD_CharactersData
                     return $char['id'] . 'skillonDraw';
                 },
                 'onNight' => function (Game $game, $char, &$data) {
-                    if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
+                    if (
+                        array_key_exists('eventType', $data['card']) &&
+                        $data['card']['eventType'] == 'rival-tribe' &&
+                        !$char['incapacitated']
+                    ) {
                         foreach ($game->character->getAllCharacterData() as $k => $character) {
                             if (
                                 sizeof(
@@ -986,7 +987,7 @@ class DLD_CharactersData
                     }
                 },
                 'onEncounterPost' => function (Game $game, $char, &$data) {
-                    if ($game->encounter->killCheck($data)) {
+                    if ($game->encounter->killCheck($data) && !$char['incapacitated']) {
                         if (
                             sizeof(
                                 array_filter($char['mentalHindrance'], function ($hindrance) {
@@ -1039,12 +1040,10 @@ class DLD_CharactersData
                         'onUse' => function (Game $game, $skill, &$data) {
                             $game->selectionStates->initiateHindranceSelection(
                                 $skill['id'],
-                                array_map(
-                                    function ($d) {
-                                        return $d['id'];
-                                    },
+                                toId(
                                     array_filter($game->character->getAllCharacterData(false), function ($d) {
-                                        return sizeof($d['physicalHindrance']) > 0;
+                                        return sizeof($d['physicalHindrance']) > 0 &&
+                                            !in_array('hindrance_2_5', toId($d['physicalHindrance']));
                                     })
                                 )
                             );
@@ -1083,7 +1082,8 @@ class DLD_CharactersData
                             return $char['isActive'] &&
                                 sizeof(
                                     array_filter($game->character->getAllCharacterData(false), function ($d) {
-                                        return sizeof($d['physicalHindrance']) > 0;
+                                        return sizeof($d['physicalHindrance']) > 0 &&
+                                            !in_array('hindrance_2_5', toId($d['physicalHindrance']));
                                     })
                                 ) > 0;
                         },
@@ -1415,7 +1415,7 @@ class DLD_CharactersData
                 },
                 // 1 FKP for Danger Cards Killed
                 'onEncounterPost' => function (Game $game, $char, &$data) {
-                    if ($game->encounter->killCheck($data)) {
+                    if ($game->encounter->killCheck($data) && !$char['incapacitated']) {
                         if ($game->adjustResource('fkp', 1)['changed'] > 0) {
                             $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 1,
@@ -1780,9 +1780,7 @@ class DLD_CharactersData
                 //     }
                 // },
                 'onMorning' => function (Game $game, $char, &$data) {
-                    if ($char['isActive']) {
-                        array_push($data['skipMorningDamage'], 'Vog');
-                    }
+                    array_push($data['skipMorningDamage'], 'Vog');
                 },
                 'skills' => [
                     'skill1' => [
@@ -1867,8 +1865,8 @@ class DLD_CharactersData
                 'onGetMaxBuildingCount' => function (Game $game, $char, &$data) {
                     $data['count'] = 2;
                 },
-                'onGetUnlockCost' => function (Game $game, $unlock, &$data) {
-                    if (str_contains($data['id'], 'crafting')) {
+                'onGetUnlockCost' => function (Game $game, $char, &$data) {
+                    if (str_contains($data['id'], 'crafting') && !$char['incapacitated']) {
                         $data['unlockCost'] -= 2;
                     }
                 },
@@ -1880,10 +1878,7 @@ class DLD_CharactersData
                         'stamina' => 1,
                         'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacter();
-                            $characterIds = array_map(
-                                function ($d) {
-                                    return $d['id'];
-                                },
+                            $characterIds = toId(
                                 array_filter($game->character->getAllCharacterData(false), function ($character) use (
                                     $currentCharacter,
                                     $game
@@ -1946,10 +1941,7 @@ class DLD_CharactersData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            $characterIds = array_map(
-                                function ($d) {
-                                    return $d['id'];
-                                },
+                            $characterIds = toId(
                                 array_filter($game->character->getAllCharacterData(false), function ($character) use ($skill, $game) {
                                     return !$character['incapacitated'] &&
                                         $character != $skill['characterId'] &&
@@ -2055,11 +2047,13 @@ class DLD_CharactersData
                 'name' => 'Loka',
                 'slots' => ['weapon', 'tool'],
                 'onUnlock' => function (Game $game, $char, &$data) {
-                    $game->adjustResource('wood', 1);
-                    $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                        'count' => 1,
-                        'resource_type' => 'wood',
-                    ]);
+                    if (!$char['incapacitated']) {
+                        $game->adjustResource('wood', 1);
+                        $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                            'count' => 1,
+                            'resource_type' => 'wood',
+                        ]);
+                    }
                 },
                 'onGetResourceMax' => function (Game $game, $char, &$data) {
                     if ($data['resourceType'] == 'hide') {
@@ -2288,7 +2282,7 @@ class DLD_CharactersData
                     }
                 },
                 'onInvestigateFirePost' => function (Game $game, $char, &$data) {
-                    if ($data['roll'] == 3) {
+                    if ($data['roll'] == 3 && !$char['incapacitated']) {
                         $game->character->updateCharacterData($char['id'], function (&$data) {
                             $data['modifiedMaxStamina'] += 1;
                         });
@@ -2304,26 +2298,25 @@ class DLD_CharactersData
                 'slots' => ['weapon', 'tool'],
                 'onCraftPost' => function (Game $game, $char, &$data) {
                     // Choose tribe member to gain 1 hp or 1 stamina
-                    $characterIds = array_map(
-                        function ($d) {
-                            return $d['id'];
-                        },
-                        array_filter($game->character->getAllCharacterData(), function ($character) {
-                            return !$character['incapacitated'];
-                        })
-                    );
-                    if (sizeof($characterIds) > 0) {
-                        $game->selectionStates->initiateState(
-                            'characterSelection',
-                            [
-                                'selectableCharacters' => array_values($characterIds),
-                                'id' => $char['id'] . 'craft',
-                            ],
-                            $char['id'],
-                            false,
-                            'playerTurn',
-                            clienttranslate('Give Character 1 Health or Stamina')
+                    if (!$char['incapacitated']) {
+                        $characterIds = toId(
+                            array_filter($game->character->getAllCharacterData(), function ($character) {
+                                return !$character['incapacitated'];
+                            })
                         );
+                        if (sizeof($characterIds) > 0) {
+                            $game->selectionStates->initiateState(
+                                'characterSelection',
+                                [
+                                    'selectableCharacters' => array_values($characterIds),
+                                    'id' => $char['id'] . 'craft',
+                                ],
+                                $char['id'],
+                                false,
+                                'playerTurn',
+                                clienttranslate('Give Character 1 Health or Stamina')
+                            );
+                        }
                     }
                 },
                 'skills' => [
@@ -2352,7 +2345,9 @@ class DLD_CharactersData
                         'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['characterId'] . 'craft') {
-                                $game->actInterrupt->addSkillInterrupt($skill);
+                                if (!$game->character->getCharacterData($skill['characterId'], true)['incapacitated']) {
+                                    $game->actInterrupt->addSkillInterrupt($skill);
+                                }
                             }
                         },
                     ],
@@ -2381,7 +2376,9 @@ class DLD_CharactersData
                         'onCharacterSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('characterSelection');
                             if ($state && $state['id'] == $skill['characterId'] . 'craft') {
-                                $game->actInterrupt->addSkillInterrupt($skill);
+                                if (!$game->character->getCharacterData($skill['characterId'], true)['incapacitated']) {
+                                    $game->actInterrupt->addSkillInterrupt($skill);
+                                }
                             }
                         },
                     ],

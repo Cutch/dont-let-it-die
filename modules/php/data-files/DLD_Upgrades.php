@@ -378,10 +378,7 @@ class DLD_UpgradesData
                         $aboveMax = $data['currentHealth'] + $data['change'] - $data['maxHealth'];
                         if ($aboveMax > 0) {
                             $currentCharacter = $game->character->getTurnCharacterId();
-                            $characterIds = array_map(
-                                function ($d) {
-                                    return $d['id'];
-                                },
+                            $characterIds = toId(
                                 array_filter($game->character->getAllCharacterData(), function ($character) use ($currentCharacter) {
                                     return !$character['incapacitated'] && $character['id'] != $currentCharacter;
                                 })
@@ -446,6 +443,7 @@ class DLD_UpgradesData
                         'onUse' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getTurnCharacterId();
                             if (getUsePerDay($char . $skill['id'], $game) < 1) {
+                                $game->adjustResource('fkp', -2);
                                 usePerDay($char . $skill['id'], $game);
                                 $game->gameData->destroyResource('fiber', 1);
                                 $cooked = $game->adjustResource('meat-cooked', 3);
@@ -466,7 +464,7 @@ class DLD_UpgradesData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getTurnCharacterId();
-                            return getUsePerDay($char . $skill['id'], $game) < 1;
+                            return $game->gameData->getResource('fkp') >= 2 && getUsePerDay($char . $skill['id'], $game) < 1;
                         },
                     ],
                 ],

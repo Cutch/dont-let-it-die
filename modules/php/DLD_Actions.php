@@ -138,9 +138,11 @@ class DLD_Actions
                             $skill['sendNotification']();
                         },
                         'onEat' => function (Game $game, $skill, &$data) {
+                            $char = $this->game->character->getCharacterData($data['characterId'], true);
                             if (
                                 ($data['characterId'] !== 'Cali' || !str_contains($data['type'], '-cooked')) &&
-                                sizeof($this->game->character->getCharacterData($data['characterId'], true)['physicalHindrance']) > 0
+                                sizeof($char['physicalHindrance']) > 0 &&
+                                !in_array('hindrance_2_5', $char['physicalHindrance'])
                             ) {
                                 $skill['characterId'] = $data['characterId'];
                                 $game->actInterrupt->addSkillInterrupt($skill);
@@ -171,7 +173,8 @@ class DLD_Actions
                             return ['notify' => false];
                         },
                         'onEat' => function (Game $game, $skill, &$data) {
-                            if (sizeof($this->game->character->getCharacterData($data['characterId'], true)['physicalHindrance']) > 0) {
+                            $char = $this->game->character->getCharacterData($data['characterId'], true);
+                            if (sizeof($char['physicalHindrance']) > 0 && !in_array('hindrance_2_5', $char['physicalHindrance'])) {
                                 $skill['characterId'] = $data['characterId'];
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
@@ -684,12 +687,7 @@ class DLD_Actions
             //         ))) &&
             (!array_key_exists('interruptState', $actionObj) ||
                 ($this->game->actInterrupt->getLatestInterruptState() &&
-                    in_array(
-                        $actionObj['id'],
-                        array_map(function ($d) {
-                            return $d['id'];
-                        }, $this->game->actInterrupt->getLatestInterruptState()['data']['skills'])
-                    ))) &&
+                    in_array($actionObj['id'], toId($this->game->actInterrupt->getLatestInterruptState()['data']['skills'])))) &&
             (!array_key_exists('requires', $actionObj) || $actionObj['requires']($this->game, $actionObj, ...$args));
     }
     public function spendActionCost(string $action, ?string $subAction = null, ?string $characterId = null)

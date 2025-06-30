@@ -366,10 +366,7 @@ class DLD_ExpansionData
                         'state' => ['dayEvent'],
                         'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
-                            $characterIds = array_map(
-                                function ($d) {
-                                    return $d['id'];
-                                },
+                            $characterIds = toId(
                                 array_filter($game->character->getAllCharacterData(false), function ($character) use ($currentCharacter) {
                                     return !$character['incapacitated'] && $character['id'] != $currentCharacter;
                                 })
@@ -408,10 +405,7 @@ class DLD_ExpansionData
                         'stamina' => 2,
                         'onUse' => function (Game $game, $skill) {
                             $currentCharacter = $game->character->getTurnCharacterId();
-                            $characterIds = array_map(
-                                function ($d) {
-                                    return $d['id'];
-                                },
+                            $characterIds = toId(
                                 array_filter($game->character->getAllCharacterData(false), function ($character) use ($currentCharacter) {
                                     return !$character['incapacitated'] && $character['id'] != $currentCharacter;
                                 })
@@ -760,6 +754,10 @@ class DLD_ExpansionData
                 'name' => clienttranslate('Paranoid'),
                 // Always eat, this is not a hook, hooks are below
                 'handleEat' => function (Game $game, $card, &$data, ?string $preferType = null) {
+                    $hinderedCharacter = $game->character->getCharacterData($card['characterId'], true);
+                    if ($hinderedCharacter['incapacitated']) {
+                        return false;
+                    }
                     if (getUsePerDay($card['characterId'] . 'hindrance_2_3' . 'nauseous', $game) >= 1) {
                         return false;
                     }
@@ -777,12 +775,7 @@ class DLD_ExpansionData
                         )
                     );
                     if ($preferType) {
-                        $i = array_search(
-                            $preferType,
-                            array_map(function ($d) {
-                                return $d['id'];
-                            }, $array)
-                        );
+                        $i = array_search($preferType, toId($array));
                         if ($i !== false && $i > 0) {
                             $temp = $array[0];
                             $array[0] = $array[$i];
@@ -790,7 +783,6 @@ class DLD_ExpansionData
                         }
                     }
                     if (sizeof($array) > 0) {
-                        $hinderedCharacter = $game->character->getCharacterData($card['characterId'], true);
                         if ($hinderedCharacter['health'] != $hinderedCharacter['maxHealth']) {
                             // $prevCharacterId = $game->character->getSubmittingCharacterId();
                             // $game->character->setSubmittingCharacterById($card['characterId']);
