@@ -1667,7 +1667,7 @@ class Game extends \Table
                     ];
                 },
                 array_filter($characters, function ($char) {
-                    return !$char['incapacitated'] || $char['recovering'];
+                    return !$char['incapacitated'];
                 })
             )
         );
@@ -1687,7 +1687,7 @@ class Game extends \Table
         $this->getResources($result);
 
         foreach ($characters as $char) {
-            if (!$char['incapacitated'] || $char['recovering']) {
+            if (!$char['incapacitated']) {
                 $result['dinnerEatableFoods'][$char['id']] = array_map(function ($eatable) use ($char) {
                     $data = [...$eatable['actEat'], 'id' => $eatable['id'], 'characterId' => $char['id']];
                     $this->hooks->onGetEatData($data);

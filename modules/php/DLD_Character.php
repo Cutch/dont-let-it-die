@@ -644,6 +644,9 @@ class DLD_Character
         if ($data['incapacitated'] && !$data['recovering'] && $healthChange > 0) {
             return true;
         }
+        if ($data['recovering'] && $healthChange < 0) {
+            return true;
+        }
         $prev = $data['health'];
         $hookData = [
             'currentHealth' => $prev,
