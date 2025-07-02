@@ -372,7 +372,7 @@ class Game extends \Table
         $this->characterSelection->actChooseCharacters();
         $this->completeAction(false);
     }
-    public function actMoveDiscovery(string $upgradeId, string $upgradeReplaceId): void
+    public function actMoveDiscovery(string $upgradeId, ?string $upgradeReplaceId = null): void
     {
         $selectableUpgrades = array_keys(
             array_filter($this->data->getBoards()['knowledge-tree-' . $this->getDifficulty()]['track'], function ($v) {
@@ -380,8 +380,13 @@ class Game extends \Table
             })
         );
         $upgrades = $this->gameData->get('upgrades');
+        if ($upgradeReplaceId == null) {
+            array_walk($upgrades, function () use (&$upgrades, $upgradeId) {
+                $upgrades[$upgradeId]['replace'] = null;
+            });
+        }
         // This is a swap
-        if (in_array($upgradeId, $selectableUpgrades) && in_array($upgradeReplaceId, $selectableUpgrades)) {
+        elseif (in_array($upgradeId, $selectableUpgrades) && in_array($upgradeReplaceId, $selectableUpgrades)) {
             $keys = [];
             array_walk($upgrades, function ($upgrade, $k) use ($upgradeId, $upgradeReplaceId, &$keys) {
                 if ($upgrade['replace'] == $upgradeId || $upgrade['replace'] == $upgradeReplaceId) {

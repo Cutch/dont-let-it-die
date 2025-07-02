@@ -64,6 +64,23 @@ export class UpgradeSelectionScreen {
       } else {
         if (filled[unlockId]) {
           renderImage(filled[unlockId], elem, { scale: 1.7 / 1.2 });
+          if (!elem.querySelector('.cross')) {
+            elem.insertAdjacentHTML('beforeend', `<div class="cross"><div class="dot"><i class="fa fa-times"></i></div></div>`);
+
+            addClickListener(
+              elem.querySelector('.cross'),
+              'Remove',
+              () => {
+                this.game.bgaPerformAction('actMoveDiscovery', {
+                  upgradeId: filled[unlockId],
+                  upgradeReplaceId: null,
+                });
+                this.upgradeElem.querySelectorAll(`.upgrade-selections .fkp-spot`).forEach((d) => (d.style['outline'] = ''));
+                this.upgradeSelected = {};
+              },
+              true,
+            );
+          }
         } else {
           this.game.addHelpTooltip({
             node: elem,
