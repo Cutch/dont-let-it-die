@@ -1464,7 +1464,7 @@ class Game extends \Table
                 $_this->hooks->reconnectHooks($card, $_this->decks->getCard($card['id']));
 
                 $this->setActiveNightCard($card['id']);
-
+                $result = null;
                 if (!$data || !array_key_exists('onUse', $data) || $data['onUse'] != false) {
                     $result = array_key_exists('onUse', $card) ? $card['onUse']($this, $card) : null;
                 }
