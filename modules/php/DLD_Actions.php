@@ -203,6 +203,7 @@ class DLD_Actions
                                     throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
                                 }
                                 $game->notify('notify', clienttranslate('${character_name} ate and removed a hindrance'));
+                                $game->actInterrupt->setEntireState([]);
                             }
                         },
                     ],

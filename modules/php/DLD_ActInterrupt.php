@@ -138,7 +138,7 @@ class DLD_ActInterrupt
     {
         return $this->game->gameData->get('actInterruptState');
     }
-    private function setEntireState(array $data): void
+    public function setEntireState(array $data): void
     {
         $this->game->gameData->set('actInterruptState', $data);
     }
