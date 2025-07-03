@@ -202,6 +202,9 @@ class DLD_Actions
                                 if ($count > 1) {
                                     throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
                                 }
+                                $eatData = $game->actInterrupt->getState('actEat');
+                                $game->actions->spendActionCost('actEat');
+                                $left = $game->adjustResource($eatData['data']['type'], -$eatData['data']['count'])['left'];
                                 $game->notify('notify', clienttranslate('${character_name} ate and removed a hindrance'));
                                 $game->actInterrupt->setEntireState([]);
                             }
