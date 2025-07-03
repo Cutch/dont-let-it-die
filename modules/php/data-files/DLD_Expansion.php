@@ -81,7 +81,7 @@ class DLD_ExpansionData
                 'type' => 'deck',
                 'damage' => 1,
                 'health' => 3,
-                'name' => clienttranslate('Shell Shield'),
+                'name' => clienttranslate('Turtle'),
                 'rotate' => 180,
                 'skills' => [
                     'skill1' => [

@@ -930,6 +930,7 @@ class Game extends \Table
                 };
                 if ($_this->gamestate->state(true, false, true)['name'] == 'interrupt') {
                     $_this->actInterrupt->actInterrupt($skillId);
+                    $_this->actions->spendActionCost('actUseItem', $skillId);
                     $_this->character->setSubmittingCharacter('actUseItem', $skillId);
                     $skill['sendNotification']();
                 }

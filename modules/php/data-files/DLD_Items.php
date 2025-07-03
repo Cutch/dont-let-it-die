@@ -1101,6 +1101,7 @@ class DLD_ItemsData
                         'state' => ['interrupt'],
                         'interruptState' => ['resolveEncounter'],
                         'stamina' => 2,
+                        'cancellable' => false,
                         'onEncounterPre' => function (Game $game, $skill, &$data) {
                             if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
                                 $game->actInterrupt->addSkillInterrupt($skill);
@@ -1121,6 +1122,7 @@ class DLD_ItemsData
                         'name' => clienttranslate('Discard Bola'),
                         'state' => ['interrupt'],
                         'interruptState' => ['resolveEncounter'],
+                        'cancellable' => false,
                         'onEncounterPre' => function (Game $game, $skill, &$data) {
                             if (!($data['soothe'] || $data['escape']) && in_array($skill['itemId'], $data['itemIds'])) {
                                 $game->actInterrupt->addSkillInterrupt($skill);

@@ -1660,7 +1660,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.statusBar.addActionButton(_('Cancel'), () => this.bgaPerformAction('actCancelTrade'), { color: 'secondary' });
           break;
         case 'interrupt':
-          if (!this.gamedatas.availableSkills.some((d) => d.cancellable === false))
+          if (![...this.gamedatas.availableSkills, ...this.gamedatas.availableItemSkills].some((d) => d.cancellable === false))
             this.statusBar.addActionButton(_('Skip'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
           break;
         case 'dayEvent':
@@ -1791,7 +1791,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           backAction();
           break;
         case 'interrupt':
-          if (!this.gamedatas.availableSkills.some((d) => d.cancellable === false))
+          if (![...this.gamedatas.availableSkills, ...this.gamedatas.availableItemSkills].some((d) => d.cancellable === false))
             if (gameui.gamedatas.activeTurnPlayerId == gameui.player_id && !this.gamedatas.isRealTime) {
               actions
                 .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
