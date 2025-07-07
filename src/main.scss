@@ -21,11 +21,20 @@
 }
 /* Character Start */
 #character-selector {
-  display: flex;
-  gap: 0.5rem;
-  margin: 1rem auto auto;
-  flex-flow: row wrap;
-  justify-content: center;
+  .characters {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem auto auto;
+    flex-flow: row wrap;
+    justify-content: center;
+  }
+  .character-tokens {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem auto auto;
+    flex-flow: row wrap;
+    justify-content: center;
+  }
 }
 #character-selector .characters-card {
   border: 1px solid #000;

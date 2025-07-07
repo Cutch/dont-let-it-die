@@ -822,7 +822,7 @@ class DLD_ItemsData
                 ],
                 'onGetActionCost' => function (Game $game, $item, &$data) {
                     $char = $game->character->getCharacterData($item['characterId']);
-                    if ($char['isActive'] && $data['action'] == 'actCook' && getUsePerDay($char['id'] . $item['itemId'], $game) % 2 == 0) {
+                    if ($char['isActive'] && $data['action'] == 'actCook' && getUsePerDay($char['id'] . $item['itemId'], $game) % 2 == 1) {
                         $data['stamina'] = min($data['stamina'], 0);
                     }
                 },
@@ -830,8 +830,8 @@ class DLD_ItemsData
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && getUsePerDay($char['id'] . $item['itemId'], $game) % 2 == 0) {
                         $game->eventLog(clienttranslate('${character_name} another cook action can be used for free'));
-                        usePerDay($char['id'] . $item['itemId'], $game);
                     }
+                    usePerDay($char['id'] . $item['itemId'], $game);
                 },
             ],
             'bone-claws' => [

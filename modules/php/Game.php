@@ -1496,7 +1496,11 @@ class Game extends \Table
 
     public function argSelectionCount(): array
     {
-        $result = ['actions' => []];
+        $result = [
+            'actions' => [],
+            'upgrades' => $this->gameData->get('upgrades'),
+            'showUpgrades' => $this->useRandomUpgrades(),
+        ];
         $this->getAllPlayers($result);
         return $result;
     }
@@ -1724,10 +1728,6 @@ class Game extends \Table
     }
     public function stSelectCharacter()
     {
-        $this->gamestate->setAllPlayersMultiactive();
-        foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
-            $this->giveExtraTime((int) $playerId);
-        }
         if ($this->isValidExpansion('hindrance')) {
             $randomUpgrades = $this->useRandomUpgrades();
             $upgrades = $this->data->getUpgrades();
@@ -1759,6 +1759,11 @@ class Game extends \Table
             }
             $this->gameData->set('upgrades', $upgrades);
             $this->gameData->set('upgradesCount', $count);
+
+            $this->gamestate->setAllPlayersMultiactive();
+            foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
+                $this->giveExtraTime((int) $playerId);
+            }
         }
     }
     public function stStartHindrance()
@@ -2491,6 +2496,7 @@ class Game extends \Table
             'difficulty' => $this->getDifficulty(),
             'trackDifficulty' => $this->getTrackDifficulty(),
             'isRealTime' => $this->isRealTime() || !$this->getIsTrusting(),
+            'showUpgrades' => $this->useRandomUpgrades(),
             'allItems' => array_values(
                 toId(
                     array_filter($this->data->getItems(), function ($d) {

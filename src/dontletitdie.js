@@ -810,7 +810,10 @@ declare('bgagame.dontletitdie', Gamegui, {
   },
   setupCharacterSelections: function (gameData) {
     const playArea = $('game_play_area');
-    playArea.parentElement.insertAdjacentHTML('beforeend', `<div id="character-selector" class="dlid__container"></div>`);
+    playArea.parentElement.insertAdjacentHTML(
+      'beforeend',
+      `<div id="character-selector" class="dlid__container"><div class="characters"></div></div>`,
+    );
     const elem = $('character-selector');
     if (gameData.gamestate.name === 'characterSelect') playArea.style.display = 'none';
     else elem.style.display = 'none';
@@ -818,7 +821,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       .filter((d) => this.data[d].options.type === 'character')
       .sort()
       .forEach((characterName) => {
-        renderImage(characterName, elem, { scale: 2, pos: 'append' });
+        renderImage(characterName, elem.querySelector('.characters'), { scale: 2, pos: 'append' });
         addClickListener(elem.querySelector(`.${characterName}`), characterName, () => {
           const saved = [...this.mySelectedCharacters];
           const i = this.mySelectedCharacters.indexOf(characterName);
@@ -846,6 +849,14 @@ declare('bgagame.dontletitdie', Gamegui, {
           tooltipText: characterName,
         });
       });
+    if (gameData.showUpgrades) {
+      elem.insertAdjacentHTML('beforeend', `<h3>${_('Upgrades')}</h3><div class="character-tokens"></div>`);
+      const container = elem.querySelector('.character-tokens');
+      Object.keys(gameData.upgrades).forEach((unlockId) => {
+        // Render the new discovery
+        renderImage(unlockId, container, { scale: 1, pos: 'append' });
+      });
+    }
   },
   updateCharacterSelections: function (gameData) {
     const elem = $('character-selector');
