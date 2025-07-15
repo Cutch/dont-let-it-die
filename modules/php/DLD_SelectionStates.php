@@ -456,10 +456,14 @@ class DLD_SelectionStates
         ?string $button = null,
         ?bool $cancellable = true,
         ?string $nextState = 'playerTurn',
-        bool $isInterrupt = false
+        bool $isInterrupt = false,
+        ?string $characterId = null
     ) {
+        if ($characterId == null) {
+            $characterId = $this->game->character->getTurnCharacterId();
+        }
         if ($characters == null) {
-            $characters = [$this->game->character->getTurnCharacterId()];
+            $characters = [$characterId];
         }
         $characters = array_values(
             array_map(
@@ -474,7 +478,7 @@ class DLD_SelectionStates
         $this->initiateState(
             'hindranceSelection',
             ['id' => $id, 'characters' => $characters, 'button' => $button],
-            $this->game->character->getTurnCharacterId(),
+            $characterId,
             $cancellable,
             $nextState,
             null,

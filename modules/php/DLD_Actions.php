@@ -158,14 +158,14 @@ class DLD_Actions
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $data['skipAndDontComplete'] = true;
-                                // var_dump(json_encode($data));
                                 $game->selectionStates->initiateHindranceSelection(
                                     $skill['id'],
                                     [$data['data']['characterId']],
                                     null,
                                     false,
                                     $data['currentState'],
-                                    true
+                                    true,
+                                    $data['data']['characterId']
                                 );
                             }
                         },
