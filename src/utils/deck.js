@@ -110,14 +110,10 @@ export class Deck {
   discardTooltip(cardId, isPartial = false) {
     return () => {
       this.game.tooltip.show();
-      const {
-        frame: { w, h },
-        rotate,
-      } = getAllData()[cardId];
 
       renderImage(cardId, this.game.tooltip.renderByElement(), {
         withText: true,
-        scale: (rotate ? h : w) < 300 ? 1 : 2,
+        scale: this.scale / 2,
         pos: 'replace',
       });
       if (!isPartial) {

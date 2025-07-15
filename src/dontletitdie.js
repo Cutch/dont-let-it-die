@@ -287,6 +287,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           renderImage(`character-board`, document.querySelector(`#player-${character.name} > .card`), { scale, pos: 'insert' });
           renderImage('skull', document.querySelector(`#player-${character.name} .first-player-marker`), { scale: 8, pos: 'replace' });
         }
+
         document.querySelector(`#player-${character.name} .card`).style['outline'] = character?.isActive
           ? `5px solid #fff` //#${character.playerColor}
           : '';
@@ -335,6 +336,9 @@ declare('bgagame.dontletitdie', Gamegui, {
             coverElem.classList.remove('incapacitated');
           }
         }
+        this.addHelpTooltip({
+          node: characterElem,
+        });
 
         const renderedItems = [];
         const weapon = equipments.find((d) => d.itemType === 'weapon');
@@ -465,23 +469,23 @@ declare('bgagame.dontletitdie', Gamegui, {
     const promises = [];
     const resourcesForDisplay = this.getResourcesForDisplay(gameData);
 
-    let sideTokenContainer = document.querySelector(`#token-container .resources`);
-    if (!sideTokenContainer) {
-      $('player_boards').insertAdjacentHTML(
-        'beforeend',
-        `<div id="token-container" class="player-board"><div class="resource-title">${_('Resources')}</div><div class="resources"></div></div>`,
-      );
-      sideTokenContainer = document.querySelector(`#token-container .resources`);
-    }
-    sideTokenContainer.innerHTML = '';
-    const sideResources = resourcesForDisplay.filter((elem) => !elem.includes('trap') && gameData.resources[elem] > 0);
-    sideResources.forEach((name) => this.updateResource(name, sideTokenContainer, gameData.resources[name] ?? 0, { scale: 4 }));
-    if (sideResources.length === 0) {
-      sideTokenContainer.classList.add('no-resource');
-      sideTokenContainer.innerHTML = _('None');
-    } else {
-      sideTokenContainer.classList.remove('no-resource');
-    }
+    // let sideTokenContainer = document.querySelector(`#token-container .resources`);
+    // if (!sideTokenContainer) {
+    //   $('player_boards').insertAdjacentHTML(
+    //     'beforeend',
+    //     `<div id="token-container" class="player-board"><div class="resource-title">${_('Resources')}</div><div class="resources"></div></div>`,
+    //   );
+    //   sideTokenContainer = document.querySelector(`#token-container .resources`);
+    // }
+    // sideTokenContainer.innerHTML = '';
+    // const sideResources = resourcesForDisplay.filter((elem) => !elem.includes('trap') && gameData.resources[elem] > 0);
+    // sideResources.forEach((name) => this.updateResource(name, sideTokenContainer, gameData.resources[name] ?? 0, { scale: 4 }));
+    // if (sideResources.length === 0) {
+    //   sideTokenContainer.classList.add('no-resource');
+    //   sideTokenContainer.innerHTML = _('None');
+    // } else {
+    //   sideTokenContainer.classList.remove('no-resource');
+    // }
 
     // Shared Resource Pool
     let sharedElem = document.querySelector(`#shared-resource-container .tokens`);
@@ -724,7 +728,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     renderImage(`board`, document.querySelector(`#board-container > .board`), { scale: 2, pos: 'insert' });
     decks.forEach(({ name: deck }) => {
       if (!this.decks[deck] && gameData.decks[deck]) {
-        this.decks[deck] = new Deck(this, deck, gameData.decks[deck], document.querySelector(`.board > .${deck}`), 2);
+        this.decks[deck] = new Deck(this, deck, gameData.decks[deck], document.querySelector(`.board > .${deck}`), 4);
         if (!this.decks[deck].isAnimating() && gameData.decksDiscards)
           this.decks[deck].setDiscard(gameData.decksDiscards[deck]?.name ?? gameData.decksDiscards[deck]?.[0]);
         if (gameData.game.partials && gameData.game.partials[deck]) {
@@ -840,7 +844,7 @@ declare('bgagame.dontletitdie', Gamegui, {
             character2: this.mySelectedCharacters?.[1],
             character3: this.mySelectedCharacters?.[2],
             character4: this.mySelectedCharacters?.[3],
-          }).catch(() => {
+          })?.catch(() => {
             this.mySelectedCharacters = saved;
           });
         });
@@ -882,7 +886,7 @@ declare('bgagame.dontletitdie', Gamegui, {
   updateTrack: function (gameData) {
     let trackContainer = $('track-container');
     const decks = [
-      { name: 'night-event', expansion: 'base', scale: 1.5 },
+      { name: 'night-event', expansion: 'base', scale: 3 },
       { name: 'day-event', expansion: 'mini-expansion', scale: 3 },
       { name: 'mental-hindrance', expansion: 'hindrance', scale: 3 },
       { name: 'physical-hindrance', expansion: 'hindrance', scale: 3 },
@@ -1325,9 +1329,9 @@ declare('bgagame.dontletitdie', Gamegui, {
           // actAddWood: 'darkgray',
           // actRevive: 'darkgray',
           // actEat: 'darkgray',
-          actDraw: 'green',
-          actUseSkill: 'green',
-          actUseItem: 'green',
+          // actDraw: 'green',
+          // actUseSkill: 'green',
+          // actUseItem: 'green',
         };
         actions
           .sort((a, b) => {
@@ -1437,8 +1441,8 @@ declare('bgagame.dontletitdie', Gamegui, {
                           requested: this.tradeScreen.getRequested(),
                         }),
                       })
-                        .then(() => this.tradeScreen.hide())
-                        .catch(console.error);
+                        ?.then(() => this.tradeScreen.hide())
+                        ?.catch(console.error);
                     }
                   });
                   this.statusBar.addActionButton(
@@ -1463,10 +1467,10 @@ declare('bgagame.dontletitdie', Gamegui, {
                         this.bgaPerformAction('actCraft', {
                           itemName: this.craftScreen.getSelectedId(),
                         })
-                          .then(() => {
+                          ?.then(() => {
                             this.craftScreen.hide();
                           })
-                          .catch(console.error);
+                          ?.catch(console.error);
 
                       if (this.gamedatas.allBuildings.includes(this.craftScreen.getSelectedId()))
                         this.confirmationDialog(
@@ -1494,10 +1498,10 @@ declare('bgagame.dontletitdie', Gamegui, {
                       this.bgaPerformAction('actCook', {
                         resourceType: this.cookScreen.getSelectedId(),
                       })
-                        .then(() => {
+                        ?.then(() => {
                           this.cookScreen.hide();
                         })
-                        .catch(console.error);
+                        ?.catch(console.error);
                     }
                   });
                   this.statusBar.addActionButton(
@@ -1518,10 +1522,10 @@ declare('bgagame.dontletitdie', Gamegui, {
                         character: characterSelected,
                         food: foodSelected,
                       })
-                        .then(() => {
+                        ?.then(() => {
                           this.reviveScreen.hide();
                         })
-                        .catch(console.error);
+                        ?.catch(console.error);
                     }
                   });
                   this.statusBar.addActionButton(
@@ -1541,10 +1545,10 @@ declare('bgagame.dontletitdie', Gamegui, {
                         resourceType: this.eatScreen.getSelectedId(),
                         characterId: action.character ?? null,
                       })
-                        .then(() => {
+                        ?.then(() => {
                           if (this.gamedatas.gamestate.name !== 'eatSelection') this.eatScreen.hide();
                         })
-                        .catch(console.error);
+                        ?.catch(console.error);
                     }
                   });
                   this.statusBar.addActionButton(
@@ -1576,7 +1580,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.statusBar.addActionButton(
             _('Cancel'),
             () => {
-              this.bgaPerformAction('actCancel').then(() => this.selector.hide());
+              this.bgaPerformAction('actCancel')?.then(() => this.selector.hide());
             },
             { color: 'secondary' },
           );
@@ -1726,7 +1730,7 @@ declare('bgagame.dontletitdie', Gamegui, {
               character2: this.mySelectedCharacters?.[1],
               character3: this.mySelectedCharacters?.[2],
               character4: this.mySelectedCharacters?.[3],
-            }).catch(() => {
+            })?.catch(() => {
               this.mySelectedCharacters = saved;
             });
           });

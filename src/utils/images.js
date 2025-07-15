@@ -12,7 +12,7 @@ const scaleLookups = {
   'tooltip-item': 2,
   'tooltip-day-event': 2,
   'tooltip-card': 1,
-  'tooltip-night-event': 0.5,
+  'tooltip-night-event': 1,
   'tooltip-hindrance': 2,
   'tooltip-unlock': 0.75,
 };

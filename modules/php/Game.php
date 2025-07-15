@@ -2679,7 +2679,7 @@ class Game extends \Table
             'fireWood' => 3,
             'wood' => 2,
             'bone' => 6,
-            'meat' => 4,
+            'meat' => 0,
             'meat-cooked' => 4,
             'fish' => 0,
             'fish-cooked' => 0,
