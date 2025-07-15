@@ -1,6 +1,12 @@
 @use 'sass:meta';
 
 @include meta.load-css('utils/clickable');
+html {
+  background:
+    url(img/background.png) top left repeat-x,
+    url(img/background-2.png) top left repeat;
+  background-position-y: top, 56px;
+}
 .dlid {
   @include meta.load-css('utils/deck');
   @include meta.load-css('utils/dice');
@@ -135,6 +141,9 @@
   background: #eee;
   cursor: pointer;
   color: #000;
+}
+.player-board {
+  background-color: #d6f3ff;
 }
 // .mobile_version .player-board-game-specific-content {
 //   display: grid;

@@ -8,11 +8,11 @@ export const getSpriteSize = (name, scale = 2) => {
   else return { width: w / scale, height: h / scale };
 };
 const scaleLookups = {
-  'tooltip-character': 2,
+  'tooltip-character': 1.5,
   'tooltip-item': 2,
   'tooltip-day-event': 2,
   'tooltip-card': 1,
-  'tooltip-night-event': 1,
+  'tooltip-night-event': 0.5,
   'tooltip-hindrance': 2,
   'tooltip-unlock': 0.75,
 };
