@@ -36,8 +36,9 @@ export default {
               title: _('Tame the beast'),
             },
             _(
-              "Out of nowhere a beast emerges from a bush and pounces on you! You do your best to fight it off, but it's far too quick and you are easily overwhelmed. Defeated and covered in slobber, you hold up your new wolf pup friend. Give him a name! He doesn't seem to want to leave your side. Set this card next to your character. Spend 2 Stamina, roll the Fire Die. On a blank, take 1 Wood, otherwise take 1 Rock, once per day.",
+              "Out of nowhere a beast emerges from a bush and pounces on you! You do your best to fight it off, but it's far too quick and you are easily overwhelmed. Defeated and covered in slobber, you hold up your new wolf pup friend. Give him a name! He doesn't seem to want to leave your side. Set this card next to your character.",
             ),
+            _('Spend 2 Stamina, roll the Fire Die. On a blank, take 1 Wood, otherwise take 1 Rock, once per day.'),
           ],
         },
         frame: {
@@ -62,6 +63,8 @@ export default {
             _(
               'Take 1 Damage. You manage to shake it loose! It looks pretty angry though... Fight the Snapping Turtle in normal combat. 1 Damage | 1 Life. If you win, take this card and flip it upside down.',
             ),
+
+            _('Shell Shield: Add a marker to this card. Discard any amount of damage. Discard once 2 markers are placed on this card.'),
           ],
         },
         frame: {
