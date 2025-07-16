@@ -920,7 +920,7 @@ class DLD_DecksData
                     $game->eventLog(clienttranslate('All fire die rolls will be reduced tomorrow'));
                 },
                 'onRollDie' => function (Game $game, $nightCard, &$data) {
-                    if ($data['value'] > 1) {
+                    if ($data['value'] >= 1) {
                         $data['sendNotification']();
                         $game->eventLog(clienttranslate('Roll reduced by 1'));
                         $data['value'] = $data['value'] - 1;
