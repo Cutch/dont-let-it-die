@@ -67,8 +67,9 @@ class DLD_UpgradesData
                 'name' => clienttranslate('Fire Stoking'),
                 'unlockCost' => 8,
                 'onAddFireWood' => function (Game $game, $unlock, &$data) {
-                    if (getUsePerDay($unlock['id'], $game) < 1) {
-                        usePerDay($unlock['id'], $game);
+                    $char = $game->character->getTurnCharacterId();
+                    if (getUsePerDay($char . $unlock['id'], $game) < 1) {
+                        usePerDay($char . $unlock['id'], $game);
                         $count = $game->adjustResource('fkp', 2)['changed'];
                         if ($count > 0) {
                             $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
