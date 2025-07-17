@@ -1073,14 +1073,12 @@ class DLD_ExpansionData
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Diseased'),
                 'onMorning' => function (Game $game, $card, &$data) {
-                    if ($card['characterId'] == $game->character->getTurnCharacterId()) {
-                        $game->character->adjustHealth($card['characterId'], -1);
-                        $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
-                            'character_name' => $game->getCharacterHTML($card['characterId']),
-                            'count' => 1,
-                            'character_resource' => clienttranslate('Health'),
-                        ]);
-                    }
+                    $game->character->adjustHealth($card['characterId'], -1);
+                    $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
+                        'character_name' => $game->getCharacterHTML($card['characterId']),
+                        'count' => 1,
+                        'character_resource' => clienttranslate('Health'),
+                    ]);
                 },
             ],
             'hindrance_2_7' => [

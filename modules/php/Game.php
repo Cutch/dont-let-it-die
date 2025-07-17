@@ -1638,7 +1638,7 @@ class Game extends \Table
                 })
             ) == 4
         ) {
-            $this->lose();
+            $this->lose('character');
         } else {
             while (true) {
                 if ($this->character->isLastCharacter()) {
@@ -1796,8 +1796,17 @@ class Game extends \Table
         $this->DbQuery("UPDATE player SET player_score={$score} WHERE 1=1");
         $this->nextState('endGame');
     }
-    public function lose()
+    public function lose(string $reason)
     {
+        if ($reason == 'day') {
+            $this->notify('endGame', clienttranslate('The tribe has lost after 13 days'));
+        } elseif ($reason == 'fireWood') {
+            $this->notify('endGame', clienttranslate('The tribe has lost as the fire pit is empty'));
+        } elseif ($reason == 'character') {
+            $this->notify('endGame', clienttranslate('The tribe has lost as all characters are incapacitated'));
+        } else {
+            $this->notify('endGame', clienttranslate('The tribe has lost'));
+        }
         $this->DbQuery('UPDATE player SET player_score=0 WHERE 1=1');
         $this->nextState('endGame');
     }
@@ -1839,7 +1848,7 @@ class Game extends \Table
                 $this->setStat($day, 'day_number');
                 resetPerDay($this);
                 if ($day == 14) {
-                    $this->lose();
+                    $this->lose('day');
                 }
                 $difficulty = $this->getTrackDifficulty();
                 $health = -1;
@@ -1889,7 +1898,7 @@ class Game extends \Table
                 ]);
                 $this->adjustResource('fireWood', -$woodNeeded);
                 if ($this->gameData->getResource('fireWood') <= 0) {
-                    $this->lose();
+                    $this->lose('fireWood');
                 }
                 $this->notify('morningPhase', clienttranslate('Morning has arrived (Day ${day})'), [
                     'day' => $data['day'],
