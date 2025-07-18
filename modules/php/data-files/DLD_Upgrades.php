@@ -150,7 +150,7 @@ class DLD_UpgradesData
                     $char = $game->character->getTurnCharacterId();
                     if (getUsePerDay($char . '12-B', $game) == 1) {
                         usePerDay($char . '12-B', $game);
-                        $data['roll'] += $data['originalRoll'];
+                        $data['roll'] *= 2;
                     }
                 },
             ],
