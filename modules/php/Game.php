@@ -1759,11 +1759,10 @@ class Game extends \Table
             }
             $this->gameData->set('upgrades', $upgrades);
             $this->gameData->set('upgradesCount', $count);
-
-            $this->gamestate->setAllPlayersMultiactive();
-            foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
-                $this->giveExtraTime((int) $playerId);
-            }
+        }
+        $this->gamestate->setAllPlayersMultiactive();
+        foreach ($this->gamestate->getActivePlayerList() as $key => $playerId) {
+            $this->giveExtraTime((int) $playerId);
         }
     }
     public function stStartHindrance()

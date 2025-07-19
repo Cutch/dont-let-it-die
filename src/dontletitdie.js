@@ -853,7 +853,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           tooltipText: characterName,
         });
       });
-    if (gameData.showUpgrades) {
+    if (gameData.showUpgrades && this.expansions.includes('hindrance')) {
       elem.insertAdjacentHTML('beforeend', `<h3>${_('Upgrades')}</h3><div class="character-tokens"></div>`);
       const container = elem.querySelector('.character-tokens');
       Object.keys(gameData.upgrades).forEach((unlockId) => {
