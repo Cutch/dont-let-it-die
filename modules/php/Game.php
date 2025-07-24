@@ -312,7 +312,7 @@ class Game extends \Table
     public function rollFireDie(string $actionName, ?string $characterName = null): int
     {
         $this->markRandomness();
-        $rand = rand(1, 6);
+        $rand = bga_rand(1, 6);
         $value = 0;
         if ($rand == 6) {
             $value = 3;
