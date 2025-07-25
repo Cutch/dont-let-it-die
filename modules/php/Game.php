@@ -2368,6 +2368,7 @@ class Game extends \Table
                 $allUnlocks[$mapping[$k]['id']] = $mapping[$k];
             }
         });
+        $stateName = $this->gamestate->state(true, false, true)['name'];
 
         $result = [
             'version' => $this->getVersion(),
@@ -2395,7 +2396,7 @@ class Game extends \Table
             ),
             'maxBuildingCount' => $this->getMaxBuildingCount(),
         ];
-        if ($this->gamestate->state(true, false, true)['name'] != 'characterSelect') {
+        if (!($stateName === 'characterSelect' || $stateName === 'gameSetup')) {
             $result['character_name'] = $this->getCharacterHTML();
             $result['actions'] = array_values($this->actions->getValidActions());
             $result['availableSkills'] = $this->actions->getAvailableSkills();
@@ -2403,7 +2404,7 @@ class Game extends \Table
             $result['activeTurnPlayerId'] = $this->character->getTurnCharacter(true)['player_id'];
             $this->getAllPlayers($result);
         }
-        if ($this->gamestate->state(true, false, true)['name'] == 'playerTurn') {
+        if ($stateName == 'playerTurn') {
             $result['canUndo'] = $this->undo->canUndo();
         }
         $this->getDecks($result);
@@ -2455,7 +2456,7 @@ class Game extends \Table
         }
         if (
             (!$this->gameData->get('turnOrderStart') || sizeof($this->gameData->get('turnOrderStart')) < 4) &&
-            $stateName !== 'characterSelect'
+            !($stateName === 'characterSelect' || $stateName === 'gameSetup')
         ) {
             $players = $this->loadPlayersBasicInfos();
 
