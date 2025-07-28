@@ -97,7 +97,7 @@ export default {
           text: [
             { title: 'Faye' },
             _('When Faye uses a Medicinal Herb on herself to remove a Physical Hindrance card, heal 1'),
-            _('Spend Stamina, trade or take 1 Physical Hindrance from another Tribe Member'),
+            _('Spend 2 Stamina, trade or take 1 Physical Hindrance from another Tribe Member'),
             dojo.string.substitute(_('Starts with a ${item}!'), {
               item: _('Skull Shield'),
             }),
@@ -115,7 +115,7 @@ export default {
           type: 'character',
           text: [
             { title: 'Ajax' },
-            _('Spend 2 Stamina, heal once per day'),
+            _('Spend 2 Stamina, heal for 2 Health, once per day'),
             _('When Ajax draws a 1/1 Beast Danger! card, he instantly kills it and and takes 1 meat and 0 damage meat'),
             _('Can have two different Tool items equipped'),
           ],

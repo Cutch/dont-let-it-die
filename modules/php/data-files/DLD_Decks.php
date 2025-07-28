@@ -115,7 +115,7 @@ class DLD_DecksData
                 'deckType' => 'encounter',
                 'name' => clienttranslate('Carnivorous Plant'),
                 'health' => 2,
-                'damage' => 3,
+                'damage' => 2,
                 'damageStamina' => true,
                 // Instead of doing damage reduces your stamina
             ],

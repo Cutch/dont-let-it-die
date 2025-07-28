@@ -206,7 +206,7 @@ export default {
               title: _('Carnivorous Plant'),
             },
             _('Health') + ': ' + 2,
-            _('Damage') + ': ' + 3,
+            _('Damage') + ': ' + 2,
             _('Instead of doing damage reduces your stamina'),
           ],
         },
@@ -1567,7 +1567,7 @@ export default {
           text: [
             _('The sky lights up with a brilliant glow, followed shortly by a thundering boom. It looks like something fell from the sky!'),
             _(
-              'If anyone has at least 1 Stamp Mark over from the Day Phase, they may venture out in search of the falling star and take 1 Gem token of any color.',
+              'If anyone has at least 2 Stamina left over from the Day Phase, they may venture out in search of the falling star and take 1 Gem token of any color.',
             ),
           ],
         },

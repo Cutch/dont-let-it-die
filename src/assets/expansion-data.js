@@ -64,7 +64,7 @@ export default {
               'Take 1 Damage. You manage to shake it loose! It looks pretty angry though... Fight the Snapping Turtle in normal combat. 1 Damage | 1 Life. If you win, take this card and flip it upside down.',
             ),
 
-            _('Shell Shield: Add a marker to this card. Discard any amount of damage. Discard once 2 markers are placed on this card.'),
+            _('Shell Shield: Add a marker to this card and ignore any incoming damage. Discard once 2 markers are placed on this card.'),
           ],
         },
         frame: {
@@ -207,7 +207,7 @@ export default {
             _('Roll the Fire Die, if you roll a blank, you escape without taking damage, otherwise, take 1 Damage.'),
             { title: _("It doesn't look that tough...") },
             _(
-              'You charge at the lizard! Roll the Fire Die 3 times, adding each roll to the total. If the total is 5 or greater, take 2 Meat and 1 Bone. Otherwise, take 2 Damage.',
+              'You charge at the lizard! Roll the Fire Die 3 times, adding each roll to the total. If the total is 5 or greater, take 2 Meat and 2 Bone. Otherwise, take 2 Damage.',
             ),
           ],
         },
