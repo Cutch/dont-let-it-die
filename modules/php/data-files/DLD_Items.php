@@ -417,7 +417,7 @@ class DLD_ItemsData
                     usePerDay($item, $game);
                 },
                 'requires' => function (Game $game, $item) {
-                    return getUsePerDay($item, $game) < 1;
+                    return getUsePerDay($item['name'], $game) < 1;
                 },
                 'onInvestigateFire' => function (Game $game, $item, &$data) {
                     $char = $game->character->getTurnCharacter();
