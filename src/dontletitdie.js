@@ -745,7 +745,9 @@ declare('bgagame.dontletitdie', Gamegui, {
       `<div id="day-popup" class="day-popup"><div id="day-text" style="display: none">
         <i class="fa fa-sun-o day-background" aria-hidden="true"></i>
         <i class="fa fa-cloud day-background-cloud" aria-hidden="true"></i>
-        <span></span></div></div>`,
+        <span></span>
+        <div style="font-size: 36px;display:none;" class="last-day">${_('The Last Day')}</div>
+        </div></div>`,
     );
     document.getElementById('game_play_area').insertAdjacentHTML(
       'beforeend',
@@ -760,6 +762,8 @@ declare('bgagame.dontletitdie', Gamegui, {
     await Promise.all(this.animations);
     this.animations = [];
     const elem = $('day-text');
+    elem.classList.add('day-' + this.gamedatas.game.day);
+    elem.classList.remove('day-' + (this.gamedatas.game.day - 1));
     elem.querySelector('span').innerText = _('Day') + ' ' + this.gamedatas.game.day;
     const anim = dojo.fx.chain([
       dojo.fadeIn({ node: elem, duration: 500 }),

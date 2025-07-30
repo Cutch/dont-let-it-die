@@ -277,6 +277,12 @@
     overflow: hidden;
     text-align: center;
     pointer-events: all;
+    &.day-14 {
+      background-color: #e1b920;
+      .last-day {
+        display: block !important;
+      }
+    }
     .day-background {
       color: yellow;
       position: absolute;

@@ -1847,7 +1847,15 @@ class Game extends \Table
                 $this->setStat($day, 'day_number');
                 resetPerDay($this);
                 if ($day == 14) {
+                    $this->notify(
+                        'morningPhase',
+                        clienttranslate('A flood is coming! We must investigate the fire before it is covered in water.'),
+                        []
+                    );
+                }
+                if ($day == 15) {
                     $this->lose('day');
+                    return;
                 }
                 $difficulty = $this->getTrackDifficulty();
                 $health = -1;
@@ -1934,13 +1942,16 @@ class Game extends \Table
      */
     public function upgradeTableDb($from_version)
     {
-        // if ($from_version <= 2506201717) {
-        //     // ! important ! Use DBPREFIX_<table_name> for all tables
-        //     try {
-        //         $sql = 'ALTER TABLE DBPREFIX_item ADD  `last_owner` varchar(10)';
-        //         $this->applyDbUpgradeToAllDB($sql);
-        //     } catch (Exception $e) {
-        //     }
+        // if ($from_version >= 2507250000 && $from_version <= 2507300000) {
+        //     //     // ! important ! Use DBPREFIX_<table_name> for all tables
+        //     //     try {
+        //     $sql = 'UPDATE `global` SET `global_value`=60 WHERE `global_id`=1';
+        //     $this->applyDbUpgradeToAllDB($sql);
+        //     $sql = 'UPDATE `player` SET `player_is_multiactive`=1, player_state=61 WHERE 1';
+        //     $this->applyDbUpgradeToAllDB($sql);
+
+        //     //     } catch (Exception $e) {
+        //     //     }
         // }
         //
         //       if ($from_version <= 1405061421)
