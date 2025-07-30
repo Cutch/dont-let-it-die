@@ -369,6 +369,10 @@ class DLD_ItemTrade
     }
     public function argTradePhase()
     {
+        $turnOrder = $this->game->gameData->get('turnOrder');
+        if (sizeof(array_filter($turnOrder)) != 4) {
+            return [];
+        }
         $result = [
             'version' => $this->game->getVersion(),
             'actions' => [],

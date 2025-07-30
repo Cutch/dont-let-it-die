@@ -2438,6 +2438,10 @@ class Game extends \Table
         // TODO remove this check after initial games are no longer in progress
         $turnOrder = $this->gameData->get('turnOrder');
         if (sizeof(array_filter($turnOrder)) != 4) {
+            if ($stateName === 'tradePhase') {
+                $this->nextState('characterSelect');
+                return [];
+            }
             $players = $this->loadPlayersBasicInfos();
 
             $characters = array_values(

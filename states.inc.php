@@ -439,7 +439,7 @@ $machinestates = [
         'args' => 'argTradePhase',
         'initialprivate' => $tradePhaseActions,
         'possibleactions' => ['actForceSkip', 'actUnBack'],
-        'transitions' => ['nextCharacter' => $nextCharacter],
+        'transitions' => ['nextCharacter' => $nextCharacter, 'characterSelect' => $characterSelect],
     ],
     $tradePhaseActions => [
         'name' => 'tradePhaseActions',
