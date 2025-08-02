@@ -142,13 +142,6 @@ class DLD_CharacterSelection
         $selectedCharactersArgs = [];
         $message = '';
         foreach ($selectedCharacters as $index => $value) {
-            $characterObject = $this->game->data->getCharacters()[$value];
-            if (array_key_exists('startsWith', $characterObject)) {
-                $itemId = $this->game->gameData->createItem($characterObject['startsWith']);
-                $this->game->character->equipEquipment($value, [$itemId]);
-            }
-            $this->game->hooks->onCharacterChoose($characterObject);
-
             $selectedCharactersArgs['character' . ($index + 1)] = $value;
         }
         switch (sizeof($selectedCharacters)) {
@@ -184,6 +177,14 @@ class DLD_CharacterSelection
         $this->game->gamestate->setPlayerNonMultiactive($playerId, $targetState);
         if ($this->game->gamestate->state(true, false, true)['name'] == $targetState) {
             $this->game->gameData->set('turnOrderStart', $this->game->gameData->get('turnOrder'));
+            foreach ($this->game->gameData->get('turnOrder') as $value) {
+                $characterObject = $this->game->data->getCharacters()[$value];
+                if (array_key_exists('startsWith', $characterObject)) {
+                    $itemId = $this->game->gameData->createItem($characterObject['startsWith']);
+                    $this->game->character->equipEquipment($value, [$itemId]);
+                }
+                $this->game->hooks->onCharacterChoose($characterObject);
+            }
         }
     }
     public function actUnBack(): void
