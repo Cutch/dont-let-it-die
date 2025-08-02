@@ -336,9 +336,6 @@ declare('bgagame.dontletitdie', Gamegui, {
             coverElem.classList.remove('incapacitated');
           }
         }
-        this.addHelpTooltip({
-          node: characterElem,
-        });
 
         const renderedItems = [];
         const weapon = equipments.find((d) => d.itemType === 'weapon');
