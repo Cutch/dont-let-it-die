@@ -1171,26 +1171,6 @@ class Game extends \Table
         $this->completeAction($saveState);
     }
 
-    public function argResourceSelection()
-    {
-        $resources = array_filter(
-            $this->gameData->getResources(),
-            function ($v, $k) {
-                return $v > 0;
-            },
-            ARRAY_FILTER_USE_BOTH
-        );
-        $this->hooks->onResourceSelectionOptions($resources);
-        $result = [
-            ...$this->gameData->get('state'),
-            'actions' => [],
-            'character_name' => $this->getCharacterHTML(),
-            'tokenSelection' => $resources,
-        ];
-        $this->getGameData($result);
-        $this->getResources($result);
-        return $result;
-    }
     public function argDrawCard()
     {
         $result = [

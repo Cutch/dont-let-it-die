@@ -226,7 +226,7 @@ $machinestates = [
         'description' => clienttranslate('${character_name} is selecting a resource'),
         'descriptionmyturn' => clienttranslate('${character_name} Select a resource'),
         'type' => 'multipleactiveplayer',
-        'args' => 'argResourceSelection',
+        'args' => 'argSelectionState',
         'possibleactions' => ['actSelectResource', 'actCancel'],
         'transitions' => ['playerTurn' => $playerTurn],
     ],

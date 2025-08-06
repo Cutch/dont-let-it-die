@@ -341,11 +341,6 @@ class DLD_Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
-    function onResourceSelectionOptions(&$data, array $args = [])
-    {
-        $this->callHooks(__FUNCTION__, $args, $data);
-        return $data;
-    }
     function onAdjustStamina(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);

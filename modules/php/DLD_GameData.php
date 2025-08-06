@@ -215,6 +215,16 @@ class DLD_GameData
             ARRAY_FILTER_USE_KEY
         );
     }
+    public function getBasicResources(): array
+    {
+        return array_filter(
+            $this->getResources(),
+            function ($v, $k) {
+                return $k != 'fireWood';
+            },
+            ARRAY_FILTER_USE_BOTH
+        );
+    }
     public function getAllMultiActiveCharacterIds(): array
     {
         return $this->get('activateCharacters');

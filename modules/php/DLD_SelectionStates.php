@@ -363,11 +363,22 @@ class DLD_SelectionStates
         if ($stateName === 'deckSelectionState') {
             $this->game->getDecks($result);
         }
-        if ($stateName === 'eatSelection') {
+        if ($stateName === 'eatSelectionState') {
             $this->game->getItemData($result);
+        }
+        if ($stateName === 'resourceSelectionState') {
+            $resources = array_filter(
+                $this->game->gameData->getBasicResources(),
+                function ($v, $k) {
+                    return $v > 0;
+                },
+                ARRAY_FILTER_USE_BOTH
+            );
+            $result['tokenSelection'] = $resources;
         }
         return $result;
     }
+
     public function actCancel(): void
     {
         $stateName = $this->stateToStateNameMapping();
