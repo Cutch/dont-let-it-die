@@ -129,7 +129,13 @@ html {
 
 .dlid__container {
   margin: 0 auto 1rem;
-  place-items: anchor-center;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  .content {
+    display: flex;
+    flex-flow: column;
+  }
 }
 
 .dlid__log-button {

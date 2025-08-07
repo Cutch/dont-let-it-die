@@ -164,6 +164,7 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
+  flex-flow: row wrap;
 
   // @media screen and (max-width: 1798px) {
   //   flex-flow: row wrap;

@@ -1491,7 +1491,11 @@ class Game extends \Table
                 return !array_key_exists('upgradeType', $v);
             })
         );
-        $result = [...$this->getArgsData(), 'selectableUpgrades' => $selectableUpgrades];
+        $result = [
+            ...$this->getArgsData(),
+            'upgradesCount' => $this->gameData->get('upgradesCount'),
+            'selectableUpgrades' => $selectableUpgrades,
+        ];
         return $result;
     }
     public function log(...$args)
