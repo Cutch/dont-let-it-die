@@ -674,20 +674,28 @@ class Game extends \Table
         $requested = $data['requested'];
         $this->actions->validateCanRunAction('actTrade');
         $offeredSum = 0;
+        $offeredGem = false;
         foreach ($offered as $key => $value) {
-            $offeredSum += $value * (str_starts_with($key, 'gem') ? 2 : 1);
+            $offeredSum += $value * (str_starts_with($key, 'gem') ? $this->getTradeRatio() : 1);
+            if (str_starts_with($key, 'gem')) {
+                $offeredGem = true;
+            }
         }
         $requestedSum = 0;
         foreach ($requested as $key => $value) {
-            $requestedSum += $value * (str_starts_with($key, 'gem') ? 2 : 1);
+            $requestedSum += $value * (str_starts_with($key, 'gem') ? $this->getTradeRatio() : 1);
         }
         if ($offeredSum != $this->getTradeRatio()) {
             throw new BgaUserException(
                 str_replace('${amount}', (string) $this->getTradeRatio(), clienttranslate('You must offer ${amount} resources'))
             );
         }
-        if ($requestedSum != 1) {
-            throw new BgaUserException(clienttranslate('You must request only one resource'));
+        if ($requestedSum != ($offeredGem ? 2 : 1)) {
+            if ($offeredGem) {
+                throw new BgaUserException(clienttranslate('You must request two resource'));
+            } else {
+                throw new BgaUserException(clienttranslate('You must request only one resource'));
+            }
         }
         $this->actions->spendActionCost('actTrade');
         $offeredStr = [];

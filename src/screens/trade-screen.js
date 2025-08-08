@@ -6,14 +6,12 @@ export class TradeScreen {
     this.error = false;
   }
   setError() {
+    const tradingGem = Object.keys(this.resourceSelected).some((name) => name.includes('gem-') && this.resourceSelected[name] > 0);
     const resourceCount = Object.keys(this.resourceSelected).reduce(
-      (a, name) => a + this.resourceSelected[name] * (name.includes('gem-') ? 2 : 1),
+      (a, name) => a + this.resourceSelected[name] * (name.includes('gem-') ? this.tradeRatio : 1),
       0,
     );
-    const requestedCount = Object.keys(this.resourceRequested).reduce(
-      (a, name) => a + this.resourceRequested[name] * (name.includes('gem-') ? 2 : 1),
-      0,
-    );
+    const requestedCount = Object.keys(this.resourceRequested).reduce((a, name) => a + this.resourceRequested[name], 0);
     document.querySelector(`#trade-resource .cost`).innerHTML = resourceCount;
     document.querySelector(`#trade-for .cost`).innerHTML = requestedCount;
     const error = document.querySelector(`#trade-screen .error`);
@@ -21,8 +19,8 @@ export class TradeScreen {
       error.innerHTML = _('Select ${tradeRatio} of your resources').replace('${tradeRatio}', this.tradeRatio);
       error.style.visibility = '';
       this.error = true;
-    } else if (requestedCount != 1) {
-      error.innerHTML = _('Select ${requestedCount} to trade for').replace('${requestedCount}', 1);
+    } else if (requestedCount != (tradingGem ? 2 : 1)) {
+      error.innerHTML = _('Select ${requestedCount} to trade for').replace('${requestedCount}', tradingGem ? 2 : 1);
       error.style.visibility = '';
       this.error = true;
     } else {
