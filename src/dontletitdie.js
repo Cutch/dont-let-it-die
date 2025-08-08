@@ -226,6 +226,7 @@ declare('bgagame.dontletitdie', Gamegui, {
 
       playerSideContainer.querySelector(`.equipment .value`).innerHTML =
         [
+          ...(gameData.gamestate?.name === 'characterSelect' && character.startsWith ? [character.startsWith] : []),
           ...equipments,
           ...character.dayEvent,
           ...character.necklaces,
@@ -236,7 +237,12 @@ declare('bgagame.dontletitdie', Gamegui, {
           .map((d) => `<span class="equipment-item equipment-${d.itemId}">${_(d.name)}</span>`)
           .join(', ') || _('None');
       playerSideContainer.querySelector(`.hindrance .value`).innerHTML =
-        hindrance.map((d) => `<span class="hindrance-item hindrance-${d.id}">${_(d.name)}</span>`).join(', ') || _('None');
+        [
+          ...hindrance,
+          ...(gameData.gamestate?.name === 'characterSelect' && character.startsWithHindrance ? [character.startsWithHindrance] : []),
+        ]
+          .map((d) => `<span class="hindrance-item hindrance-${d.id}">${_(d.name)}</span>`)
+          .join(', ') || _('None');
       if (gameData.gamestate?.name !== 'characterSelect') playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
       [...equipments, ...character.dayEvent, ...character.necklaces].forEach((d) => {
         addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), _(d.name), () => {

@@ -1960,6 +1960,7 @@ class DLD_CharactersData
                 'stamina' => '6',
                 'name' => 'Cali',
                 'slots' => ['weapon', 'tool'],
+                'startsWithHindrance' => 'hindrance_1_4',
                 // Assign Paranoid
                 'onCharacterChoose' => function (Game $game, $char, &$data) {
                     if ($data['id'] == $char['id']) {

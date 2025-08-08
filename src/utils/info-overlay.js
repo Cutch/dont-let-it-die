@@ -19,7 +19,7 @@ export class InfoOverlay {
     this.activeMessages = [];
   }
   updateTurnOrder() {
-    if (this.game.gamedatas.characters.length < 4 || gameui.gamedatas.gamestate.name === 'characterSelect') {
+    if (this.game.gamedatas.characters.length < 4 || this.game.gamedatas.gamestate.name === 'characterSelect') {
       this.infoOverlayElem.style.display = 'none';
       return;
     }

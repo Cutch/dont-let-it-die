@@ -219,6 +219,22 @@ class DLD_Character
                 return $hindrance['deck'] == 'physical-hindrance';
             })
         );
+        $characterData['startsWithHindrance'] = array_key_exists('startsWithHindrance', $underlyingCharacterData)
+            ? [
+                'itemId' => 0,
+                ...$this->game->data->getExpansion()[$underlyingCharacterData['startsWithHindrance']],
+                'character_name' => $characterName,
+                'characterId' => $characterName,
+            ]
+            : null;
+        $characterData['startsWith'] = array_key_exists('startsWith', $underlyingCharacterData)
+            ? [
+                'itemId' => 0,
+                ...$this->game->data->getItems()[$underlyingCharacterData['startsWith']],
+                'character_name' => $characterName,
+                'characterId' => $characterName,
+            ]
+            : null;
 
         $characterData['equipment'] = array_map(function ($itemId) use ($isActive, $characterName, $itemsLookup) {
             $itemName = $itemsLookup[$itemId];
@@ -730,6 +746,8 @@ class DLD_Character
                 'recovering' => $char['recovering'],
                 'slotsUsed' => $slotsUsed,
                 'slotsAllowed' => $slotsAllowed,
+                'startsWith' => array_key_exists('startsWith', $char) ? $char['startsWith'] : null,
+                'startsWithHindrance' => array_key_exists('startsWithHindrance', $char) ? $char['startsWithHindrance'] : null,
             ];
         }, $this->getAllCharacterData());
     }
