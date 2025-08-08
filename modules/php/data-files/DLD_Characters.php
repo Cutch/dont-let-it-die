@@ -127,23 +127,20 @@ class DLD_CharactersData
                             ) {
                                 $rolling2 = array_key_exists('originalRoll2', $data);
 
-                                if ($data['originalRoll'] < 3) {
-                                    // If the roll is not the max
-                                    $game->actInterrupt->addSkillInterrupt([
-                                        ...$skill,
-                                        'id' => $skill['id'],
-                                        'secondaryId' => 'roll1',
-                                        ...$rolling2
-                                            ? [
-                                                'skillOption' => [
-                                                    'name' => $data['originalRoll'] == 0 ? clienttranslate('blank') : $data['originalRoll'],
-                                                ],
-                                            ]
-                                            : [],
-                                    ]);
-                                }
-                                if ($rolling2 && $data['originalRoll2'] < 3) {
-                                    // If the roll is not the max
+                                $game->actInterrupt->addSkillInterrupt([
+                                    ...$skill,
+                                    'id' => $skill['id'],
+                                    'secondaryId' => 'roll1',
+                                    ...$rolling2
+                                        ? [
+                                            'skillOption' => [
+                                                'name' => $data['originalRoll'] == 0 ? clienttranslate('blank') : $data['originalRoll'],
+                                            ],
+                                        ]
+                                        : [],
+                                ]);
+
+                                if ($rolling2) {
                                     $game->actInterrupt->addSkillInterrupt([
                                         ...$skill,
                                         'id' => $skill['id'],
@@ -1976,7 +1973,7 @@ class DLD_CharactersData
                 // Guess is handled on the FE, if correct take double else 0
                 'onInvestigateFire' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
-                        if ($data['originalRoll'] == $data['guess']) {
+                        if ($data['roll'] == $data['guess']) {
                             $data['roll'] *= 2;
                         } else {
                             $data['roll'] = 0;
