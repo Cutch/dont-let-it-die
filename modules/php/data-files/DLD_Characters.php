@@ -2082,7 +2082,7 @@ class DLD_CharactersData
                             if ($skill['id'] == $activatedSkill['id']) {
                                 subtractPerForever('hide-token', $game);
 
-                                if ($data['data']['willTakeDamage'] > 1) {
+                                if ($data['data']['willTakeDamage'] >= 1) {
                                     $data['data']['willTakeDamage'] -= 1;
                                 }
                             }
