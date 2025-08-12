@@ -1200,6 +1200,7 @@ declare('bgagame.dontletitdie', Gamegui, {
         break;
       case 'tradeSelect':
       case 'tradePhase':
+        this.updateResources(args.args);
         if (this.firstRender && args.args.drawNightCard) await this.showNightTracker(args.args.drawNightCard.card.id);
 
         this.leftTradePhase = false;

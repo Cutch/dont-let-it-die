@@ -2012,7 +2012,7 @@ class Game extends \Table
         $result['decks'] = $data['decks'];
         $result['decksDiscards'] = $data['decksDiscards'];
     }
-    public function getCraftedItems(): array
+    public function getCraftedItems(bool $noBuildings = false): array
     {
         $items = $this->gameData->getCreatedItems();
         $campEquipment = array_count_values(
@@ -2043,7 +2043,7 @@ class Game extends \Table
             $sums[$key] =
                 (array_key_exists($key, $campEquipment) ? $campEquipment[$key] : 0) +
                 (array_key_exists($key, $destroyedEquipment) ? $destroyedEquipment[$key] : 0) +
-                (array_key_exists($key, $buildings) ? $buildings[$key] : 0) +
+                (array_key_exists($key, $buildings) && !$noBuildings ? $buildings[$key] : 0) +
                 (array_key_exists($key, $equippedCounts) ? $equippedCounts[$key] : 0);
         }
         return $sums;
