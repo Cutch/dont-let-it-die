@@ -97,11 +97,16 @@ class DLD_KnowledgeTreeData
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
                         if ($game->adjustResource('rock', 1)['changed'] > 0) {
-                            $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
-                                'action_name' => $obj['name'],
-                                'count' => 1,
-                                'resource_type' => $card['resourceType'],
-                            ]);
+                            $game->notify(
+                                'tree',
+                                clienttranslate('Received ${count} ${resource_type} from ${action_name} ${name_suffix}'),
+                                [
+                                    'action_name' => $obj['name'],
+                                    'name_suffix' => $obj['name_suffix'],
+                                    'count' => 1,
+                                    'resource_type' => $card['resourceType'],
+                                ]
+                            );
                         }
                     }
                 },
@@ -113,11 +118,16 @@ class DLD_KnowledgeTreeData
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
                         if ($game->adjustResource('wood', 1)['changed'] > 0) {
-                            $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
-                                'action_name' => $obj['name'],
-                                'count' => 1,
-                                'resource_type' => $card['resourceType'],
-                            ]);
+                            $game->notify(
+                                'tree',
+                                clienttranslate('Received ${count} ${resource_type} from ${action_name} ${name_suffix}'),
+                                [
+                                    'action_name' => $obj['name'],
+                                    'name_suffix' => $obj['name_suffix'],
+                                    'count' => 1,
+                                    'resource_type' => $card['resourceType'],
+                                ]
+                            );
                         }
                     }
                 },
@@ -129,11 +139,16 @@ class DLD_KnowledgeTreeData
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
                         if ($game->adjustResource('meat', 1)['changed'] > 0) {
-                            $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
-                                'action_name' => $obj['name'],
-                                'count' => 1,
-                                'resource_type' => $card['resourceType'],
-                            ]);
+                            $game->notify(
+                                'tree',
+                                clienttranslate('Received ${count} ${resource_type} from ${action_name} ${name_suffix}'),
+                                [
+                                    'action_name' => $obj['name'],
+                                    'name_suffix' => $obj['name_suffix'],
+                                    'count' => 1,
+                                    'resource_type' => $card['resourceType'],
+                                ]
+                            );
                         }
                     }
                 },
@@ -145,11 +160,16 @@ class DLD_KnowledgeTreeData
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
                         if ($game->adjustResource('berry', 1)['changed'] > 0) {
-                            $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
-                                'action_name' => $obj['name'],
-                                'count' => 1,
-                                'resource_type' => $card['resourceType'],
-                            ]);
+                            $game->notify(
+                                'tree',
+                                clienttranslate('Received ${count} ${resource_type} from ${action_name} ${name_suffix}'),
+                                [
+                                    'action_name' => $obj['name'],
+                                    'name_suffix' => $obj['name_suffix'],
+                                    'count' => 1,
+                                    'resource_type' => $card['resourceType'],
+                                ]
+                            );
                         }
                     }
                 },
@@ -161,11 +181,16 @@ class DLD_KnowledgeTreeData
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
                         if ($game->adjustResource('fiber', 1)['changed'] > 0) {
-                            $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
-                                'action_name' => $obj['name'],
-                                'count' => 1,
-                                'resource_type' => $card['resourceType'],
-                            ]);
+                            $game->notify(
+                                'tree',
+                                clienttranslate('Received ${count} ${resource_type} from ${action_name} ${name_suffix}'),
+                                [
+                                    'action_name' => $obj['name'],
+                                    'name_suffix' => $obj['name_suffix'],
+                                    'count' => 1,
+                                    'resource_type' => $card['resourceType'],
+                                ]
+                            );
                         }
                     }
                 },

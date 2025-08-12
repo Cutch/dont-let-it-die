@@ -266,12 +266,18 @@ class DLD_Encounter
                     $_this->character->adjustActiveStamina($data['stamina']);
                 }
                 if ($data['soothe']) {
-                    $_this->eventLog(clienttranslate('${character_name} soothed a ${name}'), $data);
+                    $_this->eventLog(clienttranslate('${character_name} soothed a ${name}'), [
+                        'i18n' => ['name'],
+                        ...$data,
+                    ]);
                     $deck = $_this->decks->getDeck($data['deck']);
                     $deck->insertCard($data['cardId'], 'deck', 0);
                     // TODO: Need to test
                 } elseif ($data['escape']) {
-                    $_this->eventLog(clienttranslate('${character_name} escaped from a ${name}'), $data);
+                    $_this->eventLog(clienttranslate('${character_name} escaped from a ${name}'), [
+                        'i18n' => ['name'],
+                        ...$data,
+                    ]);
                 } else {
                     $items = $this->game->gameData->getCreatedItems();
                     foreach ($data['itemIds'] as $k => $itemId) {
@@ -315,12 +321,16 @@ class DLD_Encounter
                             } else {
                                 $_this->eventLog(
                                     clienttranslate('${character_name} defeated a ${name} and gained ${willReceiveMeat} meat'),
-                                    [...$data]
+                                    [
+                                        'i18n' => ['name'],
+                                        ...$data,
+                                    ]
                                 );
                             }
                             foreach ($data['loot'] as $k => $num) {
                                 $_this->adjustResource($k, $num);
                                 $this->game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                                    'i18n' => ['resource_type'],
                                     'count' => $num,
                                     'resource_type' => $k,
                                 ]);
@@ -332,6 +342,7 @@ class DLD_Encounter
                             $_this->eventLog(
                                 clienttranslate('${character_name} was attacked by a ${name} and lost ${damageTaken} ${resource}'),
                                 [
+                                    'i18n' => ['name', 'resource'],
                                     ...$data,
                                     'damageTaken' => -$change,
                                     'resource' => $data['damageStamina'] ? clienttranslate('Stamina') : clienttranslate('Health'),
@@ -339,6 +350,7 @@ class DLD_Encounter
                             );
                         } else {
                             $_this->eventLog(clienttranslate('${character_name} was attacked by a ${name} but lost no ${resource}'), [
+                                'i18n' => ['name', 'resource'],
                                 ...$data,
                                 'resource' => $data['damageStamina'] ? clienttranslate('Stamina') : clienttranslate('Health'),
                             ]);

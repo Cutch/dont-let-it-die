@@ -135,7 +135,11 @@ class DLD_SelectionStates
                                         '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
                                     )
                                     : clienttranslate('${character_name} ate ${count} ${token_name} and gained ${stamina} stamina')),
-                            [...$data, 'token_name' => $data['tokenName']]
+                            [
+                                'i18n' => ['token_name'],
+                                ...$data,
+                                'token_name' => $data['tokenName'],
+                            ]
                         );
                     }
                 }

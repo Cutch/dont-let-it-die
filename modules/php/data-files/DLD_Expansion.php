@@ -1034,6 +1034,7 @@ class DLD_ExpansionData
                     ) {
                         usePerDay($card['characterId'] . $card['id'] . 'nauseous', $game);
                         $game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
+                            'i18n' => ['acquireOrDropSentence'],
                             'acquireOrDropSentence' => $card['acquireSentence'],
                             'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
                         ]);
@@ -1092,6 +1093,7 @@ class DLD_ExpansionData
                 'onMorningAfter' => function (Game $game, $card, &$data) {
                     $game->character->adjustStamina($card['characterId'], -2);
                     $game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
+                        'i18n' => ['acquireOrDropSentence'],
                         'character_name' => $game->getCharacterHTML($card['characterId']),
                         'acquireOrDropSentence' => $card['acquireSentence'],
                         'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
@@ -1123,6 +1125,7 @@ class DLD_ExpansionData
                 'onInvestigateFire' => function (Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId() && $data['roll'] >= 1) {
                         $game->eventLog(clienttranslate('${character_name} ${acquireOrDropSentence} ${cardName}'), [
+                            'i18n' => ['acquireOrDropSentence'],
                             'acquireOrDropSentence' => $card['acquireSentence'],
                             'cardName' => notifyTextButton(['name' => $card['name'], 'dataId' => $card['id'], 'dataType' => 'hindrance']),
                         ]);

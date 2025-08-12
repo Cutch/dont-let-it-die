@@ -405,6 +405,7 @@ class DLD_CharactersData
                     if ($char['isActive'] && $data['value'] == 1) {
                         if ($game->adjustResource('berry', 1)['changed'] > 0) {
                             $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                                'i18n' => ['resource_type'],
                                 'count' => 1,
                                 'resource_type' => 'berry',
                             ]);

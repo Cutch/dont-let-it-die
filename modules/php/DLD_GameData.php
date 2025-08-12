@@ -178,6 +178,7 @@ class DLD_GameData
         $this->set('destroyedResources', $data);
         $this->game->adjustResource($resourceType, 0);
         $this->game->notify('notify', clienttranslate('${count} ${resource_type} removed from the game'), [
+            'i18n' => ['resourceType'],
             'count' => 1,
             'resource_type' => $resourceType,
         ]);

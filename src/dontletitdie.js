@@ -1368,7 +1368,7 @@ declare('bgagame.dontletitdie', Gamegui, {
               elemCost.style.display = '';
               this.clickListeners.push(
                 addClickListener(document.querySelector(`#fire-pit .fire-wood`), 'Add Fire Wood', () => {
-                  this.bgaPerformAction(`actAddWood`);
+                  this.bgaPerformAction(`actAddWood`, { characterId: action.hiddenCharacterId ?? null });
                 }),
               );
             } else if (['actDrawGather', 'actDrawForage', 'actDrawHarvest', 'actDrawHunt', 'actDrawExplore'].includes(actionId)) {
@@ -1420,7 +1420,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                     this.statusBar.addActionButton(
                       `${_(unlock.name)}${suffix}`,
                       () => {
-                        return this.bgaPerformAction(actionId, { knowledgeId: unlock.id });
+                        return this.bgaPerformAction(actionId, { knowledgeId: unlock.id, characterId: action.hiddenCharacterId ?? null });
                       },
                       { disabled: unlock.unlockCost > this.gamedatas.resources.fkp },
                     );
@@ -1460,6 +1460,10 @@ declare('bgagame.dontletitdie', Gamegui, {
                     },
                     { color: 'secondary' },
                   );
+                } else if (actionId === 'actSpendFKP') {
+                  this.bgaPerformAction('actSpendFKP', { characterId: action.hiddenCharacterId ?? null });
+                } else if (actionId === 'actAddWood') {
+                  this.bgaPerformAction('actAddWood', { characterId: action.hiddenCharacterId ?? null });
                 } else if (actionId === 'actTradeItem') {
                   this.bgaPerformAction('actTradeItem', {
                     data: JSON.stringify(this.itemTradeScreen.getTrade()),

@@ -190,6 +190,7 @@ class DLD_Decks
             $gameData = [];
             $this->game->getDecks($gameData);
             $results = [
+                'i18n' => ['deckName'],
                 'deck' => $deck,
                 'deckName' => $this->getDeckName($deck),
                 'gameData' => $gameData,
@@ -208,6 +209,7 @@ class DLD_Decks
             $gameData = [];
             $this->game->getDecks($gameData);
             $results = [
+                'i18n' => ['deckName'],
                 'deck' => $deck,
                 'deckName' => $this->getDeckName($deck),
                 'gameData' => $gameData,

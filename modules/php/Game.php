@@ -96,6 +96,9 @@ class Game extends \Table
         $this->undo = new DLD_Undo($this);
         // automatically complete notification args when needed
         $this->notify->addDecorator(function (string $message, array $args) {
+            if (!array_key_exists('i18n', $args)) {
+                $args['i18n'] = [];
+            }
             $args['gamestate'] = ['name' => $this->gamestate->state(true, false, true)['name']];
             if (!array_key_exists('character_name', $args) && str_contains($message, '${character_name}')) {
                 $args['character_name'] = $this->getCharacterHTML();
@@ -115,7 +118,17 @@ class Game extends \Table
                 $args['character_name'] = $this->getCharacterHTML();
             }
             if (str_contains($message, '${resource_type}')) {
+                if (!in_array('resource_type', $args['i18n'])) {
+                    $args['i18n'][] = ['resource_type'];
+                }
                 $args['resource_type'] = $this->data->getTokens()[$args['resource_type']]['name'];
+            }
+            foreach (['character_resource', 'deck', 'action', 'action_name', 'acquireOrDropSentence'] as $key) {
+                if (str_contains($message, '${' . $key . '}')) {
+                    if (!in_array($key, $args['i18n'])) {
+                        $args['i18n'][] = $key;
+                    }
+                }
             }
             return $args;
         });
@@ -328,18 +341,20 @@ class Game extends \Table
         $data['sendNotification'] = function () use ($value, $characterName, &$notificationSent, $actionName) {
             $sideNum = $value == 0 ? 1 : ($value == 3 ? 6 : ($value == 2 ? 5 : 2));
             if ($characterName) {
-                $this->notify('rollFireDie', clienttranslate('${character_name} rolled a ${value} ${action_name}'), [
+                $this->notify('rollFireDie', clienttranslate('${character_name} rolled a ${value} (${action_name})'), [
+                    'i18n' => ['card_name', 'action_name', 'value'],
                     'value' => $value == 0 ? clienttranslate('blank') : $value,
                     'character_name' => $this->getCharacterHTML($characterName),
                     'characterId' => $characterName,
                     'roll' => $sideNum,
-                    'action_name' => '(' . $actionName . ')',
+                    'action_name' => $actionName,
                 ]);
             } else {
-                $this->notify('rollFireDie', clienttranslate('The fire die rolled a ${value} ${action_name}'), [
+                $this->notify('rollFireDie', clienttranslate('The fire die rolled a ${value} (${action_name})'), [
+                    'i18n' => ['value', 'action_name', 'value'],
                     'value' => $value == 0 ? clienttranslate('blank') : $value,
                     'roll' => $sideNum,
-                    'action_name' => '(' . $actionName . ')',
+                    'action_name' => $actionName,
                 ]);
             }
             $notificationSent = true;
@@ -438,6 +453,7 @@ class Game extends \Table
         $this->actions->spendActionCost('actCook');
 
         $this->notify('notify', clienttranslate('${character_name} cooked ${amount} ${type}'), [
+            'i18n' => ['type'],
             'amount' => 1,
             'type' => $resourceType,
             'usedActionId' => 'actCook',
@@ -486,8 +502,11 @@ class Game extends \Table
         $this->setLastAction('actRevive');
         $this->completeAction();
     }
-    public function actSpendFKP(string $knowledgeId): void
+    public function actSpendFKP(string $knowledgeId, ?string $characterId = null): void
     {
+        if ($characterId) {
+            $this->character->setSubmittingCharacterById($characterId);
+        }
         // $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actSpendFKP', null);
 
@@ -517,10 +536,12 @@ class Game extends \Table
         $knowledgeObj = $this->data->getKnowledgeTree()[$knowledgeId];
         array_key_exists('onUse', $knowledgeObj) ? $knowledgeObj['onUse']($this, $knowledgeObj) : null;
         $this->notify('notify', clienttranslate('${character_name} unlocked ${knowledge_name}${knowledge_name_suffix}'), [
+            'i18n' => ['knowledge_name'],
             'knowledgeId' => $knowledgeId,
             'knowledge_name' => $knowledgeObj['name'],
             'knowledge_name_suffix' => array_key_exists('name_suffix', $knowledgeObj) ? $knowledgeObj['name_suffix'] : '',
             'usedActionId' => 'actSpendFKP',
+            'character_name' => $this->getCharacterHTML($characterId),
         ]);
         $this->hooks->onUnlock($knowledgeObj);
         $this->setLastAction('actSpendFKP');
@@ -798,7 +819,12 @@ class Game extends \Table
                                     '${character_name} ate ${count} ${token_name} and gained ${health} health and ${stamina} stamina'
                                 )
                                 : clienttranslate('${character_name} ate ${count} ${token_name} and gained ${stamina} stamina')),
-                        [...$data, 'token_name' => $data['tokenName'], 'usedActionId' => 'actEat']
+                        [
+                            'i18n' => ['token_name'],
+                            ...$data,
+                            'token_name' => $data['tokenName'],
+                            'usedActionId' => 'actEat',
+                        ]
                     );
                 }
             }
@@ -807,8 +833,11 @@ class Game extends \Table
         $this->setLastAction('actEat');
         $this->completeAction();
     }
-    public function actAddWood(): void
+    public function actAddWood(?string $characterId = null): void
     {
+        if ($characterId) {
+            $this->character->setSubmittingCharacterById($characterId);
+        }
         // $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actAddWood');
         $data = $this->gameData->getResources('fireWood', 'wood');
@@ -817,9 +846,11 @@ class Game extends \Table
         $this->gameData->setResource('wood', max($data['wood'] - 1, 0));
 
         $this->notify('notify', clienttranslate('${character_name} added ${count} ${token_name} to the fire'), [
-            'token_name' => 'wood',
+            'i18n' => ['token_name'],
+            'token_name' => clienttranslate('Wood'),
             'count' => 1,
             'usedActionId' => 'actAddWood',
+            'character_name' => $this->getCharacterHTML($characterId),
         ]);
         $this->setLastAction('actAddWood');
         $this->completeAction();
@@ -860,6 +891,7 @@ class Game extends \Table
                 $notificationSent = false;
                 $skill['sendNotification'] = function () use (&$skill, $_this, &$notificationSent) {
                     $_this->notify('notify', clienttranslate('${character_name} used the skill ${skill_name}'), [
+                        'i18n' => ['skill_name'],
                         'skill_name' => $skill['name'],
                         'usedActionId' => 'actUseSkill',
                         'usedActionName' => $skill['name'],
@@ -930,6 +962,7 @@ class Game extends \Table
                 $notificationSent = false;
                 $skill['sendNotification'] = function () use (&$skill, $_this, &$notificationSent) {
                     $_this->notify('notify', clienttranslate('${character_name} used the item\'s skill ${skill_name}'), [
+                        'i18n' => ['skill_name'],
                         'skill_name' => $skill['name'],
                         'usedActionId' => 'actUseSkill',
                         'usedActionName' => $skill['name'],
@@ -1658,6 +1691,18 @@ class Game extends \Table
         $hasWood = $actAddWood['requires']($this, $actAddWood);
         $actSpendFKP = $this->actions->getAction('actSpendFKP');
         $hasFKP = $actSpendFKP['requires']($this, $actSpendFKP);
+        $validCharacters = array_values(
+            array_filter($characters, function ($char) {
+                return !$char['incapacitated'];
+            })
+        );
+        $validCharacter = sizeof($validCharacters) > 0 ? $validCharacters[0] : $characters[0];
+        if ($hasWood) {
+            $actAddWood['hiddenCharacterId'] = $validCharacter['id'];
+        }
+        if ($hasFKP) {
+            $actSpendFKP['hiddenCharacterId'] = $validCharacter['id'];
+        }
         $actions = array_values(
             array_map(
                 function ($char) {
@@ -1828,8 +1873,9 @@ class Game extends \Table
                                 'notify',
                                 clienttranslate('During the night the tribe quickly added ${woodNeeded} ${token_name} to the fire'),
                                 [
+                                    'i18n' => ['token_name'],
                                     'woodNeeded' => $woodNeeded,
-                                    'token_name' => 'wood',
+                                    'token_name' => clienttranslate('Wood'),
                                 ]
                             );
                         }
@@ -1887,6 +1933,7 @@ class Game extends \Table
                 });
                 if ($health != 0) {
                     $this->notify('morningPhase', clienttranslate('Everyone lost ${amount} ${character_resource}'), [
+                        'i18n' => ['character_resource'],
                         'amount' => -$health,
                         'character_resource' => clienttranslate('Health'),
                     ]);
