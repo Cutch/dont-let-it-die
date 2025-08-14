@@ -231,13 +231,24 @@ class DLD_ItemsData
                     $card = $data['card'];
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
-                        $game->gameData->setResource('fiber', $game->gameData->getResource('fiber') + 1);
+                        $resourceChange = $game->adjustResource($card['resourceType'], 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
+                            clienttranslate('${character_name} used ${item_name} and received ${count} ${resource_type}'),
                             [
                                 'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                                 'resource_type' => $card['resourceType'],
+                                'count' => $resourceChange['changed'],
+                                'i18n_suffix' =>
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
+                                        ],
                             ]
                         );
                     }
@@ -258,13 +269,24 @@ class DLD_ItemsData
 
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
-                        $game->gameData->setResource('berry', $game->gameData->getResource('berry') + 1);
+                        $resourceChange = $game->adjustResource($card['resourceType'], 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
+                            clienttranslate('${character_name} used ${item_name} and received ${count} ${resource_type}'),
                             [
                                 'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                                 'resource_type' => $card['resourceType'],
+                                'count' => $resourceChange['changed'],
+                                'i18n_suffix' =>
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
+                                        ],
                             ]
                         );
                     }
@@ -452,13 +474,24 @@ class DLD_ItemsData
                     $card = $data['card'];
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
-                        $game->gameData->setResource('wood', $game->gameData->getResource('wood') + 1);
+                        $resourceChange = $game->adjustResource($card['resourceType'], 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
+                            clienttranslate('${character_name} used ${item_name} and received ${count} ${resource_type}'),
                             [
                                 'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                                 'resource_type' => $card['resourceType'],
+                                'count' => $resourceChange['changed'],
+                                'i18n_suffix' =>
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
+                                        ],
                             ]
                         );
                     }
@@ -520,13 +553,24 @@ class DLD_ItemsData
                     $card = $data['card'];
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
-                        $game->adjustResource('meat', 1);
+                        $resourceChange = $game->adjustResource($card['resourceType'], 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
+                            clienttranslate('${character_name} used ${item_name} and received ${count} ${resource_type}'),
                             [
-                                'item_name' => notifyTextButton([['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']]),
+                                'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                                 'resource_type' => $card['resourceType'],
+                                'count' => $resourceChange['changed'],
+                                'i18n_suffix' =>
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
+                                        ],
                             ]
                         );
                     }
@@ -569,13 +613,24 @@ class DLD_ItemsData
                     $card = $data['card'];
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
-                        $game->gameData->setResource('rock', $game->gameData->getResource('rock') + 1);
+                        $resourceChange = $game->adjustResource($card['resourceType'], 1);
                         $game->notify(
                             'usedItem',
-                            clienttranslate('${character_name} used ${item_name} and received one ${resource_type}'),
+                            clienttranslate('${character_name} used ${item_name} and received ${count} ${resource_type}'),
                             [
                                 'item_name' => notifyTextButton(['name' => $item['name'], 'dataId' => $item['id'], 'dataType' => 'item']),
                                 'resource_type' => $card['resourceType'],
+                                'count' => $resourceChange['changed'],
+                                'i18n_suffix' =>
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
+                                        ],
                             ]
                         );
                     }

@@ -328,11 +328,20 @@ class DLD_Encounter
                                 );
                             }
                             foreach ($data['loot'] as $k => $num) {
-                                $_this->adjustResource($k, $num);
+                                $resourceChange = $_this->adjustResource($k, $num);
                                 $this->game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                    'i18n' => ['resource_type'],
-                                    'count' => $num,
                                     'resource_type' => $k,
+                                    'count' => $resourceChange['changed'],
+                                    'i18n_suffix' =>
+                                        $resourceChange['left'] == 0
+                                            ? []
+                                            : [
+                                                'prefix' => ', ',
+                                                'message' => clienttranslate('${left} could not be collected'),
+                                                'args' => [
+                                                    'left' => $resourceChange['left'],
+                                                ],
+                                            ],
                                 ]);
                             }
                         }

@@ -1318,10 +1318,10 @@ export default {
           deck: 'night-event',
           text: [
             dojo.string.substitute(_('A rival tribe snuck into your camp and tried to steal your ${resource}!'), {
-              resource: _('Berries'),
+              resource: _('Rock'),
             }),
             dojo.string.substitute(_("Roll the Fire Die and remove that many ${resource} tokens from the group's supply") + '.', {
-              resource: _('Berries'),
+              resource: _('Rock'),
             }),
           ],
         },

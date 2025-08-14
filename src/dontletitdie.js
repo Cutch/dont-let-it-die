@@ -1117,6 +1117,38 @@ declare('bgagame.dontletitdie', Gamegui, {
       selections.appendChild(itemsArr[i]);
     }
   },
+  format_string_recursive(log, args) {
+    const saved = {};
+    try {
+      if (log && args && !args.processed) {
+        args.processed = true;
+        if (args.i18n) {
+          for (const key of args.i18n) {
+            if (args[key] && Array.isArray(args[key]) && args[key].length > 0 && typeof args[key][0] === 'object') {
+              const arr = [];
+              for (const obj of args[key]) {
+                arr.push(_(obj.value) + (obj.suffix ? ` (${obj.suffix})` : ''));
+              }
+              saved[key] = arr.join(', ');
+              args[key] = arr.join(', ');
+            }
+          }
+        }
+        if (args.i18n_suffix) {
+          log += (args.i18n_suffix.prefix ?? '') + this.format_string_recursive(args.i18n_suffix.message, args.i18n_suffix.args);
+        }
+      }
+    } catch (e) {
+      console.error(log, args, 'Exception thrown', e.stack);
+    }
+    try {
+      return this.inherited(this.format_string_recursive, [log, args]);
+    } finally {
+      for (const k in saved) {
+        args[k] = saved[k];
+      }
+    }
+  },
   updateGameDatas: function (gameData) {
     if (gameData?.version && this.gamedatas.version < gameData?.version && !this.reloadShown && !this.replayFrom) {
       this.infoDialog(_('There is a new version available.'), _('Reload'), () => window.location.reload());

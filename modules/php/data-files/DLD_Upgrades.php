@@ -162,13 +162,22 @@ class DLD_UpgradesData
                 'onResolveDraw' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'hide') {
-                        if ($game->adjustResource('hide', 1)['changed'] > 0) {
-                            $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
-                                'action_name' => $obj['name'],
-                                'count' => 1,
-                                'resource_type' => $card['resourceType'],
-                            ]);
-                        }
+                        $resourceChange = $game->adjustResource($card['resourceType'], 1);
+                        $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                            'action_name' => $obj['name'],
+                            'resource_type' => $card['resourceType'],
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
+                        ]);
                     }
                 },
             ],
@@ -180,13 +189,22 @@ class DLD_UpgradesData
                 'onResolveDraw' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'bone') {
-                        if ($game->adjustResource('bone', 1)['changed'] > 0) {
-                            $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
-                                'action_name' => $obj['name'],
-                                'count' => 1,
-                                'resource_type' => $card['resourceType'],
-                            ]);
-                        }
+                        $resourceChange = $game->adjustResource($card['resourceType'], 1);
+                        $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                            'action_name' => $obj['name'],
+                            'resource_type' => $card['resourceType'],
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
+                        ]);
                     }
                 },
             ],
@@ -198,13 +216,22 @@ class DLD_UpgradesData
                 'onResolveDraw' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'herb') {
-                        if ($game->adjustResource('herb', 1)['changed'] > 0) {
-                            $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
-                                'action_name' => $obj['name'],
-                                'count' => 1,
-                                'resource_type' => $card['resourceType'],
-                            ]);
-                        }
+                        $resourceChange = $game->adjustResource($card['resourceType'], 1);
+                        $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                            'action_name' => $obj['name'],
+                            'resource_type' => $card['resourceType'],
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
+                        ]);
                     }
                 },
             ],
@@ -216,13 +243,22 @@ class DLD_UpgradesData
                 'onResolveDraw' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'dino-egg') {
-                        if ($game->adjustResource('dino-egg', 1)['changed'] > 0) {
-                            $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
-                                'action_name' => $obj['name'],
-                                'count' => 1,
-                                'resource_type' => $card['resourceType'],
-                            ]);
-                        }
+                        $resourceChange = $game->adjustResource($card['resourceType'], 1);
+                        $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
+                            'action_name' => $obj['name'],
+                            'resource_type' => $card['resourceType'],
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
+                        ]);
                     }
                 },
             ],

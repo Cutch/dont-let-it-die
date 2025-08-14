@@ -80,12 +80,21 @@ class DLD_CharactersData
                 'onDraw' => function (Game $game, $char, &$data) {
                     $deck = $data['deck'];
                     if ($char['isActive'] && $deck == 'gather') {
-                        if ($game->adjustResource('fiber', 1)['changed'] > 0) {
-                            $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                'count' => 1,
-                                'resource_type' => 'fiber',
-                            ]);
-                        }
+                        $resourceChange = $game->adjustResource('fiber', 1);
+                        $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                            'resource_type' => 'fiber',
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
+                        ]);
                     }
                 },
             ],
@@ -403,13 +412,21 @@ class DLD_CharactersData
                 'onRollDie' => function (Game $game, $char, &$data) {
                     $data['sendNotification']();
                     if ($char['isActive'] && $data['value'] == 1) {
-                        if ($game->adjustResource('berry', 1)['changed'] > 0) {
-                            $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                'i18n' => ['resource_type'],
-                                'count' => 1,
-                                'resource_type' => 'berry',
-                            ]);
-                        }
+                        $resourceChange = $game->adjustResource('berry', 1);
+                        $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                            'resource_type' => 'berry',
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
+                        ]);
                     }
                 },
             ],
@@ -627,10 +644,20 @@ class DLD_CharactersData
                         },
                         'onUse' => function (Game $game, $skill) {
                             usePerDay($skill['getPerDayKey']($game, $skill), $game);
-                            $game->adjustResource('wood', 1);
+                            $resourceChange = $game->adjustResource('wood', 1);
                             $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                'count' => 1,
                                 'resource_type' => 'wood',
+                                'count' => $resourceChange['changed'],
+                                'i18n_suffix' =>
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
+                                        ],
                             ]);
                         },
                         'requires' => function (Game $game, $skill) {
@@ -847,12 +874,21 @@ class DLD_CharactersData
                             $skill['sendNotification']();
                             $roll = $game->rollFireDie($skill['name']);
                             if ($roll > 0) {
-                                if ($game->adjustResource('fish', $roll)['changed'] != 0) {
-                                    $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                        'count' => $roll,
-                                        'resource_type' => 'fish',
-                                    ]);
-                                }
+                                $resourceChange = $game->adjustResource('fish', $roll);
+                                $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                                    'resource_type' => 'fish',
+                                    'count' => $resourceChange['changed'],
+                                    'i18n_suffix' =>
+                                        $resourceChange['left'] == 0
+                                            ? []
+                                            : [
+                                                'prefix' => ', ',
+                                                'message' => clienttranslate('${left} could not be collected'),
+                                                'args' => [
+                                                    'left' => $resourceChange['left'],
+                                                ],
+                                            ],
+                                ]);
                             }
                         },
                         'requires' => function (Game $game, $skill) {
@@ -904,12 +940,21 @@ class DLD_CharactersData
                 'onDraw' => function (Game $game, $char, &$data) {
                     $card = $data['card'];
                     if ($char['isActive'] && $card['deck'] == 'forage') {
-                        if ($game->adjustResource('berry', 1)['changed'] > 0) {
-                            $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                'count' => 1,
-                                'resource_type' => 'berry',
-                            ]);
-                        }
+                        $resourceChange = $game->adjustResource('berry', 1);
+                        $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                            'resource_type' => 'berry',
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
+                        ]);
                     }
                 },
                 'skills' => [
@@ -1616,12 +1661,21 @@ class DLD_CharactersData
                 'onDraw' => function (Game $game, $char, &$data) {
                     $deck = $data['deck'];
                     if ($char['isActive'] && $deck == 'hunt') {
-                        if ($game->adjustResource('meat', 1)['changed'] > 0) {
-                            $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                'count' => 1,
-                                'resource_type' => 'meat',
-                            ]);
-                        }
+                        $resourceChange = $game->adjustResource('meat', 1);
+                        $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                            'resource_type' => 'meat',
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
+                        ]);
                     }
                 },
             ],
@@ -1636,12 +1690,21 @@ class DLD_CharactersData
                     $card = $data['card'];
                     $deck = $data['deck'];
                     if ($char['isActive'] && $deck == 'explore' && $card['deckType'] != 'encounter') {
-                        if ($game->adjustResource('dino-egg', 1)['changed'] > 0) {
-                            $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                'count' => 1,
-                                'resource_type' => 'dino-egg',
-                            ]);
-                        }
+                        $resourceChange = $game->adjustResource('dino-egg', 1);
+                        $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
+                            'resource_type' => 'dino-egg',
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
+                        ]);
                     }
                 },
                 // Not affected by mental hindrance, can hold 4 physical
@@ -2047,10 +2110,20 @@ class DLD_CharactersData
                 'slots' => ['weapon', 'tool'],
                 'onUnlock' => function (Game $game, $char, &$data) {
                     if (!$char['incapacitated']) {
-                        $game->adjustResource('wood', 1);
+                        $resourceChange = $game->adjustResource('wood', 1);
                         $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                            'count' => 1,
                             'resource_type' => 'wood',
+                            'count' => $resourceChange['changed'],
+                            'i18n_suffix' =>
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
+                                        ],
+                                    ],
                         ]);
                     }
                 },

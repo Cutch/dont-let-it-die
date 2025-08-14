@@ -118,12 +118,18 @@ class Game extends \Table
                 $args['character_name'] = $this->getCharacterHTML();
             }
             if (str_contains($message, '${resource_type}')) {
-                if (!in_array('resource_type', $args['i18n'])) {
-                    $args['i18n'][] = ['resource_type'];
-                }
                 $args['resource_type'] = $this->data->getTokens()[$args['resource_type']]['name'];
             }
-            foreach (['character_resource', 'deck', 'action', 'action_name', 'acquireOrDropSentence'] as $key) {
+            if (
+                array_key_exists('i18n_suffix', $args) &&
+                array_key_exists('args', $args['i18n_suffix']) &&
+                array_key_exists('resource_type', $args['i18n_suffix']['args'])
+            ) {
+                $args['i18n_suffix']['args']['resource_type'] = $this->data->getTokens()[$args['i18n_suffix']['args']['resource_type']][
+                    'name'
+                ];
+            }
+            foreach (['character_resource', 'deck', 'action', 'action_name', 'acquireOrDropSentence', 'resource_type'] as $key) {
                 if (str_contains($message, '${' . $key . '}')) {
                     if (!in_array($key, $args['i18n'])) {
                         $args['i18n'][] = $key;
@@ -719,12 +725,12 @@ class Game extends \Table
             }
         }
         $this->actions->spendActionCost('actTrade');
-        $offeredStr = [];
-        $requestedStr = [];
+        $offeredArr = [];
+        $requestedArr = [];
         foreach ($offered as $key => $value) {
             if ($value > 0) {
                 $this->adjustResource($key, -$value);
-                array_push($offeredStr, $this->data->getTokens()[$key]['name'] . "($value)");
+                array_push($offeredArr, ['value' => $this->data->getTokens()[$key]['name'], 'suffix' => $value]);
             }
         }
         foreach ($requested as $key => $value) {
@@ -736,15 +742,16 @@ class Game extends \Table
                     throw new BgaUserException(clienttranslate('You cannot trade for gems'));
                 }
                 $this->adjustResource($key, $value);
-                array_push($requestedStr, $this->data->getTokens()[$key]['name'] . "($value)");
+                array_push($requestedArr, ['value' => $this->data->getTokens()[$key]['name'], 'suffix' => $value]);
             }
         }
         // Finalize the trade hooks
         $this->getTradeRatio(false);
         // $this->hooks->onTrade($data);
         $this->notify('notify', clienttranslate('${character_name} traded ${offered} for ${requested}'), [
-            'offered' => join(', ', $offeredStr),
-            'requested' => join(', ', $requestedStr),
+            'i18n' => ['offered', 'requested'],
+            'offered' => $offeredArr,
+            'requested' => $requestedArr,
             'usedActionId' => 'actTrade',
         ]);
         $this->setLastAction('actTrade');
@@ -1351,13 +1358,24 @@ class Game extends \Table
                 $card = $state['card'];
                 $this->cardDrawEvent($card, $deck);
                 if ($card['deckType'] == 'resource') {
-                    $this->adjustResource($card['resourceType'], $card['count']);
+                    $resourceChange = $this->adjustResource($card['resourceType'], $card['count']);
 
                     $this->eventLog(clienttranslate('${character_name} found ${count} ${name}(s) ${buttons}'), [
                         ...$card,
+                        'count' => $resourceChange['changed'],
                         'buttons' => notifyButtons([
                             ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
                         ]),
+                        'i18n_suffix' =>
+                            $resourceChange['left'] == 0
+                                ? []
+                                : [
+                                    'prefix' => ' ',
+                                    'message' => clienttranslate('${left} could not be collected'),
+                                    'args' => [
+                                        'left' => $resourceChange['left'],
+                                    ],
+                                ],
                     ]);
                 } elseif ($card['deckType'] == 'encounter') {
                     // Change state and check for health/damage modifications
@@ -2739,21 +2757,21 @@ class Game extends \Table
     public function giveResources()
     {
         $this->gameData->setResources([
-            'fireWood' => 3,
-            'wood' => 2,
-            'bone' => 6,
-            'meat' => 0,
+            'fireWood' => 0,
+            'wood' => 7,
+            'bone' => 7,
+            'meat' => 7,
             'meat-cooked' => 4,
             'fish' => 0,
             'fish-cooked' => 0,
-            'herb' => 4,
+            'herb' => 2,
             'dino-egg' => 4,
             'dino-egg-cooked' => 4,
-            'berry' => 3,
-            'berry-cooked' => 2,
-            'rock' => 6,
+            'berry' => 7,
+            'berry-cooked' => 1,
+            'rock' => 7,
             'stew' => 1,
-            'fiber' => 6,
+            'fiber' => 7,
             'hide' => 8,
             'trap' => 0,
             'fkp' => 20,
