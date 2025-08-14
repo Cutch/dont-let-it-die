@@ -704,7 +704,7 @@ class Game extends \Table
         $offeredGem = false;
         foreach ($offered as $key => $value) {
             $offeredSum += $value * (str_starts_with($key, 'gem') ? $this->getTradeRatio() : 1);
-            if (str_starts_with($key, 'gem')) {
+            if ($value > 0 && str_starts_with($key, 'gem-')) {
                 $offeredGem = true;
             }
         }
