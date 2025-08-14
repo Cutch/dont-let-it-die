@@ -596,6 +596,7 @@ class DLD_DecksData
                 'onAdjustStamina' => function (Game $game, $nightCard, &$data) {
                     if ($data['change'] > 0) {
                         $data['change'] = 0;
+                        $game->eventLog(clienttranslate('Food poisoning prevented the gain of stamina'));
                     }
                     return $data;
                 },
