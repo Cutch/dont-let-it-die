@@ -59,6 +59,7 @@ export default {
       Cron: {
         options: {
           type: 'character',
+          startsWith: 'hide-armor',
           text: [
             { title: 'Cron' },
             _('When a tribe member kills a Danger! card, they gain 1 Stamina'),
@@ -94,6 +95,7 @@ export default {
         options: {
           expansion: 'hindrance',
           type: 'character',
+          startsWith: 'skull-shield',
           text: [
             { title: 'Faye' },
             _('When Faye uses a Medicinal Herb on herself to remove a Physical Hindrance card, heal 1'),
@@ -240,6 +242,7 @@ export default {
         options: {
           expansion: 'hindrance',
           type: 'character',
+          startsWith: 'mortar-and-pestle',
           text: [
             { title: 'Oof' },
             _('When Oof is part of the tribe, you may also revive characters with 6 Cooked Berries'),
@@ -260,6 +263,7 @@ export default {
         options: {
           expansion: 'hindrance',
           type: 'character',
+          startsWith: 'fire-stick',
           text: [
             { title: 'Rex' },
             _('Spend 2 Stamina to look at the top card from a Resource deck, place it back on top of the deck'),
@@ -315,6 +319,7 @@ export default {
       Nibna: {
         options: {
           type: 'character',
+          startsWith: 'bag',
           text: [
             { title: 'Nibna' },
             _('When Nibna eats food and her Health is 1, the food heals for double, once per day'),
@@ -351,6 +356,7 @@ export default {
       Thunk: {
         options: {
           type: 'character',
+          startsWith: 'sharp-stick',
           text: [
             { title: 'Thunk' },
             _('Thunk can NOT perform Forage or Gather actions'),
@@ -438,6 +444,7 @@ export default {
         options: {
           expansion: 'death-valley',
           type: 'character',
+          startsWithHindrance: 'hindrance_1_4',
           text: [
             { title: 'Cali' },
             _(

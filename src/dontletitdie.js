@@ -244,7 +244,12 @@ declare('bgagame.dontletitdie', Gamegui, {
           .map((d) => `<span class="hindrance-item hindrance-${d.id}">${_(d.name)}</span>`)
           .join(', ') || _('None');
       if (gameData.gamestate?.name !== 'characterSelect') playerSideContainer.style['background-color'] = character?.isActive ? '#fff' : '';
-      [...equipments, ...character.dayEvent, ...character.necklaces].forEach((d) => {
+      [
+        ...(gameData.gamestate?.name === 'characterSelect' && character.startsWith ? [character.startsWith] : []),
+        ...equipments,
+        ...character.dayEvent,
+        ...character.necklaces,
+      ].forEach((d) => {
         addClickListener(playerSideContainer.querySelector(`.equipment-${d.itemId}`), _(d.name), () => {
           this.tooltip.show();
           renderImage(d.id, this.tooltip.renderByElement(), {
@@ -256,7 +261,10 @@ declare('bgagame.dontletitdie', Gamegui, {
           });
         });
       });
-      hindrance.forEach((d) => {
+      [
+        ...hindrance,
+        ...(gameData.gamestate?.name === 'characterSelect' && character.startsWithHindrance ? [character.startsWithHindrance] : []),
+      ].forEach((d) => {
         addClickListener(playerSideContainer.querySelector(`.hindrance-${d.id}`), _(d.name), () => {
           this.tooltip.show();
           renderImage(d.id, this.tooltip.renderByElement(), {
@@ -855,9 +863,11 @@ declare('bgagame.dontletitdie', Gamegui, {
             this.mySelectedCharacters = saved;
           });
         });
+
         this.addHelpTooltip({
           node: elem.querySelector(`.${characterName}`),
           tooltipText: characterName,
+          tooltipText2: this.data[characterName].options.startsWith ?? this.data[characterName].options.startsWithHindrance,
         });
       });
     if (gameData.showUpgrades && this.expansions.includes('hindrance')) {
@@ -1872,7 +1882,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     }
   },
 
-  addHelpTooltip: function ({ node, text = '', tooltipText = '', iconCSS, tooltipElem = this.tooltip }) {
+  addHelpTooltip: function ({ node, text = '', tooltipText = '', tooltipText2 = '', iconCSS, tooltipElem = this.tooltip }) {
     // game.addTooltip(id, helpString, actionString);
     if (!node.querySelector('.tooltip')) {
       node.insertAdjacentHTML(
@@ -1891,6 +1901,13 @@ declare('bgagame.dontletitdie', Gamegui, {
               'beforeend',
               `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${tooltipText ? renderText({ name: tooltipText }) : text}</span></div>`,
             );
+          if (tooltipText2)
+            tooltipElem
+              .renderByElement()
+              .insertAdjacentHTML(
+                'beforeend',
+                `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${renderText({ name: tooltipText2 })}</span></div>`,
+              );
         },
         true,
       );
