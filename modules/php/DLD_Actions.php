@@ -259,6 +259,7 @@ class DLD_Actions
                         if ($count > 1) {
                             throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
                         }
+                        $game->actions->spendActionCost('actUseHerb');
                         $game->adjustResource('herb', -1);
                         $game->notify('notify', clienttranslate('${character_name} used a herb to cure their wounds'));
                         $data['nextState'] = 'playerTurn';

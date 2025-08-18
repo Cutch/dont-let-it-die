@@ -764,6 +764,7 @@ class Game extends \Table
             func_get_args(),
             [$this->hooks, 'onUseHerb'],
             function (Game $_this) {
+                $this->actions->validateCanRunAction('actUseHerb');
                 return ['herb' => 1];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {

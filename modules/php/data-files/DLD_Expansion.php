@@ -694,7 +694,7 @@ class DLD_ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Cowardly'),
-                'onResolveDraw' => function (Game $game, $card, &$data) {
+                'onResolveDrawPost' => function (Game $game, $card, &$data) {
                     if ($card['characterId'] == $game->character->getTurnCharacterId()) {
                         $data['discard'] = true;
                         $game->eventLog(clienttranslate('${character_name} ran from the encounter'));

@@ -623,6 +623,7 @@ class DLD_CharactersData
                         $data['encounterHealth'] = 0;
                         $data['willTakeDamage'] = 0;
                         $data['willReceiveMeat'] = 1;
+                        $data['characterDamage'] = 1;
                     }
                 },
             ],

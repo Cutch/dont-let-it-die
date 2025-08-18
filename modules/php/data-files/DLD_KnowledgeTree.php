@@ -93,7 +93,7 @@ class DLD_KnowledgeTreeData
             'resource-1' => [
                 'name' => clienttranslate('Resource'),
                 'name_suffix' => ' 1',
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
@@ -119,7 +119,7 @@ class DLD_KnowledgeTreeData
             'resource-2' => [
                 'name' => clienttranslate('Resource'),
                 'name_suffix' => ' 2',
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
@@ -145,7 +145,7 @@ class DLD_KnowledgeTreeData
             'hunt-1' => [
                 'name' => clienttranslate('Hunt'),
                 'name_suffix' => ' 1',
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
@@ -171,7 +171,7 @@ class DLD_KnowledgeTreeData
             'forage-1' => [
                 'name' => clienttranslate('Forage'),
                 'name_suffix' => ' 1',
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'berry') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
@@ -197,7 +197,7 @@ class DLD_KnowledgeTreeData
             'forage-2' => [
                 'name' => clienttranslate('Forage'),
                 'name_suffix' => ' 2',
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);

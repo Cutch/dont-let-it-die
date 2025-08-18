@@ -159,7 +159,7 @@ class DLD_UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Bone Efficiency'),
                 'unlockCost' => 4,
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'hide') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
@@ -186,7 +186,7 @@ class DLD_UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Hide Efficiency'),
                 'unlockCost' => 4,
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'bone') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
@@ -213,7 +213,7 @@ class DLD_UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Medicinal Herb Efficiency'),
                 'unlockCost' => 5,
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'herb') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
@@ -240,7 +240,7 @@ class DLD_UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Dino Egg Efficiency'),
                 'unlockCost' => 5,
-                'onResolveDraw' => function (Game $game, $obj, &$data) {
+                'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
                     if ($card['deckType'] == 'resource' && $card['resourceType'] == 'dino-egg') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
