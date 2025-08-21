@@ -813,13 +813,6 @@ class DLD_DecksData
                             'count' => 1,
                             'name' => clienttranslate('Gem'),
                         ]);
-                    } else {
-                        $game->adjustResource('fireWood', -1);
-                        $game->eventLog(clienttranslate('1 firewood was lost'));
-                        $game->gameData->set('morningState', [
-                            ...$game->gameData->get('morningState') ?? [],
-                            'allowFireWoodAddition' => true,
-                        ]);
                     }
                 },
             ],
