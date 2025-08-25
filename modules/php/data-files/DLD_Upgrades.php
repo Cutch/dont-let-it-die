@@ -68,6 +68,15 @@ class DLD_UpgradesData
                 'unlockCost' => 8,
                 'onAddFireWood' => function (Game $game, $unlock, &$data) {
                     $char = $game->character->getTurnCharacterId();
+                    if ($game->gamestate->state(true, false, true)['name'] === 'dinnerPhase') {
+                        $dinnerCharacters = $game->character->getAllCharacterDataForPlayer($game->getCurrentPlayerId());
+                        foreach ($dinnerCharacters as $checkChar) {
+                            if (getUsePerDay($checkChar['id'] . $unlock['id'], $game) == 0) {
+                                $char = $checkChar['id'];
+                                break;
+                            }
+                        }
+                    }
                     if (getUsePerDay($char . $unlock['id'], $game) < 1) {
                         usePerDay($char . $unlock['id'], $game);
                         $count = $game->adjustResource('fkp', 2)['changed'];
