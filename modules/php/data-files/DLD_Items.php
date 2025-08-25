@@ -1297,7 +1297,7 @@ class DLD_ItemsData
                         'perDay' => 1,
                         'onInvestigateFire' => function (Game $game, $skill, &$data) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            if ($data['roll'] < 3 && getUsePerDay($char['id'] . 'gem-p-necklace', $game) < 1) {
+                            if (getUsePerDay($char['id'] . 'gem-p-necklace', $game) < 1) {
                                 // If kara is not the character, and the roll is not the max
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }

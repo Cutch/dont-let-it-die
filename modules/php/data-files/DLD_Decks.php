@@ -8,15 +8,15 @@ if (!function_exists('rivalTribe')) {
     function rivalTribe(Game $game, array $nightCard, int $roll)
     {
         $resourceType = $nightCard['resourceType'];
-        $left = $roll;
+        $left = -$roll;
         if ($resourceType == 'gem') {
-            $left = $game->adjustResource('gem-y', -$roll)['left'];
+            $left = $game->adjustResource('gem-y', $left)['left'];
             $left = $game->adjustResource('gem-p', $left)['left'];
             $left = $game->adjustResource('gem-b', $left)['left'];
             $resourceType = 'gem-y';
         } else {
             if (array_key_exists($resourceType . '-cooked', $game->data->getTokens())) {
-                $left = $game->adjustResource($resourceType . '-cooked', -$roll)['left'];
+                $left = $game->adjustResource($resourceType . '-cooked', $left)['left'];
             }
             $game->adjustResource($resourceType, $left);
         }
