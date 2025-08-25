@@ -131,11 +131,14 @@ class DLD_Actions
                         'cancellable' => false,
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
+                                $data['notify'] = false;
                                 $game->character->clearCharacterSkills($data['skills']);
                             }
                         },
-                        'onUse' => function (Game $game, $skill) {
-                            $skill['sendNotification']();
+                        'onUseSkill' => function (Game $game, $skill, &$data) {
+                            if ($data['skillId'] == $skill['id']) {
+                                $data['notify'] = false;
+                            }
                         },
                         'onEat' => function (Game $game, $skill, &$data) {
                             $char = $this->game->character->getCharacterData($data['characterId'], true);
@@ -158,6 +161,7 @@ class DLD_Actions
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $data['skipAndDontComplete'] = true;
+                                $data['notify'] = false;
                                 $game->selectionStates->initiateHindranceSelection(
                                     $skill['id'],
                                     [$data['data']['characterId']],
@@ -169,8 +173,10 @@ class DLD_Actions
                                 );
                             }
                         },
-                        'onUse' => function (Game $game, $skill) {
-                            return ['notify' => false];
+                        'onUseSkill' => function (Game $game, $skill, &$data) {
+                            if ($data['skillId'] == $skill['id']) {
+                                $data['notify'] = false;
+                            }
                         },
                         'onEat' => function (Game $game, $skill, &$data) {
                             $char = $this->game->character->getCharacterData($data['characterId'], true);
@@ -196,16 +202,22 @@ class DLD_Actions
                                         if (in_array($card['id'], $cardIds)) {
                                             $count++;
                                             $this->game->character->removeHindrance($char['characterId'], $card);
+                                            $characterId = $char['characterId'];
                                         }
                                     }
                                 }
                                 if ($count > 1) {
                                     throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
                                 }
+                                if ($count == 0) {
+                                    throw new BgaUserException(clienttranslate('Select a Hindrance'));
+                                }
                                 $eatData = $game->actInterrupt->getState('actEat');
                                 $game->actions->spendActionCost('actEat');
                                 $left = $game->adjustResource($eatData['data']['type'], -$eatData['data']['count'])['left'];
-                                $game->notify('notify', clienttranslate('${character_name} ate and removed a hindrance'));
+                                $game->notify('notify', clienttranslate('${character_name} ate and removed a hindrance'), [
+                                    'character_name' => $game->getCharacterHTML($characterId),
+                                ]);
                                 $game->actInterrupt->setEntireState([]);
                             }
                         },

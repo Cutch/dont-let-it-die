@@ -193,32 +193,10 @@ class DLD_ItemTrade
             ]);
             $activatePlayer($trade1['character']['playerId']);
         } else {
-            // var_dump($this->game->gamestate->getActivePlayerList(), $this->game->gamestate->isPlayerActive(2411502));
             $activatePlayer($trade1['character']['playerId']);
             $activatePlayer($trade2['character']['playerId']);
-            // if ($trade1['character']['playerId'] != $trade2['character']['playerId']) {
-            //     $this->game->gameData->set('tradeState', [
-            //         'trade1' => $trade1,
-            //         'trade2' => $trade2,
-            //     ]);
-            //     $toPlayerId = $trade2['character']['playerId'];
-            //     if (!$this->game->gamestate->isPlayerActive($toPlayerId)) {
-            //         $this->game->gamestate->setPlayersMultiactive([$toPlayerId], 'playerTurn', false);
-            //         $this->game->gamestate->initializePrivateState($toPlayerId);
-            //         $this->game->gamestate->nextPrivateState($toPlayerId, 'confirmTradePhase');
-            //     } else {
-            //         $this->game->gamestate->nextPrivateState($toPlayerId, 'confirmTradePhase');
-            //     }
-            //     foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
-            //         // $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
-            //         if ($toPlayerId != $playerId) {
-            //             $this->game->gamestate->nextPrivateState($playerId, 'waitTradePhase');
-            //         }
-            //     }
-            // } else {
             $responseData = [...$this->tradeProcess($trade1, $trade2), 'trade1' => $trade1, 'trade2' => $trade2];
             $this->completeTrade($responseData);
-            // }
         }
     }
     public function checkForTradableCharacters(string $characterName, string|int|null $itemId)
