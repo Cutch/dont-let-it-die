@@ -69,7 +69,7 @@
         "default": 1
     },
     "102": {
-        "name": "Track Difficulty",
+        "name": "Day Tracker Difficulty",
         "values": {
             "0": {
                 "name": "Normal",

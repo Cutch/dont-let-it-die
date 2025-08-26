@@ -820,7 +820,7 @@ class DLD_CharactersData
                         $data['spendActionCost'] = false;
                     }
                 },
-                'onDraw' => function (Game $game, $char, &$data) {
+                'onDrawPost' => function (Game $game, $char, &$data) {
                     $card = $data['card'];
                     if ($char['isActive'] && $card['deckType'] == 'nothing') {
                         $game->adjustResource('fkp', 2);
