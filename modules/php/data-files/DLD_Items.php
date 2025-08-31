@@ -366,7 +366,7 @@ class DLD_ItemsData
                     'bone' => 2,
                 ],
                 'onNightDrawCard' => function (Game $game, $item, &$data) {
-                    if (array_key_exists('eventType', $data['card']) && $data['card']['eventType'] == 'rival-tribe') {
+                    if (array_key_exists('eventType', $data['state']['card']) && $data['state']['card']['eventType'] == 'rival-tribe') {
                         $game->eventLog(clienttranslate('${character_name} Camp walls protect against the rival tribe'));
                         $data['onUse'] = false;
                     }
