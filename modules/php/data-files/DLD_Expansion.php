@@ -732,7 +732,7 @@ class DLD_ExpansionData
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Obsessive'),
                 'onEndTurn' => function (Game $game, $card, &$data) {
-                    if ($card['id'] == $data['id']) {
+                    if ($card['characterId'] == $data['characterId']) {
                         $character = $game->character->getTurnCharacter();
                         if ($character['health'] % 2 == 1) {
                             $game->character->adjustActiveHealth(-1);

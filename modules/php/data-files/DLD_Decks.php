@@ -33,12 +33,14 @@ class DLD_DecksData
     {
         return [
             'explore-7_0' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'physical-hindrance',
                 'expansion' => 'hindrance',
             ],
             'explore-7_1' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'encounter',
@@ -49,6 +51,7 @@ class DLD_DecksData
                 // Cannot be blocked, soothed or escaped
             ],
             'explore-7_10' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'resource',
@@ -56,6 +59,7 @@ class DLD_DecksData
                 'resourceType' => 'herb',
             ],
             'explore-7_11' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'encounter',
@@ -66,6 +70,7 @@ class DLD_DecksData
                 // Can only be killed with a range 2 weapon
             ],
             'explore-7_12' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'resource',
@@ -73,6 +78,7 @@ class DLD_DecksData
                 'resourceType' => 'gem-b',
             ],
             'explore-7_13' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'resource',
@@ -80,6 +86,7 @@ class DLD_DecksData
                 'resourceType' => 'gem-p',
             ],
             'explore-7_14' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'resource',
@@ -87,6 +94,7 @@ class DLD_DecksData
                 'resourceType' => 'gem-y',
             ],
             'explore-7_15' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'resource',
@@ -94,6 +102,7 @@ class DLD_DecksData
                 'resourceType' => 'dino-egg',
             ],
             'explore-7_4' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'encounter',
@@ -102,6 +111,7 @@ class DLD_DecksData
                 'damage' => 3,
             ],
             'explore-7_5' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'encounter',
@@ -110,6 +120,7 @@ class DLD_DecksData
                 'damage' => 2,
             ],
             'explore-7_6' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'encounter',
@@ -120,6 +131,7 @@ class DLD_DecksData
                 // Instead of doing damage reduces your stamina
             ],
             'explore-7_7' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'encounter',
@@ -130,6 +142,7 @@ class DLD_DecksData
                 'loot' => ['dino-egg' => 1],
             ],
             'explore-7_8' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'resource',
@@ -137,6 +150,7 @@ class DLD_DecksData
                 'resourceType' => 'herb',
             ],
             'explore-7_9' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'deck',
                 'deckType' => 'resource',
@@ -144,6 +158,7 @@ class DLD_DecksData
                 'resourceType' => 'dino-egg',
             ],
             'explore-back' => [
+                'expansion' => 'hindrance',
                 'deck' => 'explore',
                 'type' => 'back',
             ],
