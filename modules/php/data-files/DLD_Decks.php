@@ -485,9 +485,11 @@ class DLD_DecksData
             'night-event-7_10' => [
                 'deck' => 'night-event',
                 'type' => 'deck',
-                'onMorning' => function (Game $game, $nightCard, &$data) {
-                    $data['health'] = 0;
-                    $game->eventLog(clienttranslate('No damage taken in the morning'));
+                'onMorningPost' => function (Game $game, $nightCard, &$data) {
+                    if ($data['health'] < 0) {
+                        $data['health'] = $data['health'] + 1;
+                        $game->eventLog(clienttranslate('1 damage prevented in the morning'));
+                    }
                 },
             ],
             'night-event-7_11' => [
