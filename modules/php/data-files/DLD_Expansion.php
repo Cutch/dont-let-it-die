@@ -193,10 +193,14 @@ class DLD_ExpansionData
                         'state' => ['dayEvent'],
                         'health' => 1,
                         'onUse' => function (Game $game, $skill) {
-                            $game->adjustResource('berry', 3);
+                            $game->adjustResource('berry', 5);
                             $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 5,
                                 'resource_type' => 'berry',
+                            ]);
+                            $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
+                                'count' => 1,
+                                'character_resource' => clienttranslate('Health'),
                             ]);
                             return ['notify' => false];
                         },
