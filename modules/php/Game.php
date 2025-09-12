@@ -461,7 +461,7 @@ class Game extends \Table
         $this->notify('notify', clienttranslate('${character_name} cooked ${amount} ${type}'), [
             'i18n' => ['type'],
             'amount' => 1,
-            'type' => $resourceType,
+            'type' => $this->data->getTokens()[$resourceType]['name'],
             'usedActionId' => 'actCook',
         ]);
         $this->hooks->onCookAfter($data);
@@ -1362,6 +1362,7 @@ class Game extends \Table
                     $resourceChange = $this->adjustResource($card['resourceType'], $card['count']);
 
                     $this->eventLog(clienttranslate('${character_name} found ${count} ${name}(s) ${buttons}'), [
+                        'i18n' => ['name'],
                         ...$card,
                         'count' => $resourceChange['changed'],
                         'buttons' => notifyButtons([

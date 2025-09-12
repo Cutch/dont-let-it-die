@@ -826,6 +826,7 @@ class DLD_DecksData
                         $left = $game->adjustResource('gem-p', $left)['left'];
                         $left = $game->adjustResource('gem-b', $left)['left'];
                         $game->eventLog(clienttranslate('${character_name} found ${count} ${name}(s)'), [
+                            'i18n' => ['name'],
                             'character_name' => $charactersWithStamina[0]['character_name'],
                             'count' => 1,
                             'name' => clienttranslate('Gem'),
