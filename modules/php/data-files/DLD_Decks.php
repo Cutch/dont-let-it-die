@@ -511,9 +511,14 @@ class DLD_DecksData
                     $currentCharacter = $game->character->getTurnCharacter();
                     $items = array_merge(
                         ...array_map(function ($character) {
-                            return array_map(function ($d) use ($character) {
-                                return ['name' => $d['id'], 'itemId' => $d['itemId'], 'characterId' => $character['id']];
-                            }, $character['equipment']);
+                            return array_map(
+                                function ($d) use ($character) {
+                                    return ['name' => $d['id'], 'itemId' => $d['itemId'], 'characterId' => $character['id']];
+                                },
+                                array_filter($character['equipment'], function ($d) {
+                                    return $d['itemType'] == 'tool';
+                                })
+                            );
                         }, $game->character->getAllCharacterData())
                     );
                     if (sizeof($items) > 0) {
