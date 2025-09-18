@@ -499,8 +499,8 @@ class DLD_DecksData
                     $card = $data['card'];
                     $roll = $game->rollFireDie(clienttranslate('Night Event'));
                     if ($roll == 0) {
-                        $game->character->adjustActiveHealth(-1);
                         $game->eventLog(clienttranslate('${character_name} was struck by lightning (1 damage)'));
+                        $game->character->adjustActiveHealth(-1);
                     }
                 },
             ],

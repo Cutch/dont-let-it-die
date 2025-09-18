@@ -1066,18 +1066,20 @@ class Game extends \Table
                     ]);
                 }
 
-                return ['deck' => $deck, 'card' => [...$card], ...$data];
+                return ['deck' => $deck, 'card' => [...$card], ...$data, 'characterId' => $this->character->getTurnCharacterId()];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 $deck = $data['deck'];
                 $card = $data['card'];
-                if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
-                    $_this->actions->spendActionCost('actDraw' . ucfirst($deck));
-                }
+                if (!array_key_exists('characterId', $data) || $this->character->getTurnCharacterId() === $data['characterId']) {
+                    if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
+                        $_this->actions->spendActionCost('actDraw' . ucfirst($deck));
+                    }
 
-                if (!$data['cancel']) {
-                    $_this->gameData->set('state', ['card' => $card, 'deck' => $deck]);
-                    $_this->nextState('drawCard');
+                    if (!$data['cancel']) {
+                        $_this->gameData->set('state', ['card' => $card, 'deck' => $deck]);
+                        $_this->nextState('drawCard');
+                    }
                 }
             }
         );
