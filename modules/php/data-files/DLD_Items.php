@@ -83,7 +83,7 @@ if (!function_exists('getUsePerDay')) {
     function clearItemSkills(&$skills, $itemId)
     {
         array_walk($skills, function ($v, $k) use (&$skills, $itemId) {
-            if ($v['itemId'] == $itemId) {
+            if (array_key_exists('itemId', $v) && $v['itemId'] == $itemId) {
                 unset($skills[$k]);
             }
         });

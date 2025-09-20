@@ -353,7 +353,7 @@ class DLD_UpgradesData
                 'onNightDrawCard' => function (Game $game, $unlock, &$data) {
                     if (array_key_exists('eventType', $data['state']['card']) && $data['state']['card']['eventType'] == 'rival-tribe') {
                         $roll = min($game->rollFireDie($unlock['name']), $game->rollFireDie($unlock['name']));
-                        rivalTribe($game, $data, $roll);
+                        rivalTribe($game, $data['state']['card'], $roll);
 
                         $data['onUse'] = false;
                     }

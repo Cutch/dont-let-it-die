@@ -1296,13 +1296,9 @@ class DLD_CharactersData
                         'interruptState' => ['drawCard'],
                         'onResolveDrawPre' => function (Game $game, $skill, &$data) {
                             $card = $data['card'];
+                            $deck = $data['deck'];
                             $tokens = $game->gameData->get('tokens') ?? [];
-                            $count = sizeof(
-                                array_filter(array_keys($tokens ?? []), function ($deck) use ($tokens) {
-                                    return in_array('trap', $tokens[$deck]);
-                                })
-                            );
-                            if ($card['deckType'] == 'encounter' && $count > 0) {
+                            if ($card['deckType'] == 'encounter' && array_key_exists($deck, $tokens) && in_array('trap', $tokens[$deck])) {
                                 $value = $game->rollFireDie(clienttranslate('Trap'), $game->character->getSubmittingCharacterId());
                                 if ($value >= $card['health']) {
                                     $game->actInterrupt->addSkillInterrupt($skill);

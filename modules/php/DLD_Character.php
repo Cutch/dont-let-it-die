@@ -754,7 +754,7 @@ class DLD_Character
     public function clearCharacterSkills(&$skills, ?string $characterId = null)
     {
         array_walk($skills, function ($v, $k) use (&$skills, $characterId) {
-            if ($characterId == null || $v['characterId'] == $characterId) {
+            if (array_key_exists('characterId', $v) && ($characterId == null || $v['characterId'] == $characterId)) {
                 unset($skills[$k]);
             }
         });
