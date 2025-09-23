@@ -1,11 +1,12 @@
 #trade-screen {
+  font-size: 16px;
   display: flex;
-  gap: 2rem;
+  gap: 2em;
   flex-flow: column;
-  padding: 2rem 1rem;
+  padding: 2em 1em;
   overflow: hidden;
   .dot {
-    --size: 3rem;
+    --size: 3em;
   }
   .tokens {
     gap: 2em;
