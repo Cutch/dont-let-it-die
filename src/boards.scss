@@ -303,6 +303,58 @@
     }
   }
 }
+.day-event-popup {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  &-close {
+    font-size: 50px;
+    position: absolute;
+    right: -25px;
+    top: -25px;
+    background: white;
+    border-radius: 50%;
+    width: 1em;
+    border: 1px solid;
+  }
+  #day-event-text {
+    position: relative;
+    opacity: 0;
+    box-shadow: 0 0 5px black;
+    font-size: 16px;
+    font-weight: 900;
+    z-index: 10;
+    background: #d3fcff;
+    padding: 2rem 6rem;
+    border-radius: 2rem;
+    user-select: none;
+    text-align: center;
+    pointer-events: all;
+    .day-background {
+      color: yellow;
+      position: absolute;
+      font-size: 22rem;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    .day-background-cloud {
+      color: #00bcff52;
+      position: absolute;
+      font-size: 15rem;
+      bottom: -2rem;
+      right: 1rem;
+      z-index: -1;
+    }
+  }
+}
 
 .night-popup {
   position: fixed;

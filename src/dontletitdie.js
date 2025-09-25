@@ -753,6 +753,18 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.updateResources(gameData);
     document.getElementById('game_play_area').insertAdjacentHTML(
       'beforeend',
+      `<div id="day-event-popup" class="day-event-popup">
+      <div id="day-event-text" style="display: none">
+        <div id="day-event-popup-close" class="day-event-popup-close">
+          <i class="fa6 fa6-xmark" aria-hidden="true"></i>
+        </div>
+        <i class="fa fa-sun-o day-background" aria-hidden="true"></i>
+        <i class="fa fa-cloud day-background-cloud" aria-hidden="true"></i>
+        <div class="day-card"></div>
+      </div></div>`,
+    );
+    document.getElementById('game_play_area').insertAdjacentHTML(
+      'beforeend',
       `<div id="day-popup" class="day-popup"><div id="day-text" style="display: none">
         <i class="fa fa-sun-o day-background" aria-hidden="true"></i>
         <i class="fa fa-cloud day-background-cloud" aria-hidden="true"></i>
@@ -789,6 +801,44 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.animations.push(promise);
     await promise;
     elem.style.display = 'none';
+  },
+  showDayEvent: async function (cardId = 'day-event_1_3') {
+    await Promise.all(this.animations);
+    this.animations = [];
+    const elem = $('day-event-text');
+    renderImage(cardId, elem.querySelector('.day-card'), { scale: 1, pos: 'replace' });
+    this.addHelpTooltip({
+      node: elem.querySelector('.day-card .card'),
+      tooltipText: cardId,
+    });
+    addClickListener(
+      elem.querySelector('.day-card .tooltip-image-and-text'),
+      'Tooltip',
+      () => {
+        this.tooltip.show();
+        this.tooltip
+          .renderByElement()
+          .insertAdjacentHTML(
+            'beforeend',
+            `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${renderText({ name: cardId })}</span></div>`,
+          );
+      },
+      true,
+    );
+    // elem.querySelector('span').innerText = _('Day') + ' ' + this.gamedatas.game.day;
+    const promise = this.bgaPlayDojoAnimation(dojo.fadeIn({ node: elem, duration: 500 }));
+    elem.style.display = '';
+    this.animations.push(promise);
+    this.closeDayPopup = async () => {
+      this.animations = [];
+      const promise = this.bgaPlayDojoAnimation(dojo.fadeOut({ node: elem, duration: 500 }));
+      this.animations.push(promise);
+      await promise;
+      elem.style.display = 'none';
+      this.cleanupDayPopup = null;
+      this.closeDayPopup = null;
+    };
+    this.cleanupDayPopup = addClickListener($('day-event-popup-close'), 'Close', this.closeDayPopup);
   },
   showNightTracker: async function (cardId) {
     await Promise.all(this.animations);
@@ -1398,6 +1448,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                   (skill) => {
                     const suffix = this.getActionSuffixHTML(skill);
                     this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
+                      this.closeDayPopup?.();
                       return this.bgaPerformAction(actionId, { skillId: skill.id });
                     });
                   },
@@ -1475,6 +1526,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                     (skill) => {
                       const suffix = this.getActionSuffixHTML(skill);
                       this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
+                        this.closeDayPopup?.();
                         return this.bgaPerformAction(actionId, { skillId: skill.id, skillSecondaryId: skill.secondaryId });
                       });
                     },
@@ -2021,6 +2073,9 @@ declare('bgagame.dontletitdie', Gamegui, {
     if (await this.notificationWrapper(notification)) {
       if (!notification.args.partial) this.decks[notification.args.deck].setDiscard(notification.args.card.id);
     } else {
+      if (notification.args.deck === 'day-event' && !notification.args.partial) {
+        this.showDayEvent(notification.args.card.id);
+      }
       await this.decks[notification.args.deck].drawCard(notification.args.card.id, notification.args.partial);
     }
     this.decks[notification.args.deck].updateDeckCounts(gameData.decks[notification.args.deck]);
