@@ -2026,7 +2026,7 @@ class Game extends \Table
     public function getAllPlayers(&$result): void
     {
         $result['characters'] = $this->character->getMarshallCharacters();
-        $result['players'] = $this->getCollectionFromDb('SELECT `player_id` `id`, player_no FROM `player`');
+        $result['players'] = $this->getCollectionFromDb('SELECT `player_id` `id`, player_no, `player_name` as `name` FROM `player`');
     }
     public function getDecks(&$result): void
     {
