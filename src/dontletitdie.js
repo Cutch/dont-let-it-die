@@ -1516,7 +1516,11 @@ declare('bgagame.dontletitdie', Gamegui, {
                       () => {
                         return this.bgaPerformAction(actionId, { knowledgeId: unlock.id, characterId: action.hiddenCharacterId ?? null });
                       },
-                      { disabled: unlock.unlockCost > this.gamedatas.resources.fkp },
+                      {
+                        disabled:
+                          unlock.unlockCost >
+                          (action.selectableValues ?? []).reduce((acc, d) => (this.gamedatas.resources[d] ?? 0) + acc, 0),
+                      },
                     );
                   });
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });

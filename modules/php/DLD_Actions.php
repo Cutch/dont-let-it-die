@@ -624,9 +624,13 @@ class DLD_Actions
     }
     public function getActionSelectable(string $actionId, ?string $subActionId = null, ?string $characterId = null)
     {
+        $action = $this->getAction($actionId, $subActionId);
+        if (!array_key_exists('selectable', $action)) {
+            return [];
+        }
         $data = [
             'action' => $actionId,
-            'selectable' => $this->getAction($actionId, $subActionId)['selectable']($this->game),
+            'selectable' => $action['selectable']($this->game),
             'characterId' => $characterId ?? $this->game->character->getSubmittingCharacterId(),
         ];
         return $this->game->hooks->onGetActionSelectable($data)['selectable'];
@@ -640,6 +644,7 @@ class DLD_Actions
     {
         $actionObj = $this->getAction($action, $subAction);
         $this->skillActionCost($action, $subAction, $actionObj, $characterId);
+        $actionObj['selectableValues'] = $this->getActionSelectable($action);
         return $actionObj;
     }
     private function skillActionCost(string $action, ?string $subAction = null, array &$skill, ?string $characterId = null)

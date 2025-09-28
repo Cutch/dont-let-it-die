@@ -1724,6 +1724,7 @@ class Game extends \Table
         }
         if ($hasFKP) {
             $actSpendFKP['hiddenCharacterId'] = $validCharacter['id'];
+            $actSpendFKP['selectableValues'] = $this->actions->getActionSelectable('actSpendFKP', null, $actSpendFKP['hiddenCharacterId']);
         }
         $actions = array_values(
             array_map(
