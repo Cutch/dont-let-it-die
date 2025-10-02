@@ -91,6 +91,13 @@ class DLD_SelectionStates
     public function _actSelectEat(?string $resourceType = null, array $selectionState)
     {
         $this->game->character->setSubmittingCharacterById($selectionState['characterId']);
+        $hinderedCharacter = $this->game->character->getCharacterData($selectionState['characterId'], true);
+        $cost = $this->game->actions->getActionCost('actEat', null, $hinderedCharacter['id']);
+        if ($hinderedCharacter['stamina'] < $cost['stamina']) {
+            $this->completeSelectionState($selectionState);
+            // This fixes a bug with vog + paranoid
+            return;
+        }
         $this->game->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),

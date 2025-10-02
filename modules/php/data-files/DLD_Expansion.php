@@ -787,7 +787,11 @@ class DLD_ExpansionData
                         }
                     }
                     if (sizeof($array) > 0) {
-                        if ($hinderedCharacter['health'] != $hinderedCharacter['maxHealth']) {
+                        $cost = $game->actions->getActionCost('actEat', null, $hinderedCharacter['id']);
+                        if (
+                            $hinderedCharacter['health'] != $hinderedCharacter['maxHealth'] &&
+                            $hinderedCharacter['stamina'] >= $cost['stamina']
+                        ) {
                             // $prevCharacterId = $game->character->getSubmittingCharacterId();
                             // $game->character->setSubmittingCharacterById($card['characterId']);
                             // $game->actEat($v['id']);
