@@ -747,7 +747,6 @@ class Game extends \Table
         }
         // Finalize the trade hooks
         $this->getTradeRatio(false);
-        // $this->hooks->onTrade($data);
         $this->notify('notify', clienttranslate('${character_name} traded ${offered} for ${requested}'), [
             'i18n' => ['offered', 'requested'],
             'offered' => $offeredArr,
@@ -755,6 +754,7 @@ class Game extends \Table
             'usedActionId' => 'actTrade',
         ]);
         $this->setLastAction('actTrade');
+        $this->hooks->onTradeAfter($data);
         $this->completeAction();
     }
     public function actUseHerb(): void

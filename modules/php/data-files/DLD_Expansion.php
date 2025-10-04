@@ -821,6 +821,9 @@ class DLD_ExpansionData
                 'onCookAfter' => function (Game $game, $card, &$data) {
                     $card['handleEat']($game, $card, $data);
                 },
+                'onTradeAfter' => function (Game $game, $card, &$data) {
+                    $card['handleEat']($game, $card, $data);
+                },
                 'onAfterDrawResource' => function (Game $game, $card, &$data) {
                     $card['handleEat']($game, $card, $data);
                 },
