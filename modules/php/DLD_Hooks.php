@@ -367,6 +367,26 @@ class DLD_Hooks
         $this->callHooks(__FUNCTION__, $args, $data);
         return $data;
     }
+    function onAfterDrawResource(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onAfterPostEncounter(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onAfterDrawHindrance(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
+    function onAfterSkillUse(&$data, array $args = [])
+    {
+        $this->callHooks(__FUNCTION__, $args, $data);
+        return $data;
+    }
     function onIncapacitation(&$data, array $args = [])
     {
         $this->callHooks(__FUNCTION__, $args, $data);

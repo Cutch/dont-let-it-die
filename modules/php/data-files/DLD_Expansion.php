@@ -821,10 +821,16 @@ class DLD_ExpansionData
                 'onCookAfter' => function (Game $game, $card, &$data) {
                     $card['handleEat']($game, $card, $data);
                 },
-                'onResolveDraw' => function (Game $game, $card, &$data) {
+                'onAfterDrawResource' => function (Game $game, $card, &$data) {
                     $card['handleEat']($game, $card, $data);
                 },
-                'onPlayerTurn' => function (Game $game, $card, &$data) {
+                'onAfterPostEncounter' => function (Game $game, $card, &$data) {
+                    $card['handleEat']($game, $card, $data);
+                },
+                'onAfterSkillUse' => function (Game $game, $card, &$data) {
+                    $card['handleEat']($game, $card, $data);
+                },
+                'onAfterDrawHindrance' => function (Game $game, $card, &$data) {
                     $card['handleEat']($game, $card, $data);
                 },
             ],

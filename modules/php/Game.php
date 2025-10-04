@@ -930,6 +930,9 @@ class Game extends \Table
                 $_this->character->setSubmittingCharacter(null);
                 if ($data['nextState']) {
                     $this->nextState($data['nextState']);
+                    if ($data['nextState'] === 'playerTurn') {
+                        $this->hooks->onAfterSkillUse($data);
+                    }
                 }
             }
         );
@@ -1424,6 +1427,7 @@ class Game extends \Table
                     $this->nextState('playerTurn');
                 } elseif ($card['deckType'] == 'resource') {
                     $this->nextState('playerTurn');
+                    $this->hooks->onAfterDrawResource($data);
                 } elseif ($card['deckType'] == 'encounter') {
                     $this->nextState('resolveEncounter');
                 } elseif ($card['deckType'] == 'nothing') {
@@ -1441,6 +1445,7 @@ class Game extends \Table
                 ) {
                     $this->checkHindrance(true, $this->character->getSubmittingCharacterId());
                     $this->nextState('playerTurn');
+                    $this->hooks->onAfterDrawHindrance($data);
                 } elseif ($card['deckType'] == 'day-event') {
                     $this->nextState('dayEvent');
                 } else {
@@ -2595,6 +2600,9 @@ class Game extends \Table
         $this->getAllPlayers($result);
         $this->getResources($result);
 
+        if ($stateName == 'dayEvent' && sizeof($result['availableSkills']) === 0) {
+            $this->nextState('playerTurn');
+        }
         return $result;
     }
 
@@ -2762,8 +2770,8 @@ class Game extends \Table
     public function giveResources()
     {
         $this->gameData->setResources([
-            'fireWood' => 0,
-            'wood' => 7,
+            'fireWood' => 5,
+            'wood' => 2,
             'bone' => 7,
             'meat' => 7,
             'meat-cooked' => 4,

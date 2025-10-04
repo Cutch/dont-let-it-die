@@ -380,6 +380,7 @@ class DLD_ItemTrade
         if (sizeof($this->game->getCraftedItems()) == 0) {
             $this->game->nextState('nextCharacter');
         } else {
+            $this->game->completeAction(false);
             $this->game->gamestate->setAllPlayersMultiactive();
             foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
                 $this->game->giveExtraTime((int) $playerId);
