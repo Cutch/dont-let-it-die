@@ -319,10 +319,6 @@ namespace {
             return ''; 
         }
 
-        /**
-         * @return string
-         */
-        abstract protected function getGameName();
 
         final protected function raw(string $string): array
         {
@@ -940,7 +936,6 @@ namespace {
          *     tie_breaker_description: string,
          *     losers_not_raned: bool,
          *     solo_mode_ranked: bool,
-         *     is_beta: int,
          *     is_coop: int,
          *     language_dependency: bool,
          *     player_colors: array<string>,
@@ -1433,15 +1428,6 @@ namespace {
         {
             return '';
         }
-
-        /**
-         * Returns the game name.
-         *
-         * NOTE: Do not modify, it's automatically replaced.
-         *
-         * @return string
-         */
-        abstract protected function getGameName();
 
         /**
          * Return an associative array which associate each player with the previous player around the table.
