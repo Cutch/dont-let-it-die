@@ -8,6 +8,10 @@ if (!function_exists('addId')) {
     {
         return max($min, min($max, $current));
     }
+    function gk($obj, $key)
+    {
+        return $obj && array_key_exists($key, $obj) ? $obj[$key] : null;
+    }
     function addId($data)
     {
         array_walk($data, function (&$v, $k) {

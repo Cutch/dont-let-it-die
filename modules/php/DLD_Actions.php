@@ -167,7 +167,7 @@ class DLD_Actions
                                     [$data['data']['characterId']],
                                     null,
                                     false,
-                                    $data['currentState'],
+                                    gk(gk($data['data'], 'selectionState'), 'nextState') ?? $data['currentState'],
                                     true,
                                     $data['data']['characterId']
                                 );
@@ -212,8 +212,11 @@ class DLD_Actions
                                 if ($count == 0) {
                                     throw new BgaUserException(clienttranslate('Select a Hindrance'));
                                 }
-                                $eatData = $game->actInterrupt->getState('actEat');
-                                $game->actions->spendActionCost('actEat');
+                                $eatData =
+                                    $game->actInterrupt->getState('actEat') ??
+                                    ($game->actInterrupt->getState('_actEat') ?? $game->actInterrupt->getState('_actSelectEat'));
+
+                                $game->actions->spendActionCost('actEat', null, $eatData['data']['characterId']);
                                 $left = $game->adjustResource($eatData['data']['type'], -$eatData['data']['count'])['left'];
                                 $game->notify('notify', clienttranslate('${character_name} ate and removed a hindrance'), [
                                     'character_name' => $game->getCharacterHTML($characterId),
@@ -715,16 +718,17 @@ class DLD_Actions
     public function spendActionCost(string $action, ?string $subAction = null, ?string $characterId = null)
     {
         $cost = $this->getActionCost($action, $subAction, $characterId);
-        $this->spendCost($cost);
+        $this->spendCost($cost, $characterId);
     }
-    public function spendCost(array $cost)
+    public function spendCost(array $cost, ?string $characterId = null)
     {
+        $characterId = $characterId ?? $this->game->character->getSubmittingCharacterId();
         $this->game->hooks->onSpendActionCost($cost);
         if (array_key_exists('health', $cost)) {
-            $this->game->character->adjustActiveHealth(-$cost['health']);
+            $this->game->character->adjustHealth($characterId, -$cost['health']);
         }
         if (array_key_exists('stamina', $cost)) {
-            $this->game->character->adjustActiveStamina(-$cost['stamina']);
+            $this->game->character->adjustStamina($characterId, -$cost['stamina']);
 
             if ($cost['stamina'] > 0) {
                 $this->game->incStat($cost['stamina'], 'stamina_used', $this->game->character->getSubmittingCharacter()['playerId']);

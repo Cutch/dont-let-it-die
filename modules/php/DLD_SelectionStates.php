@@ -187,7 +187,12 @@ class DLD_SelectionStates
         $this->game->hooks->onHindranceSelection($data);
 
         if ($data['nextState'] != false) {
-            $this->game->nextState($data['nextState']);
+            // TODO Can remove this hack later, fixes vog + paranoid bug
+            if ($data['nextState'] === 'eatSelection') {
+                $this->game->nextState('playerTurn');
+            } else {
+                $this->game->nextState($data['nextState']);
+            }
         }
         $this->game->hooks->onHindranceSelectionAfter($data);
         $this->initiatePendingState();
