@@ -652,6 +652,9 @@ class DLD_Actions
     }
     private function skillActionCost(string $action, ?string $subAction = null, array &$skill, ?string $characterId = null)
     {
+        $characterId = array_key_exists('characterId', $skill)
+            ? $skill['characterId']
+            : $characterId ?? $this->game->character->getSubmittingCharacterId();
         $actionCost = [
             'action' => $action,
             'subAction' => $subAction ?? (array_key_exists('id', $skill) ? $skill['id'] : null),
@@ -661,11 +664,13 @@ class DLD_Actions
             'perForever' => array_key_exists('perForever', $skill) ? $skill['perForever'] : null,
             'name' => array_key_exists('name', $skill) ? $skill['name'] : null,
             'random' => array_key_exists('random', $skill) ? $skill['random'] : null,
-            'characterId' => $characterId ?? $this->game->character->getSubmittingCharacterId(),
+            'characterId' => $characterId,
+            'playerId' => $this->game->character->getCharacterData($characterId, true)['playerId'],
         ];
         $this->game->hooks->onGetActionCost($actionCost);
 
         $skill['action'] = $actionCost['action'];
+        $skill['playerId'] = $actionCost['playerId'];
         if (array_key_exists('stamina', $actionCost)) {
             $skill['stamina'] = $actionCost['stamina'];
         }

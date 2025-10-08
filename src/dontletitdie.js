@@ -1447,10 +1447,14 @@ declare('bgagame.dontletitdie', Gamegui, {
                 return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
                   (skill) => {
                     const suffix = this.getActionSuffixHTML(skill);
-                    this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
-                      this.closeDayPopup?.();
-                      return this.bgaPerformAction(actionId, { skillId: skill.id });
-                    });
+                    this.statusBar.addActionButton(
+                      `${_(skill.name)}${suffix}`,
+                      () => {
+                        this.closeDayPopup?.();
+                        return this.bgaPerformAction(actionId, { skillId: skill.id });
+                      },
+                      { disabled: skill.playerId && skill.playerId != gameui.player_id },
+                    );
                   },
                 );
               }
@@ -1529,10 +1533,14 @@ declare('bgagame.dontletitdie', Gamegui, {
                   Object.values(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills).forEach(
                     (skill) => {
                       const suffix = this.getActionSuffixHTML(skill);
-                      this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => {
-                        this.closeDayPopup?.();
-                        return this.bgaPerformAction(actionId, { skillId: skill.id, skillSecondaryId: skill.secondaryId });
-                      });
+                      this.statusBar.addActionButton(
+                        `${_(skill.name)}${suffix}`,
+                        () => {
+                          this.closeDayPopup?.();
+                          return this.bgaPerformAction(actionId, { skillId: skill.id, skillSecondaryId: skill.secondaryId });
+                        },
+                        { disabled: skill.playerId && skill.playerId != gameui.player_id },
+                      );
                     },
                   );
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
