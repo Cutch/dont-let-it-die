@@ -2032,10 +2032,10 @@ class DLD_CharactersData
                     }
                 },
                 // Guess is handled on the FE, if correct take double else 0
-                'onInvestigateFire' => function (Game $game, $char, &$data) {
+                'onInvestigateFirePost' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
-                        if ($data['roll'] == $data['guess']) {
-                            $data['roll'] *= 2;
+                        if ($data['originalRoll'] == $data['guess']) {
+                            $data['roll'] += $data['originalRoll'] * 2;
                         } else {
                             $data['roll'] = 0;
                         }
@@ -2318,7 +2318,7 @@ class DLD_CharactersData
                 'skills' => [
                     'skill1' => [
                         'type' => 'skill',
-                        'name' => '+1 ' . clientTranslate('Roll'),
+                        'name' => clientTranslate('+1  Roll'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'health' => 1,

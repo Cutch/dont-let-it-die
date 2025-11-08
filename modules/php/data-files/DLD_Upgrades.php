@@ -155,11 +155,11 @@ class DLD_UpgradesData
                         },
                     ],
                 ],
-                'onInvestigateFirePost' => function (Game $game, $skill, &$data) {
+                'onInvestigateFirePost' => function (Game $game, $obj, &$data) {
                     $char = $game->character->getTurnCharacterId();
                     if (getUsePerDay($char . '12-B', $game) == 1) {
                         usePerDay($char . '12-B', $game);
-                        $data['roll'] *= 2;
+                        $data['roll'] += $data['originalRoll'] * 2;
                     }
                 },
             ],
