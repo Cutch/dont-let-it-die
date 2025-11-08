@@ -49,7 +49,7 @@ export class CardSelectionScreen {
             <div class="token ${cardName}"></div>
           <div>`,
       );
-      renderImage(cardName, elem.querySelector(`.token.${cardName}`), { scale: deckScaling[deckName] ?? 1, pos: 'insert' });
+      renderImage(cardName, elem.querySelector(`.token.${cardName}`), { scale: deckScaling[deckName] ?? 2, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${cardName}`), 'Card', () => selectCallback());
     };
     gameData.selectionState.cards.forEach(({ deck, id: card }) => {

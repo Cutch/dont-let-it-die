@@ -1095,10 +1095,12 @@ class DLD_DecksData
                 'type' => 'deck',
                 'expansion' => 'hindrance',
                 'onUse' => function (Game $game, $nightCard) {
-                    $card1 = $game->decks->pickCard('hunt');
+                    $card1 = $game->decks->pickCard('hunt', 'hand');
                     $game->cardDrawEvent($card1, 'hunt');
-                    $card2 = $game->decks->pickCard('hunt');
+                    $card2 = $game->decks->pickCard('hunt', 'hand');
                     $game->cardDrawEvent($card2, 'hunt');
+                    $game->decks->addBackToDeck('hunt', $card1['id']);
+                    $game->decks->addBackToDeck('hunt', $card2['id']);
                     $game->eventLog(clienttranslate('Draws 2 from the ${deck} deck ${buttons}'), [
                         'deck' => 'hunt',
                         'buttons' => notifyButtons([

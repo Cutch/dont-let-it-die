@@ -166,7 +166,6 @@ class DLD_Decks
     public function removeFromDeck(string $deck, string $cardName): void
     {
         $cards = [...$this->getDeck($deck)->getCardsInLocation('discard'), ...$this->getDeck($deck)->getCardsInLocation('deck')];
-        //swapCharacter(Yurt)
         $cards = array_values(
             array_filter($cards, function ($card) use ($cardName) {
                 return $card['type_arg'] == $cardName;
@@ -221,7 +220,7 @@ class DLD_Decks
             }
         }
     }
-    public function pickCard(string $deck): array
+    public function pickCard(string $deck, string $target = 'discard'): array
     {
         // $partials = $this->game->gameData->get('partials');
         // if (!array_key_exists($deck, $partials)) {
@@ -234,7 +233,7 @@ class DLD_Decks
             $this->shuffleInDiscard($deck);
             $topCard = $this->getDeck($deck)->getCardOnTop('deck');
         }
-        $this->getDeck($deck)->insertCardOnExtremePosition($topCard['id'], 'discard', true);
+        $this->getDeck($deck)->insertCardOnExtremePosition($topCard['id'], $target, true);
         $card = $this->getCard($topCard['type_arg']);
         unset($this->cachedData[$deck]);
         return $card;

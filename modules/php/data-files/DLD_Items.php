@@ -677,7 +677,10 @@ class DLD_ItemsData
                                 if (array_key_exists('data', $existingData)) {
                                     $deck = $existingData['data']['deck'];
                                     $card1 = $existingData['data']['card'];
-                                    $card2 = $game->decks->pickCard($deck);
+                                    $game->decks->removeFromDeck($deck, $card1['id']);
+                                    $card2 = $game->decks->pickCard($deck, 'hand');
+                                    $game->decks->addBackToDeck($deck, $card1['id']);
+                                    $game->decks->addBackToDeck($deck, $card2['id']);
                                     $game->incStat(1, 'cards_drawn', $game->character->getSubmittingCharacter()['playerId']);
                                     $data['interrupt'] = true;
                                     $game->selectionStates->initiateState(
