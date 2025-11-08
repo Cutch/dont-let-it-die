@@ -700,8 +700,11 @@ class DLD_ItemsData
                                     array_filter($state['cards'], function ($card) use ($data) {
                                         return $card['id'] != $data['cardId'];
                                     })
-                                )[0];
-                                $game->cardDrawEvent($discardCard, $discardCard['deck']);
+                                );
+                                if (sizeof($discardCard) > 0) {
+                                    $discardCard = $discardCard[0];
+                                    $game->cardDrawEvent($discardCard, $discardCard['deck']);
+                                }
 
                                 $drawState = $game->actInterrupt->getState('actDraw');
                                 $drawState['data']['card'] = $game->decks->getCard($data['cardId']);
