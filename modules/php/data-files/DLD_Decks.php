@@ -549,18 +549,16 @@ class DLD_DecksData
                 'type' => 'deck',
                 'onUse' => function (Game $game, $nightCard) {
                     $game->eventLog(clienttranslate('Mammoths storm the camp'));
-                    $game->character->updateAllCharacterData(function ($character) use ($game) {
-                        $roll = $game->rollFireDie(clienttranslate('Night Event'), $character['character_name']);
+                    foreach ($game->character->getAllCharacterIds() as $character) {
+                        $roll = $game->rollFireDie(clienttranslate('Night Event'), $character);
                         // On blank roll take a damage
                         if ($roll == 0) {
-                            $game->character->adjustHealth($character['character_name'], -1);
+                            $game->character->adjustHealth($character, -1);
                             $game->eventLog(clienttranslate('${character_name} took 1 damage'), [
-                                'character_name' => $game->getCharacterHTML($character['character_name']),
+                                'character_name' => $game->getCharacterHTML($character),
                             ]);
-                            return false;
                         }
-                        return true;
-                    });
+                    }
                 },
             ],
             'night-event-7_14' => [
