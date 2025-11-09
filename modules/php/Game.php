@@ -1089,18 +1089,18 @@ class Game extends \Table
         $this->setLastAction($deck);
         $this->completeAction();
     }
-    public function actInvestigateFire(?int $guess = null): void
+    public function actInvestigateFire(?int $guess = null, ?bool $focus = null): void
     {
         // $this->character->addExtraTime();
         $this->actInterrupt->interruptableFunction(
             __FUNCTION__,
             func_get_args(),
             [$this->hooks, 'onInvestigateFire'],
-            function (Game $_this) use ($guess) {
+            function (Game $_this) use ($guess, $focus) {
                 $_this->actions->validateCanRunAction('actInvestigateFire');
                 $character = $_this->character->getSubmittingCharacter();
                 $roll = $_this->rollFireDie(clienttranslate('Investigate Fire'), $character['character_name']);
-                return ['roll' => $roll, 'originalRoll' => $roll, 'guess' => $guess];
+                return ['roll' => $roll, 'originalRoll' => $roll, 'guess' => $guess, 'focus' => $focus];
             },
             function (Game $_this, bool $finalizeInterrupt, $data) {
                 if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {

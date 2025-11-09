@@ -145,10 +145,6 @@ class DLD_UpgradesData
                         'state' => ['playerTurn'],
                         'perDay' => 1,
                         'global' => true,
-                        'onUse' => function (Game $game, $skill, &$data) {
-                            $char = $game->character->getTurnCharacterId();
-                            usePerDay($char . '12-B', $game);
-                        },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getTurnCharacterId();
                             return getUsePerDay($char . '12-B', $game) < 1;
@@ -157,9 +153,9 @@ class DLD_UpgradesData
                 ],
                 'onInvestigateFirePost' => function (Game $game, $obj, &$data) {
                     $char = $game->character->getTurnCharacterId();
-                    if (getUsePerDay($char . '12-B', $game) == 1) {
+                    if (getUsePerDay($char . '12-B', $game) < 1 && array_key_exists('focus', $data) && $data['focus']) {
                         usePerDay($char . '12-B', $game);
-                        $data['roll'] += $data['originalRoll'] * 2;
+                        $data['roll'] += $data['originalRoll'] + (array_key_exists('originalRoll2', $data) ? $data['originalRoll2'] : 0);
                     }
                 },
             ],
@@ -528,7 +524,7 @@ class DLD_UpgradesData
                         'stamina' => 2,
                         'global' => true,
                         'onUse' => function (Game $game, $skill, &$data) {
-                            // $char = $game->character->getTurnCharacterId();
+                            return ['notify' => false, 'spendActionCost' => false];
                         },
                         'onUseSkill' => function (Game $game, $skill, &$data) {
                             if ($data['skillId'] == $skill['id']) {
@@ -536,7 +532,6 @@ class DLD_UpgradesData
                                     array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames())
                                 );
                                 $data['interrupt'] = true;
-                                // $card2 = $game->decks->pickCard($deck);
                                 $game->selectionStates->initiateState(
                                     'cardSelection',
                                     [
@@ -546,31 +541,20 @@ class DLD_UpgradesData
                                     $game->character->getTurnCharacterId(),
                                     true
                                 );
-                                //         $existingData = $game->actInterrupt->getState('actDraw');
-                                //         if (array_key_exists('data', $existingData)) {
-                                //             $decksDiscards = $game->decks->listDeckDiscards();
-                                //             // $card2 = $game->decks->pickCard($deck);
-                                //             $game->gameData->set('cardSelectionState', [
-                                //                 'cards' => $decksDiscards,
-                                //                 'cancellable' => false,
-                                //                 'id' => $skill['id'],
-                                //             ]);
-                                // $data['interrupt'] = true;
-                                //             $game->nextState('cardSelection');
-                                //         }
                             }
                         },
                         'onCardSelection' => function (Game $game, $skill, &$data) {
                             $state = $game->selectionStates->getState('cardSelection');
                             if ($state && $state['id'] == $skill['id']) {
-                                // $game->data->getDecks()[$data['cardId']];
                                 $game->decks->shuffleInCard($game->data->getDecks()[$data['cardId']]['deck'], $data['cardId']);
-                                // $discardCard = array_values(
-                                //     array_filter($state['cards'], function ($card) use ($data) {
-                                //         return $card['id'] != $data['cardId'];
-                                //     })
-                                // )[0];
+                                $game->actions->spendActionCost('actUseSkill', $skill['id']);
                             }
+                        },
+                        'requires' => function (Game $game, $skill) {
+                            $decksDiscards = $game->decks->listDeckDiscards(
+                                array_intersect(['explore', 'gather', 'forage', 'harvest', 'hunt'], $game->decks->getAllDeckNames())
+                            );
+                            return sizeof($decksDiscards) > 0;
                         },
                     ],
                 ],

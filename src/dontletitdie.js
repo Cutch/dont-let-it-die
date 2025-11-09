@@ -1444,8 +1444,9 @@ declare('bgagame.dontletitdie', Gamegui, {
             if (stateName == 'eatSelection') return;
             if (stateName !== 'playerTurn') {
               if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
-                return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(
-                  (skill) => {
+                return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)
+                  ?.filter((d) => d.id !== '12-Bskill1')
+                  ?.forEach((skill) => {
                     const suffix = this.getActionSuffixHTML(skill);
                     this.statusBar.addActionButton(
                       `${_(skill.name)}${suffix}`,
@@ -1455,8 +1456,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                       },
                       { disabled: skill.playerId && skill.playerId != gameui.player_id },
                     );
-                  },
-                );
+                  });
               }
             }
             if (actionId === 'actAddWood') {
@@ -1510,7 +1510,7 @@ declare('bgagame.dontletitdie', Gamegui, {
             const suffix = this.getActionSuffixHTML(action);
             return this.statusBar.addActionButton(
               `${this.getActionMappings()[actionId]}${suffix}`,
-              () => {
+              async () => {
                 if (actionId === 'actSpendFKP') {
                   this.clearActionButtons();
                   Object.values(this.gamedatas.availableUnlocks).forEach((unlock) => {
@@ -1530,8 +1530,9 @@ declare('bgagame.dontletitdie', Gamegui, {
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
                 } else if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
                   this.clearActionButtons();
-                  Object.values(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills).forEach(
-                    (skill) => {
+                  Object.values(actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)
+                    .filter((d) => d.id !== '12-Bskill1')
+                    .forEach((skill) => {
                       const suffix = this.getActionSuffixHTML(skill);
                       this.statusBar.addActionButton(
                         `${_(skill.name)}${suffix}`,
@@ -1541,8 +1542,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                         },
                         { disabled: skill.playerId && skill.playerId != gameui.player_id },
                       );
-                    },
-                  );
+                    });
                   this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
                 } else if (actionId === 'actTrade') {
                   this.clearActionButtons();
@@ -1677,14 +1677,60 @@ declare('bgagame.dontletitdie', Gamegui, {
                     },
                     { color: 'secondary' },
                   );
-                } else if (actionId === 'actInvestigateFire' && this.gamedatas.activeCharacter === 'Cali') {
-                  this.clearActionButtons();
-                  [0, 1, 2, 3].forEach((i) => {
-                    this.statusBar.addActionButton(`${_('Guess')} ${i}`, () => {
-                      return this.bgaPerformAction(actionId, { guess: i });
+                } else if (
+                  actionId === 'actInvestigateFire' &&
+                  (this.gamedatas.activeCharacter === 'Cali' || this.gamedatas.availableSkills.some((d) => d.id === '12-Bskill1'))
+                ) {
+                  let guess = null;
+                  let focus = null;
+                  const chain = [];
+                  const focusFunc = () => {
+                    return new Promise((resolve, reject) => {
+                      this.clearActionButtons();
+                      Object.values(this.gamedatas.availableSkills)
+                        .filter((d) => d.id === '12-Bskill1')
+                        .forEach((skill) => {
+                          const suffix = this.getActionSuffixHTML(skill);
+                          this.statusBar.addActionButton(`${_(skill.name)}${suffix}`, () => ((focus = true), resolve()));
+                        });
+                      this.statusBar.addActionButton(_('Skip'), () => ((focus = false), resolve()));
+                      this.statusBar.addActionButton(_('Cancel'), reject, {
+                        color: 'secondary',
+                      });
                     });
-                  });
-                  this.statusBar.addActionButton(_('Cancel'), () => this.onUpdateActionButtons(stateName, args), { color: 'secondary' });
+                  };
+                  const guessFunc = () => {
+                    return new Promise((resolve, reject) => {
+                      this.clearActionButtons();
+                      [1, 2, 3].forEach((i) => {
+                        this.statusBar.addActionButton(`${_('Guess')} ${i}`, () => {
+                          guess = i;
+                          resolve();
+                        });
+                      });
+                      this.statusBar.addActionButton(_('Cancel'), reject, {
+                        color: 'secondary',
+                      });
+                    });
+                  };
+                  const lastFunction = () => {
+                    this.bgaPerformAction(actionId, { guess: guess, focus: focus });
+                  };
+                  if (this.gamedatas.availableSkills.some((d) => d.id === '12-Bskill1')) {
+                    chain.push(focusFunc);
+                  }
+                  if (this.gamedatas.activeCharacter === 'Cali') {
+                    chain.push(guessFunc);
+                  }
+                  chain.push(lastFunction);
+                  for (const c of chain) {
+                    try {
+                      await c();
+                    } catch (e) {
+                      this.onUpdateActionButtons(stateName, args);
+                      break;
+                    }
+                  }
                 } else {
                   return this.bgaPerformAction(actionId);
                 }

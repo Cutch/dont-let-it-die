@@ -178,9 +178,10 @@ class DLD_CharactersData
                                         $game->character->getTurnCharacter()['character_name']
                                     ),
                                 ]);
-                                $data['data']['roll'] =
+                                $data['data']['originalRoll'] =
                                     $game->rollFireDie($skill['name'], $char['character_name']) +
                                     (array_key_exists('originalRoll2', $data['data']) ? $data['data']['originalRoll2'] : 0);
+                                $data['data']['roll'] = $data['data']['originalRoll'];
                                 usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             }
                             if (
@@ -194,8 +195,9 @@ class DLD_CharactersData
                                         $game->character->getTurnCharacter()['character_name']
                                     ),
                                 ]);
-                                $data['data']['roll'] =
+                                $data['data']['originalRoll'] =
                                     $game->rollFireDie($skill['name'], $char['character_name']) + $data['data']['originalRoll'];
+                                $data['data']['roll'] = $data['data']['originalRoll'];
                                 usePerDay($skill['getPerDayKey']($game, $skill), $game);
                             }
                         },
@@ -2035,9 +2037,11 @@ class DLD_CharactersData
                 'onInvestigateFirePost' => function (Game $game, $char, &$data) {
                     if ($char['isActive']) {
                         if ($data['originalRoll'] == $data['guess']) {
-                            $data['roll'] += $data['originalRoll'] * 2;
+                            $data['roll'] += $data['originalRoll'];
+                            $game->eventLog(clienttranslate('${character_name} guessed correctly'));
                         } else {
                             $data['roll'] = 0;
+                            $game->eventLog(clienttranslate('${character_name} did not guess correctly'));
                         }
                     }
                 },
@@ -2318,7 +2322,7 @@ class DLD_CharactersData
                 'skills' => [
                     'skill1' => [
                         'type' => 'skill',
-                        'name' => clientTranslate('+1  Roll'),
+                        'name' => clientTranslate('+1 Roll'),
                         'state' => ['interrupt'],
                         'interruptState' => ['playerTurn'],
                         'health' => 1,
@@ -2332,6 +2336,7 @@ class DLD_CharactersData
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $data['data']['roll'] += 1;
+                                $data['data']['originalRoll'] += 1;
                             }
                         },
                         'requires' => function (Game $game, $skill) {
