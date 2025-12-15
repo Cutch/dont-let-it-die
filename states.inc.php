@@ -97,6 +97,7 @@ $interruptScreens = [
     'tokenReduceSelection' => $tokenReduceSelection,
     'undo' => $undo,
     'dinnerPhase' => $dinnerPhase,
+    'changeZombiePlayer' => $changeZombiePlayer,
 ];
 
 $machinestates = [
@@ -179,7 +180,6 @@ $machinestates = [
             'endGame' => $gameEnd,
             'drawCard' => $drawCard,
             'endTurn' => $nextCharacter,
-            'changeZombiePlayer' => $changeZombiePlayer,
         ],
     ],
     $undo => [
@@ -317,7 +317,6 @@ $machinestates = [
             'endGame' => $gameEnd,
             'playerTurn' => $playerTurn,
             'drawCard' => $drawCard,
-            'changeZombiePlayer' => $changeZombiePlayer,
         ],
     ],
     $interrupt => [
@@ -352,7 +351,7 @@ $machinestates = [
         'type' => 'activeplayer',
         'args' => 'argWhichWeapon',
         'possibleactions' => ['actChooseWeapon'],
-        'transitions' => ['resolveEncounter' => $resolveEncounter, 'changeZombiePlayer' => $changeZombiePlayer],
+        'transitions' => ['resolveEncounter' => $resolveEncounter],
     ],
     $dayEvent => [
         'name' => 'dayEvent',
@@ -367,7 +366,6 @@ $machinestates = [
             'playerTurn' => $playerTurn,
             'drawCard' => $drawCard,
             'resolveEncounter' => $resolveEncounter,
-            'changeZombiePlayer' => $changeZombiePlayer,
         ],
     ],
     $dinnerPhase => [
@@ -378,7 +376,7 @@ $machinestates = [
         'action' => 'stDinnerPhase',
         // 'args' => 'argDinnerPhase',
         'possibleactions' => ['actForceSkip', 'actUnBack'],
-        'transitions' => ['endGame' => $gameEnd, 'nightPhase' => $nightPhase, 'changeZombiePlayer' => $changeZombiePlayer],
+        'transitions' => ['endGame' => $gameEnd, 'nightPhase' => $nightPhase],
         'initialprivate' => $dinnerPhasePrivate,
     ],
     $dinnerPhasePrivate => [
