@@ -27,4 +27,18 @@
       right: 0;
     }
   }
+  .craft-error {
+    color: #000;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background-color: #fff;
+    text-align: center;
+    height: 1em;
+    border-radius: 10px;
+    border: 1px solid #000;
+    margin-bottom: 1rem;
+    .hidden {
+      display: none;
+    }
+  }
 }

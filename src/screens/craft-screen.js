@@ -25,7 +25,10 @@ export class CraftScreen {
       this.game.selector.renderByElement().insertAdjacentHTML(
         'beforeend',
         `<div id="craft-screen" class="dlid__container">
-            <div id="craft-items" class="dlid__container"><h3>${_('Craftable Items')}</h3><div class="items"></div></div>
+            <div id="craft-items" class="dlid__container">
+            <h3>${_('Craftable Items')}</h3>
+            <div id="craft-error" class="craft-error">${_('No items are craftable')}</div>
+            <div class="items"></div></div>
             <div class="arrow"><i class="fa fa-arrow-up fa-5x" aria-hidden="true"></i></div>
         </div>`,
       );
@@ -36,6 +39,7 @@ export class CraftScreen {
       this.cleanup = addPassiveListener('scroll', () => this.scroll());
     }
     craftElem.innerHTML = '';
+    const canCraftSomething = false;
     const renderItem = (name, elem, count, selectCallback) => {
       const hasCost = gameData.availableEquipmentWithCost.includes(name);
       elem.insertAdjacentHTML(
@@ -51,8 +55,10 @@ export class CraftScreen {
       });
       elem.querySelector(`.token.${name} .image`).insertAdjacentHTML('beforeend', `<div class="counter dot dot--number">${count()}</div>`);
       addClickListener(elem.querySelector(`.token.${name}`), this.game.data[name].options.name, () => selectCallback(count));
-      if (hasCost) document.querySelector(`#craft-screen .token.${name}`).classList.remove('disabled');
-      else document.querySelector(`#craft-screen .token.${name}`).classList.add('disabled');
+      if (hasCost) {
+        document.querySelector(`#craft-screen .token.${name}`).classList.remove('disabled');
+        canCraftSomething = true;
+      } else document.querySelector(`#craft-screen .token.${name}`).classList.add('disabled');
     };
     Object.keys(gameData.availableEquipment).forEach((name) => {
       renderItem(
@@ -72,6 +78,11 @@ export class CraftScreen {
         },
       );
     });
+    if (canCraftSomething) {
+      $('craft-error').classList.add('hidden');
+    } else {
+      $('craft-error').classList.remove('hidden');
+    }
     this.scroll();
   }
 }
