@@ -297,6 +297,8 @@ class DLD_Encounter
                         );
                     }
                     $data['damageTaken'] = $damageTaken;
+                    // This one is important so it comes before onIncapacitation, can probably remove the second thats used in postEncounter
+                    $_this->gameData->set('encounterState', $data);
                     if ($this->killCheck($data)) {
                         // Killed
                         $change = 0;

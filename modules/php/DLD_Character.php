@@ -97,8 +97,10 @@ class DLD_Character
             array_key_exists('becameIncapacitated', $data) &&
             $data['becameIncapacitated'] &&
             $data['isActive'] &&
-            $this->game->gamestate->state(true, false, true)['name'] == 'playerTurn'
+            $this->game->gamestate->state(true, false, true)['name'] == 'playerTurn' &&
+            $this->game->character->getTurnCharacterId() === $name
         ) {
+            $data['becameIncapacitated'] = false;
             $this->game->endTurn();
         }
     }
@@ -682,17 +684,23 @@ class DLD_Character
         }
 
         if ($data['health'] == 0 && !$data['incapacitated']) {
-            $this->game->eventLog(clienttranslate('${character_name} is incapacitated'), [
-                'character_name' => $this->game->getCharacterHTML($characterName),
-            ]);
-            $data['incapacitated'] = true;
-            $data['becameIncapacitated'] = true;
-            $data['stamina'] = 0;
             $hookData = [
                 'characterId' => $characterName,
+                'cancel' => false,
+                'health' => &$data['health'],
             ];
             $this->game->hooks->onIncapacitation($hookData);
-            return false;
+            $data['health'] = clamp($data['health'], 0, $data['maxHealth']);
+            if (!$hookData['cancel']) {
+                $data['stamina'] = 0;
+                $this->game->eventLog(clienttranslate('${character_name} is incapacitated'), [
+                    'character_name' => $this->game->getCharacterHTML($characterName),
+                ]);
+                $data['incapacitated'] = true;
+                $data['becameIncapacitated'] = true;
+                return false;
+            }
+            return $prev == 0;
         } else {
             return $prev == 0;
         }

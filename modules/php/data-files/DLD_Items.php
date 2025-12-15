@@ -839,6 +839,9 @@ class DLD_ItemsData
                     if ($char['isActive']) {
                         $game->eventLog(clienttranslate('${character_name} used their bandage to revive'));
                         $game->destroyItem($item['itemId']);
+                        $game->character->updateCharacterData($item['characterId'], function (&$data) {
+                            $data['health'] = clamp(3, 0, $data['maxHealth']);
+                        });
                     }
                 },
             ],

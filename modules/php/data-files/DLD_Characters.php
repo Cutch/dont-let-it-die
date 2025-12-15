@@ -791,7 +791,12 @@ class DLD_CharactersData
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            if ($char['isActive'] && $char['health'] < $char['maxHealth']) {
+                            if (
+                                $skill['characterId'] === $game->character->getTurnCharacterId() &&
+                                $char['isActive'] &&
+                                $char['health'] < $char['maxHealth'] &&
+                                !$char['incapacitated']
+                            ) {
                                 $state = $game->gameData->get('encounterState');
                                 if ($game->encounter->killCheck($state)) {
                                     return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
@@ -800,6 +805,14 @@ class DLD_CharactersData
                         },
                     ],
                 ],
+                'onIncapacitation' => function (Game $game, $char, &$data) {
+                    $state = $game->gameData->get('encounterState');
+                    if ($game->encounter->killCheck($state) && getUsePerDay($char['id'] . 'skill2', $game) < 1) {
+                        $game->eventLog(clienttranslate('${character_name} healed by 2'));
+                        $data['health'] += 2;
+                        $data['cancel'] = true;
+                    }
+                },
             ],
             'River' => [
                 'type' => 'character',
