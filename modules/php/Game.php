@@ -1669,6 +1669,7 @@ class Game extends \Table
     }
     public function endTurn()
     {
+        $this->character->setSubmittingCharacter(null);
         $data = [
             'characterId' => $this->character->getTurnCharacterId(),
         ];
