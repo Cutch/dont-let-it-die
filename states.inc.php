@@ -378,7 +378,7 @@ $machinestates = [
         'action' => 'stDinnerPhase',
         // 'args' => 'argDinnerPhase',
         'possibleactions' => ['actForceSkip', 'actUnBack'],
-        'transitions' => ['nightPhase' => $nightPhase, 'changeZombiePlayer' => $changeZombiePlayer],
+        'transitions' => ['endGame' => $gameEnd, 'nightPhase' => $nightPhase, 'changeZombiePlayer' => $changeZombiePlayer],
         'initialprivate' => $dinnerPhasePrivate,
     ],
     $dinnerPhasePrivate => [
