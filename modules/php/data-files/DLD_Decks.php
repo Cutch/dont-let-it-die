@@ -610,7 +610,11 @@ class DLD_DecksData
                 'onCheckSkillRequirements' => function (Game $game, $nightCard, $data, &$requires) {
                     // Stamina skills can't be used
                     if (array_key_exists('type', $data)) {
-                        $requires['requires'] = $requires['requires'] && $data['type'] == 'skill' && array_key_exists('stamina', $data);
+                        $requires['requires'] =
+                            $requires['requires'] &&
+                            $data['type'] == 'skill' &&
+                            array_key_exists('stamina', $data) &&
+                            !($data['stamina'] > 0);
                     }
                 },
                 'onAdjustStamina' => function (Game $game, $nightCard, &$data) {

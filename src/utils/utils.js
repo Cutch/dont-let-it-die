@@ -21,6 +21,7 @@ export const addPassiveListener = (type, callback) => {
 };
 
 export const scrollArrow = (content, arrowElem) => {
+  if (!content || !arrowElem) return;
   const { y, height } = content.getBoundingClientRect();
   arrowElem.style['top'] = `calc(${Math.max(
     0,
