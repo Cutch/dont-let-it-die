@@ -282,6 +282,7 @@ class DLD_ExpansionData
                             if ($game->rollFireDie(clienttranslate('Day Event'), $game->character->getTurnCharacterId()) == 0) {
                                 usePerDay($skill['parentId'], $game);
                                 if (getUsePerDay($skill['parentId'], $game) == 3) {
+                                    $game->adjustResource('meat', 3);
                                     $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                         'count' => 3,
                                         'resource_type' => 'meat',
@@ -465,11 +466,6 @@ class DLD_ExpansionData
                                 $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 1,
                                     'character_resource' => clienttranslate('Health'),
-                                ]);
-                            } else {
-                                $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
-                                    'count' => 3,
-                                    'resource_type' => 'wood',
                                 ]);
                             }
                             return ['notify' => false];
