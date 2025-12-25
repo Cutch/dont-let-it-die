@@ -166,7 +166,7 @@ class DLD_UpgradesData
                 'unlockCost' => 4,
                 'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
-                    if ($card['deckType'] == 'resource' && $card['resourceType'] == 'hide') {
+                    if ($card['deckType'] == 'resource' && $card['resourceType'] == 'bone') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
                         $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                             'action_name' => $obj['name'],
@@ -193,7 +193,7 @@ class DLD_UpgradesData
                 'unlockCost' => 4,
                 'onResolveDrawPost' => function (Game $game, $obj, &$data) {
                     $card = $data['card'];
-                    if ($card['deckType'] == 'resource' && $card['resourceType'] == 'bone') {
+                    if ($card['deckType'] == 'resource' && $card['resourceType'] == 'hide') {
                         $resourceChange = $game->adjustResource($card['resourceType'], 1);
                         $game->notify('tree', clienttranslate('Received ${count} ${resource_type} from ${action_name}'), [
                             'action_name' => $obj['name'],
