@@ -1906,7 +1906,14 @@ class DLD_CharactersData
                                     'usedActionId' => 'actUseSkill',
                                     'usedActionName' => $skill['name'],
                                 ]);
-                                // $data['data']['willTakeDamage'] = 0;
+                                $data['data']['willTakeDamage'] = 0;
+                            }
+                        },
+                        'onInterruptCheckRemoveSkill' => function (Game $game, $skill, &$data) {
+                            $damageTaken = $game->encounter->countDamageTaken($data['data']);
+                            $char = $game->character->getCharacterData($skill['characterId'], true);
+                            if (!$char['incapacitated'] && !$char['isActive'] && $damageTaken == 0 && !$data['data']['damageStamina']) {
+                                $game->actInterrupt->removeSkill($data['skills'], $skill['id']);
                             }
                         },
                         'onUse' => function (Game $game, $skill) {

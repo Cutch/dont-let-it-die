@@ -198,6 +198,15 @@ class DLD_ActInterrupt
         $data = $state[$functionName];
         return ['functionName' => $functionName, 'data' => $data];
     }
+    public function removeSkill(&$skills, string $skillId): void
+    {
+        array_walk($skills, function ($v, $k) use ($skillId, &$skills) {
+            if ($skillId == $v['id']) {
+                unset($skills[$k]);
+                $skills = array_values($skills);
+            }
+        });
+    }
     public function actInterrupt(string $skillId, ?string $skillSecondaryId = null): void
     {
         $state = $this->getLatestInterruptState();
@@ -220,6 +229,8 @@ class DLD_ActInterrupt
                 }
                 unset($skills[$k]);
                 $skills = array_values($skills);
+            } else {
+                $this->game->hooks->onInterruptCheckRemoveSkill($data, $v);
             }
         });
         if (array_key_exists('skipAndDontComplete', $data)) {

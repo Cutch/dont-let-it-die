@@ -162,6 +162,15 @@ class DLD_Hooks
         $this->callHooks(__FUNCTION__, $args, $data, $activatedSkill);
         return $data;
     }
+    function onInterruptCheckRemoveSkill(&$data, $activatedSkill, array $args = [])
+    {
+        // Default checkInterrupt to true
+        if (!array_key_exists('checkInterrupt', $args)) {
+            $args['checkInterrupt'] = true;
+        }
+        $this->callHooks(__FUNCTION__, $args, $data, $activatedSkill);
+        return $data;
+    }
     public function reconnectHooks(&$jsonData, $underlyingData)
     {
         array_walk($underlyingData, function ($v, $k) use (&$jsonData) {

@@ -134,6 +134,14 @@ class DLD_ExpansionData
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
                         },
+                        'onInterruptCheckRemoveSkill' => function (Game $game, $skill, &$data) {
+                            $damageTaken = $game->encounter->countDamageTaken($data['data']);
+                            $char = $game->character->getCharacterData($skill['characterId']);
+
+                            if ($char['isActive'] && $damageTaken == 0) {
+                                $game->actInterrupt->removeSkill($data['skills'], $skill['id']);
+                            }
+                        },
                         'onInterrupt' => function (Game $game, $skill, &$data, $activatedSkill) {
                             if ($skill['id'] == $activatedSkill['id']) {
                                 $char = $game->character->getCharacterData($game->character->getTurnCharacterId());
