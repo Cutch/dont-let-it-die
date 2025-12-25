@@ -517,6 +517,18 @@ declare('bgagame.dontletitdie', Gamegui, {
     this.updateResource('wood', firewoodElem, this.gamedatas.resources['fireWood'] ?? 0, {
       warn: (this.gamedatas.resources['fireWood'] ?? 0) <= (this.gamedatas['fireWoodCost'] ?? 0),
     });
+    if ((this.gamedatas.resources['fireWood'] ?? 0) <= (this.gamedatas['fireWoodCost'] ?? 0)) {
+      this.addHelpTooltip({
+        node: document.querySelector(`.wood-alert`),
+        text: _(
+          'Warning, the morning phase will cause ${count} fire wood to be removed. If there is not enough fire wood the game is lost.',
+        ).replace('${count}', this.gamedatas['fireWoodCost'] ?? 0),
+        iconCSS: 'fa fa-fire dld-warning',
+      });
+    } else {
+      document.querySelector(`.wood-alert`).innerHTML = '';
+    }
+
     // Available Resource Pool
     let availableElem = document.querySelector(`#discoverable-container .tokens`);
     if (!availableElem) {
@@ -731,7 +743,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       .getElementById('game_play_area')
       .insertAdjacentHTML(
         'beforeend',
-        `<div id="board-track-wrapper"><div id="board-resource-wrapper"><div id="board-container" class="dlid__container"><div class="board"><div class="buildings"></div>${decks
+        `<div id="board-track-wrapper"><div id="board-resource-wrapper"><div id="board-container" class="dlid__container"><div class="wood-alert"></div><div class="board"><div class="buildings"></div>${decks
           .map((d) => `<div class="${d.name}"></div>`)
           .join('')}</div></div></div></div>`,
       );

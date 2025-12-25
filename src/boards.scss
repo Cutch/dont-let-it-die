@@ -60,6 +60,13 @@
 #board-container {
   position: relative;
 }
+.wood-alert {
+  position: absolute;
+  top: 0;
+  left: 18px;
+  padding: 5px;
+  z-index: 1;
+}
 #fire-pit .fire-wood {
   position: absolute;
   left: 50%;
