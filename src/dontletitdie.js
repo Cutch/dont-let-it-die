@@ -743,7 +743,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       .getElementById('game_play_area')
       .insertAdjacentHTML(
         'beforeend',
-        `<div id="board-track-wrapper"><div id="board-resource-wrapper"><div id="board-container" class="dlid__container"><div class="wood-alert"></div><div class="board"><div class="buildings"></div>${decks
+        `<div id="board-track-wrapper"><div id="board-resource-wrapper"><div id="board-container" class="dlid__container"><div class="board"><div class="wood-alert"></div><div class="buildings"></div>${decks
           .map((d) => `<div class="${d.name}"></div>`)
           .join('')}</div></div></div></div>`,
       );

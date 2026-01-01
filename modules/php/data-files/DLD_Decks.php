@@ -607,16 +607,16 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     $game->eventLog(clienttranslate('Can\'t gain stamina tomorrow'));
                 },
-                'onCheckSkillRequirements' => function (Game $game, $nightCard, $data, &$requires) {
-                    // Stamina skills can't be used
-                    if (array_key_exists('type', $data)) {
-                        $requires['requires'] =
-                            $requires['requires'] &&
-                            $data['type'] == 'skill' &&
-                            array_key_exists('stamina', $data) &&
-                            !($data['stamina'] > 0);
-                    }
-                },
+                // 'onCheckSkillRequirements' => function (Game $game, $nightCard, $data, &$requires) {
+                //     // Stamina skills can't be used
+                //     if (array_key_exists('type', $data)) {
+                //         $requires['requires'] =
+                //             $requires['requires'] &&
+                //             $data['type'] == 'skill' &&
+                //             array_key_exists('stamina', $data) &&
+                //             !($data['stamina'] > 0);
+                //     }
+                // },
                 'onAdjustStamina' => function (Game $game, $nightCard, &$data) {
                     if ($data['change'] > 0) {
                         $data['change'] = 0;
