@@ -927,7 +927,7 @@ class DLD_ItemsData
                 ],
                 'onGetActionCost' => function (Game $game, $item, &$data) {
                     $char = $game->character->getCharacterData($item['characterId']);
-                    if ($char['isActive'] && $data['action'] == 'actExplore') {
+                    if ($char['isActive'] && $data['action'] == 'actDrawExplore') {
                         $data['stamina'] = max($data['stamina'] - 2, 0);
                     }
                 },

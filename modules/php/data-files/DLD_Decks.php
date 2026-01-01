@@ -787,7 +787,7 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     $berries = $game->gameData->getResource('berry');
                     if ($berries > 0) {
-                        $lostBerries = floor($berries / 2);
+                        $lostBerries = ceil($berries / 2);
                         $game->adjustResource('berry', -$lostBerries);
                         if ($lostBerries == 1) {
                             $game->eventLog(clienttranslate('Boars steal ${count} berry'), ['count' => $lostBerries]);

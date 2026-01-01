@@ -571,8 +571,8 @@ class DLD_ExpansionData
                         'type' => 'skill',
                         'name' => clienttranslate('Head back to camp'),
                         'state' => ['dayEvent'],
+                        'stamina' => 1,
                         'onUse' => function (Game $game, $skill) {
-                            $game->character->adjustActiveStamina(-1);
                             $game->adjustResource('berry', 2);
                             $game->eventLog(clienttranslate('${character_name} received ${count} ${resource_type}'), [
                                 'count' => 2,
@@ -703,7 +703,7 @@ class DLD_ExpansionData
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Cowardly'),
                 'onResolveDrawPost' => function (Game $game, $card, &$data) {
-                    if ($card['characterId'] == $game->character->getTurnCharacterId()) {
+                    if ($card['deckType'] == 'encounter' && $card['characterId'] == $game->character->getTurnCharacterId()) {
                         $data['discard'] = true;
                         $game->eventLog(clienttranslate('${character_name} ran from the encounter'));
                         $game->character->adjustActiveHealth(-1);
