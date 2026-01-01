@@ -1960,7 +1960,7 @@ class Game extends \Table
                         $data['stamina'] = clamp($data['stamina'] + $stamina, 0, $data['maxStamina']);
                     }
                 });
-                if ($health != 0) {
+                if ($health != 0 && sizeof($skipMorningDamage) != 4) {
                     $this->notify('morningPhase', clienttranslate('Everyone lost ${amount} ${character_resource}'), [
                         'i18n' => ['character_resource'],
                         'amount' => -$health,
