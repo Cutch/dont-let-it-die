@@ -2599,6 +2599,15 @@ class Game extends \Table
                     })
                 )
             ),
+            'allItemsWithCosts' => array_map(
+                function ($d) {
+                    return $d['cost'];
+                },
+                array_filter($this->data->getItems(), function ($d) {
+                    return $d['type'] == 'item';
+                })
+            ),
+
             ...$this->getArgsData(),
         ];
         $this->getAllPlayers($result);

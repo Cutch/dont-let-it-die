@@ -58,7 +58,27 @@ export class CraftScreen {
       if (hasCost) {
         document.querySelector(`#craft-screen .token.${name}`).classList.remove('disabled');
         canCraftSomething = true;
-      } else document.querySelector(`#craft-screen .token.${name}`).classList.add('disabled');
+      } else {
+        document.querySelector(`#craft-screen .token.${name}`).classList.add('disabled');
+        elem
+          .querySelector(`.token.${name} .image`)
+          .insertAdjacentHTML(
+            'beforeend',
+            `<div class="missing-container"><div>${_('Need')}: </div><div class="missing-tokens"></div></div>`,
+          );
+        const tokensDiv = elem.querySelector(`.token.${name} .image .missing-tokens`);
+        const costs = this.game.gamedatas.allItemsWithCosts[name];
+        Object.keys(costs).forEach((missingToken) => {
+          const missingCount = costs[missingToken] - this.game.gamedatas.resources[missingToken];
+          if (missingCount > 0) {
+            tokensDiv.insertAdjacentHTML(
+              'beforeend',
+              `<div class="missing-token-container"><div class="missing-count">${missingCount}</div><div class="missing-${missingToken}"></div></div>`,
+            );
+            renderImage(missingToken, tokensDiv.querySelector(`.missing-${missingToken}`), { scale: 4, pos: 'insert' });
+          }
+        });
+      }
     };
     Object.keys(gameData.availableEquipment).forEach((name) => {
       renderItem(

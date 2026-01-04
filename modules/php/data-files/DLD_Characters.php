@@ -140,13 +140,9 @@ class DLD_CharactersData
                                     ...$skill,
                                     'id' => $skill['id'],
                                     'secondaryId' => 'roll1',
-                                    ...$rolling2
-                                        ? [
-                                            'skillOption' => [
-                                                'name' => $data['originalRoll'] == 0 ? clienttranslate('blank') : $data['originalRoll'],
-                                            ],
-                                        ]
-                                        : [],
+                                    'skillOption' => [
+                                        'name' => $data['originalRoll'] == 0 ? clienttranslate('blank') : $data['originalRoll'],
+                                    ],
                                 ]);
 
                                 if ($rolling2) {
@@ -154,14 +150,9 @@ class DLD_CharactersData
                                         ...$skill,
                                         'id' => $skill['id'],
                                         'secondaryId' => 'roll2',
-                                        ...$rolling2
-                                            ? [
-                                                'skillOption' => [
-                                                    'name' =>
-                                                        $data['originalRoll2'] == 0 ? clienttranslate('blank') : $data['originalRoll2'],
-                                                ],
-                                            ]
-                                            : [],
+                                        'skillOption' => [
+                                            'name' => $data['originalRoll2'] == 0 ? clienttranslate('blank') : $data['originalRoll2'],
+                                        ],
                                     ]);
                                 }
                             }

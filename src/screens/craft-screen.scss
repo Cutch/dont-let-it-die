@@ -17,7 +17,7 @@
     .counter {
       background-color: #7e7e7e;
     }
-    .card::after {
+    .items-card::after {
       content: '';
       background-color: rgba(0, 0, 0, 0.369);
       position: absolute;
@@ -39,6 +39,32 @@
     margin-bottom: 1rem;
     .hidden {
       display: none;
+    }
+  }
+  .missing-container {
+    display: flex;
+    position: absolute;
+    bottom: -24px;
+    left: 0;
+    right: 0;
+    padding: 3px 6px;
+    border: 1px solid;
+    border-radius: 10px;
+    background-color: #fffb;
+    z-index: 1;
+    font-weight: 600;
+    align-items: center;
+    gap: 4px;
+
+    .missing-tokens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 6px;
+    }
+    .missing-token-container {
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
   }
 }
