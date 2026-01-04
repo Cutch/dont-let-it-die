@@ -5,6 +5,9 @@ export class EatScreen {
     this.game = game;
   }
   getSelectedId() {
+    return this.foodSelected['id'];
+  }
+  getSelected() {
     return this.foodSelected;
   }
   hasError() {
@@ -73,9 +76,9 @@ export class EatScreen {
       if (available >= requires) {
         renderResource(food, eatElem, () => {
           if (this.foodSelected) {
-            document.querySelector(`#eat-screen .token-block.${this.foodSelected}`).style['outline'] = '';
+            document.querySelector(`#eat-screen .token-block.${this.foodSelected['id']}`).style['outline'] = '';
           }
-          this.foodSelected = food['id'];
+          this.foodSelected = food;
           if (this.foodSelected) {
             document.querySelector(`#eat-screen .token-block.${food['id']}`).style['outline'] = `5px solid #fff`;
           }

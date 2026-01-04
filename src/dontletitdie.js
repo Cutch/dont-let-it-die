@@ -1669,16 +1669,28 @@ declare('bgagame.dontletitdie', Gamegui, {
                 } else if (actionId === 'actEat') {
                   this.clearActionButtons();
                   this.eatScreen.show(this.gamedatas, action.character && this.gamedatas.dinnerEatableFoods?.[action.character]);
+
                   this.statusBar.addActionButton(_('Eat') + `${suffix}`, () => {
                     if (!this.eatScreen.hasError()) {
-                      this.bgaPerformAction('actEat', {
-                        resourceType: this.eatScreen.getSelectedId(),
-                        characterId: action.character ?? null,
-                      })
-                        ?.then(() => {
-                          if (this.gamedatas.gamestate.name !== 'eatSelection') this.eatScreen.hide();
+                      const eatAction = () =>
+                        this.bgaPerformAction('actEat', {
+                          resourceType: this.eatScreen.getSelectedId(),
+                          characterId: action.character ?? null,
                         })
-                        ?.catch(console.error);
+                          ?.then(() => {
+                            if (this.gamedatas.gamestate.name !== 'eatSelection') this.eatScreen.hide();
+                          })
+                          ?.catch(console.error);
+                      const character = this.gamedatas.characters.find(({ name }) => name === action.character);
+
+                      (stateName === 'dinnerPhase' || stateName === 'dinnerPhasePrivate') &&
+                      action.character &&
+                      this.eatScreen.getSelected()['health'] > character.maxHealth - character.health
+                        ? this.confirmationDialog(
+                            _('This will heal you more than needed. Are you sure you want to continue? This cannot be undone.'),
+                            eatAction,
+                          )
+                        : eatAction();
                     }
                   });
                   this.statusBar.addActionButton(
