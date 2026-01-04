@@ -73,6 +73,7 @@ class DLD_ItemTrade
                 )
             );
             $this->game->gamestate->setPlayersMultiactive([$selfId], 'playerTurn', false);
+            $this->game->gamestate->initializePrivateStateForAllActivePlayers();
         }
     }
     public function actTradeItem(#[JsonParam] array $data): void

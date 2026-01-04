@@ -109,32 +109,35 @@ export class Deck {
   }
   discardTooltip(cardId, isPartial = false) {
     return () => {
+      const deckTooltip = getAllData()[this.deck]?.options?.html;
       this.game.tooltip.show();
+      this.game.tooltip.renderByElement().innerHTML = `<div class='discard-screen'><div class='top-discard'></div>${deckTooltip ? `<div id="see-all" class="see-all see-all-button">${_('View Deck Distribution')}</div>` : ''}<div class='all-discards'></div></div>`;
 
-      renderImage(cardId, this.game.tooltip.renderByElement(), {
+      renderImage(cardId, this.game.tooltip.renderByElement().querySelector('.top-discard'), {
         withText: true,
         scale: this.scale / 2,
         pos: 'replace',
       });
       if (!isPartial) {
-        this.game.tooltip
-          .renderByElement()
-          .insertAdjacentHTML('beforeend', `<div id="see-all" class="see-all see-all-button">${_('See All')}</div>`);
-        addClickListener($('see-all'), _('See All'), () => {
-          this.game.tooltip.renderByElement().innerHTML = '';
-          const cardInnerTooltip = new Tooltip(this.game.tooltip.renderByElement());
-          const renderItem = (name, elem) => {
-            elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"></div>`);
-            renderImage(name, elem.querySelector(`.token.${name}`), { scale: this.scale / 2, pos: 'replace' });
-            this.game.addHelpTooltip({
-              node: elem.querySelector(`.token.${name}`),
-              tooltipText: name,
-              tooltipElem: cardInnerTooltip,
-            });
-          };
-          this.game.gamedatas.decksDiscards[this.deck].forEach((name) => {
-            renderItem(name, this.game.tooltip.renderByElement());
+        const cardInnerTooltip = new Tooltip(this.game.tooltip.renderByElement().querySelector('.all-discards'));
+        if (deckTooltip)
+          this.game.addHelpTooltip({
+            node: $('see-all'),
+            text: deckTooltip,
+            tooltipElem: cardInnerTooltip,
+            wrapNode: true,
           });
+        const renderItem = (name, elem) => {
+          elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"></div>`);
+          renderImage(name, elem.querySelector(`.token.${name}`), { scale: this.scale / 2, pos: 'replace' });
+          this.game.addHelpTooltip({
+            node: elem.querySelector(`.token.${name}`),
+            tooltipText: name,
+            tooltipElem: cardInnerTooltip,
+          });
+        };
+        this.game.gamedatas.decksDiscards[this.deck].forEach((name) => {
+          renderItem(name, this.game.tooltip.renderByElement().querySelector('.all-discards'));
         });
       }
     };

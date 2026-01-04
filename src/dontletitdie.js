@@ -2004,16 +2004,24 @@ declare('bgagame.dontletitdie', Gamegui, {
     }
   },
 
-  addHelpTooltip: function ({ node, text = '', tooltipText = '', tooltipText2 = '', iconCSS, tooltipElem = this.tooltip }) {
+  addHelpTooltip: function ({
+    node,
+    text = '',
+    tooltipText = '',
+    tooltipText2 = '',
+    iconCSS,
+    tooltipElem = this.tooltip,
+    wrapNode = false,
+  }) {
     // game.addTooltip(id, helpString, actionString);
     if (!node.querySelector('.tooltip')) {
       node.insertAdjacentHTML(
         'beforeend',
-        `<div class="tooltip"><div class="dot"><i class="${iconCSS ?? 'fa fa-question'}"></i></div></div>`,
+        `<div class="tooltip">${wrapNode ? '' : `<div class="dot"><i class="${iconCSS ?? 'fa fa-question'}"></i></div>`}</div>`,
       );
 
       addClickListener(
-        node.querySelector('.tooltip'),
+        wrapNode ? node : node.querySelector('.tooltip'),
         'Tooltip',
         () => {
           tooltipElem.show();

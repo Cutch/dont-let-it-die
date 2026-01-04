@@ -1926,6 +1926,84 @@ export default {
         },
         rotate: 0,
       },
+      gather: {
+        options: {
+          type: 'deck-text',
+          html: `<table style="width:auto;" border="2">
+<tbody><tr><th>${_('Card Type')}</th>
+<th>${_('Gather')}</th>
+</th></tr>
+<tr><td><b>${_('Danger! Card')}</b></td><td>3</td></tr>
+<tr><td><b>${_('Nothing')}</b></td><td>1</td></tr>
+<tr><td><b>${_('Wood')}</b></td><td>2</td></tr>
+<tr><td><b>${_('Rock')}</b></td><td>2</td></tr>
+<tr><th colspan="2">${_('Hindrance Expansion')}</th></tr>
+<tr><td><b>${_('Hindrance')}</b></td><td>1</td></tr>
+</tbody></table>`,
+        },
+      },
+      forage: {
+        options: {
+          type: 'deck-text',
+          html: `<table style="width:auto;" border="2">
+<tbody><tr><th>${_('Card Type')}</th>
+<th>${_('Forage')}</th>
+</th></tr>
+<tr><td><b>${_('Danger! Card')}</b></td><td>2</td></tr>
+<tr><td><b>${_('Nothing')}</b></td><td>1</td></tr>
+<tr><td><b>${_('Berry')}</b></td><td>3</td></tr>
+<tr><td><b>${_('Fiber')}</b></td><td>2</td></tr>
+<tr><th colspan="2">${_('Hindrance Expansion')}</th></tr>
+<tr><td><b>${_('Hindrance')}</b></td><td>1</td></tr>
+</tbody></table>`,
+        },
+      },
+      harvest: {
+        options: {
+          type: 'deck-text',
+          html: `<table style="width:auto;" border="2">
+<tbody><tr><th>${_('Card Type')}</th>
+<th>${_('Harvest')}</th>
+</th></tr>
+<tr><td><b>${_('Danger! Card')}</b></td><td>3</td></tr>
+<tr><td><b>${_('Nothing')}</b></td><td>1</td></tr>
+<tr><td><b>${_('Wood')}</b></td><td>3</td></tr>
+<tr><td><b>${_('Rock')}</b></td><td>2</td></tr>
+<tr><th colspan="2">${_('Hindrance Expansion')}</th></tr>
+<tr><td><b>${_('Hindrance')}</b></td><td>1</td></tr>
+</tbody></table>`,
+        },
+      },
+      hunt: {
+        options: {
+          type: 'deck-text',
+          html: `<table style="width:auto;" border="2">
+<tbody><tr><th>${_('Card Type')}</th>
+<th>${_('Hunt')}</th>
+</th></tr>
+<tr><td><b>${_('Danger! Card')}</b></td><td>5</td></tr>
+<tr><td><b>${_('Meat')}</b></td><td>3</td></tr>
+<tr><td><b>${_('Hide')}</b></td><td>2</td></tr>
+<tr><td><b>${_('Bone')}</b></td><td>2</td></tr>
+</tbody></table>`,
+        },
+      },
+      explore: {
+        options: {
+          type: 'deck-text',
+          html: `<table style="width:auto;" border="2">
+<tbody><tr><th>${_('Card Type')}</th>
+<th>${_('Explore')}</th>
+</th></tr>
+<tr><td><b>${_('Danger! Card')}</b></td><td>6</td></tr>
+<tr><th colspan="2">${_('Hindrance Expansion')}</th></tr>
+<tr><td><b>${_('Hindrance')}</b></td><td>1</td></tr>
+<tr><td><b>${_('Gem')}</b></td><td>3</td></tr>
+<tr><td><b>${_('Dino Egg')}</b></td><td>2</td></tr>
+<tr><td><b>${_('Medical Herb')}</b></td><td>2</td></tr>
+</tbody></table>`,
+        },
+      },
     },
     meta: {
       version: '1.0',

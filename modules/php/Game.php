@@ -438,8 +438,11 @@ class Game extends \Table
         $this->markChanged('knowledge');
         $this->completeAction();
     }
-    public function actCook(string $resourceType): void
+    public function actCook(?string $resourceType): void
     {
+        if (!$resourceType) {
+            throw new BgaUserException(clienttranslate('Select a food'));
+        }
         // $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actCook', null, $resourceType);
         $this->actions->validateSelectable(

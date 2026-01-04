@@ -253,14 +253,39 @@
   margin-top: 0.5rem;
   font-weight: bold;
 }
-.see-all-button {
+.see-all-button:not(#\9):not(#\9):not(#\9) {
   justify-self: center;
   background-color: rgb(255 255 255);
   font-size: 1.15rem;
   padding: 1rem;
   border-radius: 10px;
+  position: relative;
+  text-align: center;
 }
-
+.discard-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  td,
+  th {
+    padding: 4px 12px;
+  }
+  > .top-discard {
+    display: flex;
+    gap: 1rem;
+    flex-flow: wrap;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  > .all-discards {
+    display: flex;
+    gap: 1rem;
+    flex-flow: wrap;
+    align-items: flex-start;
+    justify-content: center;
+  }
+}
 .day-popup {
   position: fixed;
   top: 0;
