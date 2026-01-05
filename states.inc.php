@@ -48,7 +48,6 @@
 */
 
 //    !! It is not a good idea to modify this file when a game is running !!
-$gameSetup = 1;
 $characterSelect = 2;
 $startHindrance = 3;
 $buttonSelection = 8;
@@ -102,14 +101,6 @@ $interruptScreens = [
 
 $machinestates = [
     // The initial state. Please do not modify.
-
-    $gameSetup => [
-        'name' => 'gameSetup',
-        'description' => '',
-        'type' => 'manager',
-        'action' => 'stGameSetup',
-        'transitions' => ['' => $characterSelect],
-    ],
     $characterSelect => [
         'name' => 'characterSelect',
         'description' => clienttranslate('Others are selecting a character'),
@@ -471,16 +462,6 @@ $machinestates = [
         'descriptionmyturn' => clienttranslate('Waiting for other players'),
         'type' => 'game',
         'transitions' => [],
-    ],
-    // Final state.
-    // Please do not modify (and do not overload action/args methods).
-    $gameEnd => [
-        'name' => 'gameEnd',
-        'description' => clienttranslate('End of game'),
-        'descriptionmyturn' => clienttranslate('End of game'),
-        'type' => 'manager',
-        'action' => 'stGameEnd',
-        'args' => 'argGameEnd',
     ],
 ];
 

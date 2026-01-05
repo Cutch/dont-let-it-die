@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-use Deck;
 use Exception;
 
 class DLD_Decks
@@ -30,7 +29,7 @@ class DLD_Decks
             $this->decks[$deck] = $this->game->initDeck(str_replace('-', '', $deck));
         }
     }
-    public function getDeck(string $name): Deck
+    public function getDeck(string $name): \Bga\GameFramework\Components\Deck
     {
         return $this->decks[$name];
     }

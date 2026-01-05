@@ -22,7 +22,7 @@ class DLD_ItemTrade
         $responseData = [...$this->tradeProcess($trade1, $trade2), 'trade1' => $trade1, 'trade2' => $trade2];
         $this->completeTrade($responseData);
         foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
-            $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
+            $this->game->gamestate->nextPrivateState((int) $playerId, 'tradePhaseActions');
         }
         // $this->game->gamestate->nextPrivateState($trade1['character']['playerId'], 'tradePhaseActions');
         // $this->game->gamestate->nextPrivateState($trade2['character']['playerId'], 'tradePhaseActions');
@@ -34,7 +34,7 @@ class DLD_ItemTrade
         $trade2 = $state['trade2'];
 
         foreach ($this->game->gamestate->getActivePlayerList() as $playerId) {
-            $this->game->gamestate->nextPrivateState($playerId, 'tradePhaseActions');
+            $this->game->gamestate->nextPrivateState((int) $playerId, 'tradePhaseActions');
         }
         // $this->game->gamestate->nextPrivateState($trade1['character']['playerId'], 'tradePhaseActions');
         // $this->game->gamestate->nextPrivateState($trade2['character']['playerId'], 'tradePhaseActions');

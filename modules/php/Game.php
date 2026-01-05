@@ -46,7 +46,7 @@ require_once dirname(__DIR__) . '/php/data-files/DLD_KnowledgeTree.php';
 require_once dirname(__DIR__) . '/php/data-files/DLD_Items.php';
 require_once dirname(__DIR__) . '/php/data-files/DLD_Tokens.php';
 require_once dirname(__DIR__) . '/php/data-files/DLD_Upgrades.php';
-class Game extends \Table
+class Game extends \Bga\GameFramework\Table
 {
     public DLD_Character $character;
     public DLD_Actions $actions;
@@ -81,6 +81,7 @@ class Game extends \Table
             'trackDifficulty' => 102,
             'trusting' => 103,
             'randomUpgrades' => 104,
+            'game_version' => 300,
         ]);
         $this->gameData = new DLD_GameData($this);
         $this->actions = new DLD_Actions($this);
@@ -145,7 +146,8 @@ class Game extends \Table
     }
     public function getVersion(): int
     {
-        return intval($this->gamestate->table_globals[300]);
+        $current_version = self::getGameStateValue('game_version', 0) || $this->gamestate->table_globals[300];
+        return intval($current_version);
     }
     protected function initTable(): void
     {
@@ -201,9 +203,8 @@ class Game extends \Table
     }
     public function initDeck($type = 'card')
     {
-        $deck = $this->getNew('module.common.deck');
+        $deck = $this->deckFactory->createDeck($type);
         $deck->autoreshuffle = true;
-        $deck->init($type);
         return $deck;
     }
     public function getCurrentPlayer(bool $bReturnNullIfNotLogged = false): int
@@ -1861,7 +1862,7 @@ class Game extends \Table
 
         $trackEloMapping = [0, 5];
         $score = $eloMapping[$this->gameData->get('difficulty')] + $trackEloMapping[$this->gameData->get('trackDifficulty')];
-        $this->DbQuery("UPDATE player SET player_score={$score} WHERE 1=1");
+        $this->playerScore->setAll($score);
         $this->nextState('endGame');
     }
     public function lose(string $reason)
@@ -1875,7 +1876,8 @@ class Game extends \Table
         } else {
             $this->notify('endGame', clienttranslate('The tribe has lost'));
         }
-        $this->DbQuery('UPDATE player SET player_score=0 WHERE 1=1');
+        $this->playerScore->setAll(0);
+
         $this->nextState('endGame');
     }
     public function stMorningPhase()
@@ -2673,6 +2675,8 @@ class Game extends \Table
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
+
+        return 2;
     }
 
     public function zombieBack(): void
@@ -2689,7 +2693,7 @@ class Game extends \Table
         if ($stateType === 'activeplayer') {
             if ($returningPlayerId == $this->character->getTurnCharacter()['playerId']) {
                 $this->nextState('changeZombiePlayer');
-                $this->gamestate->changeActivePlayer($returningPlayerId);
+                $this->gamestate->changeActivePlayer((int) $returningPlayerId);
                 $this->nextState($stateName);
             }
         } elseif ($stateType === 'multipleactiveplayer') {

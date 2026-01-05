@@ -324,7 +324,7 @@ class DLD_Character
             $this->game->gameData->set('turnOrder', $turnOrder);
         }
     }
-    public function getCharacterData(string $name, $_skipHooks = false): array
+    public function getCharacterData(?string $name, $_skipHooks = false): array
     {
         try {
             return $this->_getCharacterData($name, $_skipHooks);
