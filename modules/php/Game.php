@@ -29,7 +29,7 @@ set_error_handler(function ($severity, $message, $file, $line) {
         throw new ErrorException($message, 0, $severity, $file, $line);
     }
 });
-require_once APP_GAMEMODULE_PATH . 'module/table/table.game.php';
+
 include_once dirname(__DIR__) . '/php/DLD_Data.php';
 include_once dirname(__DIR__) . '/php/DLD_Actions.php';
 include_once dirname(__DIR__) . '/php/DLD_CharacterSelection.php';
