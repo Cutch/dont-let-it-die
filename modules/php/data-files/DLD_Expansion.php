@@ -407,6 +407,7 @@ class DLD_ExpansionData
                                 $game->eventLog(clienttranslate('${character_name} lost ${count} ${character_resource}'), [
                                     'count' => 1,
                                     'character_resource' => clienttranslate('Health'),
+                                    'character_name' => $game->getCharacterHTML($data['characterId']),
                                 ]);
                             }
                         },

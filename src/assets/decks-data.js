@@ -1447,7 +1447,7 @@ export default {
             _("It seems some Dino's came down from the mountains last night and decided your camp was a great place to build their nest") +
               '.',
             _(
-              "Take 2 Raw Dino Eggs. If you have less than 2 Raw Dino Eggs in your group's supply at the end of the next day phase each tribe member takes 1 Damage before drawing the next Night Event card.",
+              "Take 3 Raw Dino Eggs. If you have less than 3 Raw Dino Eggs in your group's supply at the end of the next day phase each tribe member takes 1 Damage before drawing the next Night Event card.",
             ),
           ],
         },

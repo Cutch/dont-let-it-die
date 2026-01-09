@@ -40,7 +40,7 @@ export default {
           itemType: 'weapon',
           text: [
             { title: _('Bone Scythe') },
-            _('Item Type') + ': ' + _('Weapon'),
+            _('Item Type') + ': ' + _('Tool'),
             dojo.string.substitute(_('Take 1 ${resource} when drawing a ${card} card'), {
               resource: _('Fiber'),
               card: _('Fiber'),
