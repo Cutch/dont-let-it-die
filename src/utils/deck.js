@@ -126,6 +126,7 @@ export class Deck {
             text: deckTooltip,
             tooltipElem: cardInnerTooltip,
             wrapNode: true,
+            wrapNodeHasDot: true,
           });
         const renderItem = (name, elem) => {
           elem.insertAdjacentHTML('beforeend', `<div class="token ${name}"></div>`);

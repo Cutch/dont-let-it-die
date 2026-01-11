@@ -154,17 +154,7 @@
 .counter {
   top: 0;
   right: 0;
-  transform: translateX(50%) translateY(-0.5rem);
-}
-.stamina-counter {
-  bottom: 0;
-  left: 0;
-  transform: translateX(-50%) translateY(0.5em);
-}
-.health-counter {
-  bottom: 0;
-  right: 0;
-  transform: translateX(50%) translateY(0.5em);
+  transform: translateX(25%) translateY(-25%);
 }
 
 /* Track Board Start*/

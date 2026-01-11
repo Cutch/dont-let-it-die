@@ -16,11 +16,16 @@ const scaleLookups = {
   'tooltip-hindrance': 2,
   'tooltip-unlock': 0.75,
 };
-export const renderText = ({ name }) => {
-  const text = getAllData()[name]?.options?.text;
-  return getAllData()[name]?.options?.html || text
-    ? `<div class="tooltip-text">${text.map((d) => (d.title ? `<div class="tooltip-line"><b class="tooltip-title">${d.title}</b></div>` : `<div class="tooltip-line">${d}</div>`)).join('')}</div>`
-    : '';
+export const renderText = ({ name, text: textProp }) => {
+  const text = getAllData()[name]?.options?.text ?? textProp;
+  return (
+    getAllData()[name]?.options?.html ||
+    (!text
+      ? ''
+      : typeof text === 'string'
+        ? text
+        : `<div class="tooltip-text">${text.map((d) => (d.title ? `<div class="tooltip-line"><b class="tooltip-title">${d.title}</b></div>` : `<div class="tooltip-line">${d}</div>`)).join('')}</div>`)
+  );
 };
 export const renderImage = (
   name,

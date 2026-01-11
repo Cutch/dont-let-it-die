@@ -55,7 +55,7 @@ export class DeckSelectionScreen {
             </div>
           <div>`,
       );
-      renderImage(name + '-back', elem.querySelector(`.token.${name}`), { scale: deckScaling[name] ?? 1, pos: 'insert' });
+      renderImage(name + '-back', elem.querySelector(`.token.${name}`), { scale: deckScaling[name] ?? 2, pos: 'insert' });
       addClickListener(elem.querySelector(`.token.${name}`), getAllData()[name + '-back'].options.name, () => selectCallback());
     };
     gameData.selectionState.decks.forEach((deckName) => {

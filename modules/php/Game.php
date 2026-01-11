@@ -2822,7 +2822,7 @@ class Game extends \Bga\GameFramework\Table
             'fiber' => 0,
             'hide' => 0,
             'trap' => 0,
-            'fkp' => 20,
+            'fkp' => 0,
             'gem-y' => 0,
             'gem-b' => 0,
             'gem-p' => 0,

@@ -44,7 +44,7 @@ html {
     position: absolute;
     top: 0;
     left: 0;
-    transform: translateX(-0.75rem) translateY(-0.5rem);
+    transform: translateX(-25%) translateY(-25%);
 
     .fa-question {
       font-size: 16px;
@@ -54,6 +54,9 @@ html {
     }
     .dot {
       position: unset;
+    }
+    &.extra-padding {
+      transform: translateX(-50%) translateY(-50%);
     }
   }
   .tooltip-box {

@@ -7,6 +7,7 @@
   overflow: hidden;
   .dot {
     --size: 3em;
+    transform: translateX(50%) translateY(-50%);
   }
   .tokens {
     gap: 2em;

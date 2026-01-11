@@ -536,12 +536,30 @@ declare('bgagame.dontletitdie', Gamegui, {
         'beforeend',
         `<div id="discoverable-container" class="dlid__container"><h3>${_('Discoverable Resources')}</h3><div class="tokens"></div></div>`,
       );
+      this.addHelpTooltip({
+        node: document.querySelector(`#discoverable-container h3`),
+        text: [
+          _('This is the supply of resources, once used they go back to the supply'),
+          _('Cooked resources, and fire wood will still take up resources from the supply'),
+        ],
+        extraPadding: true,
+      });
       availableElem = document.querySelector(`#discoverable-container .tokens`);
     }
+
     availableElem.innerHTML = '';
     resourcesForDisplay
       .filter((elem) => !elem.includes('-cooked'))
-      .forEach((name) => this.updateResource(name, availableElem, gameData.resourcesAvailable?.[name] ?? 0));
+      .forEach((name) => {
+        this.updateResource(name, availableElem, gameData.resourcesAvailable?.[name] ?? 0);
+        if (this.data[name]?.options?.text)
+          this.addHelpTooltip({
+            node: availableElem.querySelector(`.token.${name}`),
+            text: this.data[name].options.text,
+            wrapNode: true,
+            wrapNodeHasDot: true,
+          });
+      });
     // this.resourcesForDisplay.forEach((name) => {
     //   this.tweening.addTween(sharedElem.querySelector(`.token.${name}`), availableElem.querySelector(`.token.${name}`), name);
     // });
@@ -966,9 +984,36 @@ declare('bgagame.dontletitdie', Gamegui, {
     let trackContainer = $('track-container');
     const decks = [
       { name: 'night-event', expansion: 'base', scale: 3 },
-      { name: 'day-event', expansion: 'mini-expansion', scale: 3 },
-      { name: 'mental-hindrance', expansion: 'hindrance', scale: 3 },
-      { name: 'physical-hindrance', expansion: 'hindrance', scale: 3 },
+      {
+        name: 'day-event',
+        expansion: 'mini-expansion',
+        scale: 3,
+        tooltipText: [{ title: _('Day Event') }, _('Drawing a Nothing Card from a resource deck triggers a Day Event')],
+      },
+      {
+        name: 'mental-hindrance',
+        expansion: 'hindrance',
+        scale: 3,
+        tooltipText: [
+          { title: _('Mental Hindrance') },
+          _(
+            'If you have the maximum number of Physical Hindrances and need to draw another, draw a Mental Hindrance instead and discard all of your Physical Hindrances',
+          ),
+          _('You can have a maximum of 1 Mental Hindrance'),
+        ],
+      },
+      {
+        name: 'physical-hindrance',
+        expansion: 'hindrance',
+        scale: 3,
+        tooltipText: [
+          { title: _('Physical Hindrance') },
+          _('When taking damage from a Danger! Card draw a Physical Hindrance'),
+          _('You can have a maximum of 3 Physical Hindrances'),
+          _('Can be removed by eating any food that heals you, or with a Medical Herb and 1 Stamina'),
+          _('When eating food, you may choose to use the foods normal effects OR remove 1 Physical Hindrance'),
+        ],
+      },
     ].filter((d) => this.expansions.includes(d.expansion));
     if (!trackContainer) {
       const playArea = $('board-track-wrapper');
@@ -1009,7 +1054,7 @@ declare('bgagame.dontletitdie', Gamegui, {
     marker.style.top = `${(gameData.game.day - 1) * 33.3 + 236}px`;
 
     const eventDeckContainer = $('event-deck-container');
-    decks.forEach(({ name: deck, scale }) => {
+    decks.forEach(({ name: deck, scale, tooltipText }) => {
       if (gameData.decks[deck]) {
         if (!this.decks[deck]) {
           this.decks[deck] = new Deck(this, deck, gameData.decks[deck], eventDeckContainer.querySelector(`.${deck}`), scale, 'horizontal');
@@ -1021,6 +1066,11 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.decks[deck].updateDeckCounts(gameData.decks[deck]);
         }
         this.decks[deck].updateMarker(gameData.decks[deck]);
+        if (tooltipText)
+          this.addHelpTooltip({
+            node: eventDeckContainer.querySelector(`.${deck}`),
+            text: tooltipText,
+          });
       }
     });
 
@@ -1773,6 +1823,27 @@ declare('bgagame.dontletitdie', Gamegui, {
             { color: 'secondary' },
           );
       };
+      const endTurnButton = () => {
+        this.statusBar.addActionButton(
+          _('End Turn'),
+          () => {
+            const actionList = new Set(actions.map((d) => d.action));
+            const character = this.gamedatas.characters.find(({ name }) => name === this.gamedatas.activeCharacter);
+            actionList.delete('actAddWood');
+            actionList.delete('actEat');
+            actionList.delete('actSpendFKP');
+
+            if (actionList.size > 0 && character?.stamina > 0) {
+              this.confirmationDialog(_('You have stamina left over, are you sure you want to end your turn?'), () =>
+                this.bgaPerformAction('actEndTurn'),
+              );
+            } else {
+              this.bgaPerformAction('actEndTurn');
+            }
+          },
+          { color: 'secondary' },
+        );
+      };
       switch (stateName) {
         case 'startHindrance':
           this.statusBar.addActionButton(_('Done'), () => {
@@ -1927,20 +1998,11 @@ declare('bgagame.dontletitdie', Gamegui, {
           if (isActive) {
             if (this.gamedatas.canUndo)
               this.statusBar.addActionButton(_('Undo'), () => this.bgaPerformAction('actUndo'), { color: 'secondary' });
-            this.statusBar.addActionButton(
-              _('End Turn'),
-              () => this.confirmationDialog(_('End Turn'), () => this.bgaPerformAction('actEndTurn')),
-              { color: 'secondary' },
-            );
+            endTurnButton();
           }
           break;
         default:
-          if (isActive)
-            this.statusBar.addActionButton(
-              _('End Turn'),
-              () => this.confirmationDialog(_('End Turn'), () => this.bgaPerformAction('actEndTurn')),
-              { color: 'secondary' },
-            );
+          if (isActive) endTurnButton();
           break;
       }
       // if (isActive && this.gamedatas.cancellable === true)
@@ -2024,12 +2086,13 @@ declare('bgagame.dontletitdie', Gamegui, {
     iconCSS,
     tooltipElem = this.tooltip,
     wrapNode = false,
+    wrapNodeHasDot = false,
+    extraPadding = false,
   }) {
-    // game.addTooltip(id, helpString, actionString);
     if (!node.querySelector('.tooltip')) {
       node.insertAdjacentHTML(
         'beforeend',
-        `<div class="tooltip">${wrapNode ? '' : `<div class="dot"><i class="${iconCSS ?? 'fa fa-question'}"></i></div>`}</div>`,
+        `<div class="tooltip ${extraPadding ? 'extra-padding' : ''}">${wrapNode && !wrapNodeHasDot ? '' : `<div class="dot"><i class="${iconCSS ?? 'fa fa-question'}"></i></div>`}</div>`,
       );
 
       addClickListener(
@@ -2041,7 +2104,7 @@ declare('bgagame.dontletitdie', Gamegui, {
             .renderByElement()
             .insertAdjacentHTML(
               'beforeend',
-              `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${tooltipText ? renderText({ name: tooltipText }) : text}</span></div>`,
+              `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${renderText({ name: tooltipText, text })}</span></div>`,
             );
           if (tooltipText2)
             tooltipElem
@@ -2051,7 +2114,7 @@ declare('bgagame.dontletitdie', Gamegui, {
                 `<div class="tooltip-box"><i class="fa fa-question-circle-o fa-2x" aria-hidden="true"></i><span>${renderText({ name: tooltipText2 })}</span></div>`,
               );
         },
-        true,
+        wrapNode && !wrapNodeHasDot ? true : false,
       );
     }
   },

@@ -65,6 +65,11 @@ export default {
         options: {
           type: 'resource',
           name: _('Dino Egg'),
+          text: [
+            { title: _('Dino Egg') },
+            _('Eat 2 Raw Dino Eggs to gain 1 HP and 1 Stamina'),
+            _('Eat 1 Cooked Dino Egg to gain 3 HP and 1 Stamina'),
+          ],
         },
         frame: {
           x: 0,
@@ -89,6 +94,13 @@ export default {
         options: {
           type: 'resource',
           name: _('Fish'),
+          text: [
+            { title: _('Fish') },
+            _('Fish are treated like Meat for cooking and eating'),
+            _('A character may only eat fish once per day'),
+            _('Eating 2 Raw Fish gives you 1 Stamina'),
+            _('Eating 1 Cooked Fish gives you 2 Stamina'),
+          ],
         },
         frame: {
           x: 226,
@@ -137,6 +149,7 @@ export default {
         options: {
           type: 'resource',
           name: _('Gem'),
+          text: [{ title: _('Gem') }, _('Trade value is 1:2 instead of 3:1')],
         },
         frame: {
           x: 113,
@@ -149,6 +162,7 @@ export default {
         options: {
           type: 'resource',
           name: _('Gem'),
+          text: [{ title: _('Gem') }, _('Trade value is 1:2 instead of 3:1')],
         },
         frame: {
           x: 226,
@@ -161,6 +175,7 @@ export default {
         options: {
           type: 'resource',
           name: _('Gem'),
+          text: [{ title: _('Gem') }, _('Trade value is 1:2 instead of 3:1')],
         },
         frame: {
           x: 339,
@@ -185,6 +200,7 @@ export default {
         options: {
           type: 'resource',
           name: _('Herb'),
+          text: [{ title: _('Medicinal Herb') }, _('Use a Medicinal Herb and 1 Stamina to remove a Physical Hindrance')],
         },
         frame: {
           x: 565,
@@ -221,6 +237,7 @@ export default {
         options: {
           type: 'resource',
           name: _('Stew'),
+          text: [{ title: _('Stew') }, _('Can be eaten once per day per character to reuse a once-per day character skill')],
         },
         frame: {
           x: 0,
@@ -233,6 +250,10 @@ export default {
         options: {
           type: 'resource',
           name: _('Trap'),
+          text: [
+            { title: _('Trap') },
+            _('When a Danger Card is drawn, roll the Fire Die. If the roll is equal to or greater than its life you may Trap It'),
+          ],
         },
         frame: {
           x: 113,

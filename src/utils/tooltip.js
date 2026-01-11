@@ -4,12 +4,13 @@ export class Tooltip {
     gamePlayAreaElem.insertAdjacentHTML(
       'beforeend',
       `<div class="tooltip-overlay">
-      <div class="scroll-overlay">
-        <div class="close"><i class="fa fa-times fa-2x" aria-hidden="true"></i></div>
-        <div class="inner">
-          <div class="body">
+        <div class="scroll-overlay">
+          <div class="close"><i class="fa fa-times fa-2x" aria-hidden="true"></i></div>
+          <div class="inner">
+            <div class="body"></div>
+          </div>
         </div>
-        </div></div></div>`,
+      </div>`,
     );
     this.tooltipElem = gamePlayAreaElem.querySelector('.tooltip-overlay');
     this.tooltipBody = gamePlayAreaElem.querySelector('.tooltip-overlay .body');
@@ -26,7 +27,9 @@ export class Tooltip {
   handleClick = () => {
     this.hide();
   };
-  handleClickOutside = () => {
+  handleClickOutside = (event) => {
+    if (this.tooltipBody.contains(event.target) && event.target !== this.tooltipBody) return;
+
     if (!this.isScrolling) {
       this.hide();
     }

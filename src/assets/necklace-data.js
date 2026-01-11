@@ -11,6 +11,7 @@ export default {
             dojo.string.substitute(_('${number} Max Health'), {
               number: '+1',
             }),
+            _('Requires the Jewelry Discovery to be Unlocked'),
           ],
         },
         frame: {
@@ -30,6 +31,7 @@ export default {
             dojo.string.substitute(_('${number} Max Stamina'), {
               number: '+1',
             }),
+            _('Requires the Jewelry Discovery to be Unlocked'),
           ],
         },
         frame: {
@@ -44,7 +46,11 @@ export default {
         options: {
           type: 'item',
           itemType: 'necklace',
-          text: [{ title: _('Purple Necklace') }, _('Once per day re-roll any Fire Die roll')],
+          text: [
+            { title: _('Purple Necklace') },
+            _('Once per day re-roll any Fire Die roll'),
+            _('Requires the Jewelry Discovery to be Unlocked'),
+          ],
         },
         frame: {
           x: 880,
