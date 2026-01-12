@@ -145,7 +145,8 @@ class DLD_Actions
                             if (
                                 ($data['characterId'] !== 'Cali' || !str_contains($data['type'], '-cooked')) &&
                                 sizeof($char['physicalHindrance']) > 0 &&
-                                !in_array('hindrance_2_5', toId($char['physicalHindrance']))
+                                !in_array('hindrance_2_5', toId($char['physicalHindrance'])) &&
+                                !str_contains($data['type'], 'fish')
                             ) {
                                 $skill['characterId'] = $data['characterId'];
                                 $game->actInterrupt->addSkillInterrupt($skill);
@@ -180,7 +181,11 @@ class DLD_Actions
                         },
                         'onEat' => function (Game $game, $skill, &$data) {
                             $char = $this->game->character->getCharacterData($data['characterId'], true);
-                            if (sizeof($char['physicalHindrance']) > 0 && !in_array('hindrance_2_5', toId($char['physicalHindrance']))) {
+                            if (
+                                sizeof($char['physicalHindrance']) > 0 &&
+                                !in_array('hindrance_2_5', toId($char['physicalHindrance'])) &&
+                                !str_contains($data['type'], 'fish')
+                            ) {
                                 $skill['characterId'] = $data['characterId'];
                                 $game->actInterrupt->addSkillInterrupt($skill);
                             }
