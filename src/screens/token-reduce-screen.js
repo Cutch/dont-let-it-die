@@ -11,11 +11,7 @@ export class TokenReduceScreen {
 
     document.querySelector(`#token-reduce-resource .cost`).innerHTML = resourceCount;
     const error = document.querySelector(`#token-reduce-screen .error`);
-    if (resourceCount == initialCost) {
-      error.style.visibility = 'hidden';
-      error.innerHTML = '';
-      this.error = false;
-    } else if (initialCost - resourceCount > this.game.gamedatas.selectionState.reduceBy) {
+    if (initialCost - resourceCount > this.game.gamedatas.selectionState.reduceBy) {
       error.innerHTML = _('Resources can only be reduced by ${count}').replace('${count}', this.game.gamedatas.selectionState.reduceBy);
       error.style.visibility = '';
       this.error = true;
@@ -24,6 +20,13 @@ export class TokenReduceScreen {
         '${count}',
         this.game.gamedatas.selectionState.totalCost,
       );
+      error.style.visibility = '';
+      this.error = true;
+    } else if (
+      initialCost - resourceCount < this.game.gamedatas.selectionState.reduceBy &&
+      resourceCount >= this.game.gamedatas.selectionState.totalCost
+    ) {
+      error.innerHTML = _('Reduce resources by ${count}').replace('${count}', this.game.gamedatas.selectionState.reduceBy);
       error.style.visibility = '';
       this.error = true;
     } else {
