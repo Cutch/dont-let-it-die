@@ -16,7 +16,7 @@ export class TokenReduceScreen {
       error.style.visibility = '';
       this.error = true;
     } else if (resourceCount < this.game.gamedatas.selectionState.totalCost) {
-      error.innerHTML = _('Total resource cost must be greater than ${count}').replace(
+      error.innerHTML = _('Total resource cost must be at least ${count}').replace(
         '${count}',
         this.game.gamedatas.selectionState.totalCost,
       );

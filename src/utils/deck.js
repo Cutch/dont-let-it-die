@@ -137,7 +137,7 @@ export class Deck {
             tooltipElem: cardInnerTooltip,
           });
         };
-        this.game.gamedatas.decksDiscards[this.deck].forEach((name) => {
+        this.game.gamedatas.decksDiscards[this.deck]?.forEach((name) => {
           renderItem(name, this.game.tooltip.renderByElement().querySelector('.all-discards'));
         });
       }

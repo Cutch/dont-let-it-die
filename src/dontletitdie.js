@@ -145,7 +145,7 @@ declare('bgagame.dontletitdie', Gamegui, {
       this.refreshCharacters = false;
     }
     const scale = 3;
-    characters.forEach((character, i) => {
+    characters.filter(Boolean).forEach((character, i) => {
       // Player side board
       const playerPanel = this.getPlayerPanelElement(character.playerId);
       const equipments = character.equipment;
@@ -1735,6 +1735,8 @@ declare('bgagame.dontletitdie', Gamegui, {
 
                       (stateName === 'dinnerPhase' || stateName === 'dinnerPhasePrivate') &&
                       action.character &&
+                      character &&
+                      this.eatScreen.getSelected() &&
                       this.eatScreen.getSelected()['health'] > character.maxHealth - character.health
                         ? this.confirmationDialog(
                             _('This will heal you more than needed. Are you sure you want to continue? This cannot be undone.'),

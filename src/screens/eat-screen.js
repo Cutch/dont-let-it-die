@@ -5,7 +5,7 @@ export class EatScreen {
     this.game = game;
   }
   getSelectedId() {
-    return this.foodSelected['id'];
+    return this.foodSelected?.['id'];
   }
   getSelected() {
     return this.foodSelected;
