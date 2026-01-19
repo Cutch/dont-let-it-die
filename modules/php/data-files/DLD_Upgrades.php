@@ -303,7 +303,7 @@ class DLD_UpgradesData
                         'type' => 'skill',
                         'name' => clienttranslate('Tinder'),
                         'state' => ['interrupt'],
-                        'interruptState' => ['playerTurn'],
+                        'interruptState' => ['playerTurn', 'morningPhase'],
                         'global' => true,
                         'onMorning' => function (Game $game, $skill, &$data) {
                             $game->actInterrupt->addSkillInterrupt($skill);
@@ -327,7 +327,7 @@ class DLD_UpgradesData
                         'type' => 'skill',
                         'name' => clienttranslate('Fire Watch'),
                         'state' => ['interrupt'],
-                        'interruptState' => ['playerTurn'],
+                        'interruptState' => ['playerTurn', 'morningPhase'],
                         'global' => true,
                         'onMorning' => function (Game $game, $skill, &$data) {
                             $game->actInterrupt->addSkillInterrupt($skill);
