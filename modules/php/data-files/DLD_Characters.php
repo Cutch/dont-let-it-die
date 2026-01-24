@@ -2151,12 +2151,14 @@ class DLD_CharactersData
                         'state' => ['playerTurn'],
                         'stamina' => 2,
                         'onUse' => function (Game $game, $skill) {
+                            if ($game->gameData->getResourceLeft('hide') === 0) {
+                                $game->adjustResource('hide', -1);
+                            }
                             usePerForever('hide-token', $game);
-                            $game->adjustResource('hide', -1);
                         },
                         'requires' => function (Game $game, $skill) {
                             $char = $game->character->getCharacterData($skill['characterId']);
-                            return $char['isActive'] && $game->gameData->getResourceLeft('hide') > 0;
+                            return $char['isActive'];
                         },
                     ],
                     'skill2' => [

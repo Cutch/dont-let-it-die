@@ -593,20 +593,22 @@ class DLD_ExpansionData
                 'name' => clienttranslate('Blind'),
                 'onAcquireHindrance' => function (Game $game, $card, &$data) {
                     if ($card['id'] == $data['id']) {
-                        $character = $game->character->getTurnCharacter();
+                        $character = $game->character->getCalculatedData($card['characterId']);
                         $weapons = array_filter($character['equipment'], function ($item) {
                             return $item['itemType'] == 'weapon' && $item['range'] > 1;
                         });
                         // Only range 1 weapon can be equipped
                         if (sizeof($weapons) > 0) {
                             $game->character->unequipEquipment(
-                                $game->character->getTurnCharacterId(),
+                                $card['characterId'],
                                 array_map(function ($item) {
                                     return $item['itemId'];
                                 }, $weapons),
                                 true
                             );
-                            $game->eventLog(clienttranslate('${character_name} sent their weapon to camp'));
+                            $game->eventLog(clienttranslate('${character_name} sent their weapon to camp'), [
+                                'character_name' => $game->getCharacterHTML($card['characterId']),
+                            ]);
                         }
                     }
                 },
@@ -626,7 +628,7 @@ class DLD_ExpansionData
                 'onAcquireHindrance' => function (Game $game, $card, &$data) {
                     if ($card['id'] == $data['id']) {
                         // No weapon can be equipped
-                        $character = $game->character->getTurnCharacter();
+                        $character = $game->character->getCalculatedData($card['characterId']);
                         $weaponIds = array_map(
                             function ($item) {
                                 return $item['itemId'];
@@ -636,8 +638,10 @@ class DLD_ExpansionData
                             })
                         );
                         if (sizeof($weaponIds) > 0) {
-                            $game->character->unequipEquipment($game->character->getTurnCharacterId(), $weaponIds, true);
-                            $game->eventLog(clienttranslate('${character_name} sent their weapon to camp'));
+                            $game->character->unequipEquipment($card['characterId'], $weaponIds, true);
+                            $game->eventLog(clienttranslate('${character_name} sent their weapon to camp'), [
+                                'character_name' => $game->getCharacterHTML($card['characterId']),
+                            ]);
                         }
                     }
                 },
@@ -852,7 +856,7 @@ class DLD_ExpansionData
                 'onAcquireHindrance' => function (Game $game, $card, &$data) {
                     if ($card['id'] == $data['id']) {
                         // No weapon can be equipped
-                        $character = $game->character->getTurnCharacter();
+                        $character = $game->character->getCharacterData($card['characterId']);
                         $toolIds = array_map(
                             function ($item) {
                                 return $item['itemId'];
@@ -862,8 +866,10 @@ class DLD_ExpansionData
                             })
                         );
                         if (sizeof($toolIds) > 0) {
-                            $game->character->unequipEquipment($game->character->getTurnCharacterId(), $toolIds, true);
-                            $game->eventLog(clienttranslate('${character_name} sent their tool to camp'));
+                            $game->character->unequipEquipment($card['characterId'], $toolIds, true);
+                            $game->eventLog(clienttranslate('${character_name} sent their tool to camp'), [
+                                'character_name' => $game->getCharacterHTML($card['characterId']),
+                            ]);
                         }
                     }
                 },
