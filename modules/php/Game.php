@@ -146,7 +146,7 @@ class Game extends \Bga\GameFramework\Table
     }
     public function getVersion(): int
     {
-        $current_version = self::getGameStateValue('game_version', 0) || $this->gamestate->table_globals[300];
+        $current_version = $this->bga->tableOptions->get(300);
         return intval($current_version);
     }
     protected function initTable(): void

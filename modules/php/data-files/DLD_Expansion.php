@@ -593,7 +593,7 @@ class DLD_ExpansionData
                 'name' => clienttranslate('Blind'),
                 'onAcquireHindrance' => function (Game $game, $card, &$data) {
                     if ($card['id'] == $data['id']) {
-                        $character = $game->character->getCalculatedData($card['characterId']);
+                        $character = $game->character->getCharacterData($card['characterId']);
                         $weapons = array_filter($character['equipment'], function ($item) {
                             return $item['itemType'] == 'weapon' && $item['range'] > 1;
                         });
@@ -628,7 +628,7 @@ class DLD_ExpansionData
                 'onAcquireHindrance' => function (Game $game, $card, &$data) {
                     if ($card['id'] == $data['id']) {
                         // No weapon can be equipped
-                        $character = $game->character->getCalculatedData($card['characterId']);
+                        $character = $game->character->getCharacterData($card['characterId']);
                         $weaponIds = array_map(
                             function ($item) {
                                 return $item['itemId'];
