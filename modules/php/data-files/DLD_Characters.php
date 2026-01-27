@@ -391,7 +391,7 @@ class DLD_CharactersData
                                 $game->setActiveNightCard($card['id']);
                                 $data['data']['state']['card'] = $card;
                                 $data['data']['notify'] = true;
-                                $game->gameData->set('state', ['card' => $card, 'deck' => 'night-event']);
+                                $game->gameData->set('drawNightState', ['card' => $card, 'deck' => 'night-event']);
                                 $game->cardDrawEvent($card, 'night-event');
                             }
                         },
