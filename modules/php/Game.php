@@ -106,13 +106,13 @@ class Game extends \Bga\GameFramework\Table
             }
             if (!array_key_exists('player_name', $args) && str_contains($message, '${player_name}')) {
                 if (array_key_exists('playerId', $args)) {
-                    $args['player_name'] = $this->getPlayerNameById($args['playerId']);
+                    $args['player_name'] = $this->getPlayerNameById((int) $args['playerId']);
                 } elseif (array_key_exists('character_name', $args)) {
                     $playerId = (int) $this->character->getCharacterData($args['character_name'])['playerId'];
-                    $args['player_name'] = $this->getPlayerNameById($playerId);
+                    $args['player_name'] = $this->getPlayerNameById((int) $playerId);
                 } else {
                     $playerId = (int) $this->getActivePlayerId();
-                    $args['player_name'] = $this->getPlayerNameById($playerId);
+                    $args['player_name'] = $this->getPlayerNameById((int) $playerId);
                 }
             }
             if (!array_key_exists('character_name', $args) && $this->character->getTurnCharacterId()) {
@@ -182,7 +182,7 @@ class Game extends \Bga\GameFramework\Table
             $char = $this->character->getSubmittingCharacter();
             $name = $char['character_name'];
         }
-        $playerName = $this->getPlayerNameById($char['playerId']);
+        $playerName = $this->getPlayerNameById((int) $char['playerId']);
         $playerColor = $char['player_color'];
         return "<!--PNS--><span class=\"playername\" style=\"color:#$playerColor;\">$name ($playerName)</span><!--PNE-->";
     }
@@ -1779,8 +1779,23 @@ class Game extends \Bga\GameFramework\Table
     }
     public function stDinnerPhase()
     {
-        $action = $this->actions->getAction('actEat');
-        $hasFood = $action['requires']($this, $action);
+        $characters = $this->character->getAllCharacterData();
+        $actions = array_values(
+            array_map(
+                function ($char) {
+                    return [
+                        ...$this->actions->getActionCost('actEat', null, $char['character_name']),
+                        'action' => 'actEat',
+                        'character' => $char['character_name'],
+                        'type' => 'action',
+                    ];
+                },
+                array_filter($characters, function ($char) {
+                    return !$char['incapacitated'];
+                })
+            )
+        );
+        $hasFood = sizeof($actions) > 0;
         $actAddWood = $this->actions->getAction('actAddWood');
         $hasWood = $actAddWood['requires']($this, $actAddWood);
         $actSpendFKP = $this->actions->getAction('actSpendFKP');

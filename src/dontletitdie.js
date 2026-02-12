@@ -2061,8 +2061,8 @@ declare('bgagame.dontletitdie', Gamegui, {
           if (![...this.gamedatas.availableSkills, ...this.gamedatas.availableItemSkills].some((d) => d.cancellable === false))
             if (gameui.gamedatas.activeTurnPlayerId == gameui.player_id && !this.gamedatas.isRealTime) {
               actions
-                .sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
-                .forEach((action) => {
+                ?.sort((a, b) => (a?.stamina ?? 9) - (b?.stamina ?? 9))
+                ?.forEach((action) => {
                   const actionId = action.action;
                   if (actionId === 'actUseSkill' || actionId === 'actUseItem') {
                     return (actionId === 'actUseSkill' ? this.gamedatas.availableSkills : this.gamedatas.availableItemSkills)?.forEach(

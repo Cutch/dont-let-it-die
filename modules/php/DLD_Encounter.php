@@ -45,6 +45,7 @@ class DLD_Encounter
             $this->game->nextState('playerTurn');
             $this->game->hooks->onAfterPostEncounter($encounterState);
         }
+        $this->game->gameData->set('encounterState', null);
     }
     public function killCheck(array $data)
     {
