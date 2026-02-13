@@ -777,6 +777,9 @@ class DLD_CharactersData
                             $game->character->adjustActiveHealth(2);
                             $game->eventLog(clienttranslate('${character_name} healed by 2'));
                             if (sizeof($game->actions->getValidActions()) == 0) {
+                                $state = $game->gameData->get('encounterState');
+                                $game->hooks->onAfterPostEncounter($state);
+                                $game->encounter->encounterCleanup();
                                 $game->nextState('playerTurn');
                             }
                         },
@@ -789,7 +792,7 @@ class DLD_CharactersData
                                 !$char['incapacitated']
                             ) {
                                 $state = $game->gameData->get('encounterState');
-                                if ($game->encounter->killCheck($state)) {
+                                if ($state && $game->encounter->killCheck($state)) {
                                     return getUsePerDay($skill['getPerDayKey']($game, $skill), $game) < 1;
                                 }
                             }
@@ -799,6 +802,7 @@ class DLD_CharactersData
                 'onIncapacitation' => function (Game $game, $char, &$data) {
                     $state = $game->gameData->get('encounterState');
                     if (
+                        $state &&
                         $char['id'] == $data['characterId'] &&
                         $game->encounter->killCheck($state) &&
                         getUsePerDay($char['id'] . 'skill2', $game) < 1

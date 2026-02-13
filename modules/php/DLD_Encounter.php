@@ -44,7 +44,11 @@ class DLD_Encounter
         if (sizeof($validActions) == 0) {
             $this->game->nextState('playerTurn');
             $this->game->hooks->onAfterPostEncounter($encounterState);
+            $this->encounterCleanup();
         }
+    }
+    public function encounterCleanup()
+    {
         $this->game->gameData->set('encounterState', null);
     }
     public function killCheck(array $data)

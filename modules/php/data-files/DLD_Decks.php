@@ -953,17 +953,15 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     // Remove physical hindrance from each character
                     // Skip morning phase damage
-
-                    if (
-                        sizeof(
-                            array_filter($game->character->getAllCharacterData(false), function ($d) {
-                                return sizeof($d['physicalHindrance']) > 0 && !in_array('hindrance_2_5', toId($d['physicalHindrance']));
-                            })
-                        ) > 0
-                    ) {
+                    $characters = array_values(
+                        array_filter($game->character->getAllCharacterData(false), function ($d) {
+                            return sizeof($d['physicalHindrance']) > 0 && !in_array('hindrance_2_5', toId($d['physicalHindrance']));
+                        })
+                    );
+                    if (sizeof($characters) > 0) {
                         $game->selectionStates->initiateHindranceSelection(
                             $nightCard['id'],
-                            $game->character->getAllCharacterIds(false),
+                            toId($characters),
                             null,
                             false,
                             'morningPhase'

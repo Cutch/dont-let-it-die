@@ -1177,6 +1177,9 @@ class Game extends \Bga\GameFramework\Table
         $saveState = true;
         $stateName = $this->gamestate->state(true, false, true)['name'];
         if ($stateName == 'postEncounter') {
+            $state = $this->gameData->get('encounterState');
+            $this->hooks->onAfterPostEncounter($state);
+            $this->encounter->encounterCleanup();
             $this->nextState('playerTurn');
         } elseif ($stateName == 'tradePhase') {
             $this->nextState('playerTurn');
