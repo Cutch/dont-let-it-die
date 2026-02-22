@@ -525,7 +525,10 @@ class DLD_ItemsData
                     'wood' => 1,
                 ],
                 'onGetCharacterData' => function (Game $game, $item, &$data) {
-                    if ($data['character_name'] == $item['character_name']) {
+                    if (
+                        $game->gamestate->getCurrentMainState()->name !== 'tradePhase' &&
+                        $data['character_name'] == $item['character_name']
+                    ) {
                         $data['maxStamina'] = clamp($data['maxStamina'] - 1, 0, 10);
                     }
                 },
