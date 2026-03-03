@@ -1,4 +1,5 @@
 <?php
+
 namespace Bga\Games\DontLetItDie;
 
 use Bga\Games\DontLetItDie\Game;
@@ -227,7 +228,7 @@ class DLD_ItemsData
                     'fiber' => 2,
                     'bone' => 2,
                 ],
-                'onDraw' => function (Game $game, $item, &$data) {
+                'onDrawPost' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'fiber') {
@@ -240,15 +241,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                    $resourceChange['left'] == 0
-                                        ? []
-                                        : [
-                                            'prefix' => ', ',
-                                            'message' => clienttranslate('${left} could not be collected'),
-                                            'args' => [
-                                                'left' => $resourceChange['left'],
-                                            ],
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
                                         ],
+                                    ],
                             ]
                         );
                     }
@@ -264,7 +265,7 @@ class DLD_ItemsData
                     'fiber' => 2,
                     'hide' => 1,
                 ],
-                'onDraw' => function (Game $game, $item, &$data) {
+                'onDrawPost' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
 
                     $char = $game->character->getCharacterData($item['characterId']);
@@ -278,15 +279,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                    $resourceChange['left'] == 0
-                                        ? []
-                                        : [
-                                            'prefix' => ', ',
-                                            'message' => clienttranslate('${left} could not be collected'),
-                                            'args' => [
-                                                'left' => $resourceChange['left'],
-                                            ],
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
                                         ],
+                                    ],
                             ]
                         );
                     }
@@ -486,7 +487,7 @@ class DLD_ItemsData
                     'wood' => 1,
                     'rock' => 2,
                 ],
-                'onDraw' => function (Game $game, $item, &$data) {
+                'onDrawPost' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'wood') {
@@ -499,15 +500,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                    $resourceChange['left'] == 0
-                                        ? []
-                                        : [
-                                            'prefix' => ', ',
-                                            'message' => clienttranslate('${left} could not be collected'),
-                                            'args' => [
-                                                'left' => $resourceChange['left'],
-                                            ],
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
                                         ],
+                                    ],
                             ]
                         );
                     }
@@ -568,7 +569,7 @@ class DLD_ItemsData
                     'rock' => 2,
                     'bone' => 1,
                 ],
-                'onDraw' => function (Game $game, $item, &$data) {
+                'onDrawPost' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'meat') {
@@ -581,15 +582,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                    $resourceChange['left'] == 0
-                                        ? []
-                                        : [
-                                            'prefix' => ', ',
-                                            'message' => clienttranslate('${left} could not be collected'),
-                                            'args' => [
-                                                'left' => $resourceChange['left'],
-                                            ],
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
                                         ],
+                                    ],
                             ]
                         );
                     }
@@ -628,7 +629,7 @@ class DLD_ItemsData
                     'wood' => 1,
                     'rock' => 1,
                 ],
-                'onDraw' => function (Game $game, $item, &$data) {
+                'onDrawPost' => function (Game $game, $item, &$data) {
                     $card = $data['card'];
                     $char = $game->character->getCharacterData($item['characterId']);
                     if ($char['isActive'] && $card['deckType'] == 'resource' && $card['resourceType'] == 'rock') {
@@ -641,15 +642,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                    $resourceChange['left'] == 0
-                                        ? []
-                                        : [
-                                            'prefix' => ', ',
-                                            'message' => clienttranslate('${left} could not be collected'),
-                                            'args' => [
-                                                'left' => $resourceChange['left'],
-                                            ],
+                                $resourceChange['left'] == 0
+                                    ? []
+                                    : [
+                                        'prefix' => ', ',
+                                        'message' => clienttranslate('${left} could not be collected'),
+                                        'args' => [
+                                            'left' => $resourceChange['left'],
                                         ],
+                                    ],
                             ]
                         );
                     }
@@ -687,7 +688,19 @@ class DLD_ItemsData
                                 getUsePerDay($skill['id'], $game) < 2 &&
                                 !$game->actInterrupt->getState('actDraw')
                             ) {
+                                $card = $data['card'];
+                                $game->gameData->set('tempCard', $data);
+                                $game->decks->removeFromDeck($deck, $card['id']);
                                 $game->actInterrupt->addSkillInterrupt($skill);
+                            }
+                        },
+                        'onInterruptCancel' => function (Game $game, $skill, &$data) {
+                            $idsSkipped = toId($data['skills']);
+                            if (in_array($skill['id'], $idsSkipped)) {
+                                $tempCard = $game->gameData->get('tempCard');
+                                $deck = $tempCard['deck'];
+                                $card = $tempCard['card'];
+                                $game->decks->addBackToDeck($deck, $card['id']);
                             }
                         },
                         'onUseSkill' => function (Game $game, $skill, &$data) {
@@ -696,7 +709,7 @@ class DLD_ItemsData
                                 if (array_key_exists('data', $existingData)) {
                                     $deck = $existingData['data']['deck'];
                                     $card1 = $existingData['data']['card'];
-                                    $game->decks->removeFromDeck($deck, $card1['id']);
+                                    // $game->decks->removeFromDeck($deck, $card1['id']);
                                     $card2 = $game->decks->pickCard($deck, 'hand');
                                     $game->decks->addBackToDeck($deck, $card1['id']);
                                     $game->decks->addBackToDeck($deck, $card2['id']);

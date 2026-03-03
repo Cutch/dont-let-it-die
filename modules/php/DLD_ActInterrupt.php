@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
@@ -72,11 +73,11 @@ class DLD_ActInterrupt
         } elseif (
             array_key_exists('cancelled', $existingData) &&
             sizeof($existingData['skills']) ==
-                sizeof(
-                    array_filter($existingData['skills'], function ($s) {
-                        return array_key_exists('cancellable', $s) && $s['cancellable'];
-                    })
-                )
+            sizeof(
+                array_filter($existingData['skills'], function ($s) {
+                    return array_key_exists('cancellable', $s) && $s['cancellable'];
+                })
+            )
         ) {
             $this->setState($functionName, null);
         } elseif (!array_key_exists('activated', $existingData)) {
@@ -282,6 +283,9 @@ class DLD_ActInterrupt
             : array_map(function ($char) {
                 return $char['id'];
             }, $this->game->character->getAllCharacterDataForPlayer($playerId));
+
+        $this->game->hooks->onInterruptCancel($data);
+
         // Remove skills so that we know there's nothing left to do
         // $skills = $data['skills'];
         // array_walk($skills, function (&$v, $k) use ($characterIds) {

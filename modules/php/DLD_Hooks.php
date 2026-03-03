@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
@@ -154,6 +155,15 @@ class DLD_Hooks
         $this->checkInterrupt = false;
     }
     function onInterrupt(&$data, $activatedSkill, array $args = [])
+    {
+        // Default checkInterrupt to true
+        if (!array_key_exists('checkInterrupt', $args)) {
+            $args['checkInterrupt'] = true;
+        }
+        $this->callHooks(__FUNCTION__, $args, $data, $activatedSkill);
+        return $data;
+    }
+    function onInterruptCancel(&$data, array $args = [])
     {
         // Default checkInterrupt to true
         if (!array_key_exists('checkInterrupt', $args)) {

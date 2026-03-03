@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -14,6 +15,7 @@
  *
  * In this PHP file, you are going to defines the rules of the game.
  */
+
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
@@ -24,6 +26,7 @@ use Bga\GameFramework\Actions\Types\JsonParam;
 use BgaUserException;
 use ErrorException;
 use Exception;
+
 set_error_handler(function ($severity, $message, $file, $line) {
     if (error_reporting() & $severity) {
         throw new ErrorException($message, 0, $severity, $file, $line);
@@ -126,9 +129,7 @@ class Game extends \Bga\GameFramework\Table
                 array_key_exists('args', $args['i18n_suffix']) &&
                 array_key_exists('resource_type', $args['i18n_suffix']['args'])
             ) {
-                $args['i18n_suffix']['args']['resource_type'] = $this->data->getTokens()[$args['i18n_suffix']['args']['resource_type']][
-                    'name'
-                ];
+                $args['i18n_suffix']['args']['resource_type'] = $this->data->getTokens()[$args['i18n_suffix']['args']['resource_type']]['name'];
             }
             foreach (['character_resource', 'deck', 'action', 'action_name', 'acquireOrDropSentence', 'resource_type'] as $key) {
                 if (str_contains($message, '${' . $key . '}')) {
@@ -1381,15 +1382,15 @@ class Game extends \Bga\GameFramework\Table
                             ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
                         ]),
                         'i18n_suffix' =>
-                            $resourceChange['left'] == 0
-                                ? []
-                                : [
-                                    'prefix' => ' ',
-                                    'message' => clienttranslate('${left} could not be collected'),
-                                    'args' => [
-                                        'left' => $resourceChange['left'],
-                                    ],
+                        $resourceChange['left'] == 0
+                            ? []
+                            : [
+                                'prefix' => ' ',
+                                'message' => clienttranslate('${left} could not be collected'),
+                                'args' => [
+                                    'left' => $resourceChange['left'],
                                 ],
+                            ],
                     ]);
                 } elseif ($card['deckType'] == 'encounter') {
                     // Change state and check for health/damage modifications
@@ -2797,19 +2798,19 @@ class Game extends \Bga\GameFramework\Table
         $this->gameData->setResources([
             'fireWood' => 5,
             'wood' => 2,
-            'bone' => 7,
-            'meat' => 7,
+            'bone' => 2,
+            'meat' => 2,
             'meat-cooked' => 4,
             'fish' => 0,
             'fish-cooked' => 0,
             'herb' => 2,
             'dino-egg' => 4,
             'dino-egg-cooked' => 4,
-            'berry' => 7,
+            'berry' => 2,
             'berry-cooked' => 1,
-            'rock' => 7,
+            'rock' => 2,
             'stew' => 1,
-            'fiber' => 7,
+            'fiber' => 2,
             'hide' => 8,
             'trap' => 0,
             'fkp' => 20,
