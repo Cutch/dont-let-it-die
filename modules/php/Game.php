@@ -2793,7 +2793,8 @@ class Game extends \Bga\GameFramework\Table
     }
 
     // TEST FUNCTIONS START HERE
-    public function giveResources()
+    #[Debug(reload: true)]
+    public function debug_giveResources()
     {
         $this->gameData->setResources([
             'fireWood' => 5,
@@ -2821,7 +2822,8 @@ class Game extends \Bga\GameFramework\Table
         $this->completeAction();
     }
     // TEST FUNCTIONS START HERE
-    public function noResources()
+    #[Debug(reload: true)]
+    public function debug_noResources()
     {
         $this->gameData->setResources([
             'fireWood' => 0,
@@ -2848,12 +2850,15 @@ class Game extends \Bga\GameFramework\Table
         ]);
         $this->completeAction();
     }
-    public function giveClub()
+    #[Debug(reload: true)]
+    public function debug_giveClub()
     {
         $itemId = $this->gameData->createItem('club');
         $this->character->equipEquipment($this->character->getSubmittingCharacter()['id'], [$itemId]);
+        $this->completeAction();
     }
-    public function give($item)
+    #[Debug(reload: true)]
+    public function debug_give($item)
     {
         $itemType = $this->data->getItems()[$item]['itemType'];
         if ($itemType == 'necklace') {
@@ -2872,12 +2877,17 @@ class Game extends \Bga\GameFramework\Table
         }
         $this->completeAction();
     }
-    public function giveItems()
+    #[Debug(reload: true)]
+    public function debug_giveItems()
     {
         $this->gameData->set('craftingLevel', [0, 1, 2, 3]);
 
         extract($this->gameData->getAll('turnNo', 'turnOrder'));
 
+        $itemId1 = $this->gameData->createItem('hide-armor');
+        $itemId2 = $this->gameData->createItem('bag');
+        $itemId3 = $this->gameData->createItem('sharp-stick');
+        $this->gameData->set('campEquipment', [$itemId1, $itemId2, $itemId3]);
         $itemId = $this->gameData->createItem('hide-armor');
         $this->character->equipEquipment($turnOrder[0], [$itemId]);
         $itemId = $this->gameData->createItem('spear');
@@ -2891,13 +2901,15 @@ class Game extends \Bga\GameFramework\Table
         $this->completeAction();
     }
 
-    public function drawDayEvent()
+    #[Debug(reload: true)]
+    public function debug_drawDayEvent()
     {
         $this->gameData->set('state', ['card' => $this->data->getDecks()['gather-7_15'], 'deck' => 'gather']);
         $this->nextState('drawCard');
         $this->completeAction();
     }
-    public function setNightCard()
+    #[Debug(reload: true)]
+    public function debug_setNightCard()
     {
         $cards = array_values($this->decks->getDeck('night-event')->getCardsInLocation('deck'));
         $firstCard = null;
@@ -2917,28 +2929,32 @@ class Game extends \Bga\GameFramework\Table
         $this->gameData->setResources(['fireWood' => 1, 'wood' => 1]);
         $this->completeAction();
     }
-    public function resetStamina()
+    #[Debug(reload: true)]
+    public function debug_resetStamina()
     {
         $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
             $data['stamina'] = $data['maxStamina'];
         });
         $this->completeAction();
     }
-    public function noStamina()
+    #[Debug(reload: true)]
+    public function debug_noStamina()
     {
         $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
             $data['stamina'] = 0;
         });
         $this->completeAction();
     }
-    public function resetHealth()
+    #[Debug(reload: true)]
+    public function debug_resetHealth()
     {
         $this->character->updateCharacterData($this->character->getSubmittingCharacter()['id'], function (&$data) {
             $data['health'] = $data['maxHealth'];
         });
         $this->completeAction();
     }
-    public function lowHealth(?string $char = null)
+    #[Debug(reload: true)]
+    public function debug_lowHealth(?string $char = null)
     {
         if (!$char) {
             $char = $this->character->getSubmittingCharacter()['id'];
@@ -2948,21 +2964,25 @@ class Game extends \Bga\GameFramework\Table
         });
         $this->completeAction();
     }
-    public function maxCraftLevel()
+    #[Debug(reload: true)]
+    public function debug_maxCraftLevel()
     {
         $this->gameData->set('craftingLevel', [0, 1, 2, 3]);
     }
-    public function kill()
+    #[Debug(reload: true)]
+    public function debug_kill()
     {
         $this->character->adjustActiveHealth(-10);
         $this->completeAction();
     }
-    public function killChar($character)
+    #[Debug(reload: true)]
+    public function debug_killChar($character)
     {
         $this->character->adjustHealth($character, -10);
         $this->completeAction();
     }
-    public function drawNightCard()
+    #[Debug(reload: true)]
+    public function debug_drawNightCard()
     {
         $this->gameData->setResources([
             'fireWood' => 5,
@@ -2995,17 +3015,20 @@ class Game extends \Bga\GameFramework\Table
         $this->endTurn();
         $this->completeAction();
     }
-    public function shuffle()
+    #[Debug(reload: true)]
+    public function debug_shuffle()
     {
         $this->decks->shuffleInDiscard('gather', true);
         $this->completeAction();
     }
-    public function destroy(string $resourceType = 'fiber')
+    #[Debug(reload: true)]
+    public function debug_destroy(string $resourceType = 'fiber')
     {
         $this->gameData->destroyResource($resourceType);
         $this->completeAction();
     }
-    public function unlockAll()
+    #[Debug(reload: true)]
+    public function debug_unlockAll()
     {
         $data = $this->data->getBoards()['knowledge-tree-' . $this->getDifficulty()]['track'];
         $unlocks = $this->getUnlockedKnowledgeIds(false);
@@ -3035,11 +3058,13 @@ class Game extends \Bga\GameFramework\Table
         }
         $this->completeAction();
     }
-    public function swapCharacter(string $char)
+    #[Debug(reload: true)]
+    public function debug_swapCharacter(string $char)
     {
         $this->characterSelection->test_swapCharacter($char);
     }
-    public function hinder()
+    #[Debug(reload: true)]
+    public function debug_hinder()
     {
         $char = $this->character->getSubmittingCharacter()['id'];
         $this->checkHindrance(true, $char);
