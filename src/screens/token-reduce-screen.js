@@ -15,10 +15,13 @@ export class TokenReduceScreen {
       error.innerHTML = _('Resources can only be reduced by ${count}').replace('${count}', this.game.gamedatas.selectionState.reduceBy);
       error.style.visibility = '';
       this.error = true;
-    } else if (resourceCount < this.game.gamedatas.selectionState.totalCost) {
+    } else if (
+      (resourceCount !== initialCost || initialCost >= this.game.gamedatas.selectionState.totalCost) &&
+      resourceCount < this.game.gamedatas.selectionState.totalCost
+    ) {
       error.innerHTML = _('Total resource cost must be at least ${count}').replace(
         '${count}',
-        this.game.gamedatas.selectionState.totalCost,
+        Math.min(this.game.gamedatas.selectionState.totalCost, initialCost),
       );
       error.style.visibility = '';
       this.error = true;
