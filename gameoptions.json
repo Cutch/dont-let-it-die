@@ -4,18 +4,22 @@
     "values": {
       "0": {
         "name": "Base",
+        "tmdisplay": "Base",
         "description": "Base game"
       },
       "1": {
         "name": "Mini Expansion",
+        "tmdisplay": "Mini Expansion",
         "description": "1 new character <br/> Day events"
       },
       "2": {
         "name": "Hindrance Expansion",
+        "tmdisplay": "Hindrance",
         "description": "4 new characters <br/> New actions and items <br/> Tech tree substitutions <br/> Physical and mental hindrances"
       },
       "3": {
         "name": "Dead Valley Expansion",
+        "tmdisplay": "Dead Valley",
         "description": "7 new characters"
       }
     },
@@ -47,19 +51,23 @@
     "values": {
       "0": {
         "name": "Easy",
+        "tmdisplay": "Easy Tech",
         "firstgameonly": true,
         "description": "Change the tech tree difficulty"
       },
       "1": {
         "name": "Normal",
+        "tmdisplay": "Normal Tech",
         "description": "Change the tech tree difficulty"
       },
       "2": {
         "name": "Normal+",
+        "tmdisplay": "Normal+ Tech",
         "description": "Change the tech tree difficulty"
       },
       "3": {
         "name": "Hard",
+        "tmdisplay": "Hard Tech",
         "description": "Change the tech tree difficulty"
       }
     },
@@ -70,10 +78,12 @@
     "values": {
       "0": {
         "name": "Normal",
+        "tmdisplay": "",
         "description": "Remove 1 health each morning"
       },
       "1": {
         "name": "Hard",
+        "tmdisplay": "Hard Mode",
         "description": "Remove 2 health each morning, more firewood"
       }
     },
@@ -84,11 +94,13 @@
     "values": {
       "0": {
         "description": "Allows players to skip certain phases or actions on behalf of other players",
-        "name": "No"
+        "name": "No",
+        "tmdisplay": "No Trust"
       },
       "1": {
         "description": "Allows players to skip certain phases or actions on behalf of other players",
-        "name": "Yes"
+        "name": "Yes",
+        "tmdisplay": ""
       }
     },
     "displaycondition": [

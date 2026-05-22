@@ -121,7 +121,7 @@ class DLD_ItemsData
                 'cost' => [
                     'fiber' => 3,
                     'rock' => 3,
-                    'hide' => 3,
+                    'hide' => 2,
                     'bone' => 2,
                 ],
                 'skills' => [
@@ -241,15 +241,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                $resourceChange['left'] == 0
-                                    ? []
-                                    : [
-                                        'prefix' => ', ',
-                                        'message' => clienttranslate('${left} could not be collected'),
-                                        'args' => [
-                                            'left' => $resourceChange['left'],
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
                                         ],
-                                    ],
                             ]
                         );
                     }
@@ -279,15 +279,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                $resourceChange['left'] == 0
-                                    ? []
-                                    : [
-                                        'prefix' => ', ',
-                                        'message' => clienttranslate('${left} could not be collected'),
-                                        'args' => [
-                                            'left' => $resourceChange['left'],
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
                                         ],
-                                    ],
                             ]
                         );
                     }
@@ -500,15 +500,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                $resourceChange['left'] == 0
-                                    ? []
-                                    : [
-                                        'prefix' => ', ',
-                                        'message' => clienttranslate('${left} could not be collected'),
-                                        'args' => [
-                                            'left' => $resourceChange['left'],
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
                                         ],
-                                    ],
                             ]
                         );
                     }
@@ -582,15 +582,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                $resourceChange['left'] == 0
-                                    ? []
-                                    : [
-                                        'prefix' => ', ',
-                                        'message' => clienttranslate('${left} could not be collected'),
-                                        'args' => [
-                                            'left' => $resourceChange['left'],
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
                                         ],
-                                    ],
                             ]
                         );
                     }
@@ -642,15 +642,15 @@ class DLD_ItemsData
                                 'resource_type' => $card['resourceType'],
                                 'count' => $resourceChange['changed'],
                                 'i18n_suffix' =>
-                                $resourceChange['left'] == 0
-                                    ? []
-                                    : [
-                                        'prefix' => ', ',
-                                        'message' => clienttranslate('${left} could not be collected'),
-                                        'args' => [
-                                            'left' => $resourceChange['left'],
+                                    $resourceChange['left'] == 0
+                                        ? []
+                                        : [
+                                            'prefix' => ', ',
+                                            'message' => clienttranslate('${left} could not be collected'),
+                                            'args' => [
+                                                'left' => $resourceChange['left'],
+                                            ],
                                         ],
-                                    ],
                             ]
                         );
                     }
