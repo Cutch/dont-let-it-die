@@ -41,7 +41,7 @@ export class WeaponScreen {
       elem.insertAdjacentHTML(
         'beforeend',
         `<div class="token-block id${weapon.itemId}">
-            <div class="name">${weapon.name}</div>
+            <div class="name">${_(weapon.name)}</div>
             <div class="line"><span class="label">${_('Damage')}: </span><span class="value">${weapon.damage}</span></div>
             <div class="line"><span class="label">${_('Range')}: </span><span class="value">${weapon.range}</span></div>
             <div style="display: ${weapon.useCostString ? '' : 'none'}" class="line"><span class="label">${_(
