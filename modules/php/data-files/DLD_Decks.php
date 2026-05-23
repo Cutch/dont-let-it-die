@@ -564,7 +564,7 @@ class DLD_DecksData
             'night-event-7_14' => [
                 'deck' => 'night-event',
                 'type' => 'deck',
-                'onMorning' => function (Game $game, $nightCard, &$data) {
+                'onMorningPre' => function (Game $game, $nightCard, &$data) {
                     $data['health'] = min($data['health'] - 1, 0);
                     $game->eventLog(clienttranslate('Everyone takes an additional 1 damage from the morning phase'));
                 },
@@ -689,7 +689,7 @@ class DLD_DecksData
                 'onUse' => function (Game $game, $nightCard) {
                     $game->eventLog(clienttranslate('Lack of sleep lessens everyone\'s stamina'));
                 },
-                'onMorning' => function (Game $game, $nightCard, &$data) {
+                'onMorningPre' => function (Game $game, $nightCard, &$data) {
                     $data['stamina'] -= 3;
                 },
             ],
@@ -777,7 +777,7 @@ class DLD_DecksData
                     $game->eventLog(clienttranslate('Everyone takes 1 damage and starts the morning with -2 stamina'));
                     $game->character->adjustAllHealth(-1);
                 },
-                'onMorning' => function (Game $game, $nightCard, &$data) {
+                'onMorningPre' => function (Game $game, $nightCard, &$data) {
                     $data['stamina'] -= 2;
                 },
             ],
@@ -969,7 +969,7 @@ class DLD_DecksData
                         return ['nextState' => false];
                     }
                 },
-                'onMorning' => function (Game $game, $nightCard, &$data) {
+                'onMorningPre' => function (Game $game, $nightCard, &$data) {
                     $turnOrder = $game->gameData->get('turnOrder');
                     $turnOrder = array_values(array_filter($turnOrder));
                     array_push($data['skipMorningDamage'], ...$turnOrder);

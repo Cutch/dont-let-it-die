@@ -1853,7 +1853,7 @@ class DLD_CharactersData
                 //         }
                 //     }
                 // },
-                'onMorning' => function (Game $game, $char, &$data) {
+                'onMorningPre' => function (Game $game, $char, &$data) {
                     array_push($data['skipMorningDamage'], 'Vog');
                 },
                 'skills' => [

@@ -1101,7 +1101,7 @@ class DLD_ExpansionData
                 'acquireSentence' => clienttranslate('is'),
                 'dropSentence' => clienttranslate('is no longer'),
                 'name' => clienttranslate('Diseased'),
-                'onMorning' => function (Game $game, $card, &$data) {
+                'onMorningPost' => function (Game $game, $card, &$data) {
                     $skipMorningDamage = $data['skipMorningDamage'];
                     if (!in_array($card['characterId'], $skipMorningDamage)) {
                         $game->character->adjustHealth($card['characterId'], -1);

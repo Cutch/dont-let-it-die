@@ -22,7 +22,7 @@ class DLD_UpgradesData
                 'type' => 'deck',
                 'name' => clienttranslate('Tracking'),
                 'unlockCost' => 5,
-                'onEncounterPre' => function (Game $game, $unlock, &$data) {
+                'onEncounterPost' => function (Game $game, $unlock, &$data) {
                     $data['willReceiveMeat'] += 1;
                 },
             ],
