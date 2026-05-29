@@ -3,7 +3,7 @@
 namespace Bga\Games\DontLetItDie;
 
 use Bga\Games\DontLetItDie\Game;
-use BgaUserException;
+use Bga\GameFramework\UserException;
 
 if (!function_exists('getUsePerDay')) {
     function getUsePerDay(string $itemId, Game $game)
@@ -165,7 +165,7 @@ class DLD_ItemsData
                                     )
                                 );
                                 if ($characterCount > 1) {
-                                    throw new BgaUserException(clienttranslate('Only 1 character\'s hindrances can be selected'));
+                                    throw new UserException(clienttranslate('Only 1 character\'s hindrances can be selected'));
                                 }
                                 $count = 0;
                                 foreach ($state['characters'] as $char) {
@@ -185,7 +185,7 @@ class DLD_ItemsData
                                     }
                                 }
                                 if ($count > 2) {
-                                    throw new BgaUserException(clienttranslate('Up to 2 hindrances can be removed'));
+                                    throw new UserException(clienttranslate('Up to 2 hindrances can be removed'));
                                 }
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
                             }

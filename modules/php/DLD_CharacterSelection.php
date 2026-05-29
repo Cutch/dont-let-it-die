@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-use BgaUserException;
+use Bga\GameFramework\UserException;
 use Exception;
 
 class DLD_CharacterSelection
@@ -21,8 +21,8 @@ class DLD_CharacterSelection
         ?string $character4 = null
     ): void {
         $characters = [$character1, $character2, $character3, $character4];
-        $this->validateCharacterCount(false, $characters);
         $playerId = $this->game->getCurrentPlayer();
+        $this->validateCharacterCount(false, $characters, $playerId);
         $characters = array_filter($characters);
         sort($characters);
         $this->setTurnOrder($playerId, $characters);
@@ -44,7 +44,7 @@ class DLD_CharacterSelection
                 )
             ) > 0
         ) {
-            throw new BgaUserException(clienttranslate('Character Selected By Another Player'));
+            throw new UserException(clienttranslate('Character Selected By Another Player'));
         }
         // Remove player's previous selected
         $this->game::DbQuery("DELETE FROM `character` WHERE player_id = $playerId");
@@ -62,26 +62,19 @@ class DLD_CharacterSelection
         }
         $characterIds = $this->game->character->getAllCharacterIds();
         if (in_array('Atouk', $characterIds) && in_array('Yurt', $characterIds)) {
-            throw new BgaUserException(clienttranslate('Atouk and Yurt cannot be in the same tribe'));
+            throw new UserException(clienttranslate('Atouk and Yurt cannot be in the same tribe'));
         }
         // Notify Players
         $results = [];
         $this->game->getAllPlayers($results);
         $this->game->notify('characterClicked', '', ['gameData' => $results]);
     }
-    private function validateCharacterCount(bool $checkIfNotEnough, array $characters)
+    public function getCharacterCount(int $playerId)
     {
-        // Check for bad character name
-        foreach ($characters as $index => $char) {
-            if ($char) {
-                if (!array_key_exists($char, $this->game->data->getCharacters())) {
-                    throw new Exception('Bad value for character');
-                }
-            }
-        }
-        // Check how many characters the player can select
-        $playerId = $this->game->getCurrentPlayer();
         $players = $this->game->loadPlayersBasicInfos();
+        $players = array_filter($players, function ($p) {
+            return $p['player_zombie'] == 0;
+        });
         $playerCount = sizeof($players);
         $count = 0;
         if ($playerCount == 3) {
@@ -93,11 +86,25 @@ class DLD_CharacterSelection
         } elseif ($playerCount == 4) {
             $count = 1;
         }
+        return $count;
+    }
+    private function validateCharacterCount(bool $checkIfNotEnough, array $characters, int $playerId)
+    {
+        // Check for bad character name
+        foreach ($characters as $index => $char) {
+            if ($char) {
+                if (!array_key_exists($char, $this->game->data->getCharacters())) {
+                    throw new Exception('Bad value for character');
+                }
+            }
+        }
+        // Check how many characters the player can select
+        $count = $this->getCharacterCount($playerId);
         if (sizeof(array_filter($characters)) > $count) {
-            throw new BgaUserException(clienttranslate('Too many characters selected'));
+            throw new UserException(clienttranslate('Too many characters selected'));
         }
         if ($checkIfNotEnough && sizeof(array_filter($characters)) != $count) {
-            throw new BgaUserException(clienttranslate('Not enough characters selected'));
+            throw new UserException(clienttranslate('Not enough characters selected'));
         }
     }
     private function setTurnOrder($playerId, $selectedCharacters)
@@ -136,7 +143,7 @@ class DLD_CharacterSelection
         }, array_values($this->game->getCollectionFromDb("SELECT character_name FROM `character` WHERE `player_id` = '$playerId'")));
         $selectedCharacters = array_orderby($selectedCharacters, 'character_name', SORT_ASC);
 
-        $this->validateCharacterCount(true, $selectedCharacters);
+        $this->validateCharacterCount(true, $selectedCharacters, $playerId);
 
         $this->game::DbQuery("UPDATE `character` set `confirmed`=1 WHERE `player_id` = $playerId");
         $selectedCharactersArgs = [];

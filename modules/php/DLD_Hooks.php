@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-use BgaUserException;
+use Bga\GameFramework\UserException;
 
 class DLD_Hooks
 {
@@ -143,7 +143,7 @@ class DLD_Hooks
         }
         // Post
         // if ($functionName == 'onEncounter') {
-        //     throw new BgaUserException(json_encode($args));
+        //     throw new UserException(json_encode($args));
         // }
         if (!array_key_exists('suffix', $args) || $args['suffix'] == 'Post') {
             foreach ($hooks as $object) {

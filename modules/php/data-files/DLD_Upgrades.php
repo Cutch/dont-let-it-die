@@ -2,7 +2,7 @@
 namespace Bga\Games\DontLetItDie;
 
 use Bga\Games\DontLetItDie\Game;
-use BgaUserException;
+use Bga\GameFramework\UserException;
 class DLD_UpgradesData
 {
     public function getData(): array
@@ -642,7 +642,7 @@ class DLD_UpgradesData
                                     }
                                 }
                                 if ($count > 1) {
-                                    throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
+                                    throw new UserException(clienttranslate('Only 1 hindrance can be removed'));
                                 }
                                 $data['nextState'] = 'playerTurn';
                             }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-use BgaUserException;
+use Bga\GameFramework\UserException;
 
 class DLD_Actions
 {
@@ -212,10 +212,10 @@ class DLD_Actions
                                     }
                                 }
                                 if ($count > 1) {
-                                    throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
+                                    throw new UserException(clienttranslate('Only 1 hindrance can be removed'));
                                 }
                                 if ($count == 0) {
-                                    throw new BgaUserException(clienttranslate('Select a Hindrance'));
+                                    throw new UserException(clienttranslate('Select a Hindrance'));
                                 }
                                 $eatData =
                                     $game->actInterrupt->getState('actEat') ??
@@ -277,7 +277,7 @@ class DLD_Actions
                             }
                         }
                         if ($count > 1) {
-                            throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
+                            throw new UserException(clienttranslate('Only 1 hindrance can be removed'));
                         }
                         $game->actions->spendActionCost('actUseHerb');
                         $game->adjustResource('herb', -1);
@@ -755,7 +755,7 @@ class DLD_Actions
         $selections = $this->getActionSelectable($actionId, $subActionId, $characterId);
         $selections = array_map($selector, $selections);
         if (!in_array($type, $selections)) {
-            throw new BgaUserException(clienttranslate('The selection is invalid'));
+            throw new UserException(clienttranslate('The selection is invalid'));
         }
     }
     public function validateCanRunAction(string $action, ?string $subAction = null, ...$args)
@@ -767,17 +767,17 @@ class DLD_Actions
         $stamina = $character['stamina'];
         // $health = $character['health'];
         if (array_key_exists('stamina', $cost) && $stamina < $cost['stamina']) {
-            throw new BgaUserException(clienttranslate('Not enough stamina'));
+            throw new UserException(clienttranslate('Not enough stamina'));
         }
         // if (array_key_exists('health', $cost) && $health < $cost['health']) {
-        //     throw new BgaUserException(clienttranslate('Not enough health'));
+        //     throw new UserException(clienttranslate('Not enough health'));
         // }
         if (!$this->checkRequirements($this->getAction($action, $subAction, ...$args))) {
-            throw new BgaUserException(clienttranslate('Can\'t use this action'));
+            throw new UserException(clienttranslate('Can\'t use this action'));
         }
         $validActions = $this->getValidActions();
         if (!array_key_exists($action, $validActions)) {
-            throw new BgaUserException(clienttranslate('This action can not be used this turn'));
+            throw new UserException(clienttranslate('This action can not be used this turn'));
         }
     }
     public function getValidActions()

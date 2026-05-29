@@ -18,11 +18,6 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-use BgaUserException;
-use Exception;
-
-use function PHPSTORM_META\type;
-
 class DLD_GameData
 {
     private Game $game;

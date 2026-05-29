@@ -2,7 +2,7 @@
 namespace Bga\Games\DontLetItDie;
 
 use Bga\Games\DontLetItDie\Game;
-use BgaUserException;
+use Bga\GameFramework\UserException;
 class DLD_CharactersData
 {
     public function getData(): array
@@ -499,13 +499,13 @@ class DLD_CharactersData
                                     }
                                 }
                                 if ($count < 1) {
-                                    throw new BgaUserException(clienttranslate('1 hindrance must be taken/traded for'));
+                                    throw new UserException(clienttranslate('1 hindrance must be taken/traded for'));
                                 }
                                 if ($count > 1) {
-                                    throw new BgaUserException(clienttranslate('Only 1 hindrance can be taken'));
+                                    throw new UserException(clienttranslate('Only 1 hindrance can be taken'));
                                 }
                                 if ($myCount > 1) {
-                                    throw new BgaUserException(clienttranslate('Only 1 hindrance can be traded'));
+                                    throw new UserException(clienttranslate('Only 1 hindrance can be traded'));
                                 }
                                 $game->character->updateCharacterData($myCharId, function (&$char) use ($card1, $card2, $game) {
                                     if ($card1) {
@@ -1131,7 +1131,7 @@ class DLD_CharactersData
                                     }
                                 }
                                 if ($count > 1) {
-                                    throw new BgaUserException(clienttranslate('Only 1 hindrance can be removed'));
+                                    throw new UserException(clienttranslate('Only 1 hindrance can be removed'));
                                 }
                                 $game->actions->spendActionCost('actUseSkill', $skill['id']);
                                 $data['nextState'] = 'playerTurn';

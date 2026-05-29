@@ -171,6 +171,7 @@ $machinestates = [
             'endGame' => $gameEnd,
             'drawCard' => $drawCard,
             'endTurn' => $nextCharacter,
+            'characterSelect' => $characterSelect,
         ],
     ],
     $undo => [

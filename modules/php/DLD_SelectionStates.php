@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Bga\Games\DontLetItDie;
 
 use Bga\GameFramework\Actions\Types\JsonParam;
-use BgaUserException;
+use Bga\GameFramework\UserException;
 use Exception;
 
 class DLD_SelectionStates
@@ -37,7 +37,7 @@ class DLD_SelectionStates
             [$this->game->hooks, 'onCharacterSelection'],
             function (Game $_this) use ($characterId) {
                 if (!$characterId) {
-                    throw new BgaUserException(clienttranslate('Select a Character'));
+                    throw new UserException(clienttranslate('Select a Character'));
                 }
                 $stateData = $this->getState(null);
                 $stateData['selectedCharacterId'] = $characterId;
@@ -56,7 +56,7 @@ class DLD_SelectionStates
     {
         // $this->game->character->addExtraTime();
         if (!$buttonValue) {
-            throw new BgaUserException(clienttranslate('Selection is required'));
+            throw new UserException(clienttranslate('Selection is required'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedButtonValue'] = $buttonValue;
@@ -74,7 +74,7 @@ class DLD_SelectionStates
     {
         // $this->game->character->addExtraTime();
         if (!$resourceType) {
-            throw new BgaUserException(clienttranslate('Select a Resource'));
+            throw new UserException(clienttranslate('Select a Resource'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedResourceType'] = $resourceType;
@@ -158,7 +158,7 @@ class DLD_SelectionStates
     {
         // $this->game->character->addExtraTime();
         if (!$resourceType) {
-            throw new BgaUserException(clienttranslate('Select a Resource'));
+            throw new UserException(clienttranslate('Select a Resource'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedResourceType'] = $resourceType;
@@ -174,7 +174,7 @@ class DLD_SelectionStates
     public function actSelectHindrance(#[JsonParam] array $data): void
     {
         if (sizeof($data) == 0) {
-            throw new BgaUserException(clienttranslate('Select a Hindrance'));
+            throw new UserException(clienttranslate('Select a Hindrance'));
         }
         $stateData = $this->getState(null);
         $stateData['selections'] = $data;
@@ -200,7 +200,7 @@ class DLD_SelectionStates
     public function actSelectCard(?string $cardId = null): void
     {
         if (!$cardId) {
-            throw new BgaUserException(clienttranslate('Select a Card'));
+            throw new UserException(clienttranslate('Select a Card'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedCardId'] = $cardId;
@@ -220,7 +220,7 @@ class DLD_SelectionStates
         $oldTotalCost = array_sum($stateData['item']['cost']);
         if ($newTotalCost != $oldTotalCost) {
             if ($oldTotalCost - $newTotalCost > $stateData['reduceBy'] || $newTotalCost < $stateData['totalCost']) {
-                throw new BgaUserException(clienttranslate('Invalid Selection'));
+                throw new UserException(clienttranslate('Invalid Selection'));
             }
         }
 
@@ -236,7 +236,7 @@ class DLD_SelectionStates
     public function actSelectItem(?string $itemId = null, ?string $characterId = null): void
     {
         if (!$itemId) {
-            throw new BgaUserException(clienttranslate('Select an item'));
+            throw new UserException(clienttranslate('Select an item'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedItemId'] = $itemId;
@@ -255,7 +255,7 @@ class DLD_SelectionStates
     {
         // $this->game->character->addExtraTime();
         if (!$deckName) {
-            throw new BgaUserException(clienttranslate('Select a Deck'));
+            throw new UserException(clienttranslate('Select a Deck'));
         }
         $stateData = $this->getState(null);
         $stateData['selectedDeckName'] = $deckName;
@@ -272,7 +272,7 @@ class DLD_SelectionStates
     {
         // $this->character->addExtraTime();
         if (!$sendToCampId) {
-            throw new BgaUserException(clienttranslate('Select an item'));
+            throw new UserException(clienttranslate('Select an item'));
         }
         $state = $this->getState($this->game->gamestate->state(true, false, true)['name']);
         $items = $state['items'];
@@ -284,7 +284,7 @@ class DLD_SelectionStates
                 }, $items)
             )
         ) {
-            throw new BgaUserException(clienttranslate('Invalid Item'));
+            throw new UserException(clienttranslate('Invalid Item'));
         }
         $items = array_map(function ($d) {
             return $d['itemId'];
@@ -316,7 +316,7 @@ class DLD_SelectionStates
         if ($stateName) {
             $state = $this->game->gameData->get($stateName);
             if (array_key_exists('cancellable', $state) && !$state['cancellable']) {
-                throw new BgaUserException(clienttranslate('This action cannot be cancelled'));
+                throw new UserException(clienttranslate('This action cannot be cancelled'));
             }
             $this->game->gameData->set($stateName, [...$state, 'cancelled' => true]);
         }

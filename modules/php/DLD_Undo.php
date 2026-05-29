@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-use BgaUserException;
+use Bga\GameFramework\UserException;
 use Error;
 use Exception;
 
@@ -22,10 +22,10 @@ class DLD_Undo
     public function actUndo(): void
     {
         if ($this->game->gamestate->state(true, false, true)['name'] != 'playerTurn') {
-            throw new BgaUserException(clienttranslate('Only player actions can be undone'));
+            throw new UserException(clienttranslate('Only player actions can be undone'));
         }
         if (!$this->canUndo()) {
-            throw new BgaUserException(clienttranslate('Nothing left to undo, dice rolls, and deck pulls clear the undo history'));
+            throw new UserException(clienttranslate('Nothing left to undo, dice rolls, and deck pulls clear the undo history'));
         }
         $char = $this->game->character->getTurnCharacterId();
         $undoState = $this->game->getFromDB(
@@ -33,7 +33,7 @@ class DLD_Undo
         );
         $storedCharacterId = $undoState['character_name'];
         if ($char != $storedCharacterId) {
-            throw new BgaUserException(clienttranslate('Can\'t undo another player\'s action'));
+            throw new UserException(clienttranslate('Can\'t undo another player\'s action'));
         }
         $undoId = $undoState['undo_id'];
         $itemTable = json_decode($undoState['itemTable'], true);

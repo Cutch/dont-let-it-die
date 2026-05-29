@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Bga\Games\DontLetItDie;
 use Bga\GameFramework\Actions\Types\JsonParam;
 
-use BgaUserException;
+use Bga\GameFramework\UserException;
 
 class DLD_ItemTrade
 {
@@ -79,7 +79,7 @@ class DLD_ItemTrade
     public function actTradeItem(#[JsonParam] array $data): void
     {
         if (sizeof($data['selection']) != 2) {
-            throw new BgaUserException(clienttranslate('You must make 2 selections'));
+            throw new UserException(clienttranslate('You must make 2 selections'));
         }
         $selfId = $this->game->getCurrentPlayer();
         $hasSelf = false;
@@ -113,10 +113,10 @@ class DLD_ItemTrade
             }
         });
         // if (!$hasSelf) {
-        //     throw new BgaUserException(clienttranslate('Select one of your character\'s items to trade'));
+        //     throw new UserException(clienttranslate('Select one of your character\'s items to trade'));
         // }
         if (!$hasItem) {
-            throw new BgaUserException(clienttranslate('Select one item to trade'));
+            throw new UserException(clienttranslate('Select one item to trade'));
         }
         $hookData = [
             'sendToCamp' => $sendToCamp,
@@ -151,16 +151,16 @@ class DLD_ItemTrade
                 $hasDuplicateTool = $result['hasDuplicateTool'];
 
                 if ($this->checkForTradableCharacters($trade1['character']['id'], $itemId2)) {
-                    throw new BgaUserException(clienttranslate('Tribe member cannot obtain items from trade'));
+                    throw new UserException(clienttranslate('Tribe member cannot obtain items from trade'));
                 }
                 if (!$hasOpenSlots) {
-                    throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
+                    throw new UserException(clienttranslate('There is no open slot for that item type'));
                 }
                 if (!$canEquip) {
-                    throw new BgaUserException(clienttranslate('Can\'t equip that item'));
+                    throw new UserException(clienttranslate('Can\'t equip that item'));
                 }
                 if ($hasDuplicateTool) {
-                    throw new BgaUserException(clienttranslate('Cannot have a duplicate tool'));
+                    throw new UserException(clienttranslate('Cannot have a duplicate tool'));
                 }
                 array_push($characterItems, $itemId2);
             }
@@ -233,16 +233,16 @@ class DLD_ItemTrade
             $hasOpenSlots = $result['hasOpenSlots'];
             $hasDuplicateTool = $result['hasDuplicateTool'];
             if ($this->checkForTradableCharacters($trade2['character']['id'], $itemId1)) {
-                throw new BgaUserException(clienttranslate('Tribe member cannot obtain items from trade'));
+                throw new UserException(clienttranslate('Tribe member cannot obtain items from trade'));
             }
             if (!$hasOpenSlots) {
-                throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
+                throw new UserException(clienttranslate('There is no open slot for that item type'));
             }
             if (!$canEquip) {
-                throw new BgaUserException(clienttranslate('Can\'t equip that item'));
+                throw new UserException(clienttranslate('Can\'t equip that item'));
             }
             if ($hasDuplicateTool) {
-                throw new BgaUserException(clienttranslate('Cannot of a duplicate tool'));
+                throw new UserException(clienttranslate('Cannot of a duplicate tool'));
             }
             array_push($characterItems2, $itemId1);
         }
@@ -253,16 +253,16 @@ class DLD_ItemTrade
             $hasDuplicateTool = $result['hasDuplicateTool'];
 
             if ($this->checkForTradableCharacters($trade1['character']['id'], $itemId2)) {
-                throw new BgaUserException(clienttranslate('Tribe member cannot obtain items from trade'));
+                throw new UserException(clienttranslate('Tribe member cannot obtain items from trade'));
             }
             if (!$hasOpenSlots) {
-                throw new BgaUserException(clienttranslate('There is no open slot for that item type'));
+                throw new UserException(clienttranslate('There is no open slot for that item type'));
             }
             if (!$canEquip) {
-                throw new BgaUserException(clienttranslate('Can\'t equip that item'));
+                throw new UserException(clienttranslate('Can\'t equip that item'));
             }
             if ($hasDuplicateTool) {
-                throw new BgaUserException(clienttranslate('Cannot of a duplicate tool'));
+                throw new UserException(clienttranslate('Cannot of a duplicate tool'));
             }
             array_push($characterItems1, $itemId2);
         }

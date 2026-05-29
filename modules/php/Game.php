@@ -20,18 +20,13 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
+use Bga\GameFramework\Actions\Debug;
 use Bga\GameFramework\Actions\CheckAction;
 use Bga\GameFramework\Actions\Types\JsonParam;
 
-use BgaUserException;
+use Bga\GameFramework\UserException;
 use ErrorException;
 use Exception;
-
-set_error_handler(function ($severity, $message, $file, $line) {
-    if (error_reporting() & $severity) {
-        throw new ErrorException($message, 0, $severity, $file, $line);
-    }
-});
 
 include_once dirname(__DIR__) . '/php/DLD_Data.php';
 include_once dirname(__DIR__) . '/php/DLD_Actions.php';
@@ -63,6 +58,7 @@ class Game extends \Bga\GameFramework\Table
     public DLD_ActInterrupt $actInterrupt;
     public DLD_SelectionStates $selectionStates;
     public DLD_Undo $undo;
+    private string $endingTurnCharacter = '';
     public static array $expansionList = ['base', 'mini-expansion', 'hindrance', 'death-valley'];
     /**
      * Your global variables labels:
@@ -129,7 +125,9 @@ class Game extends \Bga\GameFramework\Table
                 array_key_exists('args', $args['i18n_suffix']) &&
                 array_key_exists('resource_type', $args['i18n_suffix']['args'])
             ) {
-                $args['i18n_suffix']['args']['resource_type'] = $this->data->getTokens()[$args['i18n_suffix']['args']['resource_type']]['name'];
+                $args['i18n_suffix']['args']['resource_type'] = $this->data->getTokens()[$args['i18n_suffix']['args']['resource_type']][
+                    'name'
+                ];
             }
             foreach (['character_resource', 'deck', 'action', 'action_name', 'acquireOrDropSentence', 'resource_type'] as $key) {
                 if (str_contains($message, '${' . $key . '}')) {
@@ -443,7 +441,7 @@ class Game extends \Bga\GameFramework\Table
     public function actCook(?string $resourceType): void
     {
         if (!$resourceType) {
-            throw new BgaUserException(clienttranslate('Select a food'));
+            throw new UserException(clienttranslate('Select a food'));
         }
         // $this->character->addExtraTime();
         $this->actions->validateCanRunAction('actCook', null, $resourceType);
@@ -476,13 +474,13 @@ class Game extends \Bga\GameFramework\Table
     public function actRevive(?string $character, ?string $food): void
     {
         if (!$character) {
-            throw new BgaUserException(clienttranslate('Select a character'));
+            throw new UserException(clienttranslate('Select a character'));
         }
         if (!$food) {
-            throw new BgaUserException(clienttranslate('Select a food'));
+            throw new UserException(clienttranslate('Select a food'));
         }
         if (!$this->character->getCharacterData($character)['incapacitated']) {
-            throw new BgaUserException(clienttranslate('That character is not incapacitated'));
+            throw new UserException(clienttranslate('That character is not incapacitated'));
         }
         $this->actions->validateCanRunAction('actRevive');
         $requireCount = array_values(
@@ -499,7 +497,7 @@ class Game extends \Bga\GameFramework\Table
             $left = $this->adjustResource('fish-cooked', -$requireCount);
         }
         if ($left != 0) {
-            throw new BgaUserException(clienttranslate('Not enough resources'));
+            throw new UserException(clienttranslate('Not enough resources'));
         }
 
         $this->character->updateCharacterData($character, function (&$data) {
@@ -531,11 +529,11 @@ class Game extends \Bga\GameFramework\Table
         $availableUnlocks = $this->data->getValidKnowledgeTree();
 
         if (!array_key_exists($knowledgeId, $availableUnlocks)) {
-            throw new BgaUserException(clienttranslate('Requirements not met for this unlock'));
+            throw new UserException(clienttranslate('Requirements not met for this unlock'));
         } elseif (in_array($knowledgeId, $this->getUnlockedKnowledgeIds())) {
-            throw new BgaUserException(clienttranslate('Already unlocked'));
+            throw new UserException(clienttranslate('Already unlocked'));
         } elseif ($resourceCount < $availableUnlocks[$knowledgeId]['unlockCost']) {
-            throw new BgaUserException(clienttranslate('Not enough knowledge points'));
+            throw new UserException(clienttranslate('Not enough knowledge points'));
         }
         $cost = -$availableUnlocks[$knowledgeId]['unlockCost'];
         foreach ($resources as $resource) {
@@ -567,21 +565,21 @@ class Game extends \Bga\GameFramework\Table
             [$this->hooks, 'onCraft'],
             function (Game $_this) use ($itemName) {
                 if (!$itemName) {
-                    throw new BgaUserException(clienttranslate('Select an item'));
+                    throw new UserException(clienttranslate('Select an item'));
                 }
                 $_this->actions->validateCanRunAction('actCraft', $itemName);
                 if (!array_key_exists($itemName, $_this->data->getItems())) {
-                    throw new BgaUserException(clienttranslate('Invalid Item'));
+                    throw new UserException(clienttranslate('Invalid Item'));
                 }
                 $itemType = $_this->data->getItems()[$itemName]['itemType'];
                 $currentBuildings = $_this->gameData->get('buildings');
                 if ($itemType == 'building' && sizeof($currentBuildings) >= $this->getMaxBuildingCount()) {
-                    throw new BgaUserException(clienttranslate('A building has already been crafted'));
+                    throw new UserException(clienttranslate('A building has already been crafted'));
                 }
                 $result = [];
                 $_this->getItemData($result);
                 if (!isset($result['availableEquipment'][$itemName]) || $result['availableEquipment'][$itemName] == 0) {
-                    throw new BgaUserException(clienttranslate('All of those available items have been crafted'));
+                    throw new UserException(clienttranslate('All of those available items have been crafted'));
                 }
                 return [
                     'itemName' => $itemName,
@@ -595,7 +593,7 @@ class Game extends \Bga\GameFramework\Table
                 $itemType = $data['itemType'];
                 foreach ($item['cost'] as $key => $value) {
                     if ($_this->adjustResource($key, -$value)['left'] != 0) {
-                        throw new BgaUserException(clienttranslate('Missing resources'));
+                        throw new UserException(clienttranslate('Missing resources'));
                     }
                 }
                 if (!array_key_exists('spendActionCost', $data) || $data['spendActionCost'] != false) {
@@ -718,15 +716,15 @@ class Game extends \Bga\GameFramework\Table
             $requestedSum += $value * (str_starts_with($key, 'gem') ? $this->getTradeRatio() : 1);
         }
         if ($offeredSum != $this->getTradeRatio()) {
-            throw new BgaUserException(
+            throw new UserException(
                 str_replace('${amount}', (string) $this->getTradeRatio(), clienttranslate('You must offer ${amount} resources'))
             );
         }
         if ($requestedSum != ($offeredGem ? 2 : 1)) {
             if ($offeredGem) {
-                throw new BgaUserException(clienttranslate('You must request two resource'));
+                throw new UserException(clienttranslate('You must request two resource'));
             } else {
-                throw new BgaUserException(clienttranslate('You must request only one resource'));
+                throw new UserException(clienttranslate('You must request only one resource'));
             }
         }
         $this->actions->spendActionCost('actTrade');
@@ -741,10 +739,10 @@ class Game extends \Bga\GameFramework\Table
         foreach ($requested as $key => $value) {
             if ($value > 0) {
                 if (str_contains($key, '-cooked')) {
-                    throw new BgaUserException(clienttranslate('You cannot trade for a cooked resource'));
+                    throw new UserException(clienttranslate('You cannot trade for a cooked resource'));
                 }
                 if (str_contains($key, 'gem-')) {
-                    throw new BgaUserException(clienttranslate('You cannot trade for gems'));
+                    throw new UserException(clienttranslate('You cannot trade for gems'));
                 }
                 $this->adjustResource($key, $value);
                 array_push($requestedArr, ['value' => $this->data->getTokens()[$key]['name'], 'suffix' => $value]);
@@ -785,7 +783,7 @@ class Game extends \Bga\GameFramework\Table
     public function actEat(?string $resourceType = null, ?string $characterId = null): void
     {
         if (!$resourceType) {
-            throw new BgaUserException(clienttranslate('Select a Resource'));
+            throw new UserException(clienttranslate('Select a Resource'));
         }
         if ($characterId) {
             $this->character->setSubmittingCharacterById($characterId);
@@ -1022,7 +1020,7 @@ class Game extends \Bga\GameFramework\Table
                 })
             ) == 0
         ) {
-            throw new BgaUserException(clienttranslate('You need a tool to harvest'));
+            throw new UserException(clienttranslate('You need a tool to harvest'));
         }
         if (
             sizeof(
@@ -1031,7 +1029,7 @@ class Game extends \Bga\GameFramework\Table
                 })
             ) == 0
         ) {
-            throw new BgaUserException(clienttranslate('The equipped tool can\'t be used for harvesting'));
+            throw new UserException(clienttranslate('The equipped tool can\'t be used for harvesting'));
         }
         $this->actDraw('harvest');
     }
@@ -1044,7 +1042,7 @@ class Game extends \Bga\GameFramework\Table
                 })
             ) == 0
         ) {
-            throw new BgaUserException(clienttranslate('You need a weapon to hunt'));
+            throw new UserException(clienttranslate('You need a weapon to hunt'));
         }
         $this->actDraw('hunt');
     }
@@ -1202,7 +1200,7 @@ class Game extends \Bga\GameFramework\Table
                         })
                     ) > 0
                 ) {
-                    throw new BgaUserException(
+                    throw new UserException(
                         sprintf(self::_('%d discoveries must replace existing track discoveries'), sizeof($this->gameData->get('upgrades')))
                     );
                 }
@@ -1214,7 +1212,7 @@ class Game extends \Bga\GameFramework\Table
                         })
                     ) != $this->gameData->get('upgradesCount')
                 ) {
-                    throw new BgaUserException(
+                    throw new UserException(
                         sprintf(self::_('%d discoveries must replace existing track discoveries'), $this->gameData->get('upgradesCount'))
                     );
                 }
@@ -1382,15 +1380,15 @@ class Game extends \Bga\GameFramework\Table
                             ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
                         ]),
                         'i18n_suffix' =>
-                        $resourceChange['left'] == 0
-                            ? []
-                            : [
-                                'prefix' => ' ',
-                                'message' => clienttranslate('${left} could not be collected'),
-                                'args' => [
-                                    'left' => $resourceChange['left'],
+                            $resourceChange['left'] == 0
+                                ? []
+                                : [
+                                    'prefix' => ' ',
+                                    'message' => clienttranslate('${left} could not be collected'),
+                                    'args' => [
+                                        'left' => $resourceChange['left'],
+                                    ],
                                 ],
-                            ],
                     ]);
                 } elseif ($card['deckType'] == 'encounter') {
                     // Change state and check for health/damage modifications
@@ -1677,6 +1675,10 @@ class Game extends \Bga\GameFramework\Table
     }
     public function endTurn()
     {
+        if ($this->endingTurnCharacter && $this->endingTurnCharacter === $this->character->getTurnCharacterId()) {
+            return;
+        }
+        $this->endingTurnCharacter = $this->character->getTurnCharacterId();
         $this->character->setSubmittingCharacter(null);
         $data = [
             'characterId' => $this->character->getTurnCharacterId(),
@@ -2057,7 +2059,9 @@ class Game extends \Bga\GameFramework\Table
     public function getAllPlayers(&$result): void
     {
         $result['characters'] = $this->character->getMarshallCharacters();
-        $result['players'] = $this->getCollectionFromDb('SELECT `player_id` `id`, player_no, `player_name` as `name` FROM `player`');
+        $result['players'] = $this->getCollectionFromDb(
+            'SELECT `player_id` `id`, player_no, `player_name` as `name`, `player_zombie` FROM `player`'
+        );
     }
     public function getDecks(&$result): void
     {
@@ -2499,7 +2503,7 @@ class Game extends \Bga\GameFramework\Table
             ),
             'maxBuildingCount' => $this->getMaxBuildingCount(),
         ];
-        if (!($stateName === 'characterSelect' || $stateName === 'gameSetup')) {
+        if (!($stateName === 'characterSelect' || $stateName === 'gameSetup' || $stateName === 'changeZombiePlayer')) {
             $result['character_name'] = $this->getCharacterHTML();
             $result['actions'] = array_values($this->actions->getValidActions());
             $result['availableSkills'] = $this->actions->getAvailableSkills();
@@ -2559,11 +2563,15 @@ class Game extends \Bga\GameFramework\Table
                 if ($stateName !== 'characterSelect') {
                     $this->gameData->set('turnOrderStart', $this->gameData->get('turnOrder'));
                 }
+            } elseif ($stateName === 'playerTurn' || $stateName === 'changeZombiePlayer') {
+                $this->nextState('characterSelect');
+                $stateName = $this->gamestate->state(true, false, true)['name'];
             }
         }
+        $characters = array_values($this->getCollectionFromDb('SELECT character_name, player_id FROM `character` order by character_name'));
         if (
             (!$this->gameData->get('turnOrderStart') || sizeof($this->gameData->get('turnOrderStart')) < 4) &&
-            !($stateName === 'characterSelect' || $stateName === 'gameSetup')
+            !($stateName === 'characterSelect' || $stateName === 'gameSetup' || $stateName === 'changeZombiePlayer')
         ) {
             $players = $this->loadPlayersBasicInfos();
 
@@ -2586,6 +2594,8 @@ class Game extends \Bga\GameFramework\Table
                 ];
             });
             $this->gameData->set('turnOrderStart', $turnOrder);
+        }
+        if (!($stateName === 'characterSelect' || $stateName === 'gameSetup' || $stateName === 'changeZombiePlayer')) {
         }
         if ($stateName == 'characterSelect' && $this->gameData->get('turnOrderStart')) {
             $this->gameData->set('turnOrderStart', null);
@@ -2671,15 +2681,14 @@ class Game extends \Bga\GameFramework\Table
                 implode(',', $query_values)
             )
         );
-
-        $this->initStat('table', 'day_number', 1);
-        $this->initStat('player', 'damage_done', 0);
-        $this->initStat('player', 'health_lost', 0);
-        $this->initStat('player', 'health_gained', 0);
-        $this->initStat('player', 'actions_used', 0);
-        $this->initStat('player', 'stamina_used', 0);
-        $this->initStat('player', 'resources_collected', 0);
-        $this->initStat('player', 'cards_drawn', 0);
+        $this->bga->tableStats->init('day_number', 1);
+        $this->bga->playerStats->init('damage_done', 0);
+        $this->bga->playerStats->init('health_lost', 0);
+        $this->bga->playerStats->init('health_gained', 0);
+        $this->bga->playerStats->init('actions_used', 0);
+        $this->bga->playerStats->init('stamina_used', 0);
+        $this->bga->playerStats->init('resources_collected', 0);
+        $this->bga->playerStats->init('cards_drawn', 0);
         $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         $this->reloadPlayersBasicInfos();
 
@@ -2743,8 +2752,22 @@ class Game extends \Bga\GameFramework\Table
     {
         $this->undo->clearUndoHistory();
 
-        $stateName = $state['name'];
         $characters = $this->character->getAllCharacterData(true);
+        $stateName = $state['name'];
+        if ($stateName == 'characterSelect') {
+            $players = $this->loadPlayersBasicInfos();
+            $activePlayers = array_map(
+                function ($p) {
+                    return $p['player_id'];
+                },
+                array_filter($players, function ($p) {
+                    return $p['player_zombie'] == 0;
+                })
+            );
+            $nextState = $this->isValidExpansion('hindrance') ? 'startHindrance' : 'playerTurn';
+            $this->gamestate->setPlayersMultiactive($activePlayers, $nextState, true);
+            return;
+        }
         $mapping = [];
         $charactersToMove = [];
         array_walk($characters, function ($char) use ($active_player, &$mapping, &$charactersToMove) {

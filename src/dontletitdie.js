@@ -748,7 +748,9 @@ declare('bgagame.dontletitdie', Gamegui, {
     });
   },
   setupBoard: function (gameData) {
-    this.firstPlayer = Object.values(gameui.gamedatas.players).find((d) => d.player_no == 1).id;
+    this.firstPlayer = Object.values(gameui.gamedatas.players)
+      .filter((d) => d.player_zombie == 0)
+      .sort((a, b) => a.player_no - b.player_no)[0].id;
     const decks = [
       { name: 'explore', expansion: 'hindrance' },
       { name: 'gather', expansion: 'base' },
@@ -1959,7 +1961,7 @@ declare('bgagame.dontletitdie', Gamegui, {
           this.statusBar.addActionButton(_('Done'), () => this.bgaPerformAction('actDone'), { color: 'secondary' });
           break;
         case 'characterSelect':
-          const playerCount = Object.keys(args.players).length;
+          const playerCount = Object.values(args.players).filter((d) => d.player_zombie == 0).length;
           if (playerCount === 3) {
             this.selectCharacterCount = gameui.player_id == this.firstPlayer ? 2 : 1;
           } else if (playerCount === 1) {

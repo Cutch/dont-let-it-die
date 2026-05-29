@@ -82,6 +82,7 @@ namespace Bga\GameFramework\Actions\Types {
             ?string $name = null,
             public ?bool $associative = true,
             public ?bool $alphanum = true, 
+            public ?string $class = null,
         ) {}
     
         public function getValue(string $paramName): mixed { return []; }    
@@ -110,8 +111,11 @@ namespace Bga\GameFramework\States {
 
         public ?\Bga\GameFramework\GameStateMachine $gamestate = null;
 
+        /**
+         * @param int|class-string<\Bga\GameFramework\States\GameState>|null $initialPrivate
+         */
         public function __construct(
-            /*protected \Bga\GameFramework\Table*/ $game, 
+            /*protected*/ \Bga\GameFramework\Table $game, 
             public int $id, 
             public \Bga\GameFramework\StateType $type,
 
@@ -120,7 +124,7 @@ namespace Bga\GameFramework\States {
             public string $descriptionMyTurn = '',
             public array $transitions = [],
             public bool $updateGameProgression = false,
-            public ?int $initialPrivate = null,
+            public int|string|null $initialPrivate = null,
         ) {
         }
 
@@ -177,7 +181,7 @@ namespace Bga\GameFramework {
          * To be called with `[game state id] => GameStateBuilder::gameSetup(10)->build()` if your first game state is 10.
          * If not set in the $machinestates array, it will be automatically created with a transition to state 2.
          * 
-         * @param $nextStateId the first real game state, just after the setup (default 2).
+         * @param int|class-string<\Bga\GameFramework\States\GameState> $nextStateId the first real game state, just after the setup (default 2).
          */
         public static function gameSetup(int|string $nextStateId = 2): self
         {
@@ -292,7 +296,7 @@ namespace Bga\GameFramework {
          */
         public function build(): GameState
         {
-            return new GameState();
+            return new class extends GameState{}();
         }
     }
 
@@ -302,6 +306,7 @@ namespace Bga\GameFramework {
     abstract class Bga {
         public Db\Globals $globals;
         public Notify $notify;
+        public Logs $logs;
         public Legacy $legacy;
         public Tournament $tournament;
         public TableOptions $tableOptions;
@@ -324,7 +329,7 @@ namespace Bga\GameFramework {
          * @param callable $fn The decorator function. Expected signature: `function(string $message, array $args): array`
          * @return void
          */
-        public function addDecorator(callable $fn) {
+        public function addDecorator(callable $fn): void {
            //
         }
 
@@ -350,7 +355,32 @@ namespace Bga\GameFramework {
         public function all(string $notifName, string | NotificationMessage $message = '', array $args = []): void {
             //
         }
+
+        /**
+         * If called, all _private informations sent to the front will be merged to the args (if not called, they will stay into args._private).
+         * If you want to only merge some _private, add `_merge_private => true` to the relevant args instead.
+         */
+        public function alwaysMergePrivate(): void {}
     }
+
+    abstract class Logs {
+        /**
+         * Returns the current move id, when doing an action, that should be stored along informations to undo.
+         * 
+         * @return int the current move id
+         */
+        function getCurrentMoveId(): int {
+            return 0;
+        }
+
+        /**
+         * Remove all logs from a move id that was stored during an action using `getCurrentMoveId()`.
+         * The game should be in the exact same point as it was before the stored action.
+         */
+        function remove(int $startMoveId): void {
+        }
+    }
+
 
     abstract class Legacy {
         /**
@@ -692,8 +722,7 @@ namespace Bga\GameFramework {
         /**
          * You can call this method to make any player active.
          *
-         * NOTE: you CANNOT use this method in an "activeplayer" or "multipleactiveplayer" state. You must use a "game"
-         * type game state for this.
+         * NOTE: you must transition to a state in the action triggering this call, so the change of active player is notified to the front.
          * 
          * @param int $playerId the new active player.
          */
@@ -832,9 +861,9 @@ namespace Bga\GameFramework {
          * include - jumping to specific state from "do_anytime" actions, jumping to dispatcher state or jumping to
          * recovery state from zombie player function.
          * 
-         * @param int|class-string<Bga\GameFramework\States\GameState> $next_state the state id, or class name if using Class states
+         * @param int|class-string<\Bga\GameFramework\States\GameState> $next_state the state id, or class name if using Class states
          */
-        final public function jumpToState(int $next_state): void
+        final public function jumpToState(int|string $next_state): void
         {
             //
         }
@@ -849,7 +878,7 @@ namespace Bga\GameFramework {
          * - Note: this is usually used after some player actions to move to next private state
          * 
          * @param int $playerId the player id
-         * @param string|int|class-string<Bga\GameFramework\States\GameState> $transition the transition name, or state id, or class name if using Class states
+         * @param string|int|class-string<\Bga\GameFramework\States\GameState> $transition the transition name, or state id, or class name if using Class states
          */
         final public function nextPrivateState(int $playerId, int|string $transition): void
         {
@@ -866,7 +895,7 @@ namespace Bga\GameFramework {
          * - Note: this is usually used after initializing the private state to move players to specific private state
          * according to the game logic
          * 
-         * @param string|int|class-string<Bga\GameFramework\States\GameState> $transition the transition name, or state id, or class name if using Class states
+         * @param string|int|class-string<\Bga\GameFramework\States\GameState> $transition the transition name, or state id, or class name if using Class states
          */
         final public function nextPrivateStateForAllActivePlayers(int|string $transition): void
         {
@@ -879,7 +908,7 @@ namespace Bga\GameFramework {
          *
          *
          * @param array<int> $playerIds the player ids to transition
-         * @param string|int|class-string<Bga\GameFramework\States\GameState> $transition the transition name, or state id, or class name if using Class states
+         * @param string|int|class-string<\Bga\GameFramework\States\GameState> $transition the transition name, or state id, or class name if using Class states
          */
         final public function nextPrivateStateForPlayers(array $playerIds, int|string $transition): void
         {
@@ -918,10 +947,6 @@ namespace Bga\GameFramework {
          * `multipleactiveplayer` state in which multiple players have to perform some action. Do not use this method if
          * you're going to make some more changes in the active player list. (I.e., if you want to take away
          * `multipleactiveplayer` status immediately afterward, use `setPlayersMultiactive` instead).
-         * 
-         * @param int[] $players the players to activate
-         * @param string|int|class-string<Bga\GameFramework\States\GameState> $next_state the transition name, or state id, or class name if using Class states
-         * @param bool $bInactivePlayersNotOnTheList if the players not in the list should be made inactive
          */
         final public function setAllPlayersMultiactive(): void
         {
@@ -931,7 +956,7 @@ namespace Bga\GameFramework {
         /**
          * All playing players are made inactive. Transition to next state.
          * 
-         * @param string|int|class-string<Bga\GameFramework\States\GameState> $next_state the transition name, or state id, or class name if using Class states
+         * @param string|int|class-string<\Bga\GameFramework\States\GameState> $next_state the transition name, or state id, or class name if using Class states
          */
         final public function setAllPlayersNonMultiactive(string $next_state): bool
         {
@@ -945,11 +970,11 @@ namespace Bga\GameFramework {
          * possible to call it directly from multiplayer action handler. If this player was the last active player, the
          * method trigger the "next_state" transition to go to the next game state.
          * 
-         * @param int $player_id the players to make inactive
-         * @param string|int|class-string<Bga\GameFramework\States\GameState> $next_state the transition name, or state id, or class name if using Class states
+         * @param int $player the player to make inactive
+         * @param string|int|class-string<\Bga\GameFramework\States\GameState>|callable $nextState the transition name, or state id, or class name if using Class states
          * @return bool if the call moved to the next state
          */
-        final public function setPlayerNonMultiactive(int $player, string $nextState): bool
+        final public function setPlayerNonMultiactive(int $player, int|string|callable $nextState): bool
         {
             return false;
         }
@@ -965,11 +990,11 @@ namespace Bga\GameFramework {
          * - In case "players" is empty, the method trigger the "next_state" transition to go to the next game state.
          * 
          * @param int[] $players the players to activate
-         * @param string|int|class-string<Bga\GameFramework\States\GameState> $next_state the transition name, or state id, or class name if using Class states
+         * @param string|int|class-string<\Bga\GameFramework\States\GameState>|callable $nextState the transition name, or state id, or class name if using Class states
          * @param bool $bInactivePlayersNotOnTheList if the players not in the list should be made inactive
          * @return bool if the call moved to the next state
          */
-        final public function setPlayersMultiactive(array $players, string $nextState, bool $bInactivePlayersNotOnTheList = false): bool
+        final public function setPlayersMultiactive(array $players, int|string|callable $nextState, bool $bInactivePlayersNotOnTheList = false): bool
         {
             return false;
         }
@@ -985,9 +1010,9 @@ namespace Bga\GameFramework {
          * - Note: this method can run action or args methods of the target state for specified player
          * 
          * @param int $playerId the player id
-         * @param int $newStateId the new state id
+         * @param int|class-string<\Bga\GameFramework\States\GameState> $newStateId the new state id
          */
-        final public function setPrivateState(int $playerId, int $newStateId): void
+        final public function setPrivateState(int $playerId, int|string $newStateId): void
         {
             //
         }
@@ -1073,10 +1098,10 @@ namespace Bga\GameFramework {
          *
          * Do not call this if you're calling one of the other setters above.
          * 
-         * @param string|int|class-string<Bga\GameFramework\States\GameState> $next_state the transition name, or state id, or class name if using Class states
-         * @return bool if the call moved to the next state
+         * @param string|int|class-string<\Bga\GameFramework\States\GameState>|callable $nextStateIfNone the transition name, or state id, or class name if using Class states
+         * @return void
          */
-        final public function updateMultiactiveOrNextState(string $nextStateIfNone): void
+        final public function updateMultiactiveOrNextState(int|string|callable $nextStateIfNone): void
         {
             //
         }
@@ -1347,8 +1372,7 @@ namespace Bga\GameFramework {
         /**
          * Make the next player active in the natural player order.
          *
-         * NOTE: You **cannot** use this method in an `activeplayer` or `multipleactiveplayer` state. You must use a
-         * `game` type game state for this.
+         * NOTE: you must transition to a state in the action triggering this call, so the change of active player is notified to the front.
          *
          * @return int the new active player id
          */
@@ -1398,6 +1422,8 @@ namespace Bga\GameFramework {
         /**
          * Get the "active_player", whatever what is the current state type.
          *
+         * **As this function returns the value as a string, it's better to use magical $currentPlayerId, in act functions or getAllDatas, to get the value as an int.**
+         *
          * Note: it does NOT mean that this player is active right now, because state type could be "game" or
          * "multiplayer".
          *
@@ -1405,17 +1431,13 @@ namespace Bga\GameFramework {
          * 
          * @return string the active player id typed as string
          */
-        final public function getActivePlayerId(): string|int
+        final public function getActivePlayerId(): string/*|int*/
         {
             return '0'; 
         }
 
         /**
-         * Get the "active_player" name
-         *
-         * Note: avoid using this method in a "multiplayer" state because it does not mean anything.
-         * 
-         * @return string the active player name
+         * @deprecated use getPlayerNameById($activePlayerId) with $activePlayerId magic param, or getPlayerNameByNo if you use $activePlayerNo
          */
         final public function getActivePlayerName(): string
         {
@@ -1453,13 +1475,15 @@ namespace Bga\GameFramework {
          * Get the "current_player". The current player is the one from which the action originated (the one who sent
          * the request). In general, you shouldn't use this method, unless you are in "multiplayer" state.
          *
-         * **NOTE: This is not necessarily the active player!**
+         * **As this function returns the value as a string, it's better to use magical $currentPlayerId, in act functions or getAllDatas, to get the value as an int.**
+         *
+         * NOTE: This is not necessarily the active player!
          *
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#File-Structure
          * 
          * @return string the current player id, typed as string
          */
-        final public function getCurrentPlayerId(bool $bReturnNullIfNotLogged = false): string|int
+        final public function getCurrentPlayerId(bool $bReturnNullIfNotLogged = false): string/*|int*/
         {
             return '0';
         }
@@ -1495,9 +1519,9 @@ namespace Bga\GameFramework {
          * @return int
          * @see ./states.inc.php
          */
-        public function getGameProgression()
+        public function getGameProgression() //: int
         {
-            //
+            return 0;
         }
 
         /**
@@ -1507,7 +1531,7 @@ namespace Bga\GameFramework {
          * NOTE: this method use globals "cache" if you directly manipulated globals table OR call this function after
          * `undoRestorePoint()` - it won't work as expected.
          * 
-         * @param string $value_label the label
+         * @param string $label the label
          * @param ?int $default a default value if the label doesn't have an associated value
          * @return int|string the value
          */
@@ -1519,7 +1543,7 @@ namespace Bga\GameFramework {
         /**
          * Returns the value of a user preference for a player. It will return the value currently selected in the
          * select combo box, in the top-right menu.
-         * @deprecated use $this->userPreferences->get(int $playerId, int $prefId)
+         * @deprecated use $this->bga->userPreferences->get(int $playerId, int $prefId)
          */
         final public function getGameUserPreference(int $playerId, int $prefId): ?int
         {
@@ -1614,7 +1638,7 @@ namespace Bga\GameFramework {
         /**
          * Get player playing after given player in natural playing order.
          *
-         * @param int $player_id a player id
+         * @param int $playerId a player id
          * @return int the player after
          */
         final public function getPlayerAfter(int $playerId): int
@@ -1625,7 +1649,7 @@ namespace Bga\GameFramework {
         /**
          * Get player playing before given player in natural playing order.
          *
-         * @param int $player_id a player id
+         * @param int $playerId a player id
          * @return int the player before
          */
         final public function getPlayerBefore(int $playerId): int
@@ -1656,6 +1680,17 @@ namespace Bga\GameFramework {
         }
 
         /**
+         * Get the player name by player no.
+         * 
+         * @param int $playerNo the player no 
+         * @return string the player name
+         */
+        final public function getPlayerNameByNo(int $playerNo): string
+        {
+            return '';
+        }
+
+        /**
          * Get 'player_no' (number) by player id.
          * 
          * @param int $player_id the player id 
@@ -1664,6 +1699,16 @@ namespace Bga\GameFramework {
         final public function getPlayerNoById(int $player_id): int|string
         {
             return '0';
+        }
+
+        /**
+         * Get the player id by player no.
+         * 
+         * @param int $playerNo the player no 
+         * @return int the player id
+         */
+        public function getPlayerIdByNo(int $playerNo): int {
+            return 1;
         }
 
         /**
@@ -1681,7 +1726,7 @@ namespace Bga\GameFramework {
          *
          * @return int the number of players at the table
          */
-        public function getPlayerCount(): int
+        final public function getPlayerCount(): int
         {
             return 0;
         }
@@ -1713,7 +1758,7 @@ namespace Bga\GameFramework {
         /**
          * Return the value of statistic specified by $name. Useful when creating derivative statistics such as average.
          *
-         * @deprecated use tableStats->get / playerStats->get
+         * @deprecated use $this->bga->tableStats->get / $this->bga->playerStats->get
          * 
          * @param string $name the name of your statistic, as it has been defined in your stats.json file.
          * @param ?int $player_id the player to get the stat. If null, it will return the table stat.
@@ -1726,7 +1771,7 @@ namespace Bga\GameFramework {
         /**
          * Give standard extra time to this player.
          *
-         * @param int $player_id the player id
+         * @param int $playerId the player id
          * @return void
          */
         final public function giveExtraTime(int $playerId, ?int $specificTime = null): void
@@ -1742,7 +1787,7 @@ namespace Bga\GameFramework {
          * NOTE: this method use globals "cache" if you directly manipulated globals table OR call this function after
          * `undoRestorePoint()` - it won't work as expected.
          * 
-         * @param string $value_label the label
+         * @param string $label the label
          * @param int $increment the increment to add to the current value
          * @return int the new value 
          */
@@ -1755,11 +1800,11 @@ namespace Bga\GameFramework {
          * Increment (or decrement) specified statistic value by `$inc` value. Same behavior as `Table::setStat()`
          * function.
          *
-         * @deprecated use tableStats->inc / playerStats->inc
+         * @deprecated use $this->bga->tableStats->inc / $this->bga->playerStats->inc
          * 
-         * @param mixed $delta the value of the add to the current stat value.
+         * @param mixed $inc the value of the add to the current stat value.
          * @param string $name the name of your statistic, as it has been defined in your stats.json file.
-         * @param ?int $player_id the player to inc the stat. If null, it will inc the table stat.
+         * @param ?int $playerId the player to inc the stat. If null, it will inc the table stat.
          */
         final public function incStat(int $inc, string $name, ?int $playerId = null, bool $bDoNotLoop = false): void
         {
@@ -1776,12 +1821,12 @@ namespace Bga\GameFramework {
          * statistics. As a consequence - if do not want statistic to be applied, do not init it, or call set or inc
          * on it.
          *
-         * @deprecated use tableStats->init / playerStats->init
+         * @deprecated use $this->bga->tableStats->init / $this->bga->playerStats->init
          *
-         * @param string $table_or_player must be set to "table" if this is a table statistic, or "player" if this is a player statistic.
+         * @param string $tableOrPlayer must be set to "table" if this is a table statistic, or "player" if this is a player statistic.
          * @param string $name the name of your statistic, as it has been defined in your stats.json file.
          * @param mixed `$value` the initial value of the statistic.
-         * @param ?int $player_id to initiate a single player. By default, null means all players.
+         * @param ?int $playerId to initiate a single player. By default, null means all players.
          */
         final public function initStat(string $tableOrPlayer, string $name, int $value, ?int $playerId = null): void
         {
@@ -1790,7 +1835,7 @@ namespace Bga\GameFramework {
 
         /**
          * Returns true if game is turn based, false if it is realtime
-         * @deprecated use $this->tableOptions->isTurnBased()
+         * @deprecated use $this->bga->tableOptions->isTurnBased()
          */
         final public function isAsync(): bool
         {
@@ -1799,7 +1844,7 @@ namespace Bga\GameFramework {
 
         /**
          * Returns true if game is realtime, false if it is async.
-         * @deprecated use $this->tableOptions->isRealTime()
+         * @deprecated use $this->bga->tableOptions->isRealTime()
          */
         final public function isRealtime(): bool
         {
@@ -1827,8 +1872,6 @@ namespace Bga\GameFramework {
          *   player_name: string, 
          *   player_color: string, 
          *   player_no: string,
-         *   player_avatar: string,
-         *   player_canal: string,
          *   player_is_admin: string,
          *   player_zombie: int,
          *   player_eliminated: int,
@@ -1839,9 +1882,9 @@ namespace Bga\GameFramework {
          *   concede: int,
          * }>
          */
-        final public function loadPlayersBasicInfos()
+        final public function loadPlayersBasicInfos(): array
         {
-            //
+            return [];
         }
 
         /**
@@ -1859,7 +1902,7 @@ namespace Bga\GameFramework {
         /**
          * Send a notification to all players of the game and spectators (public).
          * 
-         * @deprecated use $this->notify->all
+         * @deprecated use $this->bga->notify->all
          */
         final public function notifyAllPlayers(string $notificationType, string $notificationLog, array $notificationArgs): void
         {
@@ -1869,7 +1912,7 @@ namespace Bga\GameFramework {
         /**
          * Send a notification to a single player of the game.
          * 
-         * @deprecated use $this->notify->player
+         * @deprecated use $this->bga->notify->player
          */
         final public function notifyPlayer(int $playerId, string $notificationType, string $notificationLog, array $notificationArgs): void
         {
@@ -1901,7 +1944,7 @@ namespace Bga\GameFramework {
         /**
          * Remove some legacy data with the given key.
          * 
-         * @deprecated use $this->legacy->delete(string $key, int $playerId). ⚠️ parameter order has changed.
+         * @deprecated use $this->bga->legacy->delete(string $key, int $playerId). ⚠️ parameter order has changed.
          */
         final public function removeLegacyData(int $playerId, string $key): void
         {
@@ -1912,7 +1955,7 @@ namespace Bga\GameFramework {
          * Same as `Table::removeLegacyData()`, except that it deletes the data for the whole team within the current
          * table and does not use a key.
          * 
-         * @deprecated use $this->legacy->delete
+         * @deprecated use $this->bga->legacy->delete
          */
         final public function removeLegacyTeamData(): void
         {
@@ -1922,7 +1965,7 @@ namespace Bga\GameFramework {
         /**
          * Get data associated with $key for the current game.
          * 
-         * @deprecated use $this->legacy->get(string $key, int $playerId, mixed $defaultValue = null). ⚠️ parameter order has changed, and it will now return the real data instead of the JSON-encoded one.
+         * @deprecated use $this->bga->legacy->get(string $key, int $playerId, mixed $defaultValue = null). ⚠️ parameter order has changed, and it will now return the real data instead of the JSON-encoded one.
          */
         final public function retrieveLegacyData($playerId, $key): array
         {
@@ -1933,7 +1976,7 @@ namespace Bga\GameFramework {
          * Same as `Table::storeLegacyData()`, except that it stores some data for the whole team within the current
          * table and does not use a key.
          * 
-         * @deprecated use $this->legacy->getTeam(mixed $defaultValue = null). ⚠️ it will now return the real data instead of the JSON-encoded one.
+         * @deprecated use $this->bga->legacy->getTeam(mixed $defaultValue = null). ⚠️ it will now return the real data instead of the JSON-encoded one.
          */
         final public function retrieveLegacyTeamData(): array
         {
@@ -1944,8 +1987,8 @@ namespace Bga\GameFramework {
          * Initialize global value. This is not required if you ok with default value if 0. This should be called from
          * `Table::setupNewGame()` function.
          * 
-         * @param string $value_label the label
-         * @param string $value_value the initial value
+         * @param string $label the label
+         * @param int $value the initial value
          * @return void
          */
         final public function setGameStateInitialValue(string $label, int $value): void
@@ -1956,8 +1999,8 @@ namespace Bga\GameFramework {
         /**
          * Set the current value of a global.
          * 
-         * @param string $value_label the label
-         * @param int the value to store
+         * @param string $label the label
+         * @param int $value the value to store
          * @return void 
          */
         final public function setGameStateValue(string $label, int $value): void
@@ -1968,7 +2011,7 @@ namespace Bga\GameFramework {
         /**
          * Set a statistic `$name` to `$value`.
          *
-         * @deprecated use tableStats->set / playerStats->set
+         * @deprecated use $this->bga->tableStats->set / $this->bga->playerStats->set
          * 
          * @param mixed $value the value of the statistic.
          * @param string $name the name of your statistic, as it has been defined in your stats.json file.
@@ -2068,14 +2111,13 @@ namespace Bga\GameFramework {
         /**
          * Make the previous player active (in the natural player order).
          *
-         * NOTE: You **cannot** use this method in an `activeplayer` or `multipleactiveplayer` state. You must use a
-         * `game` type game state for this.
+         * NOTE: you must transition to a state in the action triggering this call, so the change of active player is notified to the front.
          *
          * @return int the new active player id
          */
-        final public function activePrevPlayer(): void
+        final public function activePrevPlayer(): int
         {
-            //
+            return 0;
         }
 
         /**
@@ -2087,12 +2129,12 @@ namespace Bga\GameFramework {
          *
          * 
          * @param array<int> $players the player ids
-         * @param bool if a last line should be added to make a loop
+         * @param bool $bLoop if a last line should be added to make a loop
          * @return array<int, int>
          */
-        final public function createNextPlayerTable(array $players, bool $bLoop = true): void
+        final public function createNextPlayerTable(array $players, bool $bLoop = true): array
         {
-            //
+            return [];
         }
 
         /**
@@ -2105,12 +2147,7 @@ namespace Bga\GameFramework {
         //abstract protected function getAllDatas(): array;
 
         /**
-         * Get the "current_player" color.
-         *
-         * Note: avoid using this method in a "multiplayer" state because it does not mean anything.
-         * 
-         * @return string the current player color
-         * @throws \BgaSystemException if the current player is not at the table (i.e. spectator).
+         * @deprecated use getPlayerColorById($currentPlayerId) with $currentPlayerId magic param. The player color is probably only useful in the front side anyway.
          */
         final public function getCurrentPlayerColor(): string
         {
@@ -2118,12 +2155,7 @@ namespace Bga\GameFramework {
         }
 
         /**
-         * Get the "current_player" name.
-         *
-         * Note: avoid using this method in a "multiplayer" state because it does not mean anything.
-         *
-         * @return string the current player name.
-         * @throws \BgaSystemException if the current player is not at the table (i.e. spectator).
+         * @deprecated use getPlayerNameById($currentPlayerId) with $currentPlayerId magic param, or getPlayerNameByNo if you use $currentPlayerNo
          */
         final public function getCurrentPlayerName($bReturnEmptyIfNotLogged = false): string
         {
@@ -2186,9 +2218,9 @@ namespace Bga\GameFramework {
          * This method is called only once, when a new game is launched. In this method, you must setup the game
          * according to the game rules, so that the game is ready to be played.
          *
-         * @param array<int, array{ player_canal: string, player_name: string, player_avatar: string, player_colors: array<string> }> $players
+         * @param array<int, array{ player_name: string, player_colors: array<string> }> $players
          * @param array $options
-         * @return void
+         * @return mixed the first state (id or class)
          */
         abstract protected function setupNewGame($players, $options = []);
 
@@ -2214,7 +2246,7 @@ namespace Bga\GameFramework {
          * 
          * @param string $objectName must be 'module.common.deck'
          * 
-         * @deprecated use $this->deckFactory->createDeck($tableName)
+         * @deprecated use $this->bga->deckFactory->createDeck($tableName)
          */
         protected function getNew(string $objectName): \Bga\GameFramework\Components\Deck {
             return $this->deckFactory->createDeck('');
@@ -2338,7 +2370,7 @@ namespace Bga\GameFramework\Db {
         /**
          * Increment the global `$name` by `$step`.
          *
-         * @throws BgaSystemException if the global `$name` is not a numeric value.
+         * @throws \BgaSystemException if the global `$name` is not a numeric value.
          */
         public function inc(string $name, int $step): int
         {
@@ -2608,7 +2640,18 @@ namespace Bga\GameFramework\Components {
 
 }
 
-namespace Bga\GameFramework\Components\Counters {        
+namespace Bga\GameFramework\Components\Counters {
+
+    use Bga\GameFramework\NotificationMessage;
+
+    enum CounterVisibility: string
+    {
+        CASE VISIBLE = 'visible';
+        CASE SELF = 'self';
+        case HIDDEN = 'hidden';
+    }
+
+
     /**
      * Factory to create counters.
      */
@@ -2619,9 +2662,10 @@ namespace Bga\GameFramework\Components\Counters {
          * @param string $name the name of the counter, used to link it to the JS counter
          * @param ?int $min the minimum value of the counter (null = no minimum)
          * @param ?int $max the maximum value of the counter (null = no maximum)
+         * @param CounterVisibility $visibility define the visibility of the counter
          * @return PlayerCounter a new PlayerCounter object
          */
-        public function createPlayerCounter(string $name, ?int $min = 0, ?int $max = null): PlayerCounter {
+        public function createPlayerCounter(string $name, ?int $min = 0, ?int $max = null, CounterVisibility $visibility = CounterVisibility::VISIBLE,): PlayerCounter {
             return new class extends PlayerCounter {}();
         }
 
@@ -2638,11 +2682,11 @@ namespace Bga\GameFramework\Components\Counters {
         }
     }
 
-    abstract class OutOfRangeCounterException extends \BgaSystemException
+    abstract class OutOfRangeCounterException extends \Bga\GameFramework\SystemException
     {
     }
     
-    abstract class UnknownPlayerException extends \BgaSystemException
+    abstract class UnknownPlayerException extends \Bga\GameFramework\SystemException
     {
     }
 
@@ -2651,11 +2695,38 @@ namespace Bga\GameFramework\Components\Counters {
      */
     abstract class PlayerCounter {
         /**
+         * Return if the counter is visible by anyone.
+         */
+        public function isVisible(): bool {
+            return false;
+        }
+
+        /**
+         * Return if the counter is invisible.
+         */
+        public function isHidden(): bool {
+            return false;
+        }
+
+        /**
+         * Return if the counter is visible by the current player only.
+         */
+        public function isSelf(): bool {
+            return false;
+        }
+
+        /**
+         * Set the counter visibility.
+         */
+        public function setVisibility(CounterVisibility $visibility): void {
+        }
+
+        /**
          * Initialize the DB elements. Must be called during game `setupNewGame`.
          * 
          * @param int $initialValue, if different than 0
          */
-        public function initDb(array $playerIds, int $initialValue = 0) {
+        public function initDb(array $playerIds, int $initialValue = 0): void {
         }
 
         /**
@@ -2679,7 +2750,7 @@ namespace Bga\GameFramework\Components\Counters {
          * @throws OutOfRangeCounterException if the value is outside the min/max
          * @throws UnknownPlayerException if $playerId is not in the player ids initialized by initDb
          */
-        public function set(int $playerId, int $value, ?\Bga\GameFramework\NotificationMessage $message = new \Bga\GameFramework\NotificationMessage()): int {
+        public function set(int $playerId, int $value, ?NotificationMessage $message = new NotificationMessage()): int {
             return 0;
         }
 
@@ -2695,7 +2766,7 @@ namespace Bga\GameFramework\Components\Counters {
          * @throws OutOfRangeCounterException if the value is outside the min/max
          * @throws UnknownPlayerException if $playerId is not in the player ids initialized by initDb
          */
-        public function inc(int $playerId, int $inc, ?\Bga\GameFramework\NotificationMessage $message = new \Bga\GameFramework\NotificationMessage()): int {
+        public function inc(int $playerId, int $inc, ?NotificationMessage $message = new NotificationMessage()): int {
             return 0;
         }
 
@@ -2734,7 +2805,7 @@ namespace Bga\GameFramework\Components\Counters {
          * @return int the new value
          * @throws OutOfRangeCounterException if the value is outside the min/max
          */
-        public function setAll(int $value, ?\Bga\GameFramework\NotificationMessage $message = new \Bga\GameFramework\NotificationMessage()): int {
+        public function setAll(int $value, ?NotificationMessage $message = new NotificationMessage()): int {
             return 0;
         }
 
@@ -2744,8 +2815,9 @@ namespace Bga\GameFramework\Components\Counters {
          * 
          * @param array $result the object to update.
          * @param ?string $fieldName the field name to set in $result["players"], if different than the counter name.
+         * @param ?int $currentPlayerId the current player id, needed if the counter has self visibility
          */
-        public function fillResult(array &$result, ?string $fieldName = null) {
+        public function fillResult(array &$result, ?string $fieldName = null, ?int $currentPlayerId = null) {
         }
     }
 
@@ -2773,11 +2845,11 @@ namespace Bga\GameFramework\Components\Counters {
          * Set the value of the counter, and send a notif to update the value on the front side.
          * 
          * @param int $value the new value
-         * @param @param ?NotificationMessage $message the notif to send to the front, with a message and optional args. Empty message for no log, null for no notif at all (the front will not be updated).
+         * @param ?NotificationMessage $message the notif to send to the front, with a message and optional args. Empty message for no log, null for no notif at all (the front will not be updated).
          * @return int the new value
          * @throws OutOfRangeCounterException if the value is outside the min/max
          */
-        public function set(int $value, ?\Bga\GameFramework\NotificationMessage $message = new \Bga\GameFramework\NotificationMessage()): int {
+        public function set(int $value, ?NotificationMessage $message = new NotificationMessage()): int {
             return 0;
         }
 
@@ -2787,11 +2859,11 @@ namespace Bga\GameFramework\Components\Counters {
          * Note: if the inc is 0, no notif will be sent.
          * 
          * @param int $inc the value to add to the current value
-         * @param @param ?NotificationMessage $message the notif to send to the front, with a message and optional args. Empty message for no log, null for no notif at all (the front will not be updated).
+         * @param ?NotificationMessage $message the notif to send to the front, with a message and optional args. Empty message for no log, null for no notif at all (the front will not be updated).
          * @return int the new value
          * @throws OutOfRangeCounterException if the value is outside the min/max
          */
-        public function inc(int $inc, ?\Bga\GameFramework\NotificationMessage $message = new \Bga\GameFramework\NotificationMessage()): int {
+        public function inc(int $inc, ?NotificationMessage $message = new NotificationMessage()): int {
             return 0;
         }
 
@@ -2877,6 +2949,9 @@ namespace Bga\GameFramework\GameResult {
 }
 
 namespace {
+
+    use Bga\GameFramework\NotificationMessage;
+
     exit("This file should not be included, only analyzed by your IDE");
 
     /**
@@ -3147,11 +3222,7 @@ namespace {
     }
 
     /**
-     * Base class to notify a system exception. The message will be hidden from the user, but show in the logs. Use this
-     * if the message contains technical information.
-     *
-     * You shouldn't use this type of exception except if you think the information shown could be critical. Indeed: a
-     * generic error message will be shown to the user, so it's going to be difficult for you to see what happened.
+     * @deprecated Use \Bga\GameFramework\SystemException instead
      */
     class BgaSystemException extends feException
     {
@@ -3165,10 +3236,7 @@ namespace {
     }
 
     /**
-     * You must throw this exception when you detect something that is not supposed to happened in your code.
-     *
-     * The error message is shown to the user as an "Unexpected error", in order that he can report it in the forum.
-     * The error message is logged in BGA error logs. If it happens regularly, we will report it to you.
+     * @deprecated Use \Bga\GameFramework\VisibleSystemException instead
      */
     class BgaVisibleSystemException extends BgaSystemException
     {
@@ -3182,12 +3250,7 @@ namespace {
     }
 
     /**
-     * Base class to notify a user error.
-     *
-     * You must throw this exception when a player wants to do something that they are not allowed to do. The error
-     * message will be shown to the player as a "red message". 
-     * The error message should be translated (with clientranslate() and args).
-     * Throwing such an exception is NOT considered a bug, so it is not traced in BGA error logs.
+     * @deprecated Use \Bga\GameFramework\UserException instead
      */
     class BgaUserException extends BgaVisibleSystemException
     {

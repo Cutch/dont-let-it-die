@@ -2,7 +2,7 @@
 namespace Bga\Games\DontLetItDie;
 
 use Bga\Games\DontLetItDie\Game;
-use BgaUserException;
+use Bga\GameFramework\UserException;
 
 if (!function_exists('rivalTribe')) {
     function rivalTribe(Game $game, array $nightCard, int $roll)
@@ -1008,7 +1008,7 @@ class DLD_DecksData
                             }
                         }
                         if ($characterTotal != $characterCount || $characterTotal != $count) {
-                            throw new BgaUserException(clienttranslate('Remove 1 hindrance from each character'));
+                            throw new UserException(clienttranslate('Remove 1 hindrance from each character'));
                         }
                     }
                 },

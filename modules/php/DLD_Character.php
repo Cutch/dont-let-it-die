@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-use BgaUserException;
+use Bga\GameFramework\UserException;
 use Exception;
 
 class DLD_Character
@@ -278,7 +278,7 @@ class DLD_Character
         $characterData['recovering'] = $characterData['health'] > 0 && $characterData['incapacitated'];
 
         if (
-            $characterData['player_zombie'] &&
+            $characterData['player_zombie'] == 1 &&
             array_key_exists('necromancer_player_id', $characterData) &&
             $characterData['necromancer_player_id']
         ) {

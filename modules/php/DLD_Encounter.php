@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
-use BgaUserException;
+use Bga\GameFramework\UserException;
 
 class DLD_Encounter
 {
@@ -82,7 +82,7 @@ class DLD_Encounter
             })
         );
         if (sizeof($selectedWeapon) == 0) {
-            throw new BgaUserException(clienttranslate('That weapon choice is not available'));
+            throw new UserException(clienttranslate('That weapon choice is not available'));
         }
         $selectedWeapon = $selectedWeapon[0];
         $items = $this->game->gameData->getCreatedItems();
@@ -97,20 +97,20 @@ class DLD_Encounter
             foreach ($bothWeapons as $k => $weapon) {
                 $itemObj = $this->game->data->getItems()[$items[$weapon['itemId']]];
                 if (!(!array_key_exists('requires', $itemObj) || $itemObj['requires']($this->game, $itemObj))) {
-                    throw new BgaUserException(clienttranslate('A weapon is missing its requirements'));
+                    throw new UserException(clienttranslate('A weapon is missing its requirements'));
                 }
             }
         } else {
             $itemObj = $this->game->data->getItems()[$items[$weaponId]];
             if (!(!array_key_exists('requires', $itemObj) || $itemObj['requires']($this->game, $itemObj))) {
-                throw new BgaUserException(clienttranslate('A weapon is missing its requirements'));
+                throw new UserException(clienttranslate('A weapon is missing its requirements'));
             }
         }
 
         if (array_key_exists('useCost', $selectedWeapon)) {
             foreach ($selectedWeapon['useCost'] as $key => $value) {
                 if ($this->game->adjustResource($key, -$value)['left'] != 0) {
-                    throw new BgaUserException(clienttranslate('Missing resources'));
+                    throw new UserException(clienttranslate('Missing resources'));
                 }
             }
         }

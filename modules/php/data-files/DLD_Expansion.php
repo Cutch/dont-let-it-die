@@ -2,7 +2,7 @@
 namespace Bga\Games\DontLetItDie;
 
 use Bga\Games\DontLetItDie\Game;
-use BgaUserException;
+use Bga\GameFramework\UserException;
 class DLD_ExpansionData
 {
     public function getData(): array
@@ -952,7 +952,7 @@ class DLD_ExpansionData
                         (isset($data['trade1']['character']['id']) && $data['trade1']['character']['id'] == $card['characterId']) ||
                         (isset($data['trade2']['character']['id']) && $data['trade2']['character']['id'] == $card['characterId'])
                     ) {
-                        throw new BgaUserException(clienttranslate('Cannot trade with') . $card['characterId']);
+                        throw new UserException(clienttranslate('Cannot trade with') . $card['characterId']);
                     }
                 },
             ],
