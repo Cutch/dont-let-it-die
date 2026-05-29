@@ -750,7 +750,7 @@ declare('bgagame.dontletitdie', Gamegui, {
   setupBoard: function (gameData) {
     this.firstPlayer = Object.values(gameui.gamedatas.players)
       .filter((d) => d.player_zombie == 0)
-      .sort((a, b) => a.player_no - b.player_no)[0].id;
+      .sort((a, b) => a.player_no - b.player_no)[0]?.id;
     const decks = [
       { name: 'explore', expansion: 'hindrance' },
       { name: 'gather', expansion: 'base' },
