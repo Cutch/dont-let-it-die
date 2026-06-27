@@ -775,7 +775,7 @@ class DLD_ExpansionData
                         return false;
                     }
                     $variables = $game->gameData->getResources();
-                    $array = $game->actions->getActionSelectable('actEat');
+                    $array = $game->actions->getActionSelectable('actEat', null, $card['characterId']);
                     $array = array_values(
                         array_filter(
                             $array,

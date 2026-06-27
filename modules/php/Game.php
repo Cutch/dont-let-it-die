@@ -2533,6 +2533,28 @@ class Game extends \Bga\GameFramework\Table
         $stateName = $this->gamestate->state(true, false, true)['name'];
         // TODO remove this check after initial games are no longer in progress
         $turnOrder = $this->gameData->get('turnOrder');
+        if ($stateName === 'eatSelection') {
+            // Can remove after 10 days
+            $stateData = $this->selectionStates->getState(null);
+            $array = $this->actions->getActionSelectable('actEat', null, $stateData['characterId']);
+            $variables = $this->gameData->getResources();
+            $array = array_values(
+                array_filter(
+                    $array,
+                    function ($v) use ($variables) {
+                        if (array_key_exists($v['id'], $variables)) {
+                            return $v['actEat']['count'] <= $variables[$v['id']];
+                        }
+                    },
+                    ARRAY_FILTER_USE_BOTH
+                )
+            );
+            if (sizeof($array) === 0) {
+                $stateData['cancellable'] = true;
+                $this->selectionStates->setState(null, $stateData);
+                $this->selectionStates->actCancel();
+            }
+        }
         if (sizeof(array_filter($turnOrder)) != 4) {
             if ($stateName === 'tradePhase') {
                 $this->nextState('characterSelect');
