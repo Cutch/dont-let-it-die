@@ -53,7 +53,13 @@ class DLD_Encounter
     }
     public function killCheck(array $data)
     {
-        return $data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange'];
+        if ($data['soothe']) {
+            return false;
+        } elseif ($data['escape']) {
+            return false;
+        } else {
+            return $data['encounterHealth'] <= $data['characterDamage'] && $data['characterRange'] >= $data['requiresRange'];
+        }
     }
     public function countDamageTaken($data)
     {
