@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Bga\Games\DontLetItDie;
 
 use Bga\GameFramework\UserException;
 use Exception;
+use Throwable;
 
 class DLD_Character
 {
@@ -136,10 +138,18 @@ class DLD_Character
     }
     public function getAllCharacterData(bool $_skipHooks = false): array
     {
-        $turnOrder = $this->getAllCharacterIds();
-        return array_map(function ($char) use ($_skipHooks) {
-            return $this->getCharacterData($char, $_skipHooks);
-        }, $turnOrder);
+        try {
+            $turnOrder = $this->getAllCharacterIds();
+            return array_map(function ($char) use ($_skipHooks) {
+                return $this->getCharacterData($char, $_skipHooks);
+            }, $turnOrder);
+        } catch (Throwable $e) {
+            $this->turnOrderFix();
+            $turnOrder = $this->getAllCharacterIds();
+            return array_map(function ($char) use ($_skipHooks) {
+                return $this->getCharacterData($char, false);
+            }, $turnOrder);
+        }
     }
     public function getAllCharacterDataForPlayer(string|int $playerId): array
     {
@@ -360,7 +370,7 @@ class DLD_Character
         );
         $hasOpenSlots =
             (array_key_exists($itemType, $slotsAllowed) ? $slotsAllowed[$itemType] : 0) -
-                (array_key_exists($itemType, $slotsUsed) ? $slotsUsed[$itemType] : 0) >
+            (array_key_exists($itemType, $slotsUsed) ? $slotsUsed[$itemType] : 0) >
             0;
         $hasDuplicateTool =
             sizeof(
