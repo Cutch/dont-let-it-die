@@ -80,7 +80,6 @@ class Game extends \Bga\GameFramework\Table
             'trackDifficulty' => 102,
             'trusting' => 103,
             'randomUpgrades' => 104,
-            'game_version' => 300,
         ]);
         $this->gameData = new DLD_GameData($this);
         $this->actions = new DLD_Actions($this);
@@ -125,9 +124,7 @@ class Game extends \Bga\GameFramework\Table
                 array_key_exists('args', $args['i18n_suffix']) &&
                 array_key_exists('resource_type', $args['i18n_suffix']['args'])
             ) {
-                $args['i18n_suffix']['args']['resource_type'] = $this->data->getTokens()[$args['i18n_suffix']['args']['resource_type']][
-                    'name'
-                ];
+                $args['i18n_suffix']['args']['resource_type'] = $this->data->getTokens()[$args['i18n_suffix']['args']['resource_type']]['name'];
             }
             foreach (['character_resource', 'deck', 'action', 'action_name', 'acquireOrDropSentence', 'resource_type'] as $key) {
                 if (str_contains($message, '${' . $key . '}')) {
@@ -145,7 +142,7 @@ class Game extends \Bga\GameFramework\Table
     }
     public function getVersion(): int
     {
-        $current_version = $this->bga->tableOptions->get(300);
+        $current_version = $this->bga->tableOptions->getGameVersion();
         return intval($current_version);
     }
     protected function initTable(): void
@@ -1380,15 +1377,15 @@ class Game extends \Bga\GameFramework\Table
                             ['name' => $this->decks->getDeckName($card['deck']), 'dataId' => $card['id'], 'dataType' => 'card'],
                         ]),
                         'i18n_suffix' =>
-                            $resourceChange['left'] == 0
-                                ? []
-                                : [
-                                    'prefix' => ' ',
-                                    'message' => clienttranslate('${left} could not be collected'),
-                                    'args' => [
-                                        'left' => $resourceChange['left'],
-                                    ],
+                        $resourceChange['left'] == 0
+                            ? []
+                            : [
+                                'prefix' => ' ',
+                                'message' => clienttranslate('${left} could not be collected'),
+                                'args' => [
+                                    'left' => $resourceChange['left'],
                                 ],
+                            ],
                     ]);
                 } elseif ($card['deckType'] == 'encounter') {
                     // Change state and check for health/damage modifications
